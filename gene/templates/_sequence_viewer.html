@@ -1,0 +1,15 @@
+{% load i18n %}
+{% load static %}
+
+{% block addon_css %}
+    <link rel="stylesheet" href="{% static 'gene/css/sequence_viewer.css' %}" type="text/css"/>
+{% endblock addon_css %}
+
+<div id="sequence_viewer">
+    <!-- This is where the Dash app will be embedded -->
+    <p>Sequence viewer: </p>
+    <div id="sequence_viewer_input">
+        <input style="width: 300px;" type="text">
+    </div>
+</div>
+<script src="{% static 'sequence_viewer.js' %}"></script>

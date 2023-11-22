@@ -1,0 +1,43 @@
+from django.urls import path, re_path
+from django.views.decorators.cache import cache_page
+from .views import SelectionAutocomplete, DrugStatistics, DrugStatistics2
+from . import views
+from .views import search_drugs, drug_atc_expansion, atc_lookup, atc_detail_view, atc_search_view, get_drug_atc_association, get_drug_network, get_drugs_network
+
+urlpatterns = [
+    path('search_drugs', views.search_drugs, name='search_drugs'),
+    path('atc-lookup', views.atc_lookup, name='atc-lookup'),
+    path('atc-anatomical-groups', views.AtcAnatomicalGroupListView.as_view(), name='atc-anatomical-groups'),
+    path('atc_search_view', views.atc_search_view, name='atc_search_view'),
+    path('drug_network', views.get_drug_network, name='drug_network'), #'viz_index1_v3.html'
+    path('drug_network/<str:drug_bank_id>/general_data', views.get_drug_general_data, name='drug_network_general_data'),
+    path('drug_network/<str:drug_bank_id>/drug_data', views.get_drug_data, name='drug_network_drug_data'),
+    path(
+        'drug_network/<str:drug_bank_id>/interaction_data',
+        views.get_drug_interaction_data,
+        name='drug_network_interaction_data',
+    ),
+    path('drug_network/<str:drug_bank_id>/protein_data', views.get_drug_protein_data, name='drug_network_protein_data'),
+
+    path('atc-detail-view/', views.atc_detail_view, name='atc-detail-view'),
+    path('get_drug_atc_association/', views.get_drug_atc_association, name='get-drug-atc-association'),
+    path('get_drug_network/', views.get_drug_network, name='get-drug-network'),
+    path('get-atc-sub-levels/', views.get_atc_sub_levels, name='get-atc-sub-levels'),
+    path('drugbrowser', views.drugbrowser, name='drugbrowser'),  # load all the drugs - cached but still slow - might need to remove
+    path('drugstatistic', (DrugStatistics.as_view()), name='drugstatistic'),  # okie but with dummy data
+    path('drugstatistic2', (DrugStatistics2.as_view()), name='drugstatistic2'),  # okie but with dummy data
+    path('drug/autocomplete', (SelectionAutocomplete), name='autocomplete'),
+    path('drug/<str:drugbank_id>/', views.drug_atc_expansion, name='drug_detail'),  # still ok but template does not have much info
+    # path('get-drug-network-frame', views.get_drug_network_frame, name='get-drug-network-frame'),
+
+    # Network of list of drug
+    path('drugs-network', views.get_drugs_network, name='drugs_network'), #drugs_network.html
+    path('drugs-network/general-data', views.get_drugs_general_data, name='drugs_network_general_data'),
+    path('drugs-network/drug-data', views.get_drugs_data, name='drugs_network_drug_data'),
+    path('drugs-network/protein-data', views.get_drugs_protein_data, name='drugs_network_protein_data'),
+    path(
+        'drugs-network/interaction-data',
+        views.get_drugs_interaction_data,
+        name='drugs_network_interaction_data',
+    ),
+]

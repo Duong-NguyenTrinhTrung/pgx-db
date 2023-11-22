@@ -1,0 +1,73 @@
+{% load i18n %}
+{% load static %}
+
+<p style="font-size:16px; padding-left:0; margin:40px 0 0;">Encoded protein: {{ protein_name }} -
+    length: {{ seq_length }}</p>
+
+<div class="text-area" id="myTextArea">
+    {% for d in chunks %}
+        <div
+                {% if not forloop.last %}
+                    style="text-align: right; width: 155px; margin-right: 4px; background-color: bisque; margin-bottom: 4px;"
+                {% else %}
+                    style="text-align: left; margin-bottom: 4px; background-color: bisque; width: 155px;"
+                {% endif %}
+        >
+            {% if not forloop.last %}
+                <span style="margin-right: 7px; font-size: 14px;">{{ d.position }}</span> <br>
+            {% else %}
+                <br>
+            {% endif %}
+            {% if not forloop.last %}
+                <div class="amino_acid_chunk"
+                     style="display: flex; align-items: center; justify-content: space-between; margin: 0 7px;">
+                    {% for a in d.chunk %}
+                        {% if a in "GAVLIFWMP" %}
+                            <div><a href=""><span class="yellow color-coded-text">{{ a }}</span></a></div>
+                        {% else %}
+                            {% if a in "STCYNQ" %}
+                                <div><a href=""><span class="green color-coded-text">{{ a }}</span></a></div>
+                            {% else %}
+                                {% if a in "DE" %}
+                                    <div><a href=""><span class="red color-coded-text">{{ a }}</span></a></div>
+                                {% else %}
+                                    {% if a in "KHR" %}
+                                        <div><a href=""><span class="blue color-coded-text">{{ a }}</span></a></div>
+                                    {% else %}
+                                        <div><a href=""><span class="color-coded-text">{{ a }}</span></a></div>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="amino_acid_chunk" style="display: flex; gap: 5px; align-items: left;  margin: 0 7px;">
+                    {% for a in d.chunk %}
+                        {% if a in "GAVLIFWMP" %}
+                            <div><a href=""><span class="yellow color-coded-text">{{ a }}</span></a></div>
+                        {% else %}
+                            {% if a in "STCYNQ" %}
+                                <div><a href=""><span class="green color-coded-text">{{ a }}</span></a></div>
+                            {% else %}
+                                {% if a in "DE" %}
+                                    <div><a href=""><span class="red color-coded-text">{{ a }}</span></a></div>
+                                {% else %}
+                                    {% if a in "KHR" %}
+                                        <div><a href=""><span class="blue color-coded-text">{{ a }}</span></a></div>
+                                    {% else %}
+                                        <div><a href=""><span class="color-coded-text">{{ a }}</span></a></div>
+                                    {% endif %}
+                                {% endif %}
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        </div>
+
+    {% endfor %}
+
+
+</div>

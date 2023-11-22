@@ -1,0 +1,220 @@
+{% extends "home/base.html" %}
+{% load static %}
+{% csrf_token %}
+
+{% block addon_css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'drug/css/atc_lookup.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'drug/css/atc_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+    {% autoescape off %}
+        <div class="grid-container">
+        {% include 'atc_detail/left_navigation.html' %}
+            <div id="atc_right" class="col-8">
+                <!-- block for showing the table -->
+                <div id='drug-table'>
+                </div>
+                <!-- block for showing network -->
+                <div class="forcenetworkgraph" id="graphvisibility" style="display: none; width: 97%; margin: 10px 0; height: 90%">
+                    <iframe id="myIframe" style="
+                                                display: none;
+                                                width: 97%;
+                                                height: 100%;
+                                                border: 1px solid black;
+                                                margin-right: 5px;">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    {% endautoescape %}
+{% endblock %}
+
+{% block addon_js %}
+
+    <script>
+        // JavaScript for toggling the visibility of nested lists
+        document.querySelectorAll('.tree .desc').forEach(function (el) {
+            el.addEventListener('click', function () {
+                var parentLi = el.parentElement; // Get the parent <li> element
+                var ul = parentLi.querySelector('ul'); // Select the nested <ul>
+                if (ul) {
+                    if (ul.style.display === "" || ul.style.display === "none") {
+                        ul.style.display = 'block';
+                    } else {
+                        if (ul.style.display === 'block') {
+                            ul.style.display = 'none';
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+
+    <script>
+            // Function to show visualization
+            function toggleDivVisibility(element, url) {
+                var drugBankId = element.getAttribute('data-drugbank_id');
+                var iframe = $("#myIframe");
+                // var url = "https://entertainmentbuz.com/visual/d3/index1.html";
+                iframe.attr('src', url);  // Set the iframe source using jQuery
+
+                //showing the visualization module
+                iframe.css('display', 'block');
+                var element = $("#graphvisibility");
+                element.css('display', 'block');
+                element.css('color', 'grey');
+                // accessing the  content of d3
+                // iframe.onload = function () {
+                //     var iframeContentWindow = iframe.contentWindow;
+                //     if (iframeContentWindow) {
+                //         console.log("Found the iframe content");
+                //     } else {
+                //         console.log("Not finding the iframe content");
+                //     }
+                // };
+            }
+    </script>
+
+    <!-- Showing all drugs associated with an ATC code -->
+    <script>
+        $(document).ready(function () {
+            function clean_drug_network() {
+                var drug_network = $('#graphvisibility');
+                drug_network.css('display', 'none');
+            }
+
+            function list_associated_drugs_in_table(response) {
+                var associations = response.associations;
+                var right_panel = document.getElementById('drug-table');
+                right_panel.innerHTML = "";
+                var right_panel_text = document.createElement("span");
+                right_panel_text.style.fontSize = "16px";
+                
+                right_panel_text.style.color = '#337ab7'; 
+                right_panel_text.style.fontWeight = "bold";
+                var right_panel_text_guide = document.createElement("span");
+                right_panel_text_guide.style.fontSize = "14px";
+                var drug_bank_ids = [];
+                // Check if the 'associations' key exists in the JSON response
+                if (associations.length > 0) {
+                    var tableHtml = '<table id="associated_drug_tbl" ><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID</th><th>Drug name</th><th>Short description</th></tr></thead><tbody>';
+                    // var atc_url = "{% url 'drugs_network' %}";
+                    for (var i = 0; i < associations.length; i++) {
+                        var row = associations[i];
+                        drug_bank_ids.push(row.drug_bankID);
+                        var drug_url = "{% url 'drug_network' %}" + "?drug_bank_id=" + row.drug_bankID;
+                        tableHtml += `
+                        <tr style="white-space: nowrap;">
+                            <td>
+                                <a href="#" class="associated_drug" 
+                                data-drugbank_id="${row.drug_bankID}"
+                                data-json-general="{% static 'json-sample/json_GeneralFile.json' %}"
+                                data-json-drug="{% static 'json-sample/json_drugData.json' %}"
+                                data-json-protein="{% static 'json-sample/json_proteinData.json' %}"
+                                data-json-interaction="{% static 'json-sample/json_interactionData.json' %}"
+                                onclick="toggleDivVisibility(this, '${drug_url}')" 
+                                data-target="#atc_right">
+                                ${row.drug_bankID}
+                                </a> <a href="https://go.drugbank.com/drugs/${row.drug_bankID}" style="font-size:14px; color:grey; text-decoration: underline;" target="_blank";>[Ref]</a>
+                            </td>
+                            <td>${row.name}</td>
+                            <td class="long-content" >${row.description}</td>
+                        </tr>
+                        `
+                    }
+                    tableHtml += '</tbody></table>';
+                    var verb = "";
+                    if (associations.length == 1) {
+                        verb = " is ";
+                    } else {
+                        verb = " are ";
+                    }
+                    var atc_url = "{% url 'drugs_network' %}"+"?drug_bank_ids="+drug_bank_ids.toString();
+                    right_panel_text.innerHTML = "There " + verb + associations.length + " drugs associated with " + response.atc_code;
+                    right_panel_text_guide.innerHTML = `</br> <i>Click on each drugbank ID in the below table to show the interacted proteins for that specific drug or click <a onclick="toggleDivVisibility(this, '${atc_url}')">here</a> to switch back to the network of </i>` + response.atc_code;
+                    right_panel_text_guide.style.fontWeight = "italic";
+                    right_panel_text_guide.style.display = "block";
+                    right_panel_text_guide.style.marginBottom = "10px";
+                    var right_panel_content = document.createElement("div");
+                    right_panel_content.id = "atc_right_table";
+                    right_panel_content.style.marginRight = '30px';
+                    right_panel_content.innerHTML = tableHtml;
+                    right_panel.appendChild(right_panel_text);
+                    if (associations.length > 1) {
+                        right_panel.appendChild(right_panel_text_guide);
+                    }
+                    right_panel.appendChild(right_panel_content);
+
+                } else {
+                    right_panel_text.innerHTML = "There is no targeting drugs associated with " + response.atc_code;
+                    right_panel.appendChild(right_panel_text);
+                    clean_drug_network()
+                }
+            }
+
+            // Get all the network buttons and their corresponding network text elements
+            const networkButtons = document.querySelectorAll(".network-button");
+            const networkTextElements = document.querySelectorAll(".atc-network");
+
+            // Add event listeners to each button
+            networkButtons.forEach((button, index) => {
+                button.addEventListener("click", () => showATCLevelNetwork(index));
+                button.addEventListener("mouseover", () => showText(index));
+                button.addEventListener("mouseout", () => hideText(index));
+            });
+
+            // Function to show the ATC level drug-target network 
+            function showATCLevelNetwork(index) {
+                const button = networkButtons[index];
+                const atcCode = button.getAttribute("data-atc-code");
+                
+                const url = button.getAttribute('data-remote-url');
+                console.log("begin");
+                $.ajax(
+                    {
+                        url: url,
+                        type: "GET",
+                        data: {
+                            'atc_code': atcCode,
+                        },
+                        success: function (response) {
+                            list_associated_drugs_in_table(response);
+                            draw_atc_level_network(button, response);
+                            console.log("done");
+                        },
+                        error: function (xhr, status, error) {
+                            console.log('AJAX Error:', error);
+                        }
+                    })
+                }
+                
+                // 
+                function draw_atc_level_network(button, response) {
+                    var drug_bank_ids = [];
+                    associations = response.associations
+                    if (associations.length > 0) {
+                        for (var i = 0; i < associations.length; i++) {
+                            var row = associations[i];
+                            drug_bank_ids.push(row.drug_bankID);
+                        }
+                        var atc_url = "{% url 'drugs_network' %}" + "?drug_bank_ids=" + drug_bank_ids.toString();
+                        toggleDivVisibility(button, atc_url)
+                    }
+                }
+            
+
+            // Function to show the text based on the button index
+            function showText(index) {
+                networkTextElements[index].style.display = "inline";
+            }
+
+            // Function to hide the text based on the button index
+            function hideText(index) {
+                networkTextElements[index].style.display = "none";
+            }
+        });
+
+    </script>
+{% endblock %}

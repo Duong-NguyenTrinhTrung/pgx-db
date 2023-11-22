@@ -1,0 +1,122 @@
+{% extends "home/base.html" %}
+{% load static %}
+{% block addon_css %}
+<link rel="stylesheet" href="{% static 'home/css/jquery.dataTables.min.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'drug/css/drug_atc_horizontal.css' %}" type="text/css" />
+<style media="screen">
+</style>
+{% endblock %}
+
+{% block content %}
+<h2>Drug Browser</h2>
+<button onclick="tableToExcel()" type="button" class="btn btn-primary" style="margin-top:10px;margin-top:3px"> Export to
+  Excel </button>
+
+<div>
+  <div id="drug_general">
+    <h2>Drug name: {{drug_name}}</h2>
+    <p>Some brief description here</p>
+    <p>Drug indication and therapeutic uses here</p>
+    <p>Optimal: high-quality image of the drug and logo here</p>
+  </div>
+
+  <div id="drug_atc_expansion" class="col-md-6">
+    <h2>ATC code and expanded hierachy here</h2>
+    <span class="display">Show: </span>
+    <input checked id='radio-1' data-tooltip='first level' name='test' type='radio' /><label for="radio-1">Anatomical group
+      level</label>
+    <input id='radio-2' data-tooltip='second level' name='test' type='radio' /><label for="radio-2">Therapeutic group
+      level</label>
+    <input id='radio-3' data-tooltip='third level' name='test' type='radio' /><label for="radio-3">Pharmacological group
+      level</label>
+    <input id='radio-4' data-tooltip='forth level' name='test' type='radio' /><label for="radio-4">Chemical group
+      level</label>
+    <input id='radio-5'  data-tooltip='fifth level'  name='test' type='radio' /><label for="radio-5">Chemical
+      substance level</label>
+    <!-- <input id='show-drug-list'  data-tooltip='drugs in that level'  name='test' type='button' /><label for="show-drug-list">Include a list of drugs</label> -->
+
+    <ul class="wtree">
+      {% for ana_group in atc_anatomical_group_list %}
+      <li><span>{{ ana_group }}</span>
+        <button  class="show-drug-list">Show drug list&nbsp;&nbsp;&nbsp;&nbsp;>>&nbsp;&nbsp;</button>
+        <ul> 
+          {% for thera_group in atc_therapeutic_group_list%}
+          {% if ana_group.0 in thera_group|slice:"0:3" %}
+          <li>
+            <span>{{thera_group}}</span>
+            <button class="show-drug-list">Show drug list&nbsp;&nbsp;&nbsp;&nbsp;>>&nbsp;&nbsp;</button>
+            <ul>
+              {% for pharma_group in atc_pharmacological_group_list%}
+              {% if thera_group|slice:"0:3" in pharma_group|slice:"0:4" %}
+              <li>
+                <span>{{pharma_group}}</span>
+                <button class="show-drug-list">Show drug list&nbsp;&nbsp;&nbsp;&nbsp;>>&nbsp;&nbsp;</button>
+                <ul>
+                  {% for che_group in atc_chemical_group_list%}
+                  {% if pharma_group|slice:"0:4" in che_group|slice:"0:5" %}
+                  <li>
+                    <span>{{che_group}}</span>
+                    <button class="show-drug-list">Show drug list&nbsp;&nbsp;&nbsp;&nbsp;>>&nbsp;&nbsp;</button>
+                    <ul>
+                      {% for che_sub_group in atc_chemical_substance_list %}
+                      {% if che_group|slice:"0:5" in che_sub_group|slice:"0:7" %}
+                      <li>
+                        <span>{{che_sub_group}}</span>
+                        <button class="show-drug-list">Show drug list&nbsp;&nbsp;&nbsp;&nbsp;>>&nbsp;&nbsp;</button>
+                                  </li>
+                                {% endif %}
+                              {% endfor %}
+                            </ul>
+                          </li>
+                            {% endif %}
+                          {% endfor %}
+                        </ul>
+                      </li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div id="atc-association-drugs" class="col-md-6" style="background-color: violet; height: 300px;">
+    List of drugs belonging to the ATC group
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block addon_js %}
+<script>
+  // alert("hi hi hi");
+</script>
+
+<script src="{% static 'home/js/jquery-ui.min.js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap-submenu.js' %}"></script>
+<script src="{% static 'home/js/navbar-autocomplete.js' %}"></script>
+<script src="{% static 'home/js/svg-pan-zoom.min.js' %}"></script>
+<script src="{% static 'home/js/bootstrap-treeview.min.js' %}"></script>
+<script src="{% static 'home/js/papaparse.min.js' %}"></script>
+
+<!-- 3. flowplayer -->
+<script src="{% static 'flowplayer/flowplayer.min.js' %}"></script>
+<!-- the overlay plugin -->
+<script src="{% static 'flowplayer/flowplayer.overlay.min.js' %}"></script>
+<!-- the bootstrap vendor overlay wrapper -->
+<script src="{% static 'flowplayer/flowplayer.overlay.bootstrap.js' %}"></script>
+<!-- Comply with GDPR Minified Cookie Consent from https://github.com/osano/cookieconsent -->
+<script src="{% static 'home/js/gpcrdb.js' %}"></script>
+<script src="{% static 'home/js/cookieconsent.min.js' %}"></script>
+
+
+<script>
+                                                          var selected = document.querySelector("#radio-1:checked + label");
+
+</script>
+
+{% endblock addon_js %}

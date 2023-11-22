@@ -1,0 +1,412 @@
+{% extends "home/base.html" %} 
+{% load static %} 
+{% block addon_css %}
+<link rel="stylesheet" href="{% static 'home/css/jquery.dataTables.min.css' %}" type="text/css" />
+<style media="screen">
+</style>
+
+<style>
+
+  :root {
+    --hierachy-width: 100%;
+    --hierachy-height: 302px;
+  }
+  #drug_general{
+    margin: 10px;
+  }
+
+  #drug_atc_expansion{
+    margin: 10px;
+  }
+  {/* Style for tabs  */}
+  #tabs {
+    border: 1px solid rgb(155, 194, 227);
+    {% comment %} padding: 10px; {% endcomment %}
+  }
+  
+  #tab-header {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+  
+  #tab-header li {
+    float: left; 
+  }
+
+  #tab-header li.more a, #tab-header li.prev a {
+    display: block;
+    text-align: center;
+    width: 70px;
+    border: none;
+    background-color: transparent;
+    font-weight: bold;
+  }
+  
+  #tab-header li a {
+    display: block;
+    padding: 5px;
+    width: 180px;
+    background-color: rgb(135, 182, 222);
+    text-decoration: none;
+    color: #000;
+    border-top-right-radius: 12px;
+    border-top-left-radius: 3px;
+    border: 1px solid  #d6d6d6;
+    border-bottom: none;
+  }
+  
+  #tab-header li.active a {
+    // background-color: rgb(51, 122, 183);
+    background-color: rgb(72, 143, 204);
+  }
+  
+  .tab-content {
+    display: none;
+    padding: 10px;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  #tab-header li.disable a{
+    pointer-events: none;
+    color: rgba(0, 0, 0, 0.3);
+  }
+
+  .leaf_border{
+    border-top-right-radius: 30px ;
+    border-bottom-left-radius: 40px ;
+    border-top-left-radius: 10px ;
+    border-bottom-right-radius: 10px ;
+    }
+
+  #atc_hierachy_l1{
+    background: rgb(155, 194, 227);
+    border: 1px solid rgb(155, 194, 227);
+    width: var(--hierachy-width);
+    height: var(--hierachy-height);
+  }
+
+  #atc_hierachy_l2{
+    background: rgb(177, 208, 233);
+    border-top: 1px solid rgb(155, 194, 227);
+    border-left: 1px solid rgb(155, 194, 227);
+    width: calc(var(--hierachy-width) - 1*85px);
+    height: calc(var(--hierachy-height) - 1*60px);
+  }
+
+  #atc_hierachy_l3{
+    background: rgb(200, 221, 240);
+    border-top: 1px solid rgb(155, 194, 227);
+    border-left: 1px solid rgb(155, 194, 227);
+    width: calc(var(--hierachy-width) - 85px);
+    height: calc(var(--hierachy-height) - 2*60px);
+  }
+
+  #atc_hierachy_l4{
+    background: rgb(222, 235, 246);
+    border-top: 1px solid rgb(155, 194, 227);
+    border-left: 1px solid rgb(155, 194, 227);
+    width: calc(var(--hierachy-width) - 85px);
+    height: calc(var(--hierachy-height) - 3*60px);
+  }
+
+  #atc_hierachy_l5{
+    background: rgb(244, 248, 252);
+    border-top: 1px solid rgb(155, 194, 227);
+    border-left: 1px solid rgb(155, 194, 227);
+    width: calc(var(--hierachy-width) - 85px);
+    height: calc(var(--hierachy-height) - 4*60px);
+  }
+
+  .outer {
+    position: relative;
+  }
+
+  .inner {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+  }
+
+  .atc_hierachy p {
+    margin: 20px;
+  }
+
+  .atc_hierachy p a{
+    color: #2e6da4;
+    text-decoration: none;
+  }
+</style>
+{% endblock %}
+
+{% block content %} 
+<h2>Drug Browser</h2>
+<button onclick="tableToExcel()" type="button" class="btn btn-primary" style="margin-top:10px;margin-top:3px"> Export to Excel </button>
+
+<div>
+  <div id="drug_general">
+    <h2>Drug name: {{drug_name}}</h2>
+    <p>Some brief description here</p>
+    <p>Drug indication and therapeutic uses here</p>
+    <p>Optimal: high-quality image of the drug and logo here</p>
+  </div>
+
+  <div id="drug_atc_expansion">
+      <h2>ATC code and expanded hierachy here</h2>
+      <div id="tabs">
+        <ul id="tab-header">
+          <li class="prev"><a href="#prev">&lt;&lt;</a></li>
+          {% for code in atc_code %}
+              <li><a href="#tab-{{forloop.counter}}">{{code.0}}</a></li>
+          {% endfor %}
+          <li class="more"><a href="#more">&gt;&gt;</a></li>
+        </ul>
+
+        {% for level in atcCodeInAllLevels %}
+          <div id="tab-{{forloop.counter}}" class="tab-content">
+            {% comment %} {% for key, value in level.items %}
+              <p>{{ key }}: {{ value }}</p>
+            {% endfor %} {% endcomment %}
+
+            {% comment %} Div to display all level associated with a drug {% endcomment %}
+            <div id="atc_hierachy_l1" class="outer atc_hierachy leaf_border">
+              <p>{{level.atc_anatomical_group}}<a href="#" class="more_drug_link"> <i>[Click to see all drugs in this category]</i></a></p>
+              <div id="atc_hierachy_l2" class="inner atc_hierachy leaf_border">
+                <p>{{level.atc_therapeutic_group}}<a href="#" class="more_drug_link"> <i>[Click to see all drugs in this category]</i></a></p>
+                <div id="atc_hierachy_l3" class="inner atc_hierachy leaf_border">
+                  <p>{{level.atc_pharmacological_group}}<a href="#" class="more_drug_link"> <i>[Click to see all drugs in this category]</i></a></p>
+                  <div id="atc_hierachy_l4" class="inner atc_hierachy leaf_border">
+                    <p>{{level.atc_chemical_group}}<a href="#" class="more_drug_link"> <i>[Click to see all drugs in this category]</i></a></p>
+                    <div id="atc_hierachy_l5" class="inner atc_hierachy leaf_border">
+                      <p>{{level.atc_chemical_substance}}<a href="#" class="more_drug_link"> <i>[Click to see all drugs in this category]</i></a></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            {% comment %} Modal popup to display all drugs associated with a level {% endcomment %}
+            {% comment %} <div id="chemical_group_drug_list">
+              <p style="color:red;">Drugs in chemical group:</p>
+              {% for drug_name, drug_bank_id in level.atc_chemical_group_drugs %}
+                <p>{{drug_name}}, {{drug_bank_id}}</p>
+              {% endfor %}
+            </div>
+            <div id="pharmacological_group_drug_list">
+              <p style="color:red;">Drugs in pharmacological group:</p>
+              {% for drug_name, drug_bank_id in level.atc_pharmacological_group_drugs %}
+                <p>{{drug_name}}, {{drug_bank_id}}</p>
+              {% endfor %}
+            </div>
+            <div id="therapeutic_group_drug_list">
+              <p style="color:red;">Drugs in therapeutic group:</p>
+              {% for drug_name, drug_bank_id in level.atc_therapeutic_group_drugs %}
+                <p>{{drug_name}}, {{drug_bank_id}}</p>
+              {% endfor %}
+            </div>
+            <div id="anatomical_group_drug_list">
+              <p style="color:red;">Drugs in anatomical group:</p>
+              {% for drug_name, drug_bank_id in level.atc_anatomical_group_drugs %}
+                <p>{{drug_name}}, {{drug_bank_id}}</p>
+              {% endfor %}
+            </div> {% endcomment %}
+          </div>
+        {% endfor %}
+        
+      </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block addon_js %}
+
+  <script src="{% static 'home/js/jquery-ui.min.js' %}"></scrip>
+  <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'bootstrap/js/bootstrap-submenu.js' %}"></script>
+  <script src="{% static 'home/js/navbar-autocomplete.js' %}"></script>
+  <script src="{% static 'home/js/svg-pan-zoom.min.js' %}"></script>
+  <script src="{% static 'home/js/bootstrap-treeview.min.js' %}"></script>
+  <script src="{% static 'home/js/papaparse.min.js' %}"></script>
+  
+  <!-- 3. flowplayer -->
+  <script src="{% static 'flowplayer/flowplayer.min.js' %}"></script>
+  <!-- the overlay plugin -->
+  <script src="{% static 'flowplayer/flowplayer.overlay.min.js' %}"></script>
+  <!-- the bootstrap vendor overlay wrapper -->
+  <script src="{% static 'flowplayer/flowplayer.overlay.bootstrap.js' %}"></script>
+  <!-- Comply with GDPR Minified Cookie Consent from https://github.com/osano/cookieconsent -->
+  <script src="{% static 'home/js/gpcrdb.js' %}"></script>
+  <script src="{% static 'home/js/cookieconsent.min.js' %}"></script>
+  
+  
+  <script type="text/javascript" charset="utf-8">
+    console.log($('#atc_hierachy_l1').width());
+    console.log($('#atc_hierachy_l1').height());
+    console.log($('#atc_hierachy_l2').width());
+    console.log($('#atc_hierachy_l2').height());
+    console.log($('#atc_hierachy_l3').width());
+    console.log($('#atc_hierachy_l3').height());
+    var numTabs = {{ num_substance }};
+    {/* var numTabs = 13;  */}
+    var maxTabs = 4;
+    var lastVisibleIndex = 0; 
+    var firstVisibleIndex = 0; 
+  
+    {/* Initial display */}
+    $('#tab-header li:nth-child(2)').addClass('active');
+    $('#tab-1').addClass('active');
+  
+    if (numTabs > maxTabs) 
+    {
+      for (var i=0; i<=numTabs+2; i++)
+      {
+        var str = $('#tab-header li:eq(' + (i) + ') a').text();
+        if (str !== ">>" && str !== "<<" && str!=='') 
+        {
+          const num = parseInt(str.match(/\d+/)[0], 10);
+          if (num>maxTabs){
+            $('#tab-header li:eq(' + (i) + ')').hide();
+          }
+        }
+      }
+      firstVisibleIndex = 1; //zero-based index, the prev tab is the first one at index=0
+      lastVisibleIndex = maxTabs; //zero-based index
+      $('#tab-header li.prev').addClass("disable");
+      $('#tab-header li.more').show();
+    }
+    else
+    {
+      $('#tab-header li.prev').hide();
+      $('#tab-header li.more').hide();
+    }
+  
+    {/* if content tab is clicked */}
+    $('#tab-header li a').on('click', function (e) 
+    {
+      e.preventDefault();
+      $('#tab-header li').removeClass('active');
+      $(this).parent().addClass('active');
+      
+      $('.tab-content').removeClass('active');
+      $($(this).attr('href')).addClass('active');
+    });
+  
+    {/* if a moreTab is click */}
+    $('#tab-header li.more a').on('click', function (e) 
+    {
+      e.preventDefault();
+      $('#tab-header li.more').removeClass('active');
+      for (var i = firstVisibleIndex; i <= lastVisibleIndex; i++) {
+        $('#tab-header li:eq(' + (i) + ')').hide();
+      }
+      $('#tab-header li.prev').removeClass("disable");
+      $('#tab-header li.prev').show();
+      $('#tab-header li:eq(' + (lastVisibleIndex+1) + ')').addClass('active');
+      $('#tab-'+(lastVisibleIndex+1)).addClass('active');
+  
+      if ((numTabs - (lastVisibleIndex)) < maxTabs)
+      {
+        console.log($('#tab-header li'));
+        $('#tab-header li:gt(' + (lastVisibleIndex) + ')').show();
+        $('#tab-header li.more').addClass('disable');
+        firstVisibleIndex = lastVisibleIndex+1;
+        lastVisibleIndex = numTabs;
+      }
+      else
+      {
+        console.log($('#tab-header li'));
+        for (var i = lastVisibleIndex+1; i <= lastVisibleIndex+maxTabs; i++) {
+          $('#tab-header li:nth-child(' + (i+1) + ')').show();
+        }
+        // $('#tab-header li.more').show();
+        lastVisibleIndex = lastVisibleIndex + maxTabs;
+        firstVisibleIndex = lastVisibleIndex - maxTabs+1;
+      }
+    });
+      
+    {/* if a preTab is click */}
+    $('#tab-header li.prev a').on('click', function (e) 
+      {
+        // alert("a prev tab is clicked");
+        e.preventDefault();
+        $('#tab-header li.prev').removeClass('active');
+        $('#tab-header li.more').removeClass('disable');
+        for (var i = lastVisibleIndex; i >= firstVisibleIndex; i--) {
+          $('#tab-header li:nth-child(' + (i+1) + ')').hide();
+        }
+        $('#tab-header li:eq(' + (firstVisibleIndex-maxTabs) + ')').addClass('active');
+        $('#tab-'+(firstVisibleIndex-maxTabs)).addClass('active');
+        if (firstVisibleIndex-maxTabs==1)
+        {
+          $('#tab-header li:lt(' + (firstVisibleIndex) + ')').show();
+          $('#tab-header li.prev').addClass('disable');
+          $('#tab-header li.more').show();
+          firstVisibleIndex = 1;
+          lastVisibleIndex = firstVisibleIndex + maxTabs -1;
+          console.log("firstVisibleIndex updated = ", firstVisibleIndex);
+          console.log("lastVisibleIndex updated = ", lastVisibleIndex);
+        }
+        else
+        {
+          $('#tab-header li.prev').show();
+          for (var i = firstVisibleIndex-1; i >= firstVisibleIndex-maxTabs; i--) {
+            $('#tab-header li:nth-child(' + (i+1) + ')').show();
+          }
+          $('#tab-header li.more').show();
+          lastVisibleIndex = firstVisibleIndex - 1;
+          firstVisibleIndex = firstVisibleIndex - maxTabs;
+          console.log("firstVisibleIndex updated = ", firstVisibleIndex);
+          console.log("lastVisibleIndex updated = ", lastVisibleIndex);
+        }
+      });
+  </script>
+
+  <script>
+    $(".more_drug_link").click(function() {
+      var parent = $(this).parent();
+      var drugDiv = $("<div></div>");
+      var level_id = $(this).parent().parent().attr('id');
+      var level_id_number = parseInt(level_id.substring(14));
+      var tab_id = $(this).parent().parent().parent().attr('id');
+      var tab_number = parseInt(tab_id.substring(4));
+      var category = parent.text();
+      var matches = category.match(/^(\w+):\s+([\w\s]+)\s+\[.*\]$/);
+      var name = matches[1];
+      var description = matches[2];
+      var max_drugs = 16;
+      parent.text("");
+      parent.append("<p style='text-align:center;'>LIST OF DRUGS THAT BELONGS TO <a>"+description.toUpperCase()+" ("+name+")</a> GROUP</p>");
+      $("#" + level_id).append(drugDiv);
+      
+      $("#atc_hierachy_l2").hide();
+      $("#atc_hierachy_l3").hide();
+      $("#atc_hierachy_l4").hide();
+      $("#atc_hierachy_l5").hide();
+
+      // set the background color to red
+      $('#atc_hierachy_l1').css('background-color', "#e7f0f8");
+
+      if (level_id == "atc_hierachy_l1") {
+        var data=JSON.parse('{{ json_atcCodeInAllLevels|safe }}')
+        var drug_list =  data[tab_number-1].atc_therapeutic_group_drugs;
+        var s = "<p>"
+        for (var i = 0; i < drug_list.length; i++) {
+          var d = drug_list[i];
+          s = s + "<a>"+d+"</a>" + '&nbsp'+ '&nbsp';
+          if (i%max_drugs==0 && i/max_drugs>=1){
+            s = s + "</p>"
+            $(drugDiv).append(s);
+            s = "<p>";
+          }
+          
+        }
+      }
+    });
+  </script>
+{% endblock addon_js %}  

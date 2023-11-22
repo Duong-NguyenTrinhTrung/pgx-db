@@ -1,0 +1,412 @@
+{% load i18n %}
+{% load static %}
+{% block addon_css %}   
+<link rel="stylesheet" href="{% static 'gene/css/filter-gene-detail.css' %}" type="text/css"/>
+{% endblock addon_css %}
+
+<style>
+    .input-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .input-group label {
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    .input-group input[type="range"] {
+        width: 200px;
+        margin-right: 10px;
+    }
+
+    .form-group{
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group .range-values {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 200px;
+    }
+
+    /* Style for multirange input  */
+    input[type=range] {
+     appearance: none;
+	 box-sizing: border-box;
+	 width: 200px;
+	 margin: 0;
+	 /* padding: 0 2px; */
+	 overflow: hidden;
+	 border: 0;
+	 border-radius: 5px;
+	 outline: none;
+	 background: linear-gradient(#FFE169, #76520E) no-repeat center;
+	 background-size: 100% 2px;
+	 pointer-events: none;
+    }
+    /* input[type=range]:active, input[type=range]:focus {
+        outline: none;
+    } */
+    /* Targets the thumb in Chrome, Safari, and Edge Chromium  */
+    input[type=range]::-webkit-slider-thumb {
+        appearance: none; /*Removes the default appearance of the slider thumb.*/
+        height: 15px;
+        width: 15px;
+        border-radius: 50%;
+        border: 2px solid #FFE169;
+        background: white;
+        position: relative;  /*need checking*/
+        margin: 5px 0;
+        cursor: pointer; 
+        pointer-events: all; /*Allows pointer events (clicks and drags) on the slider thumb*/
+        z-index: 2; /*Sets the stacking order of the slider thumb, ensuring it appears above other elements.*/
+    }
+    /* input[type=range]::-webkit-slider-thumb::before {
+        content: ' ';
+        display: block;
+        position: relative;
+        top: 13px;
+        left: 100%;
+        width: 2000px;
+        height: 12px;
+        background: #FFE169;
+    } */
+    .multirange {
+        position: relative;
+        height: 25px;
+        background-color: none;
+    }
+    .multirange input[type=range] {
+        position: absolute;
+    }
+    /* .multirange input[type=range]:nth-child(1)::-webkit-slider-thumb::before {
+        background-color: #FFE169;
+    } */
+    .multirange input[type=range]:nth-child(2) {
+        background: none;
+    }
+    /* .multirange input[type=range]:nth-child(2)::-webkit-slider-thumb::before {
+        background-color: #979797;
+    } */
+    .line {
+        position: absolute;
+        left: calc(4px + 15px);
+        top: calc(50% - 5px);
+        content: "";
+        display: block;
+        width: calc(200px - 10px);
+        background: linear-gradient(90deg, #FFE169, #76520E);
+        height: 10px;
+        z-index: 0;
+    }
+
+    /* style for the multirange - overwrite */
+  
+    input[type=range] {
+        box-sizing: border-box;
+        appearance: none;
+        width: 200px;
+        margin: 0;
+        /* padding: 0 2px; */
+        overflow: hidden;
+        border: 0;
+        border-radius: 1px;
+        outline: none;
+        background: linear-gradient(#FFE169, #76520E) no-repeat center;
+        background-size: 100% 2px;
+        pointer-events: none;
+        &:active,
+        &:focus {
+            outline: none;
+        }
+
+        &::-webkit-slider-thumb {
+        height: 15px;
+        width: 15px;
+        border-radius: 50%;
+        border: 2px solid #FFE169;
+        background:white;
+        background-color: #fff;
+        position: relative;
+        margin: 5px 0;
+        cursor: pointer;
+        appearance: none;
+        pointer-events: all;
+            z-index:2;
+        &::before {
+                content: ' ';
+                display: block;
+                position: relative;
+                top: 13px;
+                left: 100%;
+                width: 2000px;
+                height: 2px;
+                            background:#FFE169;
+        }
+        }
+    }
+
+    .multirange {
+        position: relative;
+            height:25px;
+            input[type=range] {
+            position: absolute;
+            &:nth-child(1) {
+                &::-webkit-slider-thumb::before {
+                    background-color: #FFE169;
+                }
+            }
+            &:nth-child(2) {
+                background: none;
+                &::-webkit-slider-thumb::before {
+                    background-color: #979797;
+                }
+            }
+        }
+    }
+
+  
+    .line{
+        position: absolute;
+        left: calc(4px + 15px);
+        top: calc(50% - 1px);
+        content: "";
+        display: block;
+        /* width:calc(100px - 19px); */
+        width: 200px;
+        background: linear-gradient(90deg, #FFE169, #76520E);
+        height:2px;
+        z-index:0;
+    }
+
+    .selected_ranges{
+        width: 200px;
+        display: flex;
+        justify-content: space-between;
+        color: #76520E;
+    }
+ 
+</style>
+
+<form action="">
+
+    
+    
+    <label style="padding:0; margin:0;" for="mean_vep_score">{% translate 'Select MEAN <em>range</em> of VEP scores' %}</label>
+    <!-- <div class="slider-container">
+        <input id="mean_vep_score" type="range" min="0.0" max="1.0" step="0.01" class="slider">
+    </div> -->
+    <div class="multirange">
+        <input type="range" min="0" max="1" value="0.0" step="0.01" class="lower" id="lower_mean">
+        <input type="range" min="0" max="1" value="1.0" step="0.01" class="upper" id="upper_mean">
+        <span class="line"></span>
+    </div>
+    <div class="selected_ranges">
+        <p><span class="result-l">0.0</span></p>
+        <p><span class="result-u">1.0</span></p>
+    </div>
+    
+    <!-- <div class="form-group">
+        <label for="transcript-select">{% translate "Select transcript(s)" %}</label>
+        <select  style="border: 0; width:200px;" class="transcript-select-multiple" name="transcripts[]" multiple="multiple" id="transcript-select">
+            {% for transcript in transcripts %}
+                <option style="min-width: 100px;" value="{{ transcript }}"> {{ transcript }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="variant-select">{% translate "Select variant(s)" %}</label>
+        <select style="border: 0; width:200px;" class="variant-select-multiple" name="variants[]" multiple="multiple" id="variant-select">
+            {% for variant in variants %}
+                <option style="min-width: 100px;" value="{{ variant }}"> {{ variant }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="consequence-select">{% translate "Select consequence(s)" %}</label>
+        <select style="border: 0; width:200px;" class="consequence-select-multiple" name="consequences[]" multiple="multiple" id="consequence-select">
+            {% for consequence in consequences %}
+                <option style="min-width: 50px; border-radius: 5px;" value="{{ consequence }}"> {{ consequence }}</option>
+            {% endfor %}
+        </select>
+    </div> -->
+
+</form>
+  
+
+
+<script>
+    $(document).ready(function() {
+       
+        let lo = document.querySelector('.lower');
+        let up = document.querySelector('.upper');
+
+        // Function to filter options based on range values
+        function filterOptionsByRange(loValue, upValue) 
+        {
+            let selected_transcripts = [];
+            let selected_variants = [];
+            let selected_consequences = [];
+            {% for element in array %}
+            if ({{element|last}} >= loValue && {{element|last}} <= upValue) {
+                selected_variants.push("{{element.0}}");
+                selected_transcripts.push("{{element.1}}");
+                selected_consequences.push("{{element.2}}");
+            }
+            {% endfor %}
+            // alert("number of selected transcripts: "+selected_transcripts.length)
+            // alert("number of selected variants: "+selected_variants.length)
+            // alert("number of selected consequences: "+selected_consequences.length)
+            selected_variants = [...new Set(selected_variants)];
+            selected_transcripts = [...new Set(selected_transcripts)];
+            selected_consequences = [...new Set(selected_consequences)];
+            // alert("number of unique selected transcripts: "+selected_transcripts.length)
+            // alert("number of unique selected variants: "+selected_variants.length)
+            // alert("number of unique selected consequences: "+selected_consequences.length)
+
+            $('.transcript-select-multiple option').each(function() {
+                let optionValue = $(this).val();
+                if (selected_transcripts.includes(optionValue)) {
+                    $(this).prop('hidden', false);
+                } else {
+                    $(this).prop('hidden', true);
+                }
+            });
+
+            $('.variant-select-multiple option').each(function() {
+                let optionValue = $(this).val();
+                if (selected_variants.includes(optionValue)) {
+                    $(this).prop('hidden', false);
+                } else {
+                    $(this).prop('hidden', true);
+                }
+            });
+        
+            $('.consequence-select-multiple option').each(function() {
+                let optionValue = $(this).val();
+                if (selected_consequences.includes(optionValue)) {
+                    $(this).prop('hidden', false);
+                } else {
+                    $(this).prop('hidden', true);
+                }
+            });
+
+            // Refresh the Select2 dropdown to apply the changes
+            $('.transcript-select-multiple').trigger('change');
+            $('.variant-select-multiple').trigger('change');
+            $('.consequence-select-multiple').trigger('change');
+        }
+
+        // Attach change event listeners to "lo" and "up" range inputs
+        lo.addEventListener('change', event => {
+            let loValue = parseFloat(event.target.value);
+            let upValue = parseFloat(up.value);
+            // alert("hi----lo: "+loValue +" up: "+upValue);
+            filterOptionsByRange(loValue, upValue);
+        });
+
+        up.addEventListener('change', event => {
+            let loValue = parseFloat(lo.value);
+            let upValue = parseFloat(event.target.value);
+            // alert("hi----lo: "+loValue +" up: "+upValue);
+            filterOptionsByRange(loValue, upValue);
+        });
+
+        $('.transcript-select-multiple').select2();
+        $('.variant-select-multiple').select2();
+        $('.consequence-select-multiple').select2();
+    });
+</script>
+
+
+<!-- <script>
+    $(document).ready( function() {
+        document.querySelectorAll('.slider-container').forEach(container => {
+        let slider = container.querySelector('.slider');
+        
+        // Insert slider value tag and limit labels
+        container.insertAdjacentHTML('beforeEnd', `  
+        <div class="slider-value">
+            ${slider.value}
+        </div>
+
+        <div class="slider-labels">
+            <p>${slider.min}</p>
+            <p>${slider.max}</p>
+        </div>
+        `);
+        
+        // Init slider background
+        let percentage = 100*(slider.value-slider.min)/(slider.max-slider.min);
+        slider.style.background = `linear-gradient(90deg, #FFE169, #76520E ${percentage}%, aliceblue ${percentage}%)`;
+        
+        // Update when value changes
+        slider.addEventListener('input', event => {
+            // Update background gradient
+            let s = event.target;
+            let percentage = 100*(s.value-s.min)/(s.max-s.min);
+            event.target.style.background = `linear-gradient(90deg, #FFE169, #76520E ${percentage}%, aliceblue ${percentage}%)`;
+            
+            // Update value tag
+            s.parentNode.querySelector('.slider-value').innerHTML = s.value;
+        });
+        });
+        $('.transcript-select-multiple').select2();
+        $('.variant-select-multiple').select2();
+        $('.consequence-select-multiple').select2();
+    });
+</script> -->
+
+<script>
+    var lower = $('.lower');
+    var upper = $('.upper');
+    var lowerVal = parseFloat(lower.val()); // Using parseFloat instead of parseInt for floating-point numbers
+    var upperVal = parseFloat(upper.val());
+    var resultL = $('.result-l');
+    var resultU = $('.result-u');
+    var lowMin = parseFloat(lower.attr('min')); // Update the min and max attributes to use parseFloat
+    var lowMax = parseFloat(lower.attr('max'));
+    var upMin = parseFloat(upper.attr('min'));
+    var upMax = parseFloat(upper.attr('max'));
+    var line = $('.line');
+    var lineW = upperVal - lowerVal - 15;
+    line.width(lineW);
+    console.log(lineW);
+
+    lower.on('input', function(){
+        lowerVal = parseFloat(lower.val()); // Use parseFloat instead of parseInt for floating-point numbers
+        upperVal = parseFloat(upper.val());
+        if (upperVal <= lowerVal + 0.01 ) { // Adjust the threshold value to a small value like 0.01
+            upper.val(lowerVal + 0.02); // Adjust the increment value to 0.02
+            if (lowerVal == lowMin) {
+                upper.val(lowMin + 0.02); // Adjust the increment value to 0.02
+            }
+        }
+        resultL.html(lowerVal.toFixed(2)); // Use toFixed(2) to display two decimal places
+        resultU.html(upperVal.toFixed(2)); // Use toFixed(2) to display two decimal places
+        lineW = upperVal - lowerVal;
+        line.css({'left': + lowerVal + 'px'});
+        line.width(lineW);
+    });
+
+    upper.on('input', function(){
+        lowerVal = parseFloat(lower.val()); // Use parseFloat instead of parseInt for floating-point numbers
+        upperVal = parseFloat(upper.val());
+        if (lowerVal >= upperVal - 0.01) { // Adjust the threshold value to a small value like 0.01
+            lower.val(upperVal - 0.02); // Adjust the decrement value to 0.02
+            if (upperVal == upMax) {
+                lower.val(upMax - 0.02); // Adjust the decrement value to 0.02
+            }
+        }
+        resultL.html(lowerVal.toFixed(2)); // Use toFixed(2) to display two decimal places
+        resultU.html(upperVal.toFixed(2)); // Use toFixed(2) to display two decimal places
+        lineW = upperVal - lowerVal;
+        line.css({'left': + lowerVal + 'px'});
+        line.width(lineW);
+    });
+
+</script>

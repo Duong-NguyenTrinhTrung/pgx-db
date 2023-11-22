@@ -1,0 +1,151 @@
+{% extends "home/base.html" %} 
+{% load static %} 
+{% block addon_css %}
+<link rel="stylesheet" href="{% static 'home/css/jquery.dataTables.min.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'drug/css/drug_atc.css' %}" type="text/css" />
+<style media="screen">
+</style>
+{% endblock %}
+
+{% block content %} 
+<h2>Drug Browser</h2>
+<button onclick="tableToExcel()" type="button" class="btn btn-primary" style="margin-top:10px;margin-top:3px"> Export to Excel </button>
+
+<div>
+  <div id="drug_general">
+    <h2>Drug name: {{drug_name}}</h2>
+    <p>Some brief description here</p>
+    <p>Drug indication and therapeutic uses here</p>
+    <p>Optimal: high-quality image of the drug and logo here</p>
+  </div>
+
+  <div id="drug_atc_expansion">
+      <h2>ATC code and expanded hierachy here</h2>
+      <div class="container" style="margin-top:30px;">
+        <div class="row">
+          <div class="col-md-4">
+            <ul id="tree3">
+              <!-- <li><a href="#">TECH</a> -->
+              {% for level in atcCodeInAllLevels %}
+                <li><a href="#">{{level.atc_chemical_substance}}</a></li>
+                <!-- {% for drug_bank_id in level.atc_chemical_substance_group_drugs %}
+                  <a href="#">{{drug_bank_id}}</a>
+                {% endfor %} -->
+                <ul>
+                  <li><a href="#">{{level.atc_chemical_group}}</a></li>
+                  <!-- {% for drug_bank_id in level.atc_chemical_group_drugs %}
+                  <a href="#">{{drug_bank_id}}</a>
+                  {% endfor %} -->
+                  <ul>
+                    <li><a href="#">{{level.atc_pharmacological_group}}</a></li>
+                    <!-- {% for drug_bank_id in level.atc_pharmacological_group_drugs %}
+                      <a href="#">{{drug_bank_id}}</a>
+                    {% endfor %} -->
+                    <ul>
+                      <li><a href="#">{{level.atc_therapeutic_group}}</a></li>
+                      <!-- {% for drug_bank_id in level.atc_therapeutic_group_drugs %}
+                        <a href="#">{{drug_bank_id}}</a>
+                      {% endfor %} -->
+                      <ul>
+                        <li><a href="#">{{level.atc_anatomical_group}}</a></li>
+                        <!-- {% for drug_bank_id in level.atc_anatomical_group_drugs %}
+                          <a href="#">{{drug_bank_id}}</a>
+                        {% endfor %} -->
+                      </ul>
+                    </ul>
+                  </ul>
+                </ul>
+                <br>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+  </div>
+</div>
+
+{% endblock content %}
+
+{% block addon_js %}
+
+  <script src="{% static 'home/js/jquery-ui.min.js' %}"></scrip>
+  <script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+  <script src="{% static 'bootstrap/js/bootstrap-submenu.js' %}"></script>
+  <script src="{% static 'home/js/navbar-autocomplete.js' %}"></script>
+  <script src="{% static 'home/js/svg-pan-zoom.min.js' %}"></script>
+  <script src="{% static 'home/js/bootstrap-treeview.min.js' %}"></script>
+  <script src="{% static 'home/js/papaparse.min.js' %}"></script>
+  
+  <!-- 3. flowplayer -->
+  <script src="{% static 'flowplayer/flowplayer.min.js' %}"></script>
+  <!-- the overlay plugin -->
+  <script src="{% static 'flowplayer/flowplayer.overlay.min.js' %}"></script>
+  <!-- the bootstrap vendor overlay wrapper -->
+  <script src="{% static 'flowplayer/flowplayer.overlay.bootstrap.js' %}"></script>
+  <!-- Comply with GDPR Minified Cookie Consent from https://github.com/osano/cookieconsent -->
+  <script src="{% static 'home/js/gpcrdb.js' %}"></script>
+  <script src="{% static 'home/js/cookieconsent.min.js' %}"></script>
+
+  <script>
+    $.fn.extend({treed: function (o) {
+      
+      var openedClass = 'glyphicon-minus-sign';
+      var closedClass = 'glyphicon-plus-sign';
+      
+      if (typeof o != 'undefined'){
+        if (typeof o.openedClass != 'undefined'){
+        openedClass = o.openedClass;
+        }
+        if (typeof o.closedClass != 'undefined'){
+        closedClass = o.closedClass;
+        }
+      };
+      
+        //initialize each of the top levels
+        var tree = $(this);
+        tree.addClass("tree");
+        tree.find('li').has("ul").each(function () {
+            var branch = $(this); //li with children ul
+            branch.prepend("<i class='indicator glyphicon " + closedClass + "'></i>");
+            branch.addClass('branch');
+            branch.on('click', function (e) {
+                if (this == e.target) {
+                    var icon = $(this).children('i:first');
+                    icon.toggleClass(openedClass + " " + closedClass);
+                    $(this).children().children().toggle();
+                }
+            })
+            branch.children().children().toggle();
+        });
+        //fire event from the dynamically added icon
+      tree.find('.branch .indicator').each(function(){
+        $(this).on('click', function () {
+            $(this).closest('li').click();
+        });
+      });
+        //fire event to open branch if the li contains an anchor instead of text
+        tree.find('.branch>a').each(function () {
+            $(this).on('click', function (e) {
+                $(this).closest('li').click();
+                e.preventDefault();
+            });
+        });
+        //fire event to open branch if the li contains a button instead of text
+        tree.find('.branch>button').each(function () {
+            $(this).on('click', function (e) {
+                $(this).closest('li').click();
+                e.preventDefault();
+            });
+        });
+    }
+});
+
+// Initialization of treeviews
+$('#tree3').treed({openedClass:'glyphicon-chevron-right', closedClass:'glyphicon-chevron-down'});
+
+    
+</script>
+  
+  
+  
+{% endblock addon_js %}  

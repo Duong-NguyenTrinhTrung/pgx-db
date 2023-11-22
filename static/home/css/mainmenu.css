@@ -1,0 +1,142 @@
+.highlight_reference {
+  background-color: #dcdcdc;
+}
+
+.alert {
+  padding: 5px;
+  border-color: black;
+  display: inline-block;
+}
+
+.page-selection {
+  box-shadow: 0.5px 0.5px 0.5px 0.5px;
+  background-color: #f0f0f5;
+  border-radius: 3px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: black;
+  padding: 5px;
+}
+
+.select-link,
+.select-link:link,
+.select-link:visited,
+.select-link:hover {
+  color: black;
+  text-decoration: none;
+}
+
+.widget_open {
+  display: inline;
+}
+
+.widget-link {
+  padding-right: 5px;
+}
+
+.widget-link:hover {
+  text-decoration: none;
+}
+
+.icon-button {
+  appearance: none;
+  outline: none;
+  border: 0;
+  background: transparent;
+  padding: 2px 0;
+}
+
+/* targets the nav element with the class of navbar */
+nav.navbar {
+  background-color: #fff;
+}
+
+
+/* targets list items (li) that have the class of dropdown, but not the class of highlight_menu */
+nav.navbar li.dropdown:not(.highlight_menu) {
+  background-position: 10px 12px;
+}
+
+/* targets list items (li) that have the class of dropdown and the class of highlight_menu */
+nav.navbar li.dropdown.highlight_menu {
+  background-color: rgb(163, 20, 39);
+  background-position: 10px 8px;
+}
+
+/* targets list items (li) that have the class of dropdown and the class of open */
+nav.navbar li.dropdown.open {
+  background-color: rgb(163, 20, 39, 0.4);
+}
+
+/* targets links (a) that have the class of dropdown-toggle but not the class of select-link and are nested within a list item (li) that has the class of dropdown */
+nav.navbar li.dropdown a.dropdown-toggle:not(.select-link) {
+  color: #777;
+}
+
+/* These selectors target links (a) that have the class of dropdown-toggle and are nested within a list item (li) that has the class of open and the class of dropdown. */
+nav.navbar li.dropdown.open a.dropdown-toggle,
+nav.navbar li.dropdown.open a.dropdown-toggle:hover,
+nav.navbar li.dropdown.open a.dropdown-toggle:focus {
+  background-color: transparent;
+}
+
+/* targets links (a) that have the class of dropdown-toggle but not the class of select-link and are nested within a list item (li) that has the class of dropdown */
+nav.navbar li.dropdown a.dropdown-toggle:hover:not(.select-link) {
+  color: #111;
+}
+
+/* targets links (a) that have the class of dropdown-toggle but not the class of select-link and are nested within a list item (li) that has the class of dropdown and the class of highlight_menu */
+nav.navbar li.dropdown.highlight_menu a.dropdown-toggle:not(.select-link) {
+  color: #fff;
+}
+
+
+/* target links (a) that are nested within a list item (li) that has the class of open and is a direct child of a ul element with the class of navbar-nav. */
+nav.navbar .navbar-nav > .open > a,
+nav.navbar .navbar-inverse .navbar-nav > .open > a:focus,
+nav.navbar .navbar-inverse .navbar-nav > .open > a:hover {
+  background-color: transparent;
+}
+
+/* chatGPT - adding this will make the dropdown list opens when the mouse hovers over */
+nav.navbar li.dropdown:hover > ul.dropdown-menu {
+  display: block;
+}
+
+
+li#pgx_menu,
+li#drug_menu,
+li#target_menu,
+li#variant_menu,
+li#about_menu {
+  background-repeat: no-repeat;
+  background-size: 45px;
+  padding-left: 30px;
+  margin-left: 7px;
+}
+
+li#pgx_menu {
+  background-position: -19px 2px;
+  background-size: 65px;
+  background-image: url("/static/home/logo/PGx/main8.png");
+  
+}
+
+li#drug_menu {
+  background-position: -4px 1px;
+  background-image: url("/static/home/logo/drug/drug2.png");
+}
+
+li#target_menu {
+  background-position: 5px -3px;
+  background-size: 40px;
+  background-image: url("/static/home/logo/target/main5.png");
+  margin-left: 0px;
+}
+
+li#variant_menu {
+  background-position: -1px 1px;
+  background-image: url("/static/home/logo/variant/main5.png");
+}
+
+

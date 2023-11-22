@@ -1,0 +1,126 @@
+{% extends "home/base.html" %}
+{% load static %}
+{% csrf_token %}
+
+{% block addon_css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'drug/css/atc_lookup.css' %}">
+{% endblock %}
+
+{% block content %}
+    {% autoescape off %}
+        <div class="atc-intro">
+            <h1>ATC/DDD Index 2023</h1>
+            <div>
+                <p>
+                    A searchable version of the complete ATC index with DDDs is available below. The search options
+                    enable you to find ATC codes and DDDs for substance name <br>
+                    and/or ATC levels. In your search result you may choose to show or hide the text from the Guidelines
+                    for ATC classification and DDD assignment linked to <br>
+                    the ATC level. The text in the Guidelines will give information related to the background for the
+                    ATC and DDD assignment.
+                </p>
+            </div>
+
+            <h2 style="margin-top: 10px;">Search query</h2>
+        </div>
+
+        <div class="row">
+            <form method="GET">
+                <div id="input-group">
+                    <div id="input-query">
+                        <input id="atc_code_query" type="text"  placeholder="ATC code or name">
+                            <!-- Dropdown List -->
+                        <select id="queryOption">
+                            <option value="containing">containing query</option>
+                            <option value="startingwith">starting with query</option>
+                        </select>
+                    </div>
+                    <button type="submit" id='search'>Search</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="atc-intro">
+            <h2>ATC code</h2>
+            <div>
+                <p>All ATC levels are searchable.
+                    A search will result in showing the exact substance or level and all ATC levels above (up to 1st ATC level).</p>
+            </div>
+        </div>
+        <div id="atc-l1">
+            {% for group in atc_groups %}
+                <p><a href="{% url 'atc-detail-view' %}?group_id={{ group.id }}" target="_blank">{{ group.id }}: {{ group.name }}</a></p>
+            {% empty %}
+                <p>No data available</p>
+            {% endfor %}
+        </div>
+    {% endautoescape %}
+{% endblock %}
+
+{% block addon_js %}
+    
+    <script>
+        $(document).ready(function () {
+            var hasClearSearch = false;
+            function performSearch() {
+                // Get user input
+                var atc_code_inp = $("#atc_code_query").val();
+                var query_option = $("#queryOption").val();
+
+                if (!hasClearSearch){
+                    var input_panel = $("#input-group");
+                    // Create the new div element
+                    var newSearchDiv = $('<div id="new_search"></div>');
+                    // Create the anchor element and set its attributes
+                    var anchorElement = $("<a href=\"{% url 'atc-lookup' %}\">Clear search</a>");
+                    anchorElement.css({
+                        "color": "#f17c0e",
+                        "text-decoration": "underline",
+                        "text-decoration-color": "#f17c0e"
+                    });
+                    // Append the anchor element to the new div
+                    newSearchDiv.append(anchorElement);
+                    // Insert the new div to the right of the input_panel
+                    input_panel.append(newSearchDiv);
+                    hasClearSearch = true;
+                }
+
+                // Change text of the atc-intro panel
+                $("#atc-intro h2").text("Result");
+                $("#atc-intro p").text('');
+
+
+                // Determine whether to use GET or POST based on your needs
+                var method = "GET"; // or "POST" depending on the view's requirements
+
+                // Make an AJAX request to the Django view
+                $.ajax({
+                    url: "{% url 'atc_search_view' %}", // Replace with the actual URL
+                    method: method,
+                    data: {
+                        'atc_code_inp': atc_code_inp,
+                        'query_option': query_option
+                    },
+                    success: function (data) {
+                        $("#atc-l1").html(data);
+                    },
+                    error: function (error) {
+                        console.error("Error:", error);
+                    }
+                });
+            }
+            // Handle the form submission when the "Search" button is clicked
+            $("#search").click(function () {
+                performSearch();
+            });
+
+            // Handle the form submission when the form is submitted
+            $("form").submit(function (event) {
+                event.preventDefault(); // Prevent the form from submitting normally
+                // performSearch(); // Call the search function
+            });
+        });
+
+    </script>
+{% endblock %}

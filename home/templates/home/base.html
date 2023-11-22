@@ -1,0 +1,61 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ site_title }}</title>
+
+    <!-- SEO for multiple domains -->
+    <!-- Bootstrap -->
+    <link href="{% static 'bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'bootstrap/css/bootstrap-submenu.min.css' %}" rel="stylesheet">
+    <!-- jQueryUI -->
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="{% static 'home/css/jquery-ui.theme.min.css' %}" type="text/css" media="all"/>
+
+    <!-- TreeView -->
+    <link href="{% static 'home/css/bootstrap-treeview.min.css' %}" rel="stylesheet">
+    <!-- Custom styles -->
+    <link href="{% static 'home/css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'home/css/inforgraphics.css' %}" rel="stylesheet">
+    <!-- flowplayer skin -->
+    <link href="{% static 'flowplayer/flowplayer.css' %}" rel="stylesheet">
+    <!-- Additional CSS -->
+    {% block addon_css %}
+    {% endblock addon_css %}
+
+</head>
+<body>
+<div class="container-fluid" id="content">
+    {% include 'home/mainmenu.html' %}
+    <div id="gpcrdb_alert_placeholder"></div>
+    {% block content %}{% endblock %}
+</div>
+
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+
+<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'bootstrap/js/bootstrap-submenu.js' %}"></script>
+<script src="{% static 'home/js/navbar-autocomplete.js' %}"></script>
+<script src="{% static 'home/js/svg-pan-zoom.min.js' %}"></script>
+<script src="{% static 'home/js/bootstrap-treeview.min.js' %}"></script>
+<script src="{% static 'home/js/papaparse.min.js' %}"></script>
+
+<!-- 3. flowplayer -->
+<script src="{% static 'flowplayer/flowplayer.min.js' %}"></script>
+<!-- the overlay plugin -->
+<script src="{% static 'flowplayer/flowplayer.overlay.min.js' %}"></script>
+<!-- the bootstrap vendor overlay wrapper -->
+<script src="{% static 'flowplayer/flowplayer.overlay.bootstrap.js' %}"></script>
+<!-- Comply with GDPR Minified Cookie Consent from https://github.com/osano/cookieconsent -->
+<script src="{% static 'home/js/gpcrdb.js' %}"></script>
+<script src="{% static 'home/js/cookieconsent.min.js' %}"></script>
+
+<!-- Additional JS -->
+{% block addon_js %}
+{% endblock addon_js %}
+</body>
+</html>

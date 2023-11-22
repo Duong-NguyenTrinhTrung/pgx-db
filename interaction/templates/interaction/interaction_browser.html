@@ -1,0 +1,150 @@
+{% extends "home/base.html" %} 
+{% load static %} 
+{% csrf_token %} 
+{% block addon_css %}
+<link rel="stylesheet" href="{% static 'home/css/jquery.dataTables.min.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'home/css/bootstrap2-toggle.min.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'home/css/yadcf_bootstrap_version.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'home/css/select2.css' %}" type="text/css" />
+<link rel="stylesheet" href="{% static 'home/css/modal.css' %}" type="text/css" />
+<!--This is for the filter, min max, pagination styling -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css" />
+<link rel="stylesheet" href="{% static 'home/css/construct_browser.css' %}" type="text/css" />
+
+{% endblock addon_css %} 
+{% block content %} 
+{% autoescape off %}
+
+<div style="padding-top: 0px; font-size: 14px; white-space: nowrap; overflow-y:hidden; width: 100%">
+  <br />
+
+  <div style="font-size: 12px">
+    <p>
+      Data showed in this table is collected from the <a href='//go.drugbank.com/' target='_blank'>Drugbank</a> database and <a href='https://www.uniprot.org/' target='_blank'>UniProt</a>
+    </p>
+  </div>
+  <a id="dlink" style="display: none"></a>
+  <div id="excel_table" style2="display:none;"></div>
+
+  <button
+    onclick="tableToExcel('structures_scrollable', 'Families data', 'EndogenousData.xls')"
+    type="button"
+    class="btn btn-primary"
+    style="margin-top: 10px; margin-top: 3px"
+  >
+    Export to Excel
+  </button>
+
+  <button
+    id="reset"
+    type="button"
+    class="btn btn-primary"
+    style="margin-top: 10px; margin-top: 3px"
+  >
+    Reset filters
+  </button>
+
+  <p style="margin-top:10px;margin-bottom:10px;color:#014F86">Using the filters to browse the drug-target interaction </p>
+
+  <div id="structures_scrollable_table">
+    <table class="display compact text-nowrap" id='structures_scrollable' style="width: 100%">
+      <thead id="headers">
+        <tr class="table-filter-dropdown">
+          <!-- Position blok -->
+					<th style="text-align: left">Drugtype</th>
+          <th style="text-align: left">Interacting <br> protein</th>
+          <th style="text-align: left">Interaction <br> type</th>
+          <th style="text-align: left">UniProt <br> accession</th>
+          <th style="text-align: left">Target <br> gene</th>
+          <th style="text-align: left">Clinical status</th>
+          <th style="text-align: left">Year of approval</th>
+          <th style="text-align: left">Phase</th>
+					<th style="text-align: left">Status</th>
+          <th style="text-align: left">Mechanism of action</th>
+          <th style="text-align: left">#Variants</th>
+        </tr>
+      </thead>
+      <tbody id='structures_scrollable_body'>
+        {% for value in Array %}
+        <tr>
+					<td style="text-align: left">{{value.2}}</td>
+          <td style="text-align: left">{{value.0}}</td>
+          <td style="text-align: left">{{value.1}}</td> 
+          <td style="text-align: left">{{value.3}}</td>
+          <td style="text-align: left">{{value.4}}</td>
+          <td style="text-align: left">{{value.5}}</td>
+          <td style="text-align: left">{{value.5}}</td>
+          <td style="text-align: left">{{value.5}}</td>
+          <td style="text-align: left">{{value.5}}</td>
+					<td style="text-align: left">{{value.5}}</td>
+          <td style="text-align: left">{{value.5}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <br />
+
+  </div>
+	</div> 
+
+	{% comment %} <div id="connected-graph">
+		{% include "connected-graph.html" %}
+	</div>  {% endcomment %}
+</div>
+{% endautoescape %} 
+{% endblock %}
+
+{% block addon_js %}
+<script src="{% static 'home/js/datatables.min.js' %}"> </script>
+<script src="{% static 'home/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'home/js/bootstrap2-toggle.min.js' %}"></script>
+<script src="{% static 'home/js/jquery.dataTables.yadcf.js' %}"> </script>
+<script src="{% static 'home/js/dataTables.buttons.min.js' %}"> </script>
+<script src="{% static 'home/js/select2.full.js' %}"> </script>
+<script src="{% static 'home/js/d3.min.js' %}"></script>
+<script src="{% static 'home/js/d3pie.js' %}"></script>
+<script src="{% static 'home/js/nv.d3.min.js' %}"></script>
+<script>
+	// Script for DataTable
+	$(document).ready(function() {
+		
+		$("#structures_scrollable").show();
+		oTable1 = $("#structures_scrollable").DataTable({
+	    //deferRender: true,
+	    scrollY: true,
+	    scrollX: true,
+	    //scrollCollapse: true,
+	    //scroller: true,
+	    paging: true,
+	    //bSortCellsTop: false, //prevent sort arrows going on bottom row
+	    //aaSorting: [],
+	    //autoWidth: true,
+	    //bInfo: true,
+			pagingType: 'full_numbers',
+			lengthMenu: [
+					[10, 25, 50, -1],
+					[10, 25, 50, 'All'],
+			],
+		})
+		
+		let column_filters = [];
+		// Consequence
+		column_filters = column_filters.concat(createYADCFfilters(6, 1, "multi_select", "select2", "Consequence", false, null, null, "80px"));
+		// Impact 
+		column_filters = column_filters.concat(createYADCFfilters(7, 1, "multi_select", "select2", "Impact", false, null, null, "80px"));
+
+		yadcf.init(oTable1.draw(), column_filters, {
+			cumulative_filtering: false
+		});
+		//yadcf.exFilterColumn(oTable1, [[7, ["HIGH"]]], true);
+
+		$("#reset").click(function() {
+			yadcf.exResetAllFilters(oTable1);
+		});
+	}
+	); //End of $(document).ready(function()
+	
+
+
+</script>
+{% endblock addon_js %}  

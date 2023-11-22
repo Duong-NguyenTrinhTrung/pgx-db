@@ -1,0 +1,56 @@
+[
+  {
+    "drugbank_id": "DB00898",
+    "protein": "A5X5Y0",
+    "interaction": "target",
+    "drug_name": "Ethanol",
+    "drugtype": "Small Molecule",
+    "Drug_status": "Approved",
+    "Protein_Class": "Unknown"
+  },
+  {
+    "drugbank_id": "DB01567",
+    "protein": "A8MPY1",
+    "interaction": "target",
+    "drug_name": "Fludiazepam",
+    "drugtype": "Small Molecule",
+    "Drug_status": "Approved",
+    "Protein_Class": "Unknown"
+  },
+  {
+    "drugbank_id": "DB03247",
+    "protein": "O00141",
+    "interaction": "target",
+    "drug_name": "Flavin mononucleotide",
+    "drugtype": "Small Molecule",
+    "Drug_status": "Approved",
+    "Protein_Class": "Kinase"
+  },
+  {
+    "drugbank_id": "DB07837",
+    "protein": "O00141",
+    "interaction": "target",
+    "drug_name": "[4-(5-naphthalen-2-yl-1H-pyrrolo[2,3-b]pyridin-3-yl)phenyl]acetic acid",
+    "drugtype": "Small Molecule",
+    "Drug_status": "Experimental",
+    "Protein_Class": "Kinase"
+  },
+  {
+    "drugbank_id": "DB08191",
+    "protein": "O00141",
+    "interaction": "target",
+    "drug_name": "4-(5-phenyl-1H-pyrrolo[2,3-b]pyridin-3-yl)benzoic acid",
+    "drugtype": "Small Molecule",
+    "Drug_status": "Experimental",
+    "Protein_Class": "Kinase"
+  },
+  {
+    "drugbank_id": "DB09130",
+    "protein": "F7VJQ1",
+    "interaction": "target",
+    "drug_name": "Copper",
+    "drugtype": "Small Molecule",
+    "Drug_status": "Approved",
+    "Protein_Class": "Unknown"
+  }
+]

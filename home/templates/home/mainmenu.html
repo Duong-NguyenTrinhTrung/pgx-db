@@ -1,0 +1,106 @@
+{% load static %}
+{% load i18n %}
+{% block addon_css %}
+    <!-- script and CSS dependencies -->
+    <link href="{% static 'home/css/mainmenu.css' %}" rel="stylesheet">
+    <link href="{% static 'home/css/modal.css' %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'home/css/jquery.powertip.css' %}" />
+
+    <style>
+        #center_menu ul {
+            padding: 0;
+            margin: 15px;
+        }
+
+        #center_menu li {
+            margin: 0;
+            padding: 0px;
+        }
+        #releases ul {
+            padding: 0;
+            margin: 15px;
+        }
+
+        #releases li {
+            margin: 0;
+            padding: 0px;
+        }
+
+        #api-menu {
+            color: #777;
+            white-space: nowrap;
+        }
+        #api-menu:hover {
+            color: #333;
+        }
+
+    </style>
+{% endblock addon_css %}
+
+{% block addon_js %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+
+    
+    <script>
+        $(document).ready(function() {
+
+            $('#cite').click(function() {
+                citation_tool(window.location.href);
+            })
+
+            $('#icon_citation').click(function() {
+                citation_tool(window.location.href);
+            })
+            $('.dropdown-menu').on('click', '.article_option', function() {
+                highlight_article($(this).parent().attr('id'));
+                var anchor_id = $('#' + $(this).parent().attr('id').toString() + '_tag').parent().parent().parent().attr('id')
+                document.getElementById(anchor_id).scrollIntoView(true);
+                $('#page_select_button').html($(this).text());
+            })
+        });
+    </script>
+
+{% endblock addon_js %}
+
+
+<!-- Fixed navbar -->
+<nav class="navbar navbar-inverse navbar-static-top" style="height:65px;">
+    <div>
+        <div id="navbar" class="navbar-collapse collapse" >
+            <ul class="nav navbar-nav navbar-left" style="margin: 10px 0;">
+                <!-- INFO -->
+                {% include "home/common_menu.html" %}
+
+                <!-- PGx -->
+                {% include "home/PGx_menu.html" %}
+
+                <!-- Drug -->
+                {% include "home/drug_menu.html" %}
+
+                <!-- Target -->
+                {% include "home/target_menu.html" %}
+
+                <!-- Variant -->
+                {% include "home/variant_menu.html" %}
+
+                <!-- Link to APIs documentation -->
+                <li>
+                    <a id="api-menu" href="{% url 'schema-swagger-ui' %}" target="_blank">{% trans 'APIs' %}</a>
+                </li>
+
+            </ul>
+            <form class="navbar-form navbar-right" role="search">
+                <div class="input-group">
+                    <!-- <input class="form-control" name="srch-term" id="srch-term"> -->
+                    <input type="text" id="nav-selection-autocomplete" class="optional form-control ui-autocomplete-input" size="55" autocomplete="on" placeholder="Quick search - please enter Gene, Drug or Protein information">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" type="submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</nav>

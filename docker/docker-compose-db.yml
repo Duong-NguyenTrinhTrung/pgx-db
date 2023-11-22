@@ -1,0 +1,14 @@
+name: "pharmacogenomics-db"
+
+version: "3"
+
+services:
+  postgresql:
+    image: postgres:15
+    env_file:
+      - .env.postgresql
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - "54321:5432"
+    restart: always

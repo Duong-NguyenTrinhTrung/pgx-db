@@ -1,0 +1,41 @@
+{% load static %}
+{% block addon_css %}
+    <link rel="stylesheet" href="{% static 'gene/css/3d_gene_view.css' %}" type="text/css"/>
+{% endblock addon_css %}
+
+<style>
+
+</style>
+
+
+<script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+<script src="https://3Dmol.org/build/3Dmol.ui-min.js"></script>
+<script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+
+
+<div id="structure_display" style="width: 100%; height: 600px;"></div>
+
+<script>
+    // Create the viewer
+    let element = document.querySelector('#structure_display');
+    let config = { backgroundColor: 'white' };
+    let viewer = $3Dmol.createViewer(element, config );
+
+    
+    // Load the 3D structure from a PDB file hosted online
+    var pdbUrl = "{% static 'gene/pdb-test/6bsz.pdb' %}"; // Replace with your PDB file URL
+    jQuery.ajax( pdbUrl, {
+        success: function(data) {
+            // let v = viewer;
+            viewer.addModel( data, "pdb" );                       /* load data */
+            viewer.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
+            viewer.zoomTo();                                      /* set camera */
+            viewer.render();                                      /* render scene */
+            viewer.zoom(1, 1000);                               /* slight zoom */
+        },
+        error: function(hdr, status, err) {
+            console.error( "Failed to load PDB " + pdbUrl + ": " + err );
+        },
+    } );
+
+</script>

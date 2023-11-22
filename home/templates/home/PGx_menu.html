@@ -1,0 +1,19 @@
+{% load static %}
+<!-- RECEPTORS -->
+<li class="dropdown gpcr {% if current_site == 'gpcr' %}highlight_menu{% endif %}" id="pgx_menu">
+
+    <a tabindex="0" href="{% url 'home' %}" class="dropdown-toggle" data-toggle="dropdown" role="button" data-submenu aria-expanded="false" style="padding-left: 20px;">
+        PGx <span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu" role="menu">
+        <li><a href="#">About PGx</a></li>
+        <li class="divider"></li>
+        <li><a  href="/static/document/graphical_overview.txt">Graphical overview</a></li>
+    </ul>
+</li>
+<script>
+    $("li#pgx_menu").click(function() {
+        window.location.href = "{% url 'home' %}";
+    })
+</script>
+

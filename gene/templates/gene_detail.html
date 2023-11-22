@@ -1,0 +1,1150 @@
+{% extends "home/base.html" %}
+{% load static %}
+{% load color_range_for_variants %}
+{% csrf_token %}
+{% block addon_css %}
+    <link rel="stylesheet" href="{% static 'home/css/jquery.dataTables.min.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'home/css/bootstrap2-toggle.min.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'home/css/yadcf_bootstrap_version.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'home/css/select2.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'home/css/modal.css' %}" type="text/css"/>
+    <!--This is for the filter, min max, pagination styling -->
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"/>
+    <link rel="stylesheet" href="{% static 'home/css/construct_browser.css' %}" type="text/css"/>
+
+    <link rel="stylesheet" href="{% static 'gene/css/gene-detail.css' %}" type="text/css"/>
+{% endblock addon_css %}
+
+{% block content %}
+    {% autoescape off %}
+        <div>
+        <div class="col-md-2" style="background-color: rgba(224, 225, 221, 0.3); height: inherit;">
+            <p style="font-size: 14px; display: block; margin-bottom: 10px;"><strong>UniProt ID:</strong> <span
+                style="color: #B69121">{{ protein_name }}</span></p>
+            <p style="font-size: 14px; display: block; margin-bottom: 10px;"><strong>Gene name:</strong> <span
+                    style="color: #B69121">{{ gene }}</span></p>
+            <p style="font-size: 14px; display: block; margin-bottom: 40px;"><strong>Ensembl Gene ID:</strong> <span
+                    style="color: #B69121">{{ geneID }}</span></p>
+            {% include '_filter.html' with transcripts=transcripts consequences=consequences variants=variants %}
+        </div>
+        <div class="col-md-10">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div id="gene-2d-chart" style="height: inherit;"></div>
+                </div>
+            </div>
+            <div class="gene-table-container" style="margin-top: 40px;">
+                {% include '_buttons.html' %}
+                <div id="structures_scrollable_table">
+                    <table class="display compact text-nowrap" id="structures_scrollable">
+                        <thead id="headers">
+                        <tr>
+                            <th rowspan="2">Variant</th>
+                            <th rowspan="2">Transcript</th>
+                            <th rowspan="2">Canonical</th>
+                            <th rowspan="2">Sequence<br>position</th>
+                            <th rowspan="2">Wildtype AA</th>
+                            <th rowspan="2">Mutant AA</th>
+                            <th rowspan="2">Codons</th>
+                            <th rowspan="2">Consequence</th>
+                            <th rowspan="2">Mean <br> VEP scores</th>
+                            <th rowspan="2"><a id="show-all-vep-score" href="#">Show all<br> VEP Scores</a></th>
+                            <th colspan="41">VEP scores from different algorithms <a href="#" id="vep-score-algorithms">Hide
+                                all</a></th>
+                        </tr>
+                        <tr>
+                            <!-- Score block -->
+                            <th>Alpha missense</br>Pathogenicity</th>
+                            <th>BayesDel</br>(addAF)</th>
+                            <th>BayesDel</br>(noAF)</th>
+                            <th>bStatistic</th>
+                            <th>CADD</th>
+                            <th>ClinPred</th>
+                            <th>DANN</th>
+                            <th>DEOGEN2</th>
+                            <th>Eigen_PC</th>
+                            <th>Eigen</th>
+                            <th>FATHMM</th>
+                            <th>Fathmm_</br>MKL</th>
+                            <th>Fathmm_XF</th>
+                            <th>GM12878</th>
+                            <th>Geno</br>Canyon</th>
+                            <th>GERP_RS</th>
+                            <th>H1_hESC</th>
+                            <th>HUVEC</th>
+                            <th>Integrated</th>
+                            <th>LRT</th>
+                            <th>LIST_S2</th>
+                            <th>MetaLR</th>
+                            <th>MetaRNN</th>
+                            <th>MetaSVM</th>
+                            <th>MutPred</th>
+                            <th>Mutation</br>Assessor</th>
+                            <th>Mutation</br>Taster</th>
+                            <th>M_CAP</th>
+                            <th>MPC</th>
+                            <th>MVP</th>
+                            <th>Polyphen2_</br>HDIV</th>
+                            <th>Polyphen2_</br>HVAR</th>
+                            <th>PROVEAN</th>
+                            <th>PhastCons</br>30way</th>
+                            <th>Phylo_</br>P30way</th>
+                            <th>PrimateAI</th>
+                            <th>REVEL</th>
+                            <th>SIFT4G</th>
+                            <th>SIFT</th>
+                            <th>SiPhy_</br>29way</th>
+                            <th>VEST4</th>
+                        </tr>
+                        </thead>
+                        <tbody id='structures_scrollable_body'>
+                        {% for value in array %}
+                            <tr class="data-row">
+                                <td class="align-left"><a href="#" class="variants-table-row"
+                                                          data-remote-url="{% url 'variant:get-genebass-tables' %}"
+                                                          data-variant-marker="{{ value.0 }}" data-toggle="modal"
+                                                          data-target="#genebassModal">{{ value.0 }}</a></td>
+                                <td class="align-left">{{ value.1 }}</td>
+                                <td class="align-left">{{ value.50 }}</td>
+                                <td class="align-left">{{ value.5 }}</td>
+                                <td class="align-left">{{ value.6|slice:":1" }}</td>
+                                <td class="align-left">{{ value.6|slice:"2:3" }}</td>
+                                <td class="align-left">{{ value.7 }}</td>
+                                <td class="align-left">{{ value.2 }}</td>
+                                <td class="align-left">{{ value|last }}</td>
+                                <td><a href="#" class="variant_statistics"
+                                       data-remote-url="{% url 'variant:get-plots' %}"
+                                       data-variant-marker="{{ value.0 }}" data-toggle="modal"
+                                       data-target="#variantPlots">Show variant's VEP statistics</a></td>
+
+                                       <td> 0.0 </td> <!-- Temporary alpha missense-->
+                                       {% render_variant_values_in_color_ranges value.10 %} <!-- BayesDeladdAF-->
+                                       {% render_variant_values_in_color_ranges value.11 %} <!-- BayesDel(noAF)-->
+                                       {% render_variant_values_in_color_ranges value.44 %} <!-- bStatistic-->
+                                       {% render_variant_values_in_color_ranges value.12 %} <!-- CADD-->
+                                       {% render_variant_values_in_color_ranges value.13 %} <!-- ClinPred-->
+                                       {% render_variant_values_in_color_ranges value.14 %} <!-- DANN-->
+                                       {% render_variant_values_in_color_ranges value.15 %} <!-- DEOGEN2-->
+                                       {% render_variant_values_in_color_ranges value.16 %} <!-- Eigen_PC-->
+                                       {% render_variant_values_in_color_ranges value.17 %} <!-- Eigen-->
+                                       {% render_variant_values_in_color_ranges value.18 %} <!-- FATHMM-->
+                                       {% render_variant_values_in_color_ranges value.45 %} <!-- FathmmMKL-->
+                                       {% render_variant_values_in_color_ranges value.46 %} <!-- Fathmm_XF-->
+                                       {% render_variant_values_in_color_ranges value.20 %} <!-- GM12878-->
+                                       {% render_variant_values_in_color_ranges value.21 %} <!-- GenoCanyon-->
+                                       {% render_variant_values_in_color_ranges value.19 %} <!-- GERP_RS-->
+                                       {% render_variant_values_in_color_ranges value.22 %} <!-- H1_hESC-->
+                                       {% render_variant_values_in_color_ranges value.23 %} <!-- HUVEC-->
+                                       {% render_variant_values_in_color_ranges value.47 %} <!-- Integrated-->
+                                       {% render_variant_values_in_color_ranges value.25 %} <!-- LRT-->
+                                       {% render_variant_values_in_color_ranges value.24 %} <!-- LIST_S2-->
+                                       {% render_variant_values_in_color_ranges value.29 %} <!-- MetaLR-->
+                                       {% render_variant_values_in_color_ranges value.30 %} <!-- MetaRNN-->
+                                       {% render_variant_values_in_color_ranges value.31 %} <!-- MetaSVM-->
+                                       {% render_variant_values_in_color_ranges value.32 %} <!-- MutPred-->
+                                       {% render_variant_values_in_color_ranges value.33 %} <!-- MutationAssessor-->
+                                       {% render_variant_values_in_color_ranges value.34 %} <!-- MutationTaster-->
+                                       {% render_variant_values_in_color_ranges value.26 %} <!-- M_CAP-->
+                                       {% render_variant_values_in_color_ranges value.27 %} <!-- MPC-->
+                                       {% render_variant_values_in_color_ranges value.28 %} <!-- MVP-->
+                                       {% render_variant_values_in_color_ranges value.36 %} <!-- Polyphen2 HDIV-->
+                                       {% render_variant_values_in_color_ranges value.37 %} <!-- Polyphen2 HVAR-->
+                                       {% render_variant_values_in_color_ranges value.35 %} <!-- PROVEAN-->
+                                       {% render_variant_values_in_color_ranges value.48 %} <!-- PhastCons30way-->
+                                       {% render_variant_values_in_color_ranges value.49 %} <!-- PhyloP30way-->
+                                       {% render_variant_values_in_color_ranges value.38 %} <!-- PrimateAI-->
+                                       {% render_variant_values_in_color_ranges value.39 %} <!-- REVEL-->
+                                       {% render_variant_values_in_color_ranges value.40 %} <!-- SIFT4G-->
+                                       {% render_variant_values_in_color_ranges value.41 %} <!-- SIFT -->
+                                       {% render_variant_values_in_color_ranges value.42 %} <!-- SiPhy29way-->
+                                       {% render_variant_values_in_color_ranges value.43 %} <!-- VEST4-->
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <br/>
+                </div>
+            </div>
+            {% include "_primary_seq.html" %}
+            <div id="gene-3d-chart" style="padding: 0px; margin-bottom: 30px;">
+                <div class="col-sm-3" style="padding: 0px;">
+                    <p style="font-size:16px; padding-left:0; margin-left:0;">3D structure:</p>
+                    <div id="filter_3d">
+                        <div id="filter_3d_row1">
+                            <div id="filter_3d_source">
+                                <p>Source:</p>
+                                <select id="sourceSelect" name="sourceSelect">
+                                    <option value="pdb">PDB</option>
+                                    <option value="af2">AlphaFold2</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="filter_3d_row2">
+                            <div id="filter_chain">
+                                <p>Chain:</p>
+                                <select id="chainSelect" name="chain">
+                                    <option value="all" selected="selected">All</option>
+                                    <!-- <option value="B">B</option> -->
+                                </select>
+                            </div>
+                            <div id="filter_3d_color">
+                                <p>Color:</p>
+                                <select id="colorSelect" name="color">
+                                    <option value="spectrum" selected="selected">Spectrum</option>
+                                    <option value="grey">Grey</option>
+                                </select>
+                            </div>
+                            <div id="filter_3d_source">
+                                <p>2nd structure:</p>
+                                <select id="secondStructSelect" name="secondStructSelect">
+                                    <option value="all" selected="selected">All</option>
+                                    <option value="a">Alpha-helix</option>
+                                    <option value="b">Beta-strand</option>
+                                    <option value="c">Coil</option>
+                                    <option value="l">Loop</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="filter_3d_row3">
+                            <div id="filter_3d_variant">
+                                <p>Variant:</p>
+                                <select id="variantVisibilitySelect" name="variant">
+                                    <option value="hide">Hide</option>
+                                    <option value="show">Show</option>
+                                </select>
+                            </div>
+                            <div id="filter_3d_resi_label">
+                                <p>Residue label:</p>
+                                <select id="resiLabelSelect" name="resiLabel">
+                                    <option value="hide">Hide</option>
+                                    <option value="show">Show</option>
+                                </select>
+                            </div>
+                            <div id="filter_3d_style">
+                                <p>Style:</p>
+                                <select id="styleSelect" name="styleSelect">
+                                    <option value="cartoon">Cartoon</option>
+                                    <option value="label">Label</option>
+                                    <option value="stick">Stick</option>
+                                    <option value="line">Line</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div id="seqquence_filter_row">
+                            {% include '_sequence_viewer.html' %}
+                        </div>
+                    </div>
+                </div>
+
+                <div id="structure_3D" class="col-sm-9">
+                    {% include '_3d_view.html' %}
+                </div>
+
+            </div>
+
+            <!-- The genebass modal -->
+            <div class="modal fade" id="genebassModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" id="genebass-variant-list">
+                        Data will be loaded here by jQuery
+                    </div>
+                </div>
+            </div>
+
+            <!-- The variant plots modal -->
+            <div class="modal fade" id="variantPlots" tabindex="-1" role="dialog" aria-labelledby="modalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content" id="variantPlots_content">
+                        Variant statistics plots will be shown 1
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    {% endautoescape %}
+{% endblock content %}
+
+{% block addon_js %}
+    <script src="{% static 'home/js/datatables.min.js' %}"></script>
+    <script src="{% static 'home/js/bootstrap2-toggle.min.js' %}"></script>
+    <script src="{% static 'home/js/jquery.dataTables.yadcf.js' %}"></script>
+    <script src="{% static 'home/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'home/js/select2.full.js' %}"></script>
+    <script src="{% static 'home/js/grayscale.js' %}"></script>
+    <script src="{% static 'home/js/gpcrdb.js' %}"></script>
+    <!-- <script src="{% static 'home/js/signprot-multitabtable.js' %}"></script> -->
+    <script src='https://cdn.plot.ly/plotly-2.20.0.min.js'></script>
+    <script src="https://code.jquery.com/jquery-migrate-1.4.1.min.js"></script>
+
+    <script>
+        // Show/hide VEP score algorithms
+        $(document).ready(function () {
+
+            $('#vep-score-algorithms').on(
+                'click', function (e) {
+                    e.preventDefault();
+                    hideAllVepScoreColumns();
+                }
+            )
+
+            $('#show-all-vep-score').on(
+                'click', function (e) {
+                    e.preventDefault();
+                    showAllVepScoreColumns();
+                }
+            )
+
+            $('.variants-table-row').click(function (e) {
+                e.preventDefault();
+                let variant_marker = $(this).data('variant-marker');
+                let url = $(this).data('remote-url');
+
+                $("#genebass-variant-list").html('<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Genebass variants are loading ...')
+
+                $.ajax(
+                    {
+                        url: url,
+                        type: "GET",
+                        data: {
+                            'variant_marker': variant_marker,
+                        },
+                        success: function (response) {
+                            $("#genebass-variant-list").html(response)
+                            redraw_genebass_modal()
+                        }
+                    }
+                )
+            })
+
+            $('.data-row').click(function (e) {
+                // XU LY CLICK VAO LINK VARIANT STATISTIC THI HANDLE SU KIEN
+                if ($(e.target).attr('class').includes('variant_statistics')) {
+                    e.preventDefault();
+                    let variant_marker = $(e.target).data('variant-marker');
+                    let url = $(e.target).data('remote-url');
+                    $("#variantPlots_content").html('<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> The plot will be shown...')
+                    $.ajax(
+                        {
+                            url: url,
+                            type: "GET",
+                            data: {
+                                'variant_marker': variant_marker,
+                            },
+                            success: function (response) {
+                                draw_variant_plot_modal(response, variant_marker)
+                            },
+                            error: function (response) {
+                                console.log(response)
+                            },
+                        }
+                    )
+                }
+            })
+            // Script for showing datatable of variants and VEP scores initially
+            let structures_scrollable = $("#structures_scrollable")
+            structures_scrollable.show();
+            let oTable1 = structures_scrollable.DataTable({
+                deferRender: true,
+                scrollY: true,
+                scrollX: true,
+                scrollCollapse: true,
+                scroller: true,
+                paging: true,
+                bSortCellsTop: false, //prevent sort arrows going on bottom row
+                aaSorting: [],
+                autoWidth: true,
+                bInfo: true,
+                order: [[0, "asc"]],
+                pagingType: 'full_numbers',
+                lengthMenu: [
+                    [10, 25, 50, 100, 200, -1],
+                    [10, 25, 50, 100, 200, 'All'],
+                ],
+            })
+            let column_filters = [];
+            // createYADCFfilters(start_column, num_cols, filter_type, select_type = null, filter_default_label = "", filter_reset_button_text = false, filter_match_mode = null, column_data_type = null, width = null)
+            // Variant
+            column_filters = column_filters.concat(createYADCFfilters(0, 1, "auto_complete", null, "Select", false, null, null, "80px"));
+            //Transcript
+            column_filters = column_filters.concat(createYADCFfilters(1, 1, "auto_complete", null, "Select", false, null, null, "80px"));
+            //Canonical
+            column_filters = column_filters.concat(createYADCFfilters(2, 1, "select", null, "Select", false, null, null, "80px"));
+            //Sequence position
+            column_filters = column_filters.concat(createYADCFfilters(3, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
+            //Wildtype position
+            column_filters = column_filters.concat(createYADCFfilters(4, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
+            //Mutant position
+            column_filters = column_filters.concat(createYADCFfilters(5, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
+            //Codon
+            column_filters = column_filters.concat(createYADCFfilters(6, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
+            //Consequence
+            column_filters = column_filters.concat(createYADCFfilters(7, 1, "select", null, "Select", false, null, null, "80px"));
+            //Score columns
+            column_filters = column_filters.concat(createYADCFfilters(8, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"))
+            // column_filters = column_filters.concat(createYADCFfilters(8, 43, "range_number", null, ["Min", "Max"], false, null, null, "70px"))
+
+
+            // update filters
+            yadcf.init(
+                oTable1,column_filters, {
+			    cumulative_filtering: false
+		        }
+                // [
+                //     // Filter of Primary column
+                //     {column_number: 2, filter_type: "select", filter_default_label: "Select"},
+                //     {column_number: 7, filter_type: "select", filter_default_label: "Select"},
+                //     {column_number: 0, filter_type: "select", filter_default_label: "Select"},
+                //     {column_number: 1, filter_type: "auto_complete", filter_default_label: "Select"},
+                //     {column_number: 3, filter_type: "auto_complete", filter_default_label: "Select"},
+                //     {column_number: 4, filter_type: "multi_select", select_type: "select2", filter_default_label: "Select", width: "50px"},
+                //     {column_number: 5, filter_type: "select", filter_default_label: "Select"},
+                //     {column_number: 6, filter_type: "auto_complete", filter_default_label: "Select"},
+                //     {column_number: 8, filter_type: "auto_complete", filter_default_label: "Select"},
+                // ],
+            )
+
+            oTable1.column(9).visible(false); // Hide the column `Show all VEP Scores` initially
+            $('#lower_mean').change(function () {
+                    let filter_values = get_updated_filter_params();
+                    update_selection();
+                    redraw_chart_and_table(filter_values);
+                }
+            );
+            $('#upper_mean').change(function () {
+                    let filter_values = get_updated_filter_params();
+                    update_selection();
+                    redraw_chart_and_table(filter_values);
+                }
+            );
+
+            // UPDATE_FILTER_PARAMS
+            // Thay doi tu su kien 'change' sang 'select2:select' de tranh bi lap lai
+            $('#transcript-select').on('select2:select', (function () {
+                    let filter_values = get_updated_filter_params();
+                    redraw_chart_and_table(filter_values)
+                }
+            ));
+            // UPDATE_FILTER_PARAMS
+            // Thay doi tu su kien 'change' sang 'select2:select' de tranh bi lap lai
+            $('#variant-select').on('select2:select', (function () {
+                    let filter_values = get_updated_filter_params();
+                    redraw_chart_and_table(filter_values)
+                }
+            ));
+            // UPDATE_FILTER_PARAMS
+            // Thay doi tu su kien 'change' sang 'select2:select' de tranh bi lap lai
+            $('#consequence-select').on('select2:select', (function () {
+                    let filter_values = get_updated_filter_params();
+                    redraw_chart_and_table(filter_values)
+                }
+            ));
+
+            let minEl = $('#mean_vep_score')
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                let min = parseFloat(minEl.val()) || 0.0;
+                let max = 1;
+                let mean_vep_score = parseFloat(data[10]) || 0; // use data for the mean_vep_score column
+
+                if (
+                    (isNaN(min) && isNaN(max)) ||
+                    (isNaN(min) && mean_vep_score <= max) ||
+                    (min <= mean_vep_score && isNaN(max)) ||
+                    (min <= mean_vep_score && mean_vep_score <= max)
+                ) {
+                    return true;
+                }
+
+                return false;
+            });
+
+            let table = $('#structures_scrollable').DataTable();
+
+            // Changes to the inputs will trigger a redraw to update the table
+            minEl.change(function () {
+                table.draw();
+            });
+
+            // Get all the color-coded text spans within the DOM
+            const colorCodedSpans = document.querySelectorAll('.color-coded-text');
+
+            let chunkSize = 10;
+
+            // Iterate over the color-coded text spans
+            colorCodedSpans.forEach((span, index) => {
+                // Calculate the absolute position of the character
+                const absolutePosition = index + 1;
+
+                // Add a data attribute to the span to store the absolute position
+                span.setAttribute("data-absolutePosition", absolutePosition);
+
+            });
+
+            $("a span.color-coded-text").on("click", function (e) {
+                    e.preventDefault();
+                    let position = e.target.dataset.absoluteposition;
+                    let labelText = e.target.textContent;
+
+                    // addLabelForResidueNth(position, labelText, "residue");
+
+                }
+            );
+        })
+
+        function hideAllVepScoreColumns() {
+            var table = $('#structures_scrollable').DataTable();
+            var start_col_index = 10;
+            var end_col_index = 50;
+            for (col_index = start_col_index; col_index <= end_col_index; col_index++) {
+                var column = table.column(col_index);
+                column.visible(false);
+            }
+            table.column(9).visible(true);
+
+            var vep_table_header_inner = document.querySelector("#structures_scrollable_wrapper .dataTables_scroll .dataTables_scrollHeadInner")
+            vep_table_header_inner.style.width = "100%";
+
+            var vep_table_header_inner_table = vep_table_header_inner.querySelector(".dataTable")
+            vep_table_header_inner_table.style.width = "100%";
+
+            var vep_table_body = document.querySelector("#structures_scrollable_wrapper .dataTables_scroll .dataTables_scrollBody .dataTable");
+            vep_table_body.style.width = "100%";
+        }
+
+        function showAllVepScoreColumns() {
+            var table = $('#structures_scrollable').DataTable();
+            var start_col_index = 10
+            var end_col_index = 50
+            for (col_index = start_col_index; col_index <= end_col_index; col_index++) {
+                var column = table.column(col_index);
+                column.visible(true);
+            }
+            table.column(9).visible(false);
+            
+            var vep_table_header_inner = document.querySelector("#structures_scrollable_wrapper .dataTables_scroll .dataTables_scrollHeadInner")
+            vep_table_header_inner.style.width = "100%";
+
+            var vep_table_header_inner_table = vep_table_header_inner.querySelector(".dataTable")
+            vep_table_header_inner_table.style.width = "100%";
+
+            var vep_table_body = document.querySelector("#structures_scrollable_wrapper .dataTables_scroll .dataTables_scrollBody .dataTable");
+            vep_table_body.style.width = "100%";
+        }
+
+        var tableToExcel = (function () {
+            var encabezado = '<html><head><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/><style> table, td {border:thin solid black} table {border-collapse:collapse}</style></head><body><table>';
+
+            var header_el = $('#headers')
+            var header_th_els = header_el.find('th')
+            var header = ''
+            for (var th_i = 0; th_i < header_th_els.length; th_i++) {
+                header += '<th>' + header_th_els[th_i].textContent + '</th>'
+            }
+            header = '<tr>' + header + '</tr>'
+            header = '<thead>' + header + '</thead>'
+            var excel_content = ''
+            // Lay toan bo data trong datatable, chi lay cac rows thoa man dieu kien filter
+            var rows = $('#structures_scrollable').DataTable().rows({search: 'applied'}).data()
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i]
+                excel_content += '<tr>'
+                for (var j = 0; j < row.length; j++) {
+                    excel_content += '<td>' + row[j] + '</td>'
+                }
+                excel_content += '</tr>'
+            }
+
+            var piePagina = "</table></body></html>";
+            var tabla = encabezado + header + excel_content + piePagina;
+            var myBlob = new Blob([tabla], {type: 'application/vnd.ms-excel'});
+            var url = window.URL.createObjectURL(myBlob);
+            var a = document.createElement("a");
+            document.body.appendChild(a);
+            a.href = url;
+            a.download = "DrugBrowserData.xls";
+            a.click();
+
+            setTimeout(function () {
+                window.URL.revokeObjectURL(url);
+            }, 0);
+        });
+
+        // Ham xu ly export modal genebass table
+        var genebassVariantTableToExcel = (function () {
+            var encabezado = '<html><head><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/><style> table, td {border:thin solid black} table {border-collapse:collapse}</style></head><body><table>';
+
+            var header_el = $('#genebass-tables-header')
+            var header_th_els = header_el.find('th')
+            var header = ''
+            for (var th_i = 0; th_i < header_th_els.length; th_i++) {
+                if (th_i == 3) {
+                    header += '<th>' + 'Phenocode' + '</th>'
+                } else {
+                    header += '<th>' + header_th_els[th_i].textContent + '</th>'
+                }
+            }
+            header = '<tr>' + header + '</tr>'
+            header = '<thead>' + header + '</thead>'
+            var excel_content = ''
+            // Lay toan bo data trong datatable, chi lay cac rows thoa man dieu kien filter
+
+            var rows = $('#genebass-tables').DataTable().rows({search: 'applied'}).data()
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i]
+                excel_content += '<tr>'
+                for (var j = 0; j < row.length; j++) {
+                    excel_content += '<td>' + row[j] + '</td>'
+                }
+                excel_content += '</tr>'
+            }
+
+            var piePagina = "</table></body></html>";
+            var tabla = encabezado + header + excel_content + piePagina;
+            var myBlob = new Blob([tabla], {type: 'application/vnd.ms-excel'});
+            var url = window.URL.createObjectURL(myBlob);
+            var a = document.createElement("a");
+            document.body.appendChild(a);
+            a.href = url;
+            a.download = "DrugBrowserData.xls";
+            a.click();
+
+            setTimeout(function () {
+                window.URL.revokeObjectURL(url);
+            }, 0);
+        });
+
+        <!-- Script for ploting the 2D gene viewer -->
+        let list_variants = [];
+        let list_transcripts = [];
+        let list_vep_variants_consequence = [];
+        let list_vep_variants_pos = [];
+        let list_vep_variants_mean_vep_score = [];
+        {% for element in array %}
+            list_variants.push("{{element.0}}");
+            list_transcripts.push("{{element.1}}");
+            list_vep_variants_consequence.push("{{element.2}}");
+            list_vep_variants_pos.push({{element.5}});
+            list_vep_variants_mean_vep_score.push({{element|last}});
+        {% endfor %}
+
+        let maxValue = list_vep_variants_pos[0]; // Initialize maxValue with the first element
+        let minValue = list_vep_variants_pos[0]; // Initialize minValue with the first element
+        let maxIndex = 0; // Initialize maxIndex with 0
+        let minIndex = 0; // Initialize minIndex with 0
+
+        for (let i = 1; i < list_vep_variants_pos.length; i++) {
+            if (list_vep_variants_pos[i] > maxValue) {
+                maxValue = list_vep_variants_pos[i];
+                maxIndex = i;
+            }
+            if (list_vep_variants_pos[i] < minValue) {
+                minValue = list_vep_variants_pos[i];
+                minIndex = i;
+            }
+        }
+
+        list_colors = [];
+        for (let i = 0; i < list_vep_variants_consequence.length; i++) {
+            if (list_vep_variants_consequence[i].includes('Missense')) {
+                list_colors.push('red');
+            } else if (list_vep_variants_consequence[i].includes('Synonymous')) {
+                list_colors.push('#8338EC');
+            } else if (list_vep_variants_consequence[i].includes('Frameshift')) {
+                list_colors.push('green');
+            } else if (list_vep_variants_consequence[i].includes('Stop_gained')) {
+                list_colors.push('#3A86FF')
+            } else if (list_vep_variants_consequence[i].includes('Stop_lost')) {
+                list_colors.push('orange')
+            } else {
+                list_colors.push('black');
+            }
+        }
+
+        max_xaxis = Math.max(...list_vep_variants_pos);
+        let variant_transcripts = list_variants.map((val, index) => `Variant: ${val}, in transcript: ${list_transcripts[index]}`);
+
+
+        let trace1 = {
+            x: list_vep_variants_pos,
+            y: list_vep_variants_mean_vep_score,
+            mode: 'markers',
+            marker: {
+                size: 7,
+                color: list_colors,
+            },
+            type: 'scatter',
+            text: variant_transcripts.map((variant_transcript, index) => `${variant_transcript}`),
+            transcript: list_transcripts,
+            cliponaxis: false,
+            hovertemplate: '%{text}' +
+                '<br><span style="margin-top: 10px;">at position: %{x}</span>' +
+                '<br><span style="margin-top: 10px;">with mean VEP Score: %{y}</span><extra></extra>',
+
+        };
+        let data = [trace1];
+        let layout = {
+            xaxis: {
+                title: {
+                    text: 'Position on protein sequence',
+                    font: {
+                        size: 14,
+                    }
+                },
+                range: [-2, parseInt(max_xaxis * 1.05)],
+                showline: true, // Show x-axis line
+                showgrid: true, // Show x-axis grid lines
+                zeroline: false, // Show the x-axis zero line
+            },
+            yaxis: {
+                title: {
+                    text: 'Mean of VEP scores',
+                    font: {
+                        size: 14,
+                    }
+                },
+                range: [0.01, 1.05],
+                showline: true, // Show y-axis line
+                showgrid: true, // Show y-axis grid lines
+                zeroline: false, // Show the y-axis zero line
+            },
+            margin: {
+                t: 10, // Increase the top margin for the title and plot container
+                b: 60, // Bottom margin for the x-axis labels and title
+                l: 60, // Left margin for the y-axis labels and title
+                r: 40, // Right margin
+            }
+        };
+
+        Plotly.newPlot('gene-2d-chart', data, layout);
+
+        // this function returns true if a variant, along with its transcript, consequence and vep score pass all the 4 filters
+        function condition_check(vep_score, transcript, variant, consequence, filter_values) {
+            let vep_score_check = true;
+            if ((filter_values.mean_vep_score_lower !== null || filter_values.mean_vep_score_upper !== null) &&
+                (vep_score < filter_values.mean_vep_score_lower || vep_score > filter_values.mean_vep_score_upper)) {
+                vep_score_check = false;
+            }
+            // let variant_check = true;
+            // if (filter_values.variant.length !== 0) {
+            //     if (filter_values.variant.indexOf(variant) === -1) {
+            //         variant_check = false;
+            //     }
+            // }
+            // let consequence_check = true;
+            // if (filter_values.consequence.length !== 0) {
+            //     const intersection = consequence.split(",").filter(element => filter_values.consequence.includes(element));
+            //     if (intersection.length === 0) {
+            //         consequence_check = false;
+            //     }
+            // }
+            // let transcript_check = true;
+            // if (filter_values.transcript.length !== 0) {
+            //     if (filter_values.transcript.indexOf(transcript) === -1) {
+            //         transcript_check = false;
+            //     }
+            // }
+            // return vep_score_check && variant_check && consequence_check && transcript_check;
+            return vep_score_check;
+        }
+
+        // Get the filter values
+        function get_updated_filter_params() {
+            let mean_vep_score_lower = $('#lower_mean').val();
+            let mean_vep_score_upper = $('#upper_mean').val();
+            let transcript = $('#transcript-select').val();
+            let variant = $('#variant-select').val();
+            let consequence = $('#consequence-select').val();
+
+            return {
+                mean_vep_score_lower: mean_vep_score_lower,
+                mean_vep_score_upper: mean_vep_score_upper,
+                transcript: transcript,
+                variant: variant,
+                consequence: consequence,
+            };
+        }
+
+        // return 3 list of transcript, variant, consequence corresponding to new mean VEP inputs
+        function get_updated_select_values() {
+
+            let filter_values = get_updated_filter_params();
+            let list_transcripts_options = [];
+            let list_variants_options = [];
+            let list_consequences_options = [];
+
+            for (let i = 0; i < list_vep_variants_pos.length; i++) {
+                if (condition_check(list_vep_variants_mean_vep_score[i], list_variants[i], list_vep_variants_consequence[i], list_transcripts[i], filter_values)) {
+
+                    // UPDATE_FILTER_PARAMS 
+                    if (!list_variants_options.includes(list_variants[i])) {
+                        list_variants_options.push(list_variants[i]);
+                    }
+
+                    if (!list_transcripts_options.includes(list_transcripts[i])) {
+                        list_transcripts_options.push(list_transcripts[i]);
+                    }
+
+                    if (!list_consequences_options.includes(list_vep_variants_consequence[i])) {
+                        list_consequences_options.push(list_vep_variants_consequence[i]);
+                    }
+                }
+            }
+
+            return {
+                list_transcripts_options: list_transcripts_options,
+                list_variants_options: list_variants_options,
+                list_consequences_options: list_consequences_options,
+
+            };
+        }
+
+        function get_filtered_data_for_redrawing_chart() {
+
+            let filter_values = get_updated_filter_params();
+            let filtered_list_vep_variants_pos = [];
+            let filtered_list_vep_variants_mean_vep_score = [];
+            let filtered_list_vep_variants_consequence = [];
+            let filtered_list_vep_variants_transcript = [];
+            let filtered_list_vep_variants_variant = [];
+            let filtered_list_colors = [];
+
+            for (let i = 0; i < list_vep_variants_pos.length; i++) {
+                if (condition_check(list_vep_variants_mean_vep_score[i], list_variants[i], list_vep_variants_consequence[i], list_transcripts[i], filter_values)) {
+                    filtered_list_vep_variants_pos.push(list_vep_variants_pos[i]);
+                    filtered_list_vep_variants_mean_vep_score.push(list_vep_variants_mean_vep_score[i]);
+                    filtered_list_vep_variants_consequence.push(list_vep_variants_consequence[i]);
+                    filtered_list_vep_variants_transcript.push(list_transcripts[i]);
+                    filtered_list_vep_variants_variant.push(list_variants[i]);
+                    filtered_list_colors.push(list_colors[i]);
+                }
+            }
+
+            return {
+                filtered_list_vep_variants_pos: filtered_list_vep_variants_pos,
+                filtered_list_vep_variants_mean_vep_score: filtered_list_vep_variants_mean_vep_score,
+                filtered_list_vep_variants_consequence: filtered_list_vep_variants_consequence,
+                filtered_list_colors: filtered_list_colors,
+                filtered_list_vep_variants_transcript: filtered_list_vep_variants_transcript,
+                filtered_list_vep_variants_variant: filtered_list_vep_variants_variant,
+            }
+        }
+
+        function update_selection() {
+            values = get_updated_select_values();
+            // UPDATE_FILTER_PARAMS FOR TRANSCRIPT SELECT
+            var $trans = $('#transcript-select').select2();
+            $trans.empty(); // remove old options
+            for (var i_tr = 0; i_tr < values.list_transcripts_options.length; i_tr++) {
+                var newOption = new Option(values.list_transcripts_options[i_tr], values.list_transcripts_options[i_tr], false, false);
+                $trans.append(newOption);
+            }
+            $trans.change() // notify only Select2 of changes
+
+            // UPDATE_FILTER_PARAMS FOR VARIANT SELECT
+            var $variants = $('#variant-select').select2();
+            $variants.empty(); // remove old options
+            for (var i_tr = 0; i_tr < values.list_variants_options.length; i_tr++) {
+                var newOption = new Option(values.list_variants_options[i_tr], values.list_variants_options[i_tr], false, false);
+                $variants.append(newOption);
+            }
+            $variants.change() // notify only Select2 of changes
+
+            // UPDATE_FILTER_PARAMS FOR CONSEQUENCE SELECT
+            var $consequences = $('#consequence-select').select2();
+            $consequences.empty(); // remove old options
+            for (var i_tr = 0; i_tr < values.list_consequences_options.length; i_tr++) {
+                var newOption = new Option(values.list_consequences_options[i_tr], values.list_consequences_options[i_tr], false, false);
+                $consequences.append(newOption);
+            }
+            $consequences.change() // notify only Select2 of changes
+        }
+
+        function redraw_chart_and_table(filter_values) {
+            redraw_2d_chart(filter_values)
+            redraw_vep_variants_datatable(filter_values)
+        }
+
+        function redraw_2d_chart(filter_values) {
+            redraw_data = get_filtered_data_for_redrawing_chart();
+            let variant = redraw_data.filtered_list_vep_variants_variant;
+            let transcript = redraw_data.filtered_list_vep_variants_transcript;
+            let variant_transcripts = variant.map((val, index) => `Variant: ${val}, in transcript: ${transcript[index]}`);
+
+            let trace1 = {
+                x: redraw_data.filtered_list_vep_variants_pos,
+                y: redraw_data.filtered_list_vep_variants_mean_vep_score,
+                mode: 'markers',
+                marker: {
+                    size: 7,
+                    color: list_colors,
+                },
+                type: 'scatter',
+                text: variant_transcripts.map((variant_transcript, index) => `${variant_transcript}`),
+                cliponaxis: false,
+                hovertemplate: '%{text}' +
+                    '<br><span style="margin-top: 10px;">at position: %{x}</span>' +
+                    '<br><span style="margin-top: 10px;">with mean VEP Score: %{y}</span><extra></extra>',
+
+            };
+
+            let data = [trace1];
+
+            let layout = {
+                xaxis: {
+                    title: {
+                        text: 'Position on protein sequence',
+                        font: {
+                            size: 14,
+                        }
+                    },
+                    range: [-2, parseInt(max_xaxis * 1.05)],
+                    showline: true, // Show x-axis line
+                    showgrid: true, // Show x-axis grid lines
+                    zeroline: false, // Show the x-axis zero line
+
+                },
+                yaxis: {
+                    title: {
+                        text: 'Mean of VEP scores',
+                        font: {
+                            size: 14,
+                        }
+                    },
+                    range: [0.01, 1.05],
+                    showline: true, // Show y-axis line
+                    showgrid: true, // Show y-axis grid lines
+                    zeroline: false, // Show the y-axis zero line
+
+                },
+                margin: {
+                    t: 10, // Increase the top margin for the title and plot container
+                    b: 60, // Bottom margin for the x-axis labels and title
+                    l: 60, // Left margin for the y-axis labels and title
+                    r: 40, // Right margin
+                }
+            }
+            Plotly.newPlot('gene-2d-chart', data, layout);
+        }
+
+        function redraw_vep_variants_datatable(filter_values) {
+            let vep_variants_table = $("#structures_scrollable").DataTable();
+            //filter by transcript
+            let transcript_search_terms = []
+            for (let i = 0; i < filter_values.transcript.length; i++) {
+                transcript_search_terms.push("^" + filter_values.transcript[i] + "$")
+            }
+            vep_variants_table.column(1).search(transcript_search_terms.join('|'), true, false, true).draw();
+
+            //filter by variants
+            let variant_search_terms = []
+            for (let i = 0; i < filter_values.variant.length; i++) {
+                variant_search_terms.push("^" + filter_values.variant[i] + "$")
+            }
+            vep_variants_table.column(0).search(variant_search_terms.join('|'), true, false, true).draw();
+
+            //filter by consequence
+            let consequence_search_terms = []
+            for (let i = 0; i < filter_values.consequence.length; i++) {
+                consequence_search_terms.push(filter_values.consequence[i])
+            }
+            vep_variants_table.column(8).search(consequence_search_terms.join('|'), true, false, true).draw();
+        }
+
+        function draw_variant_plot_modal(response, variant_marker) {
+            $('#variantPlots_content').html('');  // clear data
+            var data = [{
+                type: 'violin',
+                // y: unpack(rows, 'total_bill'),
+                y: response.list_vep_scores,
+                points: 'none',
+                box: {
+                    visible: true
+                },
+                boxpoints: false,
+                line: {
+                    color: '#eb9d09'
+                },
+                fillcolor: '#FFE169' , //'#eb9d09',
+                opacity: 0.6,
+                meanline: {
+                    visible: true
+                },
+                x0: "Variant: "+variant_marker
+            }]
+
+            var layout = {
+                title: "Range of predicted variant effect scores of variant: "+variant_marker,
+                yaxis: {
+                    zeroline: false
+                }
+            }
+
+            Plotly.newPlot('variantPlots_content', data, layout);
+        }
+
+        function redraw_genebass_modal() {
+            let genebass_table = $("#genebass-tables")
+            genebass_table.show()
+            let genebass_variant_table = genebass_table.DataTable({
+                searchPanes: {
+                    layout: 'columns-1'
+                },
+                dom: '<"dtsp-dataTable"frtip>',
+                deferRender: true,
+                scrollY: true,
+                scrollX: true,
+                scrollCollapse: true,
+                scroller: true,
+                paging: true,
+                bSortCellsTop: false, //prevent sort arrows going on bottom row
+                aaSorting: [],
+                autoWidth: true,
+                bInfo: true,
+                //order: [[7, "asc"]],
+                pagingType: 'full_numbers',
+                lengthMenu: [
+                    [10, 25, 50, 100, 200, -1],
+                    [10, 25, 50, 100, 200, 'All'],
+                ],
+            })
+
+            let column_filters = [];
+
+            // Phenocode
+            //column_filters = column_filters.concat(createYADCFfilters(3, 1, "multi_select", "select2", "Select", false, null, null));
+
+            yadcf.init(
+                genebass_variant_table,
+                //column_filters, 
+                [
+                    {
+                        column_number: 3,
+                        filter_type: "multi_select",
+                        select_type: "select2",
+                    },
+                ],
+                {
+                    cumulative_filtering: false
+                }
+            );
+
+            gray_scale_table(genebass_table);
+
+            $("#reset").click(function () {
+                yadcf.exResetAllFilters(genebass_variant_table);
+            });
+        }
+
+        // <!-- Script for filtering options of 3d-structure  -->
+        var structureDisplay = document.getElementById('structure_display');
+        let positionsToColor = [...new Set(list_vep_variants_pos)];
+
+        viewer_bkup = viewer;
+
+        // Count the number of chains
+        const chains = new Set();
+        const atoms = viewer.getModel().selectedAtoms({});
+        for (let i = 0; i < atoms.length; i++) {
+            const atom = atoms[i];
+            chains.add(atom.chain);
+        }
+
+        const chainSelect = document.getElementById('chainSelect');
+        const chainArray = Array.from(chains); // Convert the set to an array for easier manipulation
+        chainArray.sort(); // Sort the chains in alphabetical order (optional)
+        for (const chain of chainArray) {
+            const option = document.createElement("option");
+            option.value = chain;
+            option.textContent = chain;
+            chainSelect.appendChild(option);
+        }
+
+        chainSelect.addEventListener('change', (event) => {
+            var selectedChain = chainSelect.value;
+
+            if (selectedChain !== "") {
+                viewer.setStyle({}, {cartoon: {color: 'grey', opacity: 0.5}});
+                viewer.addStyle({chain: selectedChain}, {cartoon: {color: 'spectrum', opacity: 1}});
+            }
+            viewer.render();
+        });
+
+        let colorVariantPosition = function (atom, color1, color2) {
+            // Check if the current residue position is in the list
+            if (positionsToColor.includes(atom.resi)) {
+                return color1;
+            } else {
+                return color2;
+            }
+        };
+
+        const resiLabelSelect = document.getElementById('resiLabelSelect');
+        let toremoveLabel = null;
+        resiLabelSelect.addEventListener('change', (event) => {
+            const selectedResiVisibility = event.target.value;
+            if (selectedResiVisibility === 'hide') {
+                if (toremoveLabel != null) {
+                    viewer.removeLabel(toremoveLabel);
+                    toremoveLabel = null;
+                }
+            } else {
+                toremoveLabel = viewer.addResLabels({hetflag: false}, {
+                    font: 'Arial',
+                    fontSize: 6,
+                    fontColor: 'black',
+                    showBackground: false,
+                    screenOffset: {x: 0, y: 0}
+                });
+            }
+            viewer.render();
+        });
+
+        const variantVisibilitySelect = document.getElementById('variantVisibilitySelect');
+        variantVisibilitySelect.addEventListener('change', (event) => {
+            const selectedvisibility = event.target.value;
+            if (selectedvisibility === 'hide') {
+                viewer.setStyle({}, {cartoon: {color: "spectrum"}});
+            } else {
+                viewer.setStyle({}, {cartoon: {color: 'grey', thickness: 0.5}});
+                viewer.addStyle({resi: [5, 10, 15, 20, 25, 30, 35, 40]}, {stick: {colorscheme: 'greenCarbon'}});
+            }
+            viewer.render();
+        });
+
+        var colorSelect = document.getElementById('colorSelect');
+        colorSelect.addEventListener('change', (event) => {
+            const selectedColor = event.target.value;
+            if (selectedColor === 'grey') {
+                viewer.setStyle({}, {cartoon: {color: 'grey'}});
+            } else {
+                viewer.setStyle({}, {cartoon: {color: 'spectrum'}});
+                for (const option of variantVisibilitySelect.options) {
+                    if (option.value === "hide") {
+                        option.selected = true;
+                        break;
+                    }
+                }
+            }
+            viewer.render();
+        });
+
+        const sourceSelect = document.getElementById('sourceSelect');
+        sourceSelect.addEventListener('change', (event) => {
+            const sourceSelect = event.target.value;
+            if (sourceSelect === 'pdb') {
+            } else {
+            }
+        });
+        //adding something here
+
+        // Add a label for a specific residue at position "nth"
+        function addLabelForResidueNth(nth, labelText, labelOptions) {
+            const labels = viewer.addResLabels({resi: nth}, labelOptions);
+            return labels;
+        }
+
+    </script>
+{% endblock addon_js %}
+

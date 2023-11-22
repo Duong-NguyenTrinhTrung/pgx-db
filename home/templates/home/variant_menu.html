@@ -1,0 +1,13 @@
+{% load static %}
+
+<!-- ARRESTINS -->
+<li class="dropdown arrestin {% if current_site == 'arrestin' %}highlight_menu{% endif %}" id="variant_menu">
+    <a href="{{ hosts.arrestin }}/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" style="padding-left: 15px;">
+    Variants<span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu" role="menu">
+        <li><a role="button" href="{% url 'variant_statistics' %}">Variant statistics</a></li>
+        <li class="divider"></li>
+        <li><a href="{% url 'variant_lookup' %}">Variant lookup</a></li>
+    </ul>
+</li>

@@ -1,0 +1,38 @@
+{% extends "home/base.html" %}
+
+{% block content %}
+
+<!-- Display search results for the drug -->
+<h2>Search results for "{{ drug_name }}":</h2>
+
+<!-- Display related ATC codes -->
+{% if related_atc_codes %}
+  <p>Related ATC codes:</p>
+  <ul>
+    {% for atc_code in related_atc_codes %}
+      <li><button type="button" class="atc-code-btn" data-atc-code="{{ atc_code }}">{{ atc_code }}</button></li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<!-- Display list of drugs for selected ATC code -->
+<div id="drug-list-container">
+  <!-- AJAX content will be loaded here -->
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(function() {
+  // Handle click event on ATC code button
+  $('.atc-code-btn').click(function() {
+    var atcCode = $(this).data('atc-code');
+    var url = '{% url "get_drugs_by_atc_code" %}?atc_code=' + encodeURIComponent(atcCode);
+
+    // Load content for selected ATC code using AJAX
+    $('#drug-list-container').load(url);
+  });
+});
+</script>
+{% endblock %}

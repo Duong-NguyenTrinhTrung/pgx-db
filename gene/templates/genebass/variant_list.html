@@ -1,0 +1,228 @@
+{% extends "layouts/v2/base.html" %}
+
+{% load static %}
+{% load i18n %}
+{% load render_genebass_variant_row %}
+
+{% csrf_token %}
+
+{% block addon_css %}
+    <link rel="stylesheet" href="{% static 'home/css/jquery.dataTables.min.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'home/css/bootstrap2-toggle.min.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'home/css/yadcf_bootstrap_version.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'home/css/select2.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'home/css/modal.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/searchpanes/2.1.2/css/searchPanes.dataTables.min.css"
+          type="text/css"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.6.2/css/select.dataTables.min.css"
+          type="text/css"/>
+
+    <!--This is for the filter, min max, pagination styling -->
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css"/>
+    <link rel="stylesheet" href="{% static 'home/css/construct_browser.css' %}" type="text/css"/>
+
+{% endblock addon_css %}
+
+{% block content %}
+    {% autoescape off %}
+        <div class="row">
+            <p style="font-size: 28px">Gene <span style="color: darkred"> {{ gene.gene_id }}</span></p>
+        </div>
+        <div class="row">
+            <!-- Filter area -->
+            <div class="col-md-3" style="margin-right: auto">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Phenotype</div>
+                        </div>
+                        <select class="phenotype-dropdown">
+                            <option value="all">All</option>
+                            {% for phenotype in phenotypes %}
+                                <option value="{{ phenotype }}">{{ phenotype }}</option>
+                            {% endfor %}
+
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <div class="input-group-prepend">
+                            <div class="input-group-text">Category</div>
+                        </div>
+                        <select class="category-dropdown" multiple="multiple">
+                            <option value="all">All</option>
+
+                            {% for category in categories %}
+                                <option value="{{ category }}">{{ category }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table area -->
+            <div class="col-md-9">
+                <div class="row" id="d3js-chart">
+
+                </div>
+                <div class="row">
+                    <div id="structures_scrollable_table">
+                        <table class="display compact text-nowrap" id="structures_scrollable"
+                               style="width: 100%; margin-top: 10px; font-size: 12px;">
+                            <thead id="headers">
+                            {% include "genebass/header_row.html" %}
+                            </thead>
+                            <tbody id='structures_scrollable_body'>
+                            {% for genebass_variant in variant_list %}
+                                {% render_genebass_variant_row genebass_variant %}
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <br/>
+                    </div>
+                </div>
+
+                {% include "genebass/helper_buttons.html" %}
+
+            </div>
+        </div>
+    {% endautoescape %}
+{% endblock content %}
+
+{% block addon_js %}
+    <!--addon_js from gene_browser.html -->
+    <script src="{% static 'home/js/datatables.min.js' %}"></script>
+    <script src="{% static 'home/js/bootstrap2-toggle.min.js' %}"></script>
+    <script src="{% static 'home/js/jquery.dataTables.yadcf.js' %}"></script>
+    <script src="{% static 'home/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'home/js/select2.full.js' %}"></script>
+    <script src="{% static 'home/js/grayscale.js' %}"></script>
+    <script src="{% static 'home/js/gpcrdb.js' %}"></script>
+    <script src="{% static 'home/js/signprot-multitabtable.js' %}"></script>
+
+    <script src="https://cdn.datatables.net/searchpanes/2.1.2/js/dataTables.searchPanes.min.js"></script>
+    <script src="https://cdn.datatables.net/searchpanes/2.1.2/js/searchPanes.bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/select/1.3.1/js/dataTables.select.min.js"></script>
+
+    <script src="https://d3js.org/d3.v4.js"></script>
+
+    {#    {% include "genebass/yadcf_filter.html" %}#}
+
+    <script>
+        $(document).ready(function () {
+            $('.phenotype-dropdown').select2({
+                placeholder: 'Select a phenotype',
+                width: '100%',
+                allowClear: true
+            });
+            $('.category-dropdown').select2({
+                placeholder: 'Select a category',
+                width: '100%',
+                allowClear: true,
+            });
+            let structures_scrollable = $("#structures_scrollable")
+            structures_scrollable.show()
+            let genebass_variant_table = structures_scrollable.DataTable({
+                searchPanes: {
+                    layout: 'columns-1'
+                },
+                dom: '<"dtsp-dataTable"frtip>',
+                deferRender: true,
+                scrollY: true,
+                scrollX: true,
+                scrollCollapse: true,
+                scroller: true,
+                paging: true,
+                bSortCellsTop: false, //prevent sort arrows going on bottom row
+                aaSorting: [],
+                autoWidth: true,
+                bInfo: true,
+                //order: [[7, "asc"]],
+                pagingType: 'full_numbers',
+                lengthMenu: [
+                    [10, 25, 50, 100, 200, -1],
+                    [10, 25, 50, 100, 200, 'All'],
+                ],
+            })
+
+            $('.category-dropdown').on('change', function (e) {
+                var searchTerms = [];
+                //Get Text
+                var selected = $('.category-dropdown').select2("data");
+                for (var i = 0; i <= selected.length - 1; i++) {
+                    console.log(selected[i].text);
+                }
+
+                {#let category = $(this).val();#}
+                {#$('.category-dropdown').val(category)#}
+                {#console.log(category)#}
+                //dataTable.column(6).search('\\s' + status + '\\s', true, false, true).draw();
+                {#genebass_variant_table.column(3).search(category).draw();#}
+            })
+        })
+
+    </script>
+    <script>
+
+        // set the dimensions and margins of the graph
+        var margin = {top: 10, right: 30, bottom: 30, left: 60},
+            width = 460 - margin.left - margin.right,
+            height = 250 - margin.top - margin.bottom;
+
+        // append the svg object to the body of the page
+        var svg = d3.select("#d3js-chart")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")");
+
+        //Read the data
+        d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/3_TwoNumOrdered_comma.csv",
+
+            // When reading the csv, I must format variables:
+            function (d) {
+                return {date: d3.timeParse("%Y-%m-%d")(d.date), value: d.value}
+            },
+
+            // Now I can use this dataset:
+            function (data) {
+
+                // Add X axis --> it is a date format
+                var x = d3.scaleTime()
+                    .domain(d3.extent(data, function (d) {
+                        return d.date;
+                    }))
+                    .range([0, width]);
+                svg.append("g")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(d3.axisBottom(x));
+
+                // Add Y axis
+                var y = d3.scaleLinear()
+                    .domain([0, d3.max(data, function (d) {
+                        return +d.value;
+                    })])
+                    .range([height, 0]);
+                svg.append("g")
+                    .call(d3.axisLeft(y));
+
+                // Add the line
+                svg.append("path")
+                    .datum(data)
+                    .attr("fill", "none")
+                    .attr("stroke", "steelblue")
+                    .attr("stroke-width", 1.5)
+                    .attr("d", d3.line()
+                        .x(function (d) {
+                            return x(d.date)
+                        })
+                        .y(function (d) {
+                            return y(d.value)
+                        })
+                    )
+            })
+
+    </script>
+{% endblock addon_js %}

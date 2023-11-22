@@ -1,0 +1,52 @@
+{% extends "home/base.html" %}
+{% load static %}
+{% csrf_token %}
+
+{% block addon_css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome-pro@6.2.0/css/all.min.css">
+
+
+    <link rel="stylesheet" type="text/css" href="{% static 'drug/css/atc_lookup.css' %}">
+{% endblock %}
+
+{% block content %}
+    {% autoescape off %}
+        <div class="atc-intro">
+            <h1>ATC/DDD Index 2023</h1>
+            <div>
+                <p>
+                    A searchable version of the complete ATC index with DDDs is available below. The search options
+                    enable you to find ATC codes and DDDs for substance name <br>
+                    and/or ATC levels. In your search result you may choose to show or hide the text from the Guidelines
+                    for ATC classification and DDD assignment linked to <br>
+                    the ATC level. The text in the Guidelines will give information related to the background for the
+                    ATC and DDD assignment.
+                </p>
+            </div>
+            <h3>Search query</h3>
+        </div>
+
+        <div class="row">
+            <form method="GET">
+                {{  filter.form.as_p }}
+            </form>
+        </div>
+
+        <div class="atc-intro">
+            <h2>ATC code</h2>
+            <div>
+                <p>All ATC levels are searchable.
+                    A search will result in showing the exact substance or level and all ATC levels above (up to 1st ATC level).</p>
+            </div>
+        </div>
+        <div id="atc-l1">
+            {% for group in object_list %}
+                <p><a href="{% url 'atc-detail-view' %}?group_id={{ group.id }}" target="_blank">{{ group.id }}: {{ group.name }}</a></p>
+            {% empty %}
+                <p>No data available</p>
+            {% endfor %}
+        </div>
+    {% endautoescape %}
+{% endblock %}

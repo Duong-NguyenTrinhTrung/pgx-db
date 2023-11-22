@@ -1,0 +1,13 @@
+{% load static %}
+
+<!-- G PROTEINS -->
+<li class="dropdown gprotein {% if current_site == 'gprotein' %}highlight_menu{% endif %}" id="target_menu">
+    <a href="{{ hosts.gprotein }}/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+        &nbsp;&nbsp;Targets<span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu" role="menu">
+        <li><a role="button" href="{% url 'target_statistics' %}" >Target statistics</a></li>
+        <li class="divider"></li>
+        <li><a href="{% url 'target_lookup' %}">Target lookup</a></li>
+    </ul>
+</li>

@@ -1,0 +1,131 @@
+{% extends "home/base.html" %}
+{% load static %}
+{% csrf_token %}
+
+{% block addon_css %}
+
+
+<style type="text/css">
+	
+	{% comment %} #overlay {
+		top: 0px;
+		position: absolute;
+		background: #f8f8f8;
+		/*border: 1px solid #333;*/
+		-webkit-box-shadow: 5px 0 2px -2px #888;
+		box-shadow: 5px 0 2px -2px #888;
+	} {% endcomment %}
+
+	{% comment %} .container {
+		width: 90%;
+		/* display:flex;
+            flex-direction: column; */
+	}
+
+	.wrapper {
+		overflow-x: scroll;
+		overflow-y: hidden;
+	} {% endcomment %}
+
+	{% comment %} #overlay tbody tr {
+		background-color: #f8f8f8;
+	} {% endcomment %}
+
+	{% comment %} #count_row th {
+		font-size: 11px;
+		text-align: center;
+	}
+
+	.border-left {
+		padding-left: 3px;
+	} {% endcomment %}
+
+	{% comment %} .name {
+		width: 100px;
+		text-overflow: ellipsis;
+		cursor: pointer;
+		word-break: break-all;
+		overflow: hidden;
+		white-space: nowrap;
+	} {% endcomment %}
+
+	{% comment %} .name:hover {
+		overflow: visible;
+		white-space: normal;
+	} {% endcomment %}
+
+
+	{% comment %} .table-filter-dropdown{
+		text-align: left;
+		font-size: 16px;
+		
+	} {% endcomment %}
+
+	table, th, td {
+		border: 1px solid;
+		border-collapse: collapse;
+		padding: 15px;
+	}
+	tr:hover {background-color: coral;}
+</style>
+
+{% endblock %}
+
+{% block content %}
+{% autoescape off %}
+
+<div style='padding-top: 0px; font-size: 14px;   width:100%;'>
+  <br />
+  <div style='font-size: 12px;'>
+  <p> Data showed in this table is collected from the <a href='//go.drugbank.com/' target='_blank'>Drugbank</a> database and <a href='https://www.uniprot.org/' target='_blank'>UniProt</a>  </p>
+  </div>
+	<a id="dlink" style="display:none;"></a>
+	<div id="excel_table" style2="display:none;"></div>
+	
+	<button onclick="tableToExcel('structures_scrollable', 'Families data', 'EndogenousData.xls')" type="button" class="btn btn-primary" style="margin-top:10px;margin-top:3px"> Export to Excel </button>
+	
+	<button id="reset" type="button" class="btn btn-primary" style="margin-top:10px;margin-top:3px"> Reset filters </button>
+
+	<a href="{% url 'search_drugs' %}?q={{ search_query }}">Search for drugs</a>
+
+	<table  style="width: 100%; margin-top: 10px; ">
+		<thead >
+			
+			<tr >
+        <!-- Protein block -->
+				<th style="text-align:center;">Protein</th>
+				<th style="text-align:center;">Type</th>
+				<th style="text-align:center;">Drugtype</th>
+        <th style="text-align:center;">UniProt</th>
+				<th style="text-align:center;">Gene</th>
+				<th style="text-align:center;">ExtLink1</th>
+				<th style="text-align:center;">ExtLink2</th>
+				<th style="text-align:center;">ExtLink3</th>
+				<th style="text-align:center;">ExtLink4</th>
+				<th style="text-align:center;">#Variants</th>
+				
+			</tr>
+		</thead>
+		<tbody  style="font-size:14px;">
+				{% for value in Array %}
+				<tr>
+					<td style="text-align:center">{{value.0}}</td>
+					<td style="text-align:center">{{value.1}}</td>
+					<td style="text-align:center;">{{value.2}}</td>
+          <td style="text-align:center">{{value.3}}</td>
+					<td style="text-align:center">{{value.4}}</td>
+					<td style="text-align:center;">{{"value.5"}}</td>
+					<td style="text-align:center;">{{"value.6"}}</td>
+          <td style="text-align:center">{{"value.7"}}</td>
+					<td style="text-align:center">{{"value.8"}}</td>
+					<td style="text-align:center">{{value.5}}</td>
+				</tr>
+				{% endfor %}
+		</tbody>
+	</table>
+
+</div>
+<br>
+{% endautoescape %}
+{% endblock %}
+

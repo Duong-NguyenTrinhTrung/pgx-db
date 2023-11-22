@@ -1,0 +1,306 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+
+{% block addon_css %}
+
+<style>
+    #target, #target-result{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 80px;
+    }
+
+    #target-result{
+        margin-top: 20px;
+        width: 70%;
+        margin: 20px auto;
+    }
+
+    #target-result-table {
+        border-radius: 5px;
+    }
+
+    #target-result-table th:first-child{
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+    }
+
+    #target-result-table th:last-child {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+
+
+
+    #target-result-table th{
+        height: 40px;
+        text-align: center;
+        background-color: rgb(142, 190, 235);
+        font-weight: normal;
+        color: white;
+        font-size: 14px;
+    }
+
+    #target-result-table th, td {
+        /* border: 1px solid rgb(91, 142, 188);
+        border: 1px solid rgb(91, 142, 188); */
+        padding: 0 7px;
+    }
+
+    /* Apply alternating row colors */
+    #target-result-table tr:nth-child(even) {
+        background-color: rgba(142, 190, 235, 0.4); /* Color 1 for even rows */
+    }
+
+    #target-result-table tr:nth-child(odd) {
+        /* background-color: rgba(241, 124, 14, 0.2); */
+        background-color: white; /* Color 2 for odd rows */
+    }
+
+    /* Add background colors to the form and the paragraph */
+    #target p
+   {
+        display: block;
+        width: 70%;
+        background-color: rgb(142, 190, 235);
+        /* Use your desired pastel background color */
+        padding: 10px;
+        /* Add some padding to the paragraph */
+        border-radius: 5px;
+        /* Optional: Add rounded corners to the paragraph */
+    }
+
+    #target form
+    {
+        background-color: #F2F5F6;
+        /* Use a different pastel background color for the form if desired */
+        padding: 3px;
+        /* Add some padding to the form */
+        border-radius: 5px;
+        /* Optional: Add rounded corners to the form */
+        width: 70%;
+        height: 95px
+    }
+
+    /* Style the input elements and buttons */
+    #target input
+    {
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    /* Add some spacing between buttons */
+    #target_search,
+    #target_reset
+     {
+        margin-right: 10px;
+    }
+
+    input.form-control {
+        width: 650px;
+    }
+
+    td {
+        /* text-align: center;  */
+        vertical-align: middle;
+        /* Vertically center the content within the td */
+    }
+
+    .autocomplete-outer{
+        display: none;
+        width: 650px;
+        max-height: 400px;
+        background-color: white;
+        border: 1px solid #ccc;
+        padding: 5px;
+        position: absolute;
+        top: 100%;
+        left: 0;
+    }
+
+    #protein-autocomplete-results,
+    #gene-autocomplete-results {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div id="target">
+    <p>Search by <i><span style="color:#f8f9fa;">UniProt accession number</span></i>, <i><span
+                style="color:#f8f9fa;">protein name</span></i>, <i><span
+                    style="color:#f8f9fa;"> genename</span></i> or by <i><span
+                        style="color:#f8f9fa;">Ensembl gene ID</span></i></p>
+    <form method="get" action="">
+        <table class="table table-bordered table-gray table-fulltext-two-rows">
+            <tbody>
+                <tr>
+                    <td>
+                        <div style="position: relative;">
+                            <input id="search_protein"
+                                class="form-text form-type-textfield form-control optional ui-autocomplete-input"
+                                autocomplete="on" />
+                            <div class="autocomplete-outer">
+                                <div id="protein-autocomplete-results">
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="h-center"><input id="submit_protein" type="submit" value="Search"
+                            class="button js-form-submit form-submit form-type-submit btn btn-default"></td>
+                    <td class="h-center"><input id="reset_protein" type="reset" value="Reset"
+                            class="button js-form-submit form-submit form-type-submit btn btn-default"></td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: left; padding-left: 30px;">Examples: <a
+                            href="/gene/ENSG00000138075/" target='_blank' hreflang="en">Q9H222</a>; 
+                            <a href="/gene/ENSG00000138075/" target='_blank' hreflang="en">ATP-binding cassette sub-family G member 5 (EC 7.6.2.-) (Sterolin-1)</a>;
+                            <a href="/gene/ENSG00000138075/" target='_blank' hreflang="en">ABCG5</a>;
+                            <a href="/gene/ENSG00000138075/" target='_blank' hreflang="en">ENSG00000138075</a>
+                            ; ... </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<div id="target-result">
+
+    <table id="target-result-table">
+        <thead>
+            <tr>
+                <th>UniProtID</th>
+                <th>Protein name</th>
+                <th>Gene ID</th>
+                <th>Genename</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody id="target-result-tbody">
+            {% for protein in proteins %}
+                <tr>
+                    <td>{{ protein.uniprot_ID }}</td>
+                    <td>{{ protein.protein_name }}</td>
+                    <td>{{ protein.geneID }}</td>
+                    <td>{{ protein.genename }}</td>
+                    <td><a href="{% url 'gene:gene' slug=protein.geneID %}"  target="_blank" rel="noopener noreferrer">Link</a></td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}
+{% block addon_js %}
+<script>
+    $(document).ready(function () {
+        var autocompleteResults = $('#protein-autocomplete-results');
+        $('#search_protein').autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "{% url 'protein_autocomplete_view' %}",
+                    data: {
+                        query: request.term
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        response(data.suggestions);
+                    }
+                });
+            },
+            autoFocus: true,
+            minLength: 3,
+            select: function (event, ui) {
+                $('#search_protein').val(ui.item.value);
+                return false;
+            },
+            open: function (event, ui) {
+                autocompleteResults.show(); 
+            },
+            close: function (event, ui) {
+                autocompleteResults.hide(); 
+            }
+        });
+        // Hide autocomplete results when clicking outside of the input and results
+        $("#search_protein").on('keyup', function() {
+            $.ajax({
+                    url: "{% url 'target_lookup' %}?target="+ $(this).val(),
+                    success: function (data) {
+                        // console.log(data.proteins);
+                        $("#target-result-tbody").html('');
+                        var html_data = '';
+                        data.proteins.forEach(item => {
+                            html_data += `<tr>
+                                <td>${item.uniprot_ID}</td>
+                                <td>${item.protein_name}</td>
+                                <td>${item.geneID}</td>
+                                <td>${item.genename}</td>
+                                <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer">Link</a></td>
+                            </tr>`;
+                        });
+                        
+                        $("#target-result-tbody").html(html_data);
+                    }
+                });
+        });
+        $("#submit_protein").click(function() {
+            $.ajax({
+                    url: "{% url 'target_lookup' %}?target="+ $("#search_protein").val(),
+                    success: function (data) {
+                        // console.log(data.proteins);
+                        $("#target-result-tbody").html('');
+                        var html_data = '';
+                        data.proteins.forEach(item => {
+                            html_data += `<tr>
+                                <td>${item.uniprot_ID}</td>
+                                <td>${item.protein_name}</td>
+                                <td>${item.geneID}</td>
+                                <td>${item.genename}</td>
+                                <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer">Link</a></td>
+                            </tr>`;
+                        });
+                        $("#target-result-tbody").html(html_data);
+                    }
+                });
+        });
+        
+        $("#reset_protein").click(function() {
+            $.ajax({
+                    url: "{% url 'target_lookup' %}?target=default",
+                    // method: "GET",
+                    // dataType: "html", // Specify the expected response type
+                    success: function (data) {
+                        console.log("data.proteins: "+data.proteins);
+                        $("#target-result-tbody").html('');
+                        var html_data = '';
+                        data.proteins.forEach(item => {
+                            html_data += `<tr>
+                                <td>${item.uniprot_ID}</td>
+                                <td>${item.protein_name}</td>
+                                <td>${item.geneID}</td>
+                                <td>${item.genename}</td>
+                                <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer">Link</a></td>
+                            </tr>`;
+                        });
+                        $("#target-result-tbody").html(html_data);
+                    }
+                });
+        });
+
+        // Handle the form submission when the form is submitted
+        $("form").submit(function (event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+        });
+
+    });
+</script>
+
+{% endblock %}

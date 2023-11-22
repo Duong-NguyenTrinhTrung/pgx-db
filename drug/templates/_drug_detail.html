@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ drug.drug_bankID }}</title>
+</head>
+<body>
+    <h1>{{ drug.name }}</h1>
+    <h2>Proteins interacting with this drug:</h2>
+    <ul>
+    {% for interaction in interactions %}
+        <li>{{ interaction.uniprot_ID.uniprot_ID }} - {{ interaction.interaction_type }}</li>
+    {% endfor %}
+    </ul>
+    <h2>Counts of each interaction type:</h2>
+    <ul>
+    {% for interaction_type, count in interaction_type_counts.items %}
+        <li>{{ interaction_type }}: {{ count }}</li>
+    {% endfor %}
+    </ul>
+    <h2>ATC Chemical Substances associated with this drug:</h2>
+    <ul>
+    {% for atc_chemical_substance in atc_chemical_substances %}
+        <li>{{ atc_chemical_substance.name }}</li>
+        <ul>
+        {% for parent in atc_chemical_substance.get_all_parents %}
+            <li>{{ parent.name }}</li>
+        {% endfor %}
+        </ul>
+    {% endfor %}
+    </ul>
+</body>
+</html>
