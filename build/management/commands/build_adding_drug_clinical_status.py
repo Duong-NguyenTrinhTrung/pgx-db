@@ -42,6 +42,7 @@ class Command(BaseCommand):
                 for line in lines[1:]:
                     values=line[:-1].split(";")
                     drug_bankID = values[0]
+                    print("drug_bankID = ",drug_bankID)
                     clinical_status = values[1]
 
                     # Code to add values to the new field

@@ -1591,14 +1591,14 @@ function createChart(links) {
             console.log(d.id);
             showDialog_Child(d.id, d.id);
         });
-
+    var drugStatuses = ["Nutraceutical", "Experimental", "Investigational", "Approved", "Vet-approved", "Illicit"];
     node.filter(function (d) { return d.isParent; })
         .attr("class", "node-parent")
         .append("image")
         .attr("class", "node-image")
         .attr("xlink:href", function (d) {
 
-            var key = d.Drug_status + "|" + d.Drug_type;
+            var key = drugStatuses[d.Drug_status] + "|" + d.Drug_type;
             //console.log("key: ", key); // print the key
             //console.log("key: ", imagePaths[key]); // print the key
             //return imagePaths[key];
