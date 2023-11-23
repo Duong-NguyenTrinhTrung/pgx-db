@@ -31,10 +31,10 @@ if (drug_bank_id){
 
 $("#loading .spinner").show();
 console.log("json_GeneralFile "+json_GeneralFile);
-console.log("json_drugData "+json_drugData);
-console.log("json_proteinData "+json_proteinData);
-console.log("json_interactionData "+json_interactionData);
-console.log("Saad");
+//***console.log("json_drugData "+json_drugData);
+//***console.log("json_proteinData "+json_proteinData);
+//***console.log("json_interactionData "+json_interactionData);
+//***console.log("Saad");
 let drug_xlsxData;
 let protein_xlsxData;
 let interaction_xlsxData;
@@ -79,7 +79,6 @@ function readInteractionJSON() {
         .then((jsonData) => {
             interaction_xlsxData = jsonData;
             processData();
-            //console.log(interaction_xlsxData)
         })
         .catch((error) => {
             console.error("Error reading the file:", error);
@@ -190,7 +189,9 @@ function handleExportOption(option) {
             break;
 
         case 'Download PNG':
+            console.log("PNG Export Clikced");
             downloadPNG();
+            
             break;
         case 'Download JPEG':
             downloadJPEG();
@@ -257,7 +258,7 @@ function printChart() {
 // Download PNG
 // Download PNG
 function downloadPNG() {
-    console.log("downloadPNG")
+    console.log("downloadPNG Fucntion Called")
     var svgElement = document.querySelector("#chart svg");
     var svgData = getFilteredSvgContent(svgElement);
     svgData = addWhiteBackground(svgData);
@@ -1375,17 +1376,17 @@ function xlsxToJson(file, callback) {
 
 function processData() {
     const jsonFilePath = json_GeneralFile; // JSON file path
-    console.log("ProcessData"+jsonFilePath);
-    console.log("Saad");
+    console.log("Inside Process Data Function");
     fetch(jsonFilePath)
         .then((response) => response.json())
         .then((data) => {
             // Extract nodes and links from the JSON data
-            console.log("inside processData: "+ data);
+            console.log("inside processData: ", data);
             chartDataJ = data;
             data.forEach(function (row) {
-                console.log("ProcessData");
-                console.log("ProcessData"+row);
+              //  console.log("ProcessData");
+               // console.log("ProcessData: ", row);
+               // console.log("ProcessData: " + JSON.stringify(row));
                 var drugName = row.drug_name;
                 var drugID = row.drugbank_id;
                 var protein = row.protein;
@@ -1394,7 +1395,10 @@ function processData() {
                 var drugType = row.drugtype; // Get the "Drug_status" value
                 var proteinClass = row.Protein_Class;
                 console.log("Temp DrugId");
-                console.log("printing Drug_D"+drugID);
+                 
+                console.log("printing Clinical Status :"+drugStatus);
+                console.log("printing Product Type :"+drugType);
+                console.log("printing Drug_ID:"+drugID);
                 console.log("printing Drug_D");
                 if (!nodes.find(function (node) { return node.id === drugName; })) {
 
@@ -1599,8 +1603,8 @@ function createChart(links) {
         .attr("xlink:href", function (d) {
 
             var key = drugStatuses[d.Drug_status] + "|" + d.Drug_type;
-            //console.log("key: ", key); // print the key
-            //console.log("key: ", imagePaths[key]); // print the key
+            console.log("key: ", key); // print the key
+            console.log("key: ", imagePaths[key]); // print the key
             //return imagePaths[key];
 
             return imagePaths[key];
