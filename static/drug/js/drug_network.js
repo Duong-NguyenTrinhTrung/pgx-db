@@ -5,10 +5,10 @@ $(function () {
 });
 
 //Pass jsonFiles Here
-// var json_GeneralFile = "static/json-sample/json_GeneralFile.json";
-// var json_drugData = "static/json-sample/json_drugData.json";
-// var json_proteinData = "static/json-sample/json_proteinData.json";
-// var json_interactionData = "static/json-sample/json_interactionData.json"
+// var json_GeneralFile = "/static/json-sample/json_GeneralFile.json";
+// var json_drugData = "/static/json-sample/json_drugData.json";
+// var json_proteinData = "/static/json-sample/json_proteinData.json";
+// var json_interactionData = "/static/json-sample/json_interactionData.json"
 
 var json_GeneralFile="";
 var json_drugData = "";
@@ -307,7 +307,7 @@ function svgToCanvas(svgData, callback) {
         };
 
         if (xlinkHref) {
-            imgObj.src = "https://entertainmentbuz.com/visual/d3/" + xlinkHref;
+            imgObj.src = "http://localhost:8000/" + xlinkHref;
         } else {
             loadedCount++;
         }
@@ -410,7 +410,7 @@ function downloadPDF() {
 
         // Use the href attribute for the image path
         if (xlinkHref) {
-            imgObj.src = "https://entertainmentbuz.com/visual/d3/" + xlinkHref;
+            imgObj.src = "http://localhost:8000/" + xlinkHref;
         } else {
             loadedCount++;
         }
@@ -484,7 +484,7 @@ function downloadXLS() {
     //console.log(filteredLinks)
     // Load the XLSX
     var req = new XMLHttpRequest();
-    req.open("GET", "data_export_file.xlsx", true);
+    req.open("GET", "/static/d3/data_export_file.xlsx", true);
     req.responseType = "arraybuffer";
 
     req.onload = function (e) {
@@ -676,7 +676,7 @@ function showDialog(title, parentNodeName) {
             // Check if the image exists
             image.onerror = function () {
                 // If the image does not exist, set the default image path
-                image.src = "static/d3/drug_images/imagenotfound.png";
+                image.src = "/static/d3/drug_images/imagenotfound.png";
                 // Add the CSS classes to center the image and set the maximum height
                 image.classList.add("center-image", "first-tab-image");
                 // Append the image to the tabContent
@@ -684,7 +684,7 @@ function showDialog(title, parentNodeName) {
             };
 
             // Set the src attribute to the drug image path
-            image.src = "static/d3/drug_images/" + drugbank_id + ".png";
+            image.src = "/static/d3/drug_images/" + drugbank_id + ".png";
             // Add the CSS classes to center the image and set the maximum height
             image.classList.add("center-image", "first-tab-image");
             // Append the image to the tabContent
@@ -692,7 +692,7 @@ function showDialog(title, parentNodeName) {
         } else {
             // If the drugNameValue is not found in the data, display a default image
             var defaultImage = document.createElement("img");
-            defaultImage.src = "static/d3/drug_images/imagenotfound.png";
+            defaultImage.src = "/static/d3/drug_images/imagenotfound.png";
             defaultImage.classList.add("center-image", "first-tab-image");
             tabContent.appendChild(defaultImage);
         }
@@ -982,7 +982,7 @@ function showDialog_Child(title, childName) {
 
         // Create an img element
         var image = document.createElement("img");
-        image.src = "static/d3/drug_images/imagenotfound.png"
+        image.src = "/static/d3/drug_images/imagenotfound.png"
         image.classList.add("center-image", "first-tab-image"); // Add CSS classes
 
         // Append the image to the tabContent
@@ -1007,7 +1007,7 @@ function showDialog_Child(title, childName) {
             // Check if the image exists
             image.onerror = function () {
                 // If the image does not exist, set the default image path
-                image.src = "static/d3/protein_images/imagenotfound.png";
+                image.src = "/static/d3/protein_images/imagenotfound.png";
                 // Add the CSS classes to center the image and set the maximum height
                 image.classList.add("center-image", "first-tab-image");
                 // Append the image to the tabContent
@@ -1015,7 +1015,7 @@ function showDialog_Child(title, childName) {
             };
 
             // Set the src attribute to the drug image path
-            image.src = "static/d3/protein_images/" + drugbank_id + ".png";
+            image.src = "/static/d3/protein_images/" + drugbank_id + ".png";
             // Add the CSS classes to center the image and set the maximum height
             image.classList.add("center-image", "first-tab-image");
             // Append the image to the tabContent
@@ -1023,7 +1023,7 @@ function showDialog_Child(title, childName) {
         } else {
             // If the drugNameValue is not found in the data, display a default image
             var defaultImage = document.createElement("img");
-            defaultImage.src = "static/d3/protein_images/imagenotfound.png";
+            defaultImage.src = "/static/d3/protein_images/imagenotfound.png";
             defaultImage.classList.add("center-image", "first-tab-image");
             tabContent.appendChild(defaultImage);
         }
@@ -1286,12 +1286,12 @@ var interaction_source = "";
 var interaction_target = "";
 
 var imagePaths11 = {
-    Nutraceutical: "static/d3/images/left0.png",
-    Experimental: "static/d3/images/left1.png",
-    Investigational: "static/d3/images/left2.png",
-    Approved: "static/d3/images/left3.png",
+    Nutraceutical: "/static/d3/images/left0.png",
+    Experimental: "/static/d3/images/left1.png",
+    Investigational: "/static/d3/images/left2.png",
+    Approved: "/static/d3/images/left3.png",
     'Vet-approved': "images/left4.png",
-    Illicit: "static/d3/images/left5.png"
+    Illicit: "/static/d3/images/left5.png"
 };
 
 var colorOptions = ["#e71f73", "#d5a100", "#0a5517", "#061755", "#941a4c", "#3d3d3d"];
@@ -1310,8 +1310,8 @@ var colorCodesDrugType = {
     "Small Molecule": "#ff5722"
 };
 var colorCodesDrugType_images = {
-    "#03A9F4": "static/d3/images/right0.png",
-    "#ff5722": "static/d3/images/right1.png"
+    "#03A9F4": "/static/d3/images/right0.png",
+    "#ff5722": "/static/d3/images/right1.png"
 };
 var colorCodesDrugType = {
     Biologic: "#03A9F4",
@@ -1323,21 +1323,21 @@ var colorPaletteDrugType = {
 };
 
 var colorPalette = {
-    "#e71f73": "static/d3/images/left0.png",
-    "#d5a100": "static/d3/images/left1.png",
-    "#0a5517": "static/d3/images/left2.png",
-    "#061755": "static/d3/images/left3.png",
-    "#941a4c": "images/left4.png",
-    "#3d3d3d": "images/left5.png"
+    "#e71f73": "/static/d3/images/left0.png",
+    "#d5a100": "/static/d3/images/left1.png",
+    "#0a5517": "/static/d3/images/left2.png",
+    "#061755": "/static/d3/images/left3.png",
+    "#941a4c": "/static/d3/images/left4.png",
+    "#3d3d3d": "/static/d3/images/left5.png"
 };
 
 var colorImageMap = {
-    "#e71f73": "images/left0.png",
-    "#d5a100": "images/left1.png",
-    "#0a5517": "images/left2.png",
-    "#061755": "images/left3.png",
-    "#941a4c": "images/left4.png",
-    "#3d3d3d": "images/left5.png"
+    "#e71f73": "/static/d3/images/left0.png",
+    "#d5a100": "/static/d3/images/left1.png",
+    "#0a5517": "/static/d3/images/left2.png",
+    "#061755": "/static/d3/images/left3.png",
+    "#941a4c": "/static/d3/images/left4.png",
+    "#3d3d3d": "/static/d3/images/left5.png"
 };
 
 ////Drugs Images Setting Variables
@@ -1349,7 +1349,7 @@ var imagePaths = {};
 Object.keys(colorCodes).forEach((key, i) => {
     Object.keys(colorCodesDrugType).forEach((key2, j) => {
         var keyCombo = key + "|" + key2;
-        imagePaths[keyCombo] = `static/d3/images/capsules/left${i}right${j}.png`;
+        imagePaths[keyCombo] = `/static/d3/images/capsules/left${i}right${j}.png`;
     });
 });
 
@@ -2273,7 +2273,7 @@ function changeNodeImage(status, selectedColor) {
             // Extract drugTypeIndex from the current image path
             let drugTypeIndex = currentImagePath.match(/right(\d+)/)[1];
 
-            const correctImagePath = `static/d3/images/capsules/left${drugStatusIndex}right${drugTypeIndex}.png`;
+            const correctImagePath = `/static/d3/images/capsules/left${drugStatusIndex}right${drugTypeIndex}.png`;
             console.log(correctImagePath);
             nodeImages[node.id] = correctImagePath;
             d3.select(this)
@@ -2402,7 +2402,7 @@ function changeNodeImageForDrugType(drugType, selectedColor) {
             // Extract drugStatusIndex from the current image path
             let drugStatusIndex = currentImagePath.match(/left(\d+)/)[1];
 
-            const correctImagePath = `static/d3/images/capsules/left${drugStatusIndex}right${drugTypeIndex}.png`;
+            const correctImagePath = `/static/d3/images/capsules/left${drugStatusIndex}right${drugTypeIndex}.png`;
             console.log(correctImagePath);
             nodeImages[node.id] = correctImagePath;
             d3.select(this)
