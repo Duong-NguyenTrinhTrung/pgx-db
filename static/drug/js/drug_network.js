@@ -1328,8 +1328,8 @@ var colorPalette = {
     "#d5a100": "static/d3/images/left1.png",
     "#0a5517": "static/d3/images/left2.png",
     "#061755": "static/d3/images/left3.png",
-    "#941a4c": "images/left4.png",
-    "#3d3d3d": "images/left5.png"
+    "#941a4c": "static/d3/images/left4.png",
+    "#3d3d3d": "static/d3/images/left5.png"
 };
 
 var colorImageMap = {
@@ -1599,8 +1599,8 @@ function createChart(links) {
         .attr("xlink:href", function (d) {
 
             var key = drugStatuses[d.Drug_status] + "|" + d.Drug_type;
-            //console.log("key: ", key); // print the key
-            //console.log("key: ", imagePaths[key]); // print the key
+            console.log("key: ", key); // print the key
+            console.log("key: ", imagePaths[key]); // print the key
             //return imagePaths[key];
 
             return imagePaths[key];
