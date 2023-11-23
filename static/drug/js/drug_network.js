@@ -1381,12 +1381,12 @@ function processData() {
         .then((response) => response.json())
         .then((data) => {
             // Extract nodes and links from the JSON data
-            console.log("inside processData: "+ data);
+            console.log("inside processData: ", data);
             chartDataJ = data;
             data.forEach(function (row) {
-                console.log("ProcessData");
-                console.log("ProcessData: ", row);
-                console.log("ProcessData: " + JSON.stringify(row));
+              //  console.log("ProcessData");
+               // console.log("ProcessData: ", row);
+               // console.log("ProcessData: " + JSON.stringify(row));
                 var drugName = row.drug_name;
                 var drugID = row.drugbank_id;
                 var protein = row.protein;
