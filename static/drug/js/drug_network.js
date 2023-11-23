@@ -1394,7 +1394,10 @@ function processData() {
                 var drugType = row.drugtype; // Get the "Drug_status" value
                 var proteinClass = row.Protein_Class;
                 console.log("Temp DrugId");
-                console.log("printing Drug_ :"+drugID);
+                 
+                console.log("printing Clinical Status :"+drugStatus);
+                console.log("printing Product Type :"+drugType);
+                console.log("printing Drug_ID:"+drugID);
                 console.log("printing Drug_D");
                 if (!nodes.find(function (node) { return node.id === drugName; })) {
 
