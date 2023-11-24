@@ -1,7 +1,7 @@
 # Created by https://www.gitignore.io
 
 d3/
-static/d3/
+
 
 ### OSX ###
 .DS_Store
