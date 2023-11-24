@@ -1287,12 +1287,12 @@ var interaction_source = "";
 var interaction_target = "";
 
 var imagePaths11 = {
-    Nutraceutical: "/static/d3/images/left0.png",
-    Experimental: "/static/d3/images/left1.png",
-    Investigational: "/static/d3/images/left2.png",
-    Approved: "/static/d3/images/left3.png",
-    'Vet-approved': "images/left4.png",
-    Illicit: "/static/d3/images/left5.png"
+    Nutraceutical: "/static/d3/images/capsules/left0.png",
+    Experimental: "/static/d3/images/capsules/left1.png",
+    Investigational: "/static/d3/images/capsules/left2.png",
+    Approved: "/static/d3/images/capsules/left3.png",
+    'Vet-approved': "/static/d3/images/capsules/left4.png",
+    Illicit: "/static/d3/images/capsules/left5.png"
 };
 
 var colorOptions = ["#e71f73", "#d5a100", "#0a5517", "#061755", "#941a4c", "#3d3d3d"];
@@ -1311,8 +1311,8 @@ var colorCodesDrugType = {
     "Small Molecule": "#ff5722"
 };
 var colorCodesDrugType_images = {
-    "#03A9F4": "/static/d3/images/right0.png",
-    "#ff5722": "/static/d3/images/right1.png"
+    "#03A9F4": "/static/d3/images/capsules/right0.png",
+    "#ff5722": "/static/d3/images/capsules/right1.png"
 };
 var colorCodesDrugType = {
     Biologic: "#03A9F4",
@@ -1324,21 +1324,21 @@ var colorPaletteDrugType = {
 };
 
 var colorPalette = {
-    "#e71f73": "/static/d3/images/left0.png",
-    "#d5a100": "/static/d3/images/left1.png",
-    "#0a5517": "/static/d3/images/left2.png",
-    "#061755": "/static/d3/images/left3.png",
-    "#941a4c": "/static/d3/images/left4.png",
-    "#3d3d3d": "/static/d3/images/left5.png"
+    "#e71f73": "/static/d3/images/capsules/left0.png",
+    "#d5a100": "/static/d3/images/capsules/left1.png",
+    "#0a5517": "/static/d3/images/capsules/left2.png",
+    "#061755": "/static/d3/images/capsules/left3.png",
+    "#941a4c": "/static/d3/images/capsules/left4.png",
+    "#3d3d3d": "/static/d3/images/capsules/left5.png"
 };
 
 var colorImageMap = {
-    "#e71f73": "/static/d3/images/left0.png",
-    "#d5a100": "/static/d3/images/left1.png",
-    "#0a5517": "/static/d3/images/left2.png",
-    "#061755": "/static/d3/images/left3.png",
-    "#941a4c": "/static/d3/images/left4.png",
-    "#3d3d3d": "/static/d3/images/left5.png"
+    "#e71f73": "/static/d3/images/capsules/left0.png",
+    "#d5a100": "/static/d3/images/capsules/left1.png",
+    "#0a5517": "/static/d3/images/capsules/left2.png",
+    "#061755": "/static/d3/images/capsules/left3.png",
+    "#941a4c": "/static/d3/images/capsules/left4.png",
+    "#3d3d3d": "/static/d3/images/capsules/left5.png"
 };
 
 ////Drugs Images Setting Variables
