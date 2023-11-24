@@ -1468,7 +1468,7 @@ var simulation = null
 
 // Create the Forced Directed Network Chart
 function createChart(links) {
-    d3.select("#atc-right-network").selectAll("*").remove();
+    d3.select("#chart").selectAll("*").remove();
 
     var container = d3.select("#chart");
     //debugger
