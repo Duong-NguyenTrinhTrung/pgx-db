@@ -3,7 +3,7 @@ $(function () {
         containment: "window"
     });
 });
-
+console.log("Testtststtsstststtss");
 //Pass jsonFiles Here
 // var json_GeneralFile = "/static/json-sample/json_GeneralFile.json";
 // var json_drugData = "/static/json-sample/json_drugData.json";
