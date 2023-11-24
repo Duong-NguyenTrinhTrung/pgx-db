@@ -3,7 +3,6 @@ $(function () {
         containment: "window"
     });
 });
-console.log("Testtststtsstststtss");
 //Pass jsonFiles Here
 // var json_GeneralFile = "/static/json-sample/json_GeneralFile.json";
 // var json_drugData = "/static/json-sample/json_drugData.json";
@@ -1376,7 +1375,7 @@ function xlsxToJson(file, callback) {
 
 function processData() {
     const jsonFilePath = json_GeneralFile; // JSON file path
-    console.log("Inside Process Data Function");
+    console.log("Inside Process Data Function11");
     fetch(jsonFilePath)
         .then((response) => response.json())
         .then((data) => {
