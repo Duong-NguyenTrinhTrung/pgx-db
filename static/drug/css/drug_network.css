@@ -17,7 +17,7 @@
 #chart {
     display: inline-block;
     vertical-align: top;
-    width: 1000px;
+    width: 100%;
     height: 800px;
     margin-top: 10px;
     margin-left: 10px;
@@ -28,7 +28,7 @@
     #chart {
         display: inline-block;
         vertical-align: top;
-        width: 1000px;
+        width: 100%;
         height: 800px;
         margin-top: 10px;
         margin-left: 10px;
@@ -56,7 +56,7 @@
     #chart {
         display: inline-block;
         vertical-align: top;
-        width: 1000px;
+        width: 100%;
         height: 650px;
         margin-top: 10px;
         margin-left: 10px;
@@ -88,7 +88,7 @@
     #chart {
         display: inline-block;
         vertical-align: top;
-        width: 1000px;
+        width: 100%;
         height: 600px;
         margin-top: 10px;
         margin-left: 10px;
@@ -120,7 +120,7 @@
     #chart {
         display: inline-block;
         vertical-align: top;
-        width: 1000px;
+        width: 100%;
         height: 500px;
         margin-top: 10px;
         margin-left: 10px;
@@ -152,7 +152,7 @@
     #chart {
         display: inline-block;
         vertical-align: top;
-        width: 1000px;
+        width: 100%;
         height: 500px;
         margin-top: 10px;
         margin-left: 10px;
@@ -638,7 +638,7 @@ label {
 }
 
 svg {
-    width: 500px;
+    width: 100%;
     height: 100%;
 }
 
