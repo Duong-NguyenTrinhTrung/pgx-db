@@ -1381,6 +1381,7 @@ function processData() {
         .then((response) => response.json())
         .then((data) => {
             // Extract nodes and links from the JSON data
+            console.log("inside processData: ", data);
             chartDataJ = data;
             data.forEach(function (row) {
               //  console.log("ProcessData");
@@ -1393,9 +1394,12 @@ function processData() {
                 var drugStatus = row.Drug_status; // Get the "Drug_status" value
                 var drugType = row.drugtype; // Get the "Drug_status" value
                 var proteinClass = row.Protein_Class;
+                console.log("Temp DrugId");
                  
                 console.log("printing Clinical Status :"+drugStatus);
-               
+                console.log("printing Product Type :"+drugType);
+                console.log("printing Drug_ID:"+drugID);
+                console.log("printing Drug_D");
                 if (!nodes.find(function (node) { return node.id === drugName; })) {
 
                     nodes.push({ id: drugName, isParent: true, radius: 10, Drug_status: drugStatus, Drug_type: drugType, Drug_ID: drugID }); // Include the "Drug_status" value in the node object
@@ -1468,226 +1472,220 @@ var simulation = null
 
 // Create the Forced Directed Network Chart
 function createChart(links) {
-  d3.select("#chart").selectAll("*").remove();
-  
-  var container = d3.select("#chart");
-  var containerWidth = [container.node().getBoundingClientRect().width]-10;
-  var containerHeight = [container.node().getBoundingClientRect().height]-10;
+    d3.select("#chart").selectAll("*").remove();
+
+    var container = d3.select("#chart");
+    //debugger
+    // var containerWidth = [container.node().getBoundingClientRect().width] - 10;
+    // var containerHeight = [container.node().getBoundingClientRect().height] - 10;
+    var containerWidth = 500;
+    var containerHeight = 500;
     //console.log("Width : "+containerWidth+"  ----  Height : "+containerHeight);
-  
-  
- 
-  
-  
-  var zoom = d3.zoom()
-  .scaleExtent([0.1, 10])
-  .on("zoom", function (event, d) {
-    //console.log("zoom event:", event); 
-    //console.log("event.transform:", event.transform);
-    svg.attr("transform", event.transform.toString());
-  });
 
-// SVG creation with zoom behavior
-svg = container.append("svg")
-  .attr("width", containerWidth)
-  .attr("height", containerHeight)
-  .call(zoom);
- 
-  
-  
-  chart = svg.append("g") // Assign the group element to the 'chart' variable
-    .attr("class", "chart");
-    
-var chargeStrength = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--charge-strength'));
-var distanceBetweenNodes= 60;
-var noOfTotalNodes11= links.length;
+    var zoom = d3.zoom()
+        .scaleExtent([0.1, 10])
+        .on("zoom", function (event, d) {
+            //console.log("zoom event:", event); 
+            //console.log("event.transform:", event.transform);
+            svg.attr("transform", event.transform.toString());
+        });
 
-console.log("HHHHHHHH"+noOfTotalNodes11);
+    // SVG creation with zoom behavior
+    svg = container.append("svg")
+        .attr("width", containerWidth)
+        .attr("height", containerHeight)
+        .call(zoom);
 
-if (noOfTotalNodes11 < 100){
-    chargeStrength = -500
-    var distanceBetweenNodes= 100;
-}else if(noOfTotalNodes11 > 99 && noOfTotalNodes11 < 200){
-    chargeStrength = -150
-    var distanceBetweenNodes= 100;
-}else if(noOfTotalNodes11 > 199 && noOfTotalNodes11 < 250){
-    chargeStrength = -150
-    var distanceBetweenNodes= 100;
-}else if(noOfTotalNodes11 > 249 && noOfTotalNodes11 < 300){
-    chargeStrength = -100
-    var distanceBetweenNodes= 80;
-}else if(noOfTotalNodes11 > 299 && noOfTotalNodes11 < 350){
-    chargeStrength = -100
-    var distanceBetweenNodes= 80;
-}else if(noOfTotalNodes11 > 349 && noOfTotalNodes11 < 400){
-    chargeStrength = -100
-    var distanceBetweenNodes= 60;
-}else if(noOfTotalNodes11 > 399){
-    var distanceBetweenNodes= 60;
-}
+    chart = svg.append("g") // Assign the group element to the 'chart' variable
+        .attr("class", "chart");
 
- simulation = d3.forceSimulation(nodes)
-    .force("link", d3.forceLink(links).id(function(d) { return d.id; }).distance(distanceBetweenNodes))
-    .force("charge", d3.forceManyBody().strength(chargeStrength))
-    // Adding centering forces for X and Y coordinates
-    .force("x", d3.forceX(containerWidth / 2).strength(0.1))
-    .force("y", d3.forceY(containerHeight / 2).strength(0.1))
-    
-    .on("end", function() {
-        nodes.forEach(function(node) {
-        node.fx = node.x;
-        node.fy = node.y;
-      });
-    });
+    var chargeStrength = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--charge-strength'));
+    var distanceBetweenNodes = 60;
+    var noOfTotalNodes11 = links.length;
+
+    console.log("HHHHHHHH" + noOfTotalNodes11);
+
+    if (noOfTotalNodes11 < 100) {
+        chargeStrength = -500
+        var distanceBetweenNodes = 100;
+    } else if (noOfTotalNodes11 > 99 && noOfTotalNodes11 < 200) {
+        chargeStrength = -150
+        var distanceBetweenNodes = 100;
+    } else if (noOfTotalNodes11 > 199 && noOfTotalNodes11 < 250) {
+        chargeStrength = -150
+        var distanceBetweenNodes = 100;
+    } else if (noOfTotalNodes11 > 249 && noOfTotalNodes11 < 300) {
+        chargeStrength = -100
+        var distanceBetweenNodes = 80;
+    } else if (noOfTotalNodes11 > 299 && noOfTotalNodes11 < 350) {
+        chargeStrength = -100
+        var distanceBetweenNodes = 80;
+    } else if (noOfTotalNodes11 > 349 && noOfTotalNodes11 < 400) {
+        chargeStrength = -100
+        var distanceBetweenNodes = 60;
+    } else if (noOfTotalNodes11 > 399) {
+        var distanceBetweenNodes = 60;
+    }
+
+    simulation = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(links).id(function (d) { return d.id; }).distance(distanceBetweenNodes))
+        .force("charge", d3.forceManyBody().strength(chargeStrength))
+        // Adding centering forces for X and Y coordinates
+        .force("x", d3.forceX(containerWidth / 2).strength(0.1))
+        .force("y", d3.forceY(containerHeight / 2).strength(0.1))
+
+        .on("end", function () {
+            nodes.forEach(function (node) {
+                node.fx = node.x;
+                node.fy = node.y;
+            });
+        });
 
     //console.log("Creating nodes and links...");
-   link = svg.selectAll(".link")
-    .data(links)
-    .enter().append("line")
-    .attr("class", "link")
-    .style("stroke", function(d) { return "gray"; })
-    .style("stroke-width", 2)
-    .on("click", function(event, d) {
-        interaction_source=d.source.Drug_ID;
-        interaction_target=d.target.id;
-     // console.log(interaction_source);
-     // console.log(interaction_target);
-      console.log(d.type);
-       showDialog_Links(d.type, d.type)
-       //showDialog_Interaction(d.id, d.id);
+    link = svg.selectAll(".link")
+        .data(links)
+        .enter().append("line")
+        .attr("class", "link")
+        .style("stroke", function (d) { return "gray"; })
+        .style("stroke-width", 2)
+        .on("click", function (event, d) {
+            interaction_source = d.source.Drug_ID;
+            interaction_target = d.target.id;
+            // console.log(interaction_source);
+            // console.log(interaction_target);
+            console.log(d.type);
+            showDialog_Links(d.type, d.type)
+            //showDialog_Interaction(d.id, d.id);
+        });
+
+    node = svg.selectAll(".node")
+        .data(nodes)
+        .enter().append("g")
+        .attr("class", "node")
+        .call(drag(simulation));
+
+    var childNodeMap = {};
+    links.forEach(function (link) {
+        if (!link.target.isParent) {
+            var childNodeId = link.target.id;
+            childNodeMap[childNodeId] = (childNodeMap[childNodeId] || 0) + 1;
+        }
     });
 
-
-
-   node = svg.selectAll(".node")
-    .data(nodes)
-    .enter().append("g")
-    .attr("class", "node")
-    .call(drag(simulation));
-
- var childNodeMap = {};
-  links.forEach(function(link) {
-    if (!link.target.isParent) {
-      var childNodeId = link.target.id;
-      childNodeMap[childNodeId] = (childNodeMap[childNodeId] || 0) + 1;
-    }
-  });
-
-  // Add the following code to calculate the size of the child nodes based on the number of connected parent nodes
-  var childNodeMap = {};
-  links.forEach(function(link) {
-    if (!link.target.isParent) {
-      var childNodeId = link.target.id;
-      childNodeMap[childNodeId] = (childNodeMap[childNodeId] || 0) + 1;
-    }
-  });
-
-  // Add the following code to calculate the size of the child nodes based on the number of connected parent nodes
-  node.filter(function(d) { return !d.isParent; })
-    .append("circle")
-    .attr("r", function(d) { 
-      var parentCount = childNodeMap[d.id] || 1;
-      return 5 + (parentCount - 1) + 1; // Increase the size by 3px for each connected parent node
-    })
-    .style("fill", function(d) {
-      return proteinColorMap[d.Protein_Class] || "steelblue";
-    })
-    .on("click", function(event, d) {
-      console.log(d.id);
-      showDialog_Child(d.id, d.id);
+    // Add the following code to calculate the size of the child nodes based on the number of connected parent nodes
+    var childNodeMap = {};
+    links.forEach(function (link) {
+        if (!link.target.isParent) {
+            var childNodeId = link.target.id;
+            childNodeMap[childNodeId] = (childNodeMap[childNodeId] || 0) + 1;
+        }
     });
 
-    
-  node.filter(function(d) { return d.isParent; })
-    .attr("class", "node-parent")
-    .append("image")
-    .attr("class", "node-image")
-    .attr("xlink:href", function(d) { 
-         
-          var key = d.Drug_status + "|" + d.Drug_type;
-            //console.log("key: ", key); // print the key
-            //console.log("key: ", imagePaths[key]); // print the key
-        //return imagePaths[key];
-        
-        return imagePaths[key];
-    })
-    .attr("x", -12)
-    .attr("y", -12)
-    .attr("width", 30)
-    .attr("height", 30)
-    .on("click", function(event, d) {
-      console.log(d.id);
-      showDialog(d.id, d.id);
+    // Add the following code to calculate the size of the child nodes based on the number of connected parent nodes
+    node.filter(function (d) { return !d.isParent; })
+        .append("circle")
+        .attr("r", function (d) {
+            var parentCount = childNodeMap[d.id] || 1;
+            return 5 + (parentCount - 1) + 1; // Increase the size by 3px for each connected parent node
+        })
+        .style("fill", function (d) {
+            return proteinColorMap[d.Protein_Class] || "steelblue";
+        })
+        .on("click", function (event, d) {
+            console.log(d.id);
+            showDialog_Child(d.id, d.id);
+        });
+    var drugStatuses = ["Nutraceutical", "Experimental", "Investigational", "Approved", "Vet-approved", "Illicit"];
+    node.filter(function (d) { return d.isParent; })
+        .attr("class", "node-parent")
+        .append("image")
+        .attr("class", "node-image")
+        .attr("xlink:href", function (d) {
+
+            var key = drugStatuses[d.Drug_status] + "|" + d.Drug_type;
+            console.log("key: ", key); // print the key
+            console.log("key: ", imagePaths[key]); // print the key
+            //return imagePaths[key];
+
+            return imagePaths[key];
+        })
+        .attr("x", -12)
+        .attr("y", -12)
+        .attr("width", 30)
+        .attr("height", 30)
+        .on("click", function (event, d) {
+            console.log(d.id);
+            showDialog(d.id, d.id);
+        });
+
+    node.filter(function (d) { return d.isParent; })
+        .append("text")
+        .attr("dx", 14)
+        .attr("dy", "2em")
+        .text(function (d) { return d.id; })
+        .attr("class", "node-label");
+
+    node.append("title")
+        .text(function (d) { return d.id; });
+
+    node.filter(function (d) { return !d.isParent; })
+        .append("text")
+        .attr("dx", 10)
+        .attr("dy", ".25em")
+        .text(function (d) { return d.id; })
+        .attr("class", "node-label")
+
+    simulation.on("tick", function () {
+        link.attr("x1", function (d) { return d.source.x; })
+            .attr("y1", function (d) { return d.source.y; })
+            .attr("x2", function (d) { return d.target.x; })
+            .attr("y2", function (d) { return d.target.y; });
+
+        node.attr("transform", function (d) {
+            return "translate(" + d.x + "," + d.y + ")";
+        });
     });
 
-  node.filter(function(d) { return d.isParent; })
-    .append("text")
-    .attr("dx", 14)
-    .attr("dy", "2em")
-    .text(function(d) { return d.id; })
-    .attr("class", "node-label");
+    // Enable drag behavior for nodes
+    function drag(simulation) {
+        // console.log("Setting up drag behavior..."); 
+        function dragStarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
 
-  node.append("title")
-    .text(function(d) { return d.id; });
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
 
-  node.filter(function(d) { return !d.isParent; })
-    .append("text")
-    .attr("dx", 10)
-    .attr("dy", ".25em")
-    .text(function(d) { return d.id; })
-    .attr("class", "node-label")
-    
-  simulation.on("tick", function() {
-    link.attr("x1", function(d) { return d.source.x; })
-      .attr("y1", function(d) { return d.source.y; })
-      .attr("x2", function(d) { return d.target.x; })
-      .attr("y2", function(d) { return d.target.y; });
+        function dragEnded(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            // Removed setting of d.fx and d.fy to null here
+        }
 
-    node.attr("transform", function(d) {
-      return "translate(" + d.x + "," + d.y + ")";
+        return d3.drag()
+            .on("start", dragStarted)
+            .on("drag", dragged)
+            .on("end", dragEnded);
+    }
+
+    // Button click handlers
+    d3.select(".zoom-in-btn").on("click", function () {
+        console.log("Zoom in called");
+        zoom.scaleBy(svg.transition().duration(750), 1.1);  // scale up by 10%
     });
-  });
 
-  // Enable drag behavior for nodes
- function drag(simulation) {
-   // console.log("Setting up drag behavior..."); 
-    function dragStarted(event, d) {
-      if (!event.active) simulation.alphaTarget(0.3).restart();
-      d.fx = d.x;
-      d.fy = d.y;
-    }
+    d3.select(".zoom-out-btn").on("click", function () {
+        console.log("Zoom out called");
+        zoom.scaleBy(svg.transition().duration(750), 0.9);  // scale down by 10%
+    });
 
-    function dragged(event, d) {
-      d.fx = event.x;
-      d.fy = event.y;
-    }
-
-    function dragEnded(event, d) {
-      if (!event.active) simulation.alphaTarget(0);
-      // Removed setting of d.fx and d.fy to null here
-    }
-
-    return d3.drag()
-      .on("start", dragStarted)
-      .on("drag", dragged)
-      .on("end", dragEnded);
-  }
-
-
-// Button click handlers
-d3.select(".zoom-in-btn").on("click", function() {
-  console.log("Zoom in called");
-  zoom.scaleBy(svg.transition().duration(750), 1.1);  // scale up by 10%
-});
-
-d3.select(".zoom-out-btn").on("click", function() {
-  console.log("Zoom out called");
-  zoom.scaleBy(svg.transition().duration(750), 0.9);  // scale down by 10%
-});
-
-
-console.log("Chart created.");
-  updateChartVisibility();
+    console.log("Chart created."); 
+    // Finish updating chart
+    $("#loading .spinner").hide();
+    updateChartVisibility();
 }
 
 // Update the chart visibility based on the threshold value
