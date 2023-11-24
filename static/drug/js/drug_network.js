@@ -1381,7 +1381,6 @@ function processData() {
         .then((response) => response.json())
         .then((data) => {
             // Extract nodes and links from the JSON data
-            console.log("inside processData: ", data);
             chartDataJ = data;
             data.forEach(function (row) {
               //  console.log("ProcessData");
@@ -1394,12 +1393,9 @@ function processData() {
                 var drugStatus = row.Drug_status; // Get the "Drug_status" value
                 var drugType = row.drugtype; // Get the "Drug_status" value
                 var proteinClass = row.Protein_Class;
-                console.log("Temp DrugId");
                  
                 console.log("printing Clinical Status :"+drugStatus);
-                console.log("printing Product Type :"+drugType);
-                console.log("printing Drug_ID:"+drugID);
-                console.log("printing Drug_D");
+               
                 if (!nodes.find(function (node) { return node.id === drugName; })) {
 
                     nodes.push({ id: drugName, isParent: true, radius: 10, Drug_status: drugStatus, Drug_type: drugType, Drug_ID: drugID }); // Include the "Drug_status" value in the node object
@@ -1503,23 +1499,23 @@ function createChart(links) {
     var distanceBetweenNodes = 60;
     var noOfTotalNodes11 = links.length;
 
-    console.log("HHHHHHHH" + noOfTotalNodes11);
+    console.log("Total no of Nodes" + noOfTotalNodes11);
 
-    if (noOfTotalNodes11 < 100) {
-        chargeStrength = -500
-        var distanceBetweenNodes = 100;
-    } else if (noOfTotalNodes11 > 99 && noOfTotalNodes11 < 200) {
-        chargeStrength = -150
-        var distanceBetweenNodes = 100;
+    if (noOfTotalNodes11 < 70) {
+        chargeStrength = -200
+        var distanceBetweenNodes = 70;
+    } else if (noOfTotalNodes11 > 69 && noOfTotalNodes11 < 200) {
+        chargeStrength = -100
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 199 && noOfTotalNodes11 < 250) {
-        chargeStrength = -150
-        var distanceBetweenNodes = 100;
+        chargeStrength = -100
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 249 && noOfTotalNodes11 < 300) {
         chargeStrength = -100
-        var distanceBetweenNodes = 80;
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 299 && noOfTotalNodes11 < 350) {
         chargeStrength = -100
-        var distanceBetweenNodes = 80;
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 349 && noOfTotalNodes11 < 400) {
         chargeStrength = -100
         var distanceBetweenNodes = 60;
@@ -1603,8 +1599,8 @@ function createChart(links) {
         .attr("xlink:href", function (d) {
 
             var key = drugStatuses[d.Drug_status] + "|" + d.Drug_type;
-            console.log("key: ", key); // print the key
-            console.log("key: ", imagePaths[key]); // print the key
+           // console.log("key: ", key); // print the key
+           // console.log("key: ", imagePaths[key]); // print the key
             //return imagePaths[key];
 
             return imagePaths[key];
