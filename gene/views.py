@@ -1,7 +1,6 @@
 import decimal
 import random
 import warnings
-
 from django.core.cache import cache
 from django.db.models import (
     F,
@@ -16,24 +15,58 @@ from django.views import View
 from django.views.decorators.http import require_http_methods
 from django.views.generic import TemplateView
 from django.shortcuts import render
-
 import numpy as np
 import pandas as pd
 from gene.models import Gene
 from protein.models import Protein
+from interaction.models import Interaction
+from drug.models import Drug 
 from variant.models import (
     GenebassVariant,
     Variant,
     VepVariant,
 )
-
 import urllib.request as urlreq
-
-# gene/views.py
 import urllib.request as urlreq
 from django.shortcuts import render
 warnings.filterwarnings('ignore')
 
+
+class DrugByGeneBaseView(object):
+    browser_columns=["drug_bankID",
+                    "drugtype",
+                    "name",
+                    "groups",
+                    "categories",
+                    "description",
+                    "Clinical_status"]
+    def get_drug_by_gene_data(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("drug_data_" + slug) is not None:
+                list_of_targeting_drug = cache.get("drug_data_" + slug)
+            else:
+                browser_columns = self.browser_columns
+                table = pd.DataFrame()
+
+                if slug.startswith("ENSG"):
+                    protein = Protein.objects.get(geneID=slug)
+                    protein_ID = protein.uniprot_ID
+                else:
+                    protein = Protein.objects.get(genename=slug)
+                    protein_ID = protein.uniprot_ID
+
+                drugs = Interaction.objects.filter(
+                    uniprot_ID=protein_ID).values_list("drug_bankID", "actions", "known_action", "interaction_type")
+                for drug in drugs:
+                    drug_df = pd.DataFrame([drug])
+                    table = table.append(drug_df, ignore_index=True)
+                table.fillna('', inplace=True)
+                table.columns=["drug_bankID", "actions", "known_action", "interaction_type"]
+                context = dict()
+                cache.set("drug_data_" + slug, table, 60 * 60)
+            context['list_of_targeting_drug'] = table
+        return context
 
 class GeneDetailBaseView(object):
     browser_columns = [
@@ -224,7 +257,6 @@ class GeneDetailBaseView(object):
         if slug is not None:
             if cache.get("variant_data_" + slug) is not None:
                 table_with_protein_pos_int = cache.get("variant_data_" + slug)
-                print("cache hit")
             else:
                 browser_columns = self.browser_columns
 
@@ -277,7 +309,6 @@ class GeneDetailBaseView(object):
                         pass
 
                 cache.set("variant_data_" + slug, table_with_protein_pos_int, 60 * 60)
-
             context['array'] = table_with_protein_pos_int
             context['length'] = len(table_with_protein_pos_int)
             context["name_dic"] = self.name_dic

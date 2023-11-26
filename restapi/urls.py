@@ -1,6 +1,7 @@
 from django.urls import path
 
-from restapi.views import GeneDetailRestApiView, GeneDetailVepRestApiView, GeneDetailDrugRestApiView, AtcToTargetRestApiView, AtcToDescriptionRestApiView, AtcToPgxRestApiView
+from restapi.views import GeneDetailRestApiView, GeneDetailVepRestApiView, DrugByGeneRestApiView, TargetByAtcRestApiView, AtcToDescriptionRestApiView, \
+                            AtcCodesByLevelRestApiView, TargetsByDrugRestApiView, AtcToPgxRestApiView
 
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -21,9 +22,11 @@ schema_view = get_schema_view(
 app_name = 'restapi'
 urlpatterns = [
     path('gene/variant/<slug:gene_id>/', GeneDetailRestApiView.as_view(), name='gene'),
-    path('gene/vep/<slug:gene_id>/', GeneDetailVepRestApiView, name='gene_detail_vep_RestApiView'),
-    path('gene/drug/<slug:gene_id>/', GeneDetailDrugRestApiView, name='gene_detail_drug_RestApiView'),
-    path('atc/target/<slug:atc_code>/', AtcToTargetRestApiView, name='atc_to_target_RestApiView'),
-    path('atc/description/<slug:atc_code>/', AtcToDescriptionRestApiView, name='atc_to_description_RestApiView'),
+    path('gene/vep_score/<slug:gene_id>/', GeneDetailVepRestApiView.as_view(), name='gene_detail_vep_RestApiView'),
+    path('gene/drug/<slug:gene_id>/', DrugByGeneRestApiView.as_view(), name='drug_by_gene_RestApiView'),
+    path('atc/target/<slug:atc_code>/', TargetByAtcRestApiView.as_view(), name='target_by_atc_RestApiView'),
+    path('atc/description/<slug:atc_code>/', AtcToDescriptionRestApiView.as_view(), name='atc_to_description_RestApiView'),
+    path('atc/atc_code/<slug:atc_level>/', AtcCodesByLevelRestApiView.as_view(), name='atc_codes_by_level_RestApiView'),
+    path('drug/target/<slug:drug_id>/', TargetsByDrugRestApiView.as_view(), name='targets_by_drug_RestApiView'),
     path('atc/pgx/<slug:atc_code_gene_id>/', AtcToPgxRestApiView, name='atc_to_pgx_RestApiView'),
 ]

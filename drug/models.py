@@ -171,12 +171,3 @@ class Drug(models.Model):
         "drug.drugpubchemsubstance", on_delete=models.CASCADE)
     
     Clinical_status = models.IntegerField(null=True)
-    
-
-
-    # def __str__(self):
-    #     return "Drugname: " + self.name + " with drugbank ID: " + self.drug_bankID
-
-    # class Meta():
-    #     db_table = 'drug'
-
