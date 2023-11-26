@@ -1,6 +1,6 @@
 import json
 from django.core import serializers
-
+import pandas as pd
 from django.core.cache import cache
 from django.db.models import (
     Count,
@@ -27,6 +27,7 @@ from drug.models import (
     AtcChemicalSubstance,
     AtcPharmacologicalGroup,
     AtcTherapeuticGroup,
+    DrugAtcAssociation,
 )
 from gene.models import Gene
 from interaction.models import Interaction
@@ -784,3 +785,105 @@ def get_atc_sub_levels(request):
     reorganized_data["atc_code"] = atc_code
     return JsonResponse(reorganized_data, safe=False)
 
+
+class TargetByAtcBaseView(object):
+    def get_target_by_atc_code(self, slug):
+        print("checkpoint 1 in get_target_by_atc_code func of TargetByAtcBaseView, self = ", self, " slug = ", slug)
+
+        context = {}
+        if slug is not None:
+            print("checkpoint 2 when slug is not None in get_target_by_atc_code func of TargetByAtcBaseView")
+            if cache.get("target_by_atc_data_" + slug) is not None:
+                table = cache.get("target_by_atc_data_" + slug)
+            else:
+                print("checkpoint 3 when not cached in get_target_by_atc_code func of TargetByAtcBaseView")
+                table = pd.DataFrame()
+                data = {"chemical_substance": retrieving_chemical_substance(slug)}
+                for value in data.get('chemical_substance'):
+                    chemical_substance_code = value.get("id")
+                    drugs = DrugAtcAssociation.objects.filter(
+                        atc_id=chemical_substance_code).values_list("drug_id")
+                    for drug in drugs:
+                        drug_df = pd.DataFrame([drug])
+                        table = table.append(drug_df, ignore_index=True)
+                table.columns = ["DrugbankID"]
+                table.fillna('', inplace=True)
+                context = dict()
+                cache.set("target_by_atc_data_" + slug, table, 60 * 60)
+            context['list_of_targets'] = table
+        return context
+    
+def retrieving_atc_description(atc_code):
+    if len(atc_code)==1:
+        return AtcAnatomicalGroup.objects.get(id__iexact=atc_code)
+    else:
+        if len(atc_code)==3:
+            return AtcTherapeuticGroup.objects.get(id__iexact=atc_code)
+        else:
+            if len(atc_code)==4:
+                return AtcPharmacologicalGroup.objects.get(id__iexact=atc_code)
+            else:
+                if len(atc_code)==5:
+                    return AtcChemicalGroup.objects.get(id__iexact=atc_code)
+                else:
+                    return AtcChemicalSubstance.objects.get(id__iexact=atc_code)
+
+
+class DescriptionByAtcBaseView(object):
+    def get_description_by_atc_code(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("description_by_atc_data_" + slug) is not None:
+                description = cache.get("description_by_atc_data_" + slug)
+            else:
+                description = retrieving_atc_description(slug).name
+                context = dict()
+                cache.set("description_by_atc_data_" + slug, description, 60 * 60)
+            context['description'] = description
+            print("context : ", context)
+        return context
+
+
+def retrieving_atc_description(level):
+    if level.lower()=="anatomical":
+        return list(AtcAnatomicalGroup.objects.all().values_list("id", "name"))
+    else:
+        if level.lower()=="therapeutic":
+            return list(AtcTherapeuticGroup.objects.all().values_list("id", "name"))
+        else:
+            if level.lower()=="pharmacological":
+                return list(AtcPharmacologicalGroup.objects.all().values_list("id", "name"))
+            else:
+                if level.lower()=="chemical":
+                    return list(AtcChemicalGroup.objects.all().values_list("id", "name"))
+                else:
+                    return list(AtcChemicalSubstance.objects.all().values_list("id", "name"))
+
+class AtcCodesByLevelBaseView(object):
+    def get_atc_codes_by_level(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("atc_codes_by_level_" + slug) is not None:
+                list_of_codes = cache.get("atc_codes_by_level_" + slug)
+            else:
+                list_of_codes = retrieving_atc_description(slug)
+                context = dict()
+                cache.set("atc_codes_by_level_" + slug, list_of_codes, 60 * 60)
+            context['list_of_codes'] = list_of_codes
+            print("context : ", context)
+        return context
+    
+class TargetsByDrugBaseView(object):
+    def get_targets_by_drug(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("targets_by_drug_" + slug) is not None:
+                list_of_targets = cache.get("targets_by_drug_" + slug)
+            else:
+                list_of_targets_id = Interaction.objects.filter(drug_bankID = slug).values_list("uniprot_ID", flat=True)
+                list_of_targets = Protein.objects.filter(uniprot_ID__in=list_of_targets_id).values_list("uniprot_ID", "protein_name", "geneID", "genename")
+                context = dict()
+                cache.set("targets_by_drug_" + slug, list_of_targets, 60 * 60)
+            context['list_of_targets'] = list_of_targets
+            print("context : ", context)
+        return context

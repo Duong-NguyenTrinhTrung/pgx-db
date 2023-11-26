@@ -500,7 +500,7 @@ function downloadXLS() {
         var filteredRows = rows.filter(row =>
             filteredLinks.some(link =>
                 link.source.id === row.drug_name &&
-                link.source.Drug_type === row.drugtype &&
+                link.source.Drug_type.toLowerCase() === row.drugtype.toLowerCase() &&
                 link.target.id === row.protein &&
                 link.target.Protein_Class === row.Protein_Class
             )
