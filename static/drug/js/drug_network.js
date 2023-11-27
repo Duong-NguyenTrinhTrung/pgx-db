@@ -1473,6 +1473,7 @@ var simulation = null
 
 // Create the Forced Directed Network Chart
 function createChart(links) {
+    
     d3.select("#atc-right-network").selectAll("*").remove();
 
     var container = d3.select("#chart");
@@ -1481,7 +1482,7 @@ function createChart(links) {
      var containerHeight = [container.node().getBoundingClientRect().height] - 10;
    // var containerWidth = 500;
    // var containerHeight = 500;
-    //console.log("Width : "+containerWidth+"  ----  Height : "+containerHeight);
+    console.log("Width : "+containerWidth+"  ----  Height : "+containerHeight);
 
     var zoom = d3.zoom()
         .scaleExtent([0.1, 10])
@@ -1555,7 +1556,7 @@ function createChart(links) {
             interaction_target = d.target.id;
             // console.log(interaction_source);
             // console.log(interaction_target);
-            console.log(d.type);
+           // console.log(d.type);
             showDialog_Links(d.type, d.type)
             //showDialog_Interaction(d.id, d.id);
         });
@@ -1605,8 +1606,8 @@ function createChart(links) {
         .attr("xlink:href", function (d) {
 
             var key = drugStatuses[d.Drug_status] + "|" + d.Drug_type;
-            console.log("key: ", key); // print the key
-            console.log("key: ", imagePaths[key]); // print the key
+           // console.log("key: ", key); // print the key
+           // console.log("key: ", imagePaths[key]); // print the key
             //return imagePaths[key];
 
             return imagePaths[key];
