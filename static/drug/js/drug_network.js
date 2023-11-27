@@ -1507,24 +1507,25 @@ function createChart(links) {
    // console.log("HHHHHHHH" + noOfTotalNodes11);
 
     if (noOfTotalNodes11 < 100) {
-        chargeStrength = -500
-        var distanceBetweenNodes = 100;
+        chargeStrength = -100
+        var distanceBetweenNodes = 70;
     } else if (noOfTotalNodes11 > 99 && noOfTotalNodes11 < 200) {
-        chargeStrength = -150
-        var distanceBetweenNodes = 100;
+        chargeStrength = -100
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 199 && noOfTotalNodes11 < 250) {
-        chargeStrength = -150
-        var distanceBetweenNodes = 100;
+        chargeStrength = -100
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 249 && noOfTotalNodes11 < 300) {
         chargeStrength = -100
-        var distanceBetweenNodes = 80;
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 299 && noOfTotalNodes11 < 350) {
         chargeStrength = -100
-        var distanceBetweenNodes = 80;
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 349 && noOfTotalNodes11 < 400) {
         chargeStrength = -100
         var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 399) {
+        chargeStrength = -100
         var distanceBetweenNodes = 60;
     }
 
