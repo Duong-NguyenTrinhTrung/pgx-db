@@ -5,6 +5,7 @@ class GeneDetailSerializer(serializers.Serializer):
         required=True,
     )
 class AtcDetailSerializer(serializers.Serializer):
+    print("check point 4")
     atc_code = serializers.CharField( #why atc_code_id not work?
         required=True,
     )

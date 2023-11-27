@@ -1,12 +1,17 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from gene.views import GeneDetailBaseView, DrugByGeneBaseView
+from drf_yasg.utils import swagger_auto_schema
+from gene.views import GeneDetailBaseView, DrugByGeneBaseView, GenebasedAssociationStatisticsView
 from restapi.serializers import GeneDetailSerializer, AtcDetailSerializer, AtcByLevelSerializer, TargetDrugSerializer
-from drug.views import TargetByAtcBaseView, DescriptionByAtcBaseView, AtcCodesByLevelBaseView, TargetsByDrugBaseView
+from drug.views import TargetByAtcBaseView, DescriptionByAtcBaseView, AtcCodesByLevelBaseView, TargetsByDrugBaseView, AtcCodesByDrugView
 
 
 class GeneDetailRestApiView(GeneDetailBaseView,APIView,):
     allowed_methods = ['get']
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get a full annotation of all variants on a gene given its gene Enseml ID",
+    )
 
     def get(self, request, *args, **kwargs):
         serializer = GeneDetailSerializer(data=self.kwargs)
@@ -20,6 +25,10 @@ class GeneDetailRestApiView(GeneDetailBaseView,APIView,):
 
 class GeneDetailVepRestApiView(GeneDetailBaseView,APIView,):
     allowed_methods = ['get']
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get variant effect prediction scores of all variants on a gene given its gene Enseml ID",
+    )
 
     def get(self, request, *args, **kwargs):
         serializer = GeneDetailSerializer(data=self.kwargs)
@@ -50,6 +59,10 @@ class GeneDetailVepRestApiView(GeneDetailBaseView,APIView,):
         
 class DrugByGeneRestApiView(DrugByGeneBaseView,APIView,):
     allowed_methods = ['get']
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get a list of all drugs that target a gene given its gene Enseml ID",
+    )
 
     def get(self, request, *args, **kwargs):
         serializer = GeneDetailSerializer(data=self.kwargs)
@@ -76,6 +89,10 @@ class DrugByGeneRestApiView(DrugByGeneBaseView,APIView,):
 
 class TargetByAtcRestApiView(TargetByAtcBaseView,APIView,):
     allowed_methods = ['get']
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get a list of all targets belonging to an ATC code",
+    )
 
     def get(self, request, *args, **kwargs):
         serializer = AtcDetailSerializer(data=self.kwargs)
@@ -100,7 +117,10 @@ class TargetByAtcRestApiView(TargetByAtcBaseView,APIView,):
 
 class AtcToDescriptionRestApiView(DescriptionByAtcBaseView,APIView,):
     allowed_method = ["get"]
-
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get the description of an ATC code",
+    )
     def get(self, request, *args, **kwargs):
         serializer = AtcDetailSerializer(data=self.kwargs)
 
@@ -116,6 +136,10 @@ class AtcToDescriptionRestApiView(DescriptionByAtcBaseView,APIView,):
 
 class AtcCodesByLevelRestApiView(AtcCodesByLevelBaseView,APIView,):
     allowed_method = ["get"]
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get all ATC codes belonging to an ATC group",
+    )
 
     def get(self, request, *args, **kwargs):
         serializer = AtcByLevelSerializer(data=self.kwargs)
@@ -135,6 +159,10 @@ class AtcCodesByLevelRestApiView(AtcCodesByLevelBaseView,APIView,):
 
 class TargetsByDrugRestApiView(TargetsByDrugBaseView,APIView,):
     allowed_method = ["get"]
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get a list of all proteins targeted by a drug given its drugbank ID",
+    )
 
     def get(self, request, *args, **kwargs):
         serializer = TargetDrugSerializer(data=self.kwargs)
@@ -156,3 +184,64 @@ class TargetsByDrugRestApiView(TargetsByDrugBaseView,APIView,):
 
 def AtcToPgxRestApiView():
     pass
+
+class AtcCodesByDrugRestApiView(AtcCodesByDrugView,APIView,):
+    # pass
+    # get_atc_codes_by_drug
+    allowed_method = ["get"]
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get an ATC code of a drug given its drugbank ID",
+    )
+
+    def get(self, request, *args, **kwargs):
+        serializer = TargetDrugSerializer(data=self.kwargs)
+
+        if serializer.is_valid():
+            data = self.get_atc_codes_by_drug(serializer.validated_data.get('drug_id'))
+            returned_data = []
+            for pair in data.get("list_of_atc_codes"):
+                temp = {
+                    "ATC code": pair.get("Atc code")[0],
+                    "Description": pair.get("Description"),
+                }
+                returned_data.append(temp)
+            return Response({"ATC code of drug "+self.kwargs.get("drug_id"): returned_data})
+        else:
+            return Response(serializer.errors, status=400)
+
+class GenebasedAssociationStatisticsRestApiView(GenebasedAssociationStatisticsView,APIView,):
+    allowed_method = ["get"]
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get gene-based association statistics given a gene Ensembl ID or gene name",
+    )
+
+    def get(self, request, *args, **kwargs):
+        serializer = GeneDetailSerializer(data=self.kwargs)
+        if serializer.is_valid():
+            data = self.get_association_statistics_by_gene_id(serializer.validated_data.get('gene_id'))
+            returned_data = []
+            for index, row in data.get("association_statistics_data").iterrows():
+                temp = {
+                    "Variant marker": row["markerID"],
+                    "Phenotype description": row["phenocode"],
+                    "n_cases": row["n_cases"],
+                    "n_controls": row["n_controls"],
+                    "n_cases_defined": row["n_cases_defined"],
+                    "n_cases_both_sexes": row["n_cases_both_sexes"],
+                    "n_cases_females": row["n_cases_females"],
+                    "n_cases_males": row["n_cases_males"],
+                    "Category": row["category"],
+                    "AC": row["AC"],
+                    "AF": row["AF"],
+                    "BETA": row["BETA"],
+                    "SE": row["SE"],
+                    "AF_Cases": row["AF_Cases"],
+                    "AF_Controls": row["AF_Controls"],
+                    "Pvalue": row["Pvalue"],
+                }
+                returned_data.append(temp)
+            return Response({"Gene-based association statistics of "+self.kwargs.get("gene_id"): returned_data})
+        else:
+            return Response(serializer.errors, status=400)

@@ -25,11 +25,52 @@ from variant.models import (
     GenebassVariant,
     Variant,
     VepVariant,
+    GenebassCategory,
+    VariantPhenocode
 )
 import urllib.request as urlreq
 import urllib.request as urlreq
 from django.shortcuts import render
+
 warnings.filterwarnings('ignore')
+
+class GenebasedAssociationStatisticsView:
+    def get_association_statistics_by_gene_id(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("association_statistics_data_" + slug) is not None:
+                association_statistics_data = cache.get("association_statistics_data_" + slug)
+            else:
+                table = pd.DataFrame()
+                
+                if slug.startswith("ENSG"):
+                    data = GenebassVariant.objects.filter(gene_id=slug).values_list("markerID", "phenocode", "n_cases", "n_controls", "n_cases_defined", \
+                                                                                    "n_cases_both_sexes", "n_cases_females", "n_cases_males", "category", \
+                                                                                    "AC", "AF", "BETA", "SE", \
+                                                                                    "AF_Cases", "AF_Controls", "Pvalue")
+                else:
+                    gene_id = Gene.objects.get(genename=slug)
+                    data = GenebassVariant.objects.filter(gene_id=slug).values_list("markerID", "phenocode", "n_cases", "n_controls", "n_cases_defined", \
+                                                                                    "n_cases_both_sexes", "n_cases_females", "n_cases_males", "category", \
+                                                                                    "AC", "AF", "BETA", "SE", \
+                                                                                    "AF_Cases", "AF_Controls", "Pvalue")
+
+                print("number of rows: ", len(data))
+                for row in data[:10]:
+                    temp = pd.DataFrame([row])
+                    phenocode = temp.iloc[0, 1]
+                    temp.iloc[0, 1] = VariantPhenocode.objects.get(phenocode=phenocode).description_more
+                    category = temp.iloc[0, 8]
+                    temp.iloc[0, 8] = GenebassCategory.objects.get(category_code=category).category_description
+
+                    table = table.append(temp, ignore_index=True)
+                table.fillna('', inplace=True)
+                table.columns=["markerID", "phenocode", "n_cases", "n_controls", "n_cases_defined", "n_cases_both_sexes", "n_cases_females", \
+                                "n_cases_males", "category", "AC", "AF", "BETA", "SE", "AF_Cases", "AF_Controls", "Pvalue"]
+                context = dict()
+                cache.set("association_statistics_data_" + slug, table, 60 * 60)
+            context['association_statistics_data'] = table
+        return context
 
 
 class DrugByGeneBaseView(object):
