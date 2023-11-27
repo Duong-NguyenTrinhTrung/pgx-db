@@ -1349,7 +1349,11 @@ var imagePaths = {};
 Object.keys(colorCodes).forEach((key, i) => {
     Object.keys(colorCodesDrugType).forEach((key2, j) => {
         var keyCombo = key + "|" + key2;
+        //Starting Key Debug
+        console.log("KeyDebug", keyCombo);
         imagePaths[keyCombo] = `/static/d3/images/capsules/left${i}right${j}.png`;
+        console.log("KeyDebug", imagePaths[keyCombo]);
+        
     });
 });
 
