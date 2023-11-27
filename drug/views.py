@@ -786,7 +786,7 @@ def get_atc_sub_levels(request):
     return JsonResponse(reorganized_data, safe=False)
 
 
-class TargetByAtcBaseView(object):
+class TargetByAtcBaseView:
     def get_target_by_atc_code(self, slug):
         print("checkpoint 1 in get_target_by_atc_code func of TargetByAtcBaseView, self = ", self, " slug = ", slug)
 
@@ -829,7 +829,7 @@ def retrieving_atc_description(atc_code):
                     return AtcChemicalSubstance.objects.get(id__iexact=atc_code)
 
 
-class DescriptionByAtcBaseView(object):
+class DescriptionByAtcBaseView:
     def get_description_by_atc_code(self, slug):
         context = {}
         if slug is not None:
@@ -859,7 +859,7 @@ def retrieving_atc_description(level):
                 else:
                     return list(AtcChemicalSubstance.objects.all().values_list("id", "name"))
 
-class AtcCodesByLevelBaseView(object):
+class AtcCodesByLevelBaseView:
     def get_atc_codes_by_level(self, slug):
         context = {}
         if slug is not None:
@@ -873,7 +873,7 @@ class AtcCodesByLevelBaseView(object):
             print("context : ", context)
         return context
     
-class TargetsByDrugBaseView(object):
+class TargetsByDrugBaseView:
     def get_targets_by_drug(self, slug):
         context = {}
         if slug is not None:
@@ -885,5 +885,25 @@ class TargetsByDrugBaseView(object):
                 context = dict()
                 cache.set("targets_by_drug_" + slug, list_of_targets, 60 * 60)
             context['list_of_targets'] = list_of_targets
+            print("context : ", context)
+        return context
+    
+class AtcCodesByDrugView:
+    def get_atc_codes_by_drug(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("atc_codes_by_drug_" + slug) is not None:
+                returned_data = cache.get("atc_codes_by_drug_" + slug)
+            else:
+                list_of_atc_codes = list(DrugAtcAssociation.objects.filter(
+                        drug_id=slug).values_list("atc_id"))
+                returned_data = []
+                for code in list_of_atc_codes:
+                    name = AtcChemicalSubstance.objects.get(id=code[0]).name
+                    returned_data.append({"Atc code": code, "Description": name })
+
+                context = dict()
+                cache.set("atc_codes_by_drug_" + slug, returned_data, 60 * 60)
+            context['list_of_atc_codes'] = returned_data
             print("context : ", context)
         return context

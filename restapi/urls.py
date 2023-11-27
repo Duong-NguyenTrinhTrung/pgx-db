@@ -1,7 +1,7 @@
 from django.urls import path
 
 from restapi.views import GeneDetailRestApiView, GeneDetailVepRestApiView, DrugByGeneRestApiView, TargetByAtcRestApiView, AtcToDescriptionRestApiView, \
-                            AtcCodesByLevelRestApiView, TargetsByDrugRestApiView, AtcToPgxRestApiView
+                            AtcCodesByLevelRestApiView, TargetsByDrugRestApiView, GenebasedAssociationStatisticsRestApiView, AtcCodesByDrugRestApiView, AtcToPgxRestApiView
 
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -28,5 +28,7 @@ urlpatterns = [
     path('atc/description/<slug:atc_code>/', AtcToDescriptionRestApiView.as_view(), name='atc_to_description_RestApiView'),
     path('atc/atc_code/<slug:atc_level>/', AtcCodesByLevelRestApiView.as_view(), name='atc_codes_by_level_RestApiView'),
     path('drug/target/<slug:drug_id>/', TargetsByDrugRestApiView.as_view(), name='targets_by_drug_RestApiView'),
+    path('drug/atc_code/<slug:drug_id>/', AtcCodesByDrugRestApiView.as_view(), name='atc_codes_by_drug_RestApiView'),
+    path('gene/associateStatictics/<slug:gene_id>/', GenebasedAssociationStatisticsRestApiView.as_view(), name='genebased_association_statistics_RestApiView'),
     path('atc/pgx/<slug:atc_code_gene_id>/', AtcToPgxRestApiView, name='atc_to_pgx_RestApiView'),
 ]

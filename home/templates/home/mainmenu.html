@@ -85,10 +85,8 @@
                 <!-- Variant -->
                 {% include "home/variant_menu.html" %}
 
-                <!-- Link to APIs documentation -->
-                <li>
-                    <a id="api-menu" href="{% url 'schema-swagger-ui' %}" target="_blank">{% trans 'APIs' %}</a>
-                </li>
+                <!-- APIs -->
+                {% include "home/api_menu.html" %}
 
             </ul>
             <form class="navbar-form navbar-right" role="search">

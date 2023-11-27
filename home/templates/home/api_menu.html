@@ -1,0 +1,19 @@
+{% load static %}
+{% load i18n %}
+
+<!-- ARRESTINS -->
+<li class="dropdown arrestin {% if current_site == 'arrestin' %}highlight_menu{% endif %}" id="api_menu">
+    <a href="{{ hosts.arrestin }}/" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" style="padding-left: 15px;">
+    APIs<span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu" role="menu">
+        <!-- Link to APIs documentation -->
+        <li>
+            <a id="api" href="{% url 'schema-swagger-ui' %}" target="_blank">{% trans 'List of API endpoints' %}</a>
+        </li>
+        <li class="divider"></li>
+        <li>
+            <a id="api-script-example" href="#" target="_blank">{% trans 'API sample scripts' %}</a>
+        </li>
+    </ul>
+</li>
