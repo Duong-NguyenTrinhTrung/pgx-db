@@ -1473,14 +1473,14 @@ var simulation = null
 
 // Create the Forced Directed Network Chart
 function createChart(links) {
-    d3.select("#chart").selectAll("*").remove();
+    d3.select("#atc-right-network").selectAll("*").remove();
 
     var container = d3.select("#chart");
     //debugger
-    // var containerWidth = [container.node().getBoundingClientRect().width] - 10;
-    // var containerHeight = [container.node().getBoundingClientRect().height] - 10;
-    var containerWidth = 500;
-    var containerHeight = 500;
+     var containerWidth = [container.node().getBoundingClientRect().width] - 10;
+     var containerHeight = [container.node().getBoundingClientRect().height] - 10;
+   // var containerWidth = 500;
+   // var containerHeight = 500;
     //console.log("Width : "+containerWidth+"  ----  Height : "+containerHeight);
 
     var zoom = d3.zoom()
