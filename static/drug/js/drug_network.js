@@ -1398,12 +1398,9 @@ function processData() {
                 var drugStatus = row.Drug_status; // Get the "Drug_status" value
                 var drugType = row.drugtype; // Get the "Drug_status" value
                 var proteinClass = row.Protein_Class;
-                console.log("Temp DrugId");
+                
                  
-                console.log("printing Clinical Status :"+drugStatus);
-                console.log("printing Product Type :"+drugType);
-                console.log("printing Drug_ID:"+drugID);
-                console.log("printing Drug_D");
+               
                 if (!nodes.find(function (node) { return node.id === drugName; })) {
 
                     nodes.push({ id: drugName, isParent: true, radius: 10, Drug_status: drugStatus, Drug_type: drugType, Drug_ID: drugID }); // Include the "Drug_status" value in the node object
@@ -1507,7 +1504,7 @@ function createChart(links) {
     var distanceBetweenNodes = 60;
     var noOfTotalNodes11 = links.length;
 
-    console.log("HHHHHHHH" + noOfTotalNodes11);
+   // console.log("HHHHHHHH" + noOfTotalNodes11);
 
     if (noOfTotalNodes11 < 100) {
         chargeStrength = -500
