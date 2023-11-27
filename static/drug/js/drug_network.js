@@ -1306,7 +1306,7 @@ var colorCodes = {
 };
 
 var colorCodesDrugType = {
-    Biotech: "#03A9F4",
+    "Biotech": "#03A9F4",
     "Small Molecule": "#ff5722"
 };
 var colorCodesDrugType_images = {
@@ -1314,7 +1314,7 @@ var colorCodesDrugType_images = {
     "#ff5722": "/static/d3/images/capsules/right1.png"
 };
 var colorCodesDrugType = {
-    Biotech: "#03A9F4",
+    "Biotech": "#03A9F4",
     "Small Molecule": "#ff5722"
 };
 var colorPaletteDrugType = {
