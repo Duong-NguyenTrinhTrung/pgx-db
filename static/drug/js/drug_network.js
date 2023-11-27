@@ -29,7 +29,7 @@ if (drug_bank_id){
 }
 
 $("#loading .spinner").show();
-console.log("json_GeneralFile "+json_GeneralFile);
+console.log("json_GeneralFile ",json_GeneralFile);
 //***console.log("json_drugData "+json_drugData);
 //***console.log("json_proteinData "+json_proteinData);
 //***console.log("json_interactionData "+json_interactionData);
