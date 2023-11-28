@@ -20,7 +20,7 @@ from django.core.cache import cache
 from protein.models import Protein
 from variant.models import Variant
 from gene.models import Gene
-from drug.models import Drug
+from drug.models import Drug, DrugAtcAssociation
 from django.conf import settings
 from django.http import JsonResponse
 from django.db.models import Q
@@ -128,14 +128,16 @@ def drug_lookup(request):
 
         return JsonResponse({'drugs': drugs})
     else:
-        print("If no target parameter provided, get 10 records")
         data = Drug.objects.all()[:10]
-        print("data : ", data)
         drugs = []
         for item in data:
+            atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True).first()
+            code = atc_code if atc_code is not None else "N/A"
+
             drugs.append({
                 'drug_bankID': item.drug_bankID,
                 'name': item.name,
+                'atc_code': code,
                 'pharmacogenomics_note': "coming soon",
                 'Clinical_status': clinical_status_dict.get(item.Clinical_status)
             })
