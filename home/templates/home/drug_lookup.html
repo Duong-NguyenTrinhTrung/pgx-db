@@ -173,6 +173,7 @@
             <tr>
                 <th>Drugbank ID</th>
                 <th>Drug name</th>
+                <th>ATC code</th>
                 <th>Pharmacogenomics note</th>
                 <th>Clinical status</th>
                 <th>Reference</th>
@@ -183,6 +184,7 @@
                 <tr>
                     <td>{{ drug.drug_bankID }}</td>
                     <td>{{ drug.name }}</td>
+                    <td>{{ drug.atc_code }}</td>
                     <td>{{ drug.pharmacogenomics_note }}</td>
                     <td>{{ drug.Clinical_status }}</td>
                     <td><a href="https://go.drugbank.com/drugs/{{ drug.drug_bankID }}"  target="_blank" rel="noopener noreferrer">Link</a></td>
