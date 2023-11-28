@@ -35,7 +35,6 @@
 {% block addon_js %}
     <script>
         $('.atc_sub_levels').click(function (e) {
-            alert("we are here");
             e.preventDefault();
             let atc_code = $(this).data('atc-code');
             let url = $(this).data('remote-url');
