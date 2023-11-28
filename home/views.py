@@ -13,19 +13,16 @@ from collections import defaultdict, OrderedDict
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic import TemplateView, DetailView
-
 from django.db.models import Q, Count, Subquery, OuterRef
 from django.views.decorators.csrf import csrf_exempt
-
 from django.core.cache import cache
-
 
 from protein.models import Protein
 from variant.models import Variant
 from gene.models import Gene
+from drug.models import Drug
 from django.conf import settings
 from django.http import JsonResponse
-
 from django.db.models import Q
 
 def protein_autocomplete_view(request):
@@ -56,6 +53,12 @@ def variant_autocomplete_view(request):
         results = [variant.VariantMarker + " in gene "+ variant.Gene_ID.genename +" (" + variant.Gene_ID.gene_id +")" for variant in variants]
     return JsonResponse({'suggestions': results})
 
+def drug_autocomplete_view(request):
+    query = request.GET.get('query', '')
+    drugs = Drug.objects.filter(Q(drug_bankID__icontains=query))
+    if len(drugs) > 0:
+        results = [drug.drug_bankID + " - "+ drug.name for drug in drugs]
+    return JsonResponse({'suggestions': results})
 
 class Home(TemplateView):
     template_name = 'index_pharmcodb.html'
@@ -102,25 +105,42 @@ def variant_lookup(request):
     context["variants"] = variants
     return render(request, 'home/variant_lookup.html', context)
 
-# def target_lookup2(request):
-#     context = {}
-#     proteins = Protein.objects.all()[:10]
+def drug_lookup(request):
+    drug = request.GET.get('drug')
+    clinical_status_dict = {0: "Nutraceutical", 1: "Experimental", 2: "Investigational", 3: "Approved", 4: "Vet approved", 5: "Illicit"}
+    context = {}
+    if drug:
+        if drug != 'default':
+            data = Drug.objects.filter(
+                Q(uniprot_ID__icontains=drug) |
+                Q(geneID__icontains=drug) 
+            )
+        else:
+            data = Drug.objects.all()[:10]
+        drugs = []
+        for item in data:
+            drugs.append({
+                'drug_bankID': item.drug_bankID,
+                'name': item.name,
+                'pharmacogenomics_note': "coming soon",
+                'Clinical_status': clinical_status_dict.get(item.Clinical_status)
+            })
 
-#     if request.GET.get('target'):
-#         target = request.GET.get('target')
-#         print("do we have target ? : ", target)
-#         data = Protein.objects.filter(Q(uniprot_ID__icontains=target) | Q(protein_name__icontains=target) | Q(geneID__icontains=target) | Q(genename__icontains=target))
-#         proteins = []
-#         for item in data:
-#             proteins.append({
-#                 'uniprot_ID': item.uniprot_ID,
-#                 'genename': item.genename,
-#                 'geneID': item.geneID,
-#                 'protein_name': item.protein_name
-#             })
-#         return JsonResponse({'proteins': proteins})
-#     context["proteins"] = proteins
-#     return render(request, 'home/target_lookup2.html', context)
+        return JsonResponse({'drugs': drugs})
+    else:
+        print("If no target parameter provided, get 10 records")
+        data = Drug.objects.all()[:10]
+        print("data : ", data)
+        drugs = []
+        for item in data:
+            drugs.append({
+                'drug_bankID': item.drug_bankID,
+                'name': item.name,
+                'pharmacogenomics_note': "coming soon",
+                'Clinical_status': clinical_status_dict.get(item.Clinical_status)
+            })
+        context["drugs"] = drugs
+        return render(request, 'home/drug_lookup.html', context)
 
 def target_lookup(request):
     target = request.GET.get('target')
