@@ -1475,7 +1475,7 @@ var simulation = null
 function createChart(links) {
     
     d3.select("#chart").selectAll("*").remove();
-
+    console.log("Chart Updated with new Values ");
     var container = d3.select("#chart");
     //debugger
      var containerWidth = [container.node().getBoundingClientRect().width] - 10;
