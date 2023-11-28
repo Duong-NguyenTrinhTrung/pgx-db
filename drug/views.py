@@ -907,3 +907,23 @@ class AtcCodesByDrugView:
             context['list_of_atc_codes'] = returned_data
             print("context : ", context)
         return context
+    
+
+class PGxByAtcCodeView:
+    def get_pgx_by_atc_code(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("pgx_by_atc_codes_" + slug) is not None:
+                returned_data = cache.get("pgx_by_atc_codes_" + slug)
+            else:
+                pgx = ""
+                returned_data = []
+                # for code in pgx:
+                #     name = AtcChemicalSubstance.objects.get(id=code[0]).name
+                #     returned_data.append({"Atc code": code, "Description": name })
+
+                context = dict()
+                cache.set("pgx_by_atc_codes_" + slug, returned_data, 60 * 60)
+            context['pgx'] = returned_data
+            print("context : ", context)
+        return context

@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from gene.views import GeneDetailBaseView, DrugByGeneBaseView, GenebasedAssociationStatisticsView
 from restapi.serializers import GeneDetailSerializer, AtcDetailSerializer, AtcByLevelSerializer, TargetDrugSerializer
-from drug.views import TargetByAtcBaseView, DescriptionByAtcBaseView, AtcCodesByLevelBaseView, TargetsByDrugBaseView, AtcCodesByDrugView
+from drug.views import TargetByAtcBaseView, DescriptionByAtcBaseView, AtcCodesByLevelBaseView, TargetsByDrugBaseView, AtcCodesByDrugView, PGxByAtcCodeView
 
 
 class GeneDetailRestApiView(GeneDetailBaseView,APIView,):
@@ -182,12 +182,29 @@ class TargetsByDrugRestApiView(TargetsByDrugBaseView,APIView,):
         else:
             return Response(serializer.errors, status=400)
 
-def AtcToPgxRestApiView():
-    pass
+class AtcToPgxRestApiView(PGxByAtcCodeView,APIView,):
+    allowed_method = ["get"]
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get pharmacogenomics data given an ATC code",
+    )
+
+    def get(self, request, *args, **kwargs):
+        serializer = AtcDetailSerializer(data=self.kwargs)
+
+        if serializer.is_valid():
+            data = self.get_pgx_by_atc_code(serializer.validated_data.get('atc_code'))
+            Pharmacogenomics = data.get('pgx', [])
+            returned_data = [{
+                    "Pharmacogenomics":Pharmacogenomics,
+                }]
+            return Response({"ATC Pharmacogenomics: ": returned_data})
+        else:
+            return Response(serializer.errors, status=400)
+        
+    
 
 class AtcCodesByDrugRestApiView(AtcCodesByDrugView,APIView,):
-    # pass
-    # get_atc_codes_by_drug
     allowed_method = ["get"]
     @swagger_auto_schema(
             operation_description="operation_description",
