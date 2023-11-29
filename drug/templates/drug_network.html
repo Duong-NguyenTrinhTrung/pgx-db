@@ -8,133 +8,125 @@
 
 <div id="atc-right-network">
     <div id="loading">
-        <div class="spinner"></div>
-  </div>
-<div id="overlay"></div>
+        <div class="spinner" style="display: none;"></div>
+        <div id="overlay"></div>
 
-  <div id="dialog" style="display: none;">
-  <div class="toolbar">
-    <div class="toolbar-left">
-      <h1 id="drug-name"></h1>
+        <div id="dialog" style="display: none;">
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <h1 id="drug-name"></h1>
+                </div>
+                <div class="toolbar-right">
+                    <button id="close-button">✕</button>
+                </div>
+            </div>
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-tab="drug-image" href="#">Drug/biologics structure</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="drug-description" href="#">Description</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="drug-structure" href="#">Other properties</a>
+                </li>
+
+            </ul>
+            <div class="tab-content">
+
+                <!-- Content for each tab will be added dynamically -->
+            </div>
+        </div>
+        <!--Child/Protein Nodes Dialog-->
+        <div id="dialog1" >
+            <div class="toolbar1">
+                <div class="toolbar-left">
+                    <h1 id="drug-name1"></h1>
+                </div>
+                <div class="toolbar-right">
+                    <button id="close-button1">✕</button>
+                </div>
+            </div>
+            <ul class="nav nav-tabs1">
+                <li class="nav-item1">
+                    <a class="nav-link1 active" data-tab="protein-image" href="#">Protein structure</a>
+                </li>
+                <li class="nav-item1">
+                    <a class="nav-link1" data-tab="protein-structure" href="#">Protein properties</a>
+                </li>
+
+            </ul>
+            <div class="tab-content1">
+
+                <!-- Content for each tab will be added dynamically -->
+            </div>
+        </div>
+
+        <!--Interaction/Links Nodes Dialog-->
+        <div id="dialog2" style="display: none;">
+            <div class="toolbar2">
+                <div class="toolbar-left">
+                    <h1 id="drug-name2"></h1>
+                </div>
+                <div class="toolbar-right">
+                    <button id="close-button2">✕</button>
+                </div>
+            </div>
+            <ul class="nav nav-tabs2">
+                <li class="nav-item2">
+                    <a class="nav-link2 active" data-tab="interaction-strcuture" href="#">Details</a>
+                </li>
+
+            </ul>
+            <div class="tab-content2">
+
+                <!-- Content for each tab will be added dynamically -->
+            </div>
+        </div>
+
+        <div id="screenshot">
+            <div id="chart"></div>
+            <div id="legendsMainDiv" class="center-vertical-container">
+                <div id="all-legends">
+                    <div id="legend_drug_status">
+                        <h3>Clinical status</h3>
+                        <div id="legend_drug_status-content">
+                            <!-- Legend items will be populated dynamically -->
+                        </div>
+                    </div>
+                    <div id="legend_drug_type">
+                        <h3>Product type</h3>
+                        <div id="legend_drug_type-content">
+                            <!-- Legend items will be populated dynamically -->
+                        </div>
+                    </div>
+
+                    <div id="legend_protein_status">
+                        <h3>Protein super family</h3>
+                        <div id="legend_protein_status-content">
+                            <!-- Legend items will be populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!--Screenshot div closing-->
+        <div class="d-flex justify-content-center btmbar" id="threshold-slider-container">
+            <button type="button" class="btn btn-light d-flex btmbar zoom-in-btn"><i
+                    class="fas fa-search-plus zoom-in-icon"></i>&nbsp;Zoom In
+            </button>
+            <button type="button" class="btn btn-light d-flex btmbar col-xs-2 margin-left zoom-out-btn"><i
+                    class="fas fa-search-minus zoom-out-icon"></i>&nbsp;Zoom Out
+            </button>
+
+            <label class="d-flex btmbar" for="threshold-slider" style="display: none;">&nbsp;Threshold Value:</label>
+            <input class="d-flex btmbar" type="range" id="threshold-slider" min="1" max="" value="" step="1" style="display: none;">
+            <span class="d-flex btmbar" id="threshold-value" style="display: none;"></span>
+            <button type="button" id="exportButton" class="btn btn-light d-flex btmbar">Export</button>
+            <button type="button" id="redrawChart" class="btn btn-light d-flex btmbar">Redraw</button>
+        </div>
     </div>
-    <div class="toolbar-right">
-      <button id="close-button">✕</button>
-    </div>
-  </div>
-  <ul class="nav nav-tabs">
-    <li class="nav-item">
-      <a class="nav-link active" data-tab="drug-image" href="#">Drug/biologics structure</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" data-tab="drug-description" href="#">Description</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" data-tab="drug-structure" href="#">Other properties</a>
-    </li>
-   
-  </ul>
-  <div class="tab-content">
-    
-    <!-- Content for each tab will be added dynamically -->
-  </div>
 </div>
 
-
-<!--Child/Protein Nodes Dialog-->
-<div id="dialog1" style="display: none;">
-  <div class="toolbar1">
-    <div class="toolbar-left">
-      <h1 id="drug-name1"></h1>
-    </div>
-    <div class="toolbar-right">
-      <button id="close-button1">✕</button>
-    </div>
-  </div>
-  <ul class="nav nav-tabs1">
-    <li class="nav-item1">
-      <a class="nav-link1 active" data-tab="protein-image" href="#">Protein structure</a>
-    </li>
-    <li class="nav-item1">
-      <a class="nav-link1" data-tab="protein-structure" href="#">Protein properties</a>
-    </li>
-    
-  </ul>
-  <div class="tab-content1">
-    
-    <!-- Content for each tab will be added dynamically -->
-  </div>
-</div>
-
-
-
-
-<!--Interaction/Links Nodes Dialog-->
-<div id="dialog2" style="display: none;">
-  <div class="toolbar2">
-    <div class="toolbar-left">
-      <h1 id="drug-name2"></h1>
-    </div>
-    <div class="toolbar-right">
-      <button id="close-button2">✕</button>
-    </div>
-  </div>
-  <ul class="nav nav-tabs2">
-    <li class="nav-item2">
-      <a class="nav-link2 active" data-tab="interaction-strcuture" href="#">Details</a>
-    </li>
-    
-  </ul>
-  <div class="tab-content2">
-    
-    <!-- Content for each tab will be added dynamically -->
-  </div>
-</div>
-
-<div id="screenshot">
-  <div id="chart"></div>
-<div id="legendsMainDiv" class="center-vertical-container">
- <div id="all-legends">
-  <div id="legend">
-    <h3>Interaction type</h3>
-    <div id="legend-content">
-      <!-- Interaction legend will be populated dynamically -->
-    </div>
-  </div>
-  <div id="legend_drug_status">
-    <h3>Clinical status</h3>
-    <div id="legend_drug_status-content">
-      <!-- Legend items will be populated dynamically -->
-    </div>
-  </div>
-  <div id="legend_drug_type">
-    <h3>Product type</h3>
-    <div id="legend_drug_type-content">
-      <!-- Legend items will be populated dynamically -->
-    </div>
-</div>
-  
-  <div id="legend_protein_status">
-    <h3>Protein super family</h3>
-    <div id="legend_protein_status-content">
-      <!-- Legend items will be populated dynamically -->
-    </div>
-  </div>
- </div> 
- </div>
-  </div> <!--Screennshot div closing-->
-  <div class="d-flex justify-content-center btmbar" id="threshold-slider-container">
-     <button type="button" class="btn btn-light d-flex btmbar zoom-in-btn"><i class="fas fa-search-plus zoom-in-icon"></i>&nbsp;Zoom In</button>
-<button type="button" class="btn btn-light d-flex btmbar col-xs-2 margin-left zoom-out-btn"><i class="fas fa-search-minus zoom-out-icon"></i>&nbsp;Zoom Out</button>
-
-    <label class="d-flex btmbar" for="threshold-slider">&nbsp;Threshold Value:</label>
-    <input class="d-flex btmbar" type="range" id="threshold-slider" min="1" max="" value="" step="1">
-    <span class="d-flex btmbar" id="threshold-value"></span>
-    <button type="button" id="exportButton" class="btn btn-light d-flex btmbar">Export</button>
-    <button type="button" id="redrawChart" class="btn btn-light d-flex btmbar">Redraw</button>
-  </div>
-    
-    
-</div>
 <!--Network Chart End-->
 {% block addon_js %}
     <script src="https://d3js.org/d3.v6.min.js"></script>
