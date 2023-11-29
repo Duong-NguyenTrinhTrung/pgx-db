@@ -927,3 +927,31 @@ class PGxByAtcCodeView:
             context['pgx'] = returned_data
             print("context : ", context)
         return context
+    
+class DrugTargetInteractionByAtcBaseView:
+    def get_interaction_by_atc_code(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("interactions_by_atc_code_" + slug) is not None:
+                returned_data = cache.get("interactions_by_atc_code_" + slug)
+            else:
+                drug_ids = DrugAtcAssociation.objects.filter(atc_id=slug).values_list("drug_id", flat=True)
+                returned_data = []
+                for drug_id in drug_ids:
+                    interactions = Interaction.objects.filter(drug_bankID=drug_id).values_list("uniprot_ID", "actions", "known_action", "interaction_type")
+                    # print("interactions: ", interactions)
+                    for interaction in interactions:
+                        # print("--- interaction: ", interaction)
+                        temp={
+                            "drug_bankID":drug_id,
+                            "uniprot_ID":interaction[0],
+                            "actions":interaction[1],
+                            "known_action":interaction[2],
+                            "interaction_type":interaction[3],
+                        }
+                        returned_data.append(temp)
+                context = dict()
+                cache.set("interactions_by_atc_code_" + slug, returned_data, 60 * 60)
+            context['interactions_by_atc_code'] = returned_data
+            print("context: ", context)
+        return context
