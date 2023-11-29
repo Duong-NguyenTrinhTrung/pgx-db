@@ -786,7 +786,7 @@ function showDialog(title, parentNodeName) {
     // Function to convert drugtype reference number into meaningful labels
     function convertDrugType(drugType) {
         if (drugType === 0) {
-            return "Biologic";
+            return "Biotech";
         } else if (drugType === 1) {
             return "Small Molecule";
         } else {
@@ -1306,7 +1306,7 @@ var colorCodes = {
 };
 
 var colorCodesDrugType = {
-    Biologic: "#03A9F4",
+    "Biotech": "#03A9F4",
     "Small Molecule": "#ff5722"
 };
 var colorCodesDrugType_images = {
@@ -1314,11 +1314,11 @@ var colorCodesDrugType_images = {
     "#ff5722": "/static/d3/images/capsules/right1.png"
 };
 var colorCodesDrugType = {
-    Biologic: "#03A9F4",
+    "Biotech": "#03A9F4",
     "Small Molecule": "#ff5722"
 };
 var colorPaletteDrugType = {
-    "#03A9F4": "#03A9F4",  // Biologic
+    "#03A9F4": "#03A9F4",  // Biotech
     "#ff5722": "#ff5722"   // Small molecule
 };
 
@@ -1342,7 +1342,7 @@ var colorImageMap = {
 
 ////Drugs Images Setting Variables
 var drugStatuses = ["Nutraceutical", "Experimental", "Investigational", "Approved", "Vet-approved", "Illicit"];
-var drugTypes = ["Biologic", "Small Molecule"];
+var drugTypes = ["Biotech", "Small Molecule"];
 
 // Generate all combinations of leftXrightY.png for the image paths
 var imagePaths = {};
@@ -2294,7 +2294,7 @@ function changeNodeImage(status, selectedColor) {
 function createLegend_drugType() {
     var legendContent = d3.select("#legend_drug_type-content");
 
-    var drugTypeArray = ["Biologic", "Small Molecule"];
+    var drugTypeArray = ["Biotech", "Small Molecule"];
     var uniqueDrugType = new Set();
 
     links.forEach(function (link) {
