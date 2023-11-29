@@ -786,7 +786,7 @@ function showDialog(title, parentNodeName) {
     // Function to convert drugtype reference number into meaningful labels
     function convertDrugType(drugType) {
         if (drugType === 0) {
-            return "Biotech";
+            return "Biologic";
         } else if (drugType === 1) {
             return "Small Molecule";
         } else {
@@ -1306,7 +1306,7 @@ var colorCodes = {
 };
 
 var colorCodesDrugType = {
-    "Biotech": "#03A9F4",
+    Biologic: "#03A9F4",
     "Small Molecule": "#ff5722"
 };
 var colorCodesDrugType_images = {
@@ -1314,11 +1314,11 @@ var colorCodesDrugType_images = {
     "#ff5722": "/static/d3/images/capsules/right1.png"
 };
 var colorCodesDrugType = {
-    "Biotech": "#03A9F4",
+    Biologic: "#03A9F4",
     "Small Molecule": "#ff5722"
 };
 var colorPaletteDrugType = {
-    "#03A9F4": "#03A9F4",  // Biotech
+    "#03A9F4": "#03A9F4",  // Biologic
     "#ff5722": "#ff5722"   // Small molecule
 };
 
@@ -1342,19 +1342,14 @@ var colorImageMap = {
 
 ////Drugs Images Setting Variables
 var drugStatuses = ["Nutraceutical", "Experimental", "Investigational", "Approved", "Vet-approved", "Illicit"];
-var drugTypes = ["Biotech", "Small Molecule"];
+var drugTypes = ["Biologic", "Small Molecule"];
 
 // Generate all combinations of leftXrightY.png for the image paths
 var imagePaths = {};
 Object.keys(colorCodes).forEach((key, i) => {
     Object.keys(colorCodesDrugType).forEach((key2, j) => {
         var keyCombo = key + "|" + key2;
-        //Starting Key Debug
-        //console.log("KeyDebug");
-       // console.log("KeyDebug", keyCombo);
         imagePaths[keyCombo] = `/static/d3/images/capsules/left${i}right${j}.png`;
-      //  console.log("KeyDebug", imagePaths[keyCombo]);
-        
     });
 });
 
@@ -1398,9 +1393,12 @@ function processData() {
                 var drugStatus = row.Drug_status; // Get the "Drug_status" value
                 var drugType = row.drugtype; // Get the "Drug_status" value
                 var proteinClass = row.Protein_Class;
-                
+                console.log("Temp DrugId");
                  
-               
+                console.log("printing Clinical Status :"+drugStatus);
+                console.log("printing Product Type :"+drugType);
+                console.log("printing Drug_ID:"+drugID);
+                console.log("printing Drug_D");
                 if (!nodes.find(function (node) { return node.id === drugName; })) {
 
                     nodes.push({ id: drugName, isParent: true, radius: 10, Drug_status: drugStatus, Drug_type: drugType, Drug_ID: drugID }); // Include the "Drug_status" value in the node object
@@ -1473,16 +1471,15 @@ var simulation = null
 
 // Create the Forced Directed Network Chart
 function createChart(links) {
-    
     d3.select("#chart").selectAll("*").remove();
-    console.log("Chart Updated with new Values ");
+
     var container = d3.select("#chart");
     //debugger
     // var containerWidth = [container.node().getBoundingClientRect().width] - 10;
     // var containerHeight = [container.node().getBoundingClientRect().height] - 10;
     var containerWidth = 500;
     var containerHeight = 500;
-    console.log("Width : "+containerWidth+"  ----  Height : "+containerHeight);
+    //console.log("Width : "+containerWidth+"  ----  Height : "+containerHeight);
 
     var zoom = d3.zoom()
         .scaleExtent([0.1, 10])
@@ -1505,28 +1502,27 @@ function createChart(links) {
     var distanceBetweenNodes = 60;
     var noOfTotalNodes11 = links.length;
 
-   // console.log("HHHHHHHH" + noOfTotalNodes11);
+    console.log("HHHHHHHH" + noOfTotalNodes11);
 
     if (noOfTotalNodes11 < 100) {
-        chargeStrength = -100
-        var distanceBetweenNodes = 70;
+        chargeStrength = -500
+        var distanceBetweenNodes = 100;
     } else if (noOfTotalNodes11 > 99 && noOfTotalNodes11 < 200) {
-        chargeStrength = -100
-        var distanceBetweenNodes = 60;
+        chargeStrength = -150
+        var distanceBetweenNodes = 100;
     } else if (noOfTotalNodes11 > 199 && noOfTotalNodes11 < 250) {
-        chargeStrength = -100
-        var distanceBetweenNodes = 60;
+        chargeStrength = -150
+        var distanceBetweenNodes = 100;
     } else if (noOfTotalNodes11 > 249 && noOfTotalNodes11 < 300) {
         chargeStrength = -100
-        var distanceBetweenNodes = 60;
+        var distanceBetweenNodes = 80;
     } else if (noOfTotalNodes11 > 299 && noOfTotalNodes11 < 350) {
         chargeStrength = -100
-        var distanceBetweenNodes = 60;
+        var distanceBetweenNodes = 80;
     } else if (noOfTotalNodes11 > 349 && noOfTotalNodes11 < 400) {
         chargeStrength = -100
         var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 399) {
-        chargeStrength = -100
         var distanceBetweenNodes = 60;
     }
 
@@ -1556,7 +1552,7 @@ function createChart(links) {
             interaction_target = d.target.id;
             // console.log(interaction_source);
             // console.log(interaction_target);
-           // console.log(d.type);
+            console.log(d.type);
             showDialog_Links(d.type, d.type)
             //showDialog_Interaction(d.id, d.id);
         });
@@ -1606,8 +1602,8 @@ function createChart(links) {
         .attr("xlink:href", function (d) {
 
             var key = drugStatuses[d.Drug_status] + "|" + d.Drug_type;
-           // console.log("key: ", key); // print the key
-           // console.log("key: ", imagePaths[key]); // print the key
+            console.log("key: ", key); // print the key
+            console.log("key: ", imagePaths[key]); // print the key
             //return imagePaths[key];
 
             return imagePaths[key];
@@ -2298,7 +2294,7 @@ function changeNodeImage(status, selectedColor) {
 function createLegend_drugType() {
     var legendContent = d3.select("#legend_drug_type-content");
 
-    var drugTypeArray = ["Biotech", "Small Molecule"];
+    var drugTypeArray = ["Biologic", "Small Molecule"];
     var uniqueDrugType = new Set();
 
     links.forEach(function (link) {
