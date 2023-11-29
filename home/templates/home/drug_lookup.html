@@ -184,7 +184,7 @@
                 <tr>
                     <td>{{ drug.drug_bankID }}</td>
                     <td>{{ drug.name }}</td>
-                    <td>{{ drug.atc_code }}</td>
+                    <td><a href="#">{{ drug.atc_code }}</a></td>
                     <td>{{ drug.pharmacogenomics_note }}</td>
                     <td>{{ drug.Clinical_status }}</td>
                     <td><a href="https://go.drugbank.com/drugs/{{ drug.drug_bankID }}"  target="_blank" rel="noopener noreferrer">Link</a></td>
@@ -232,16 +232,16 @@
             $.ajax({
                     url: "{% url 'drug_lookup' %}?drug="+ $(this).val(),
                     success: function (data) {
-                        // console.log(data.drugs);
                         $("#drug-result-tbody").html('');
                         var html_data = '';
                         data.drugs.forEach(item => {
                             html_data += `<tr>
-                                <td>${item.uniprot_ID}</td>
-                                <td>${item.protein_name}</td>
-                                <td>${item.geneID}</td>
-                                <td>${item.genename}</td>
-                                <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer">Link</a></td>
+                                <td>${item.drug_bankID}</td>
+                                <td>${item.name}</td>
+                                <td><a href="#">${item.atc_code}</a></td>
+                                <td>${item.pharmacogenomics_note}</td>
+                                <td>${item.Clinical_status}</td>
+                                <td><a href="https://go.drugbank.com/drugs/{{ item.drug_bankID }}"   target="_blank" rel="noopener noreferrer">Link</a></td>
                             </tr>`;
                         });
                         
@@ -258,11 +258,12 @@
                         var html_data = '';
                         data.drugs.forEach(item => {
                             html_data += `<tr>
-                                <td>${item.uniprot_ID}</td>
-                                <td>${item.protein_name}</td>
-                                <td>${item.geneID}</td>
-                                <td>${item.genename}</td>
-                                <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer">Link</a></td>
+                                <td>${item.drug_bankID}</td>
+                                <td>${item.name}</td>
+                                <td><a href="#">${item.atc_code}</a></td>
+                                <td>${item.pharmacogenomics_note}</td>
+                                <td>${item.Clinical_status}</td>
+                                <td><a href="https://go.drugbank.com/drugs/{{ item.drug_bankID }}"   target="_blank" rel="noopener noreferrer">Link</a></td>
                             </tr>`;
                         });
                         $("#drug-result-tbody").html(html_data);
@@ -281,11 +282,12 @@
                         var html_data = '';
                         data.drugs.forEach(item => {
                             html_data += `<tr>
-                                <td>${item.uniprot_ID}</td>
-                                <td>${item.drug_name}</td>
-                                <td>${item.geneID}</td>
-                                <td>${item.genename}</td>
-                                <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer">Link</a></td>
+                                <td>${item.drug_bankID}</td>
+                                <td>${item.name}</td>
+                                <td><a href="#">${item.atc_code}</a></td>
+                                <td>${item.pharmacogenomics_note}</td>
+                                <td>${item.Clinical_status}</td>
+                                <td><a href="https://go.drugbank.com/drugs/{{ item.drug_bankID }}"   target="_blank" rel="noopener noreferrer">Link</a></td>
                             </tr>`;
                         });
                         $("#drug-result-tbody").html(html_data);
