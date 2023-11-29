@@ -4,7 +4,8 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg.inspectors import PaginatorInspector
 from gene.views import GeneDetailBaseView, DrugByGeneBaseView, GenebasedAssociationStatisticsView
 from restapi.serializers import GeneDetailSerializer, AtcDetailSerializer, AtcByLevelSerializer, TargetDrugSerializer
-from drug.views import TargetByAtcBaseView, DescriptionByAtcBaseView, AtcCodesByLevelBaseView, TargetsByDrugBaseView, AtcCodesByDrugView, PGxByAtcCodeView
+from drug.views import TargetByAtcBaseView, DescriptionByAtcBaseView, AtcCodesByLevelBaseView, TargetsByDrugBaseView, AtcCodesByDrugView, PGxByAtcCodeView, \
+                        DrugTargetInteractionByAtcBaseView
 
 
 class GeneDetailRestApiView(GeneDetailBaseView,APIView,):
@@ -116,6 +117,24 @@ class TargetByAtcRestApiView(TargetByAtcBaseView,APIView,):
             return Response(serializer.errors, status=400)
 
 
+class DrugTargetInteractionByAtcRestApiView(DrugTargetInteractionByAtcBaseView,APIView,):
+    allowed_method = ["get"]
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get the list of drug-protein interations of a given ATC code",
+    )
+    
+    def get(self, request, *args, **kwargs):
+        serializer = AtcDetailSerializer(data=self.kwargs)
+
+        if serializer.is_valid():
+            data = self.get_interaction_by_atc_code(serializer.validated_data.get('atc_code'))
+            interactions_by_atc_code = data.get('interactions_by_atc_code', [])
+            
+            return Response({"List of drug-protein interations: ": interactions_by_atc_code})
+        else:
+            return Response(serializer.errors, status=400)
+        
 class AtcToDescriptionRestApiView(DescriptionByAtcBaseView,APIView,):
     allowed_method = ["get"]
     @swagger_auto_schema(
