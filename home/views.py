@@ -111,17 +111,21 @@ def drug_lookup(request):
     context = {}
     if drug:
         if drug != 'default':
+            drug = drug.split(" - ")[0]
             data = Drug.objects.filter(
-                Q(uniprot_ID__icontains=drug) |
-                Q(geneID__icontains=drug) 
+                Q(drug_bankID__icontains=drug) |
+                Q(name__icontains=drug) 
             )
         else:
             data = Drug.objects.all()[:10]
         drugs = []
         for item in data:
+            atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True).first()
+            code = atc_code if atc_code is not None else "N/A"
             drugs.append({
                 'drug_bankID': item.drug_bankID,
                 'name': item.name,
+                'atc_code': code,
                 'pharmacogenomics_note': "coming soon",
                 'Clinical_status': clinical_status_dict.get(item.Clinical_status)
             })
