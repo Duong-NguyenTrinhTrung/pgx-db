@@ -100,7 +100,7 @@ function getDrugJsonData(drugBankId) {
         type: 'GET',
         url: url + '?drugbank_id=' + drugBankId,
     }, function (data) {
-        console.log(data);
+        //console.log(data);
     })
 
     // call process data
@@ -494,7 +494,7 @@ function downloadXLS() {
         var firstSheetName = workbook.SheetNames[0];
         var worksheet = workbook.Sheets[firstSheetName];
         var rows = XLSX.utils.sheet_to_json(worksheet);
-        console.log(rows);
+       // console.log(rows);
         // Filter the rows based on the filtered links
         var filteredRows = rows.filter(row =>
             filteredLinks.some(link =>
@@ -506,7 +506,7 @@ function downloadXLS() {
         );
 
         // Create a new worksheet with the filtered rows
-        console.log(filteredRows)
+       // console.log(filteredRows)
         var newWs = XLSX.utils.json_to_sheet(filteredRows);
         var newWb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(newWb, newWs, firstSheetName);
@@ -1375,12 +1375,12 @@ function xlsxToJson(file, callback) {
 
 function processData() {
     const jsonFilePath = json_GeneralFile; // JSON file path
-    console.log("Inside Process Data Function11");
+    //console.log("Inside Process Data Function11");
     fetch(jsonFilePath)
         .then((response) => response.json())
         .then((data) => {
             // Extract nodes and links from the JSON data
-            console.log("inside processData: ", data);
+           // console.log("inside processData: ", data);
             chartDataJ = data;
             data.forEach(function (row) {
               //  console.log("ProcessData");
@@ -1393,12 +1393,12 @@ function processData() {
                 var drugStatus = row.Drug_status; // Get the "Drug_status" value
                 var drugType = row.drugtype; // Get the "Drug_status" value
                 var proteinClass = row.Protein_Class;
-                console.log("Temp DrugId");
+              //  console.log("Temp DrugId");
                  
-                console.log("printing Clinical Status :"+drugStatus);
-                console.log("printing Product Type :"+drugType);
-                console.log("printing Drug_ID:"+drugID);
-                console.log("printing Drug_D");
+               // console.log("printing Clinical Status :"+drugStatus);
+              //  console.log("printing Product Type :"+drugType);
+              //  console.log("printing Drug_ID:"+drugID);
+              //  console.log("printing Drug_D");
                 if (!nodes.find(function (node) { return node.id === drugName; })) {
 
                     nodes.push({ id: drugName, isParent: true, radius: 10, Drug_status: drugStatus, Drug_type: drugType, Drug_ID: drugID }); // Include the "Drug_status" value in the node object
@@ -1472,7 +1472,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-
+    console.log("CreateCHart NEW EDit");
     var container = d3.select("#chart");
     //debugger
     // var containerWidth = [container.node().getBoundingClientRect().width] - 10;
