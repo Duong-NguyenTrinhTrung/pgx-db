@@ -49,12 +49,14 @@ class GenebasedAssociationStatisticsView:
                                                                                     "AC", "AF", "BETA", "SE", \
                                                                                     "AF_Cases", "AF_Controls", "Pvalue")
                 else:
-                    gene_id = Gene.objects.get(genename=slug)
-                    data = GenebassVariant.objects.filter(gene_id=slug).values_list("markerID", "phenocode", "n_cases", "n_controls", "n_cases_defined", \
+                    gene_id = Gene.objects.get(genename=slug).gene_id
+                    data = GenebassVariant.objects.filter(gene_id=gene_id).values_list("markerID", "phenocode", "n_cases", "n_controls", "n_cases_defined", \
                                                                                     "n_cases_both_sexes", "n_cases_females", "n_cases_males", "category", \
                                                                                     "AC", "AF", "BETA", "SE", \
                                                                                     "AF_Cases", "AF_Controls", "Pvalue")
 
+                print("gene_id: ", gene_id)
+                print("slug: ", slug)
                 print("number of rows: ", len(data))
                 for row in data[:10]:
                     temp = pd.DataFrame([row])
