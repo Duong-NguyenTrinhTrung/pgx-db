@@ -28,7 +28,7 @@ if (drug_bank_id){
     json_interactionData = "/drug_network/" + drug_bank_id + "/interaction_data";
 }
 
-$("#loading .spinner").show();
+$("#loading").show();
 console.log("json_GeneralFile ",json_GeneralFile);
 //***console.log("json_drugData "+json_drugData);
 //***console.log("json_proteinData "+json_proteinData);
@@ -1489,7 +1489,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-    console.log("Latest Edit CreateCHart_30_11");
+    console.log("Latest Edit CreateCHart_1_12");
     var container = d3.select("#chart");
     //debugger
     // var containerWidth = [container.node().getBoundingClientRect().width] - 10;
@@ -1522,24 +1522,25 @@ function createChart(links) {
     console.log("HHHHHHHH" + noOfTotalNodes11);
 
     if (noOfTotalNodes11 < 100) {
-        chargeStrength = -500
-        var distanceBetweenNodes = 100;
+        chargeStrength = -100
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 99 && noOfTotalNodes11 < 200) {
-        chargeStrength = -150
-        var distanceBetweenNodes = 100;
+        chargeStrength = -100
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 199 && noOfTotalNodes11 < 250) {
-        chargeStrength = -150
-        var distanceBetweenNodes = 100;
+        chargeStrength = -100
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 249 && noOfTotalNodes11 < 300) {
         chargeStrength = -100
-        var distanceBetweenNodes = 80;
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 299 && noOfTotalNodes11 < 350) {
         chargeStrength = -100
-        var distanceBetweenNodes = 80;
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 349 && noOfTotalNodes11 < 400) {
         chargeStrength = -100
         var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 399) {
+        chargeStrength = -100
         var distanceBetweenNodes = 60;
     }
 
@@ -1572,6 +1573,8 @@ function createChart(links) {
             console.log(d.type);
             showDialog_Links(d.type, d.type)
             //showDialog_Interaction(d.id, d.id);
+            console.log(d.type)l
+            showDialog_Interaction(d.id, d.id)
         });
 
     node = svg.selectAll(".node")
@@ -1700,7 +1703,7 @@ function createChart(links) {
 
     console.log("Chart created."); 
     // Finish updating chart
-    $("#loading .spinner").hide();
+    $("#loading").hide();
     updateChartVisibility();
 }
 
