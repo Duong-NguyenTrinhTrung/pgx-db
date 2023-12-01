@@ -314,7 +314,9 @@ function svgToCanvas(svgData, callback) {
         };
 
         if (xlinkHref) {
-            imgObj.src = "http://localhost:8000/" + xlinkHref;
+            //imgObj.src = "http://localhost:8000/" + xlinkHref;
+            imgObj.src = "https://pharmacogenomics-database-5pltq.ondigitalocean.app/" + xlinkHref;
+            
         } else {
             loadedCount++;
         }
@@ -424,7 +426,8 @@ function downloadPDF() {
 
         // Use the href attribute for the image path
         if (xlinkHref) {
-            imgObj.src = "http://localhost:8000/" + xlinkHref;
+            //imgObj.src = "http://localhost:8000/" + xlinkHref;
+             imgObj.src = "https://pharmacogenomics-database-5pltq.ondigitalocean.app/" + xlinkHref;
         } else {
             loadedCount++;
         }
