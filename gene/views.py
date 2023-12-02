@@ -31,34 +31,29 @@ from variant.models import (
 import urllib.request as urlreq
 import urllib.request as urlreq
 from django.shortcuts import render
+from django.core.exceptions import ObjectDoesNotExist
+
 
 warnings.filterwarnings('ignore')
 
 class GenebasedAssociationStatisticsView:
-    def get_association_statistics_by_gene_id(self, slug):
+    def get_association_statistics_by_variant_marker(self, slug):
         context = {}
+        slug = slug[:-1]
         if slug is not None:
             if cache.get("association_statistics_data_" + slug) is not None:
                 association_statistics_data = cache.get("association_statistics_data_" + slug)
             else:
                 table = pd.DataFrame()
                 
-                if slug.startswith("ENSG"):
-                    data = GenebassVariant.objects.filter(gene_id=slug).values_list("markerID", "phenocode", "n_cases", "n_controls", "n_cases_defined", \
-                                                                                    "n_cases_both_sexes", "n_cases_females", "n_cases_males", "category", \
-                                                                                    "AC", "AF", "BETA", "SE", \
-                                                                                    "AF_Cases", "AF_Controls", "Pvalue")
-                else:
-                    gene_id = Gene.objects.get(genename=slug).gene_id
-                    data = GenebassVariant.objects.filter(gene_id=gene_id).values_list("markerID", "phenocode", "n_cases", "n_controls", "n_cases_defined", \
-                                                                                    "n_cases_both_sexes", "n_cases_females", "n_cases_males", "category", \
-                                                                                    "AC", "AF", "BETA", "SE", \
-                                                                                    "AF_Cases", "AF_Controls", "Pvalue")
+                data = GenebassVariant.objects.filter(markerID_id=slug).values_list("markerID", "phenocode", "n_cases", "n_controls", "n_cases_defined", \
+                                                                                "n_cases_both_sexes", "n_cases_females", "n_cases_males", "category", \
+                                                                                "AC", "AF", "BETA", "SE", \
+                                                                                "AF_Cases", "AF_Controls", "Pvalue")
+                if len(data) == 0:
+                    return dict()
 
-                print("gene_id: ", gene_id)
-                print("slug: ", slug)
-                print("number of rows: ", len(data))
-                for row in data[:10]:
+                for row in data:
                     temp = pd.DataFrame([row])
                     phenocode = temp.iloc[0, 1]
                     temp.iloc[0, 1] = VariantPhenocode.objects.get(phenocode=phenocode).description_more
@@ -76,38 +71,38 @@ class GenebasedAssociationStatisticsView:
 
 
 class DrugByGeneBaseView(object):
-    browser_columns=["drug_bankID",
-                    "drugtype",
-                    "name",
-                    "groups",
-                    "categories",
-                    "description",
-                    "Clinical_status"]
     def get_drug_by_gene_data(self, slug):
         context = {}
         if slug is not None:
             if cache.get("drug_data_" + slug) is not None:
-                list_of_targeting_drug = cache.get("drug_data_" + slug)
+                table = cache.get("drug_data_" + slug)
             else:
-                browser_columns = self.browser_columns
                 table = pd.DataFrame()
 
-                if slug.startswith("ENSG"):
-                    protein = Protein.objects.get(geneID=slug)
-                    protein_ID = protein.uniprot_ID
+                if slug.upper().startswith("ENSG"):
+                    try:
+                        protein = Protein.objects.get(geneID=slug)
+                    except ObjectDoesNotExist:
+                        print(f"No Protein found for geneID: {slug}")
+                        protein = None
                 else:
-                    protein = Protein.objects.get(genename=slug)
+                    try:
+                        protein = Protein.objects.get(genename=slug.upper())
+                    except ObjectDoesNotExist:
+                        print(f"No Protein found for genename: {slug}")
+                        protein = None
+                if protein:
                     protein_ID = protein.uniprot_ID
 
-                drugs = Interaction.objects.filter(
-                    uniprot_ID=protein_ID).values_list("drug_bankID", "actions", "known_action", "interaction_type")
-                for drug in drugs:
-                    drug_df = pd.DataFrame([drug])
-                    table = table.append(drug_df, ignore_index=True)
-                table.fillna('', inplace=True)
-                table.columns=["drug_bankID", "actions", "known_action", "interaction_type"]
-                context = dict()
-                cache.set("drug_data_" + slug, table, 60 * 60)
+                    drugs = Interaction.objects.filter(
+                        uniprot_ID=protein_ID).values_list("drug_bankID", "actions", "known_action", "interaction_type")
+                    for drug in drugs:
+                        drug_df = pd.DataFrame([drug])
+                        table = table.append(drug_df, ignore_index=True)
+                    table.fillna('', inplace=True)
+                    table.columns=["drug_bankID", "actions", "known_action", "interaction_type"]
+                    context = dict()
+                    cache.set("drug_data_" + slug, table, 60 * 60)
             context['list_of_targeting_drug'] = table
         return context
 

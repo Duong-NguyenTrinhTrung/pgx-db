@@ -1,5 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
+from django.core.cache import cache
 from django.shortcuts import render
 import numpy as np
 import json
@@ -21,7 +22,21 @@ class VepVariantListView(generics.ListAPIView):
         queryset = VepVariant.objects.filter(Variant_marker__Gene_ID__gene_id=gene_id)
         return queryset
 
-
+#get VEP from a variant marker
+class VEPFromVariantBaseView:
+    def get_vep_from_variant(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("vep_by_variant_marker_" + slug) is not None:
+                returned_data = cache.get("vep_by_variant_marker_" + slug)
+            else:
+                vep = VepVariant.objects.get(Variant_marker=slug)
+                returned_data = []
+                context = dict()
+                cache.set("vep_by_variant_marker_" + slug, returned_data, 60 * 60)
+            context['vep'] = returned_data
+            print("context : ", context)
+        return context
 def get_variant_vep_scores_and_plot(request):
     """
         Get the vep scores for a specific variant
