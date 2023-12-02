@@ -37,6 +37,7 @@ class VEPFromVariantBaseView:
             context['vep'] = returned_data
             print("context : ", context)
         return context
+    
 def get_variant_vep_scores_and_plot(request):
     """
         Get the vep scores for a specific variant

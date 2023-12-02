@@ -39,10 +39,11 @@ warnings.filterwarnings('ignore')
 class GenebasedAssociationStatisticsView:
     def get_association_statistics_by_variant_marker(self, slug):
         context = {}
-        slug = slug[:-1]
+        print("get_association_statistics_by_variant_marker: slug: ", slug)
         if slug is not None:
+            print("cached:", cache.__dict__)
             if cache.get("association_statistics_data_" + slug) is not None:
-                association_statistics_data = cache.get("association_statistics_data_" + slug)
+                table = cache.get("association_statistics_data_" + slug)
             else:
                 table = pd.DataFrame()
                 
@@ -87,7 +88,9 @@ class DrugByGeneBaseView(object):
                         protein = None
                 else:
                     try:
+                        print("geneID:", slug)
                         protein = Protein.objects.get(genename=slug.upper())
+                        print("Data query geneID: ", protein.__dict__)
                     except ObjectDoesNotExist:
                         print(f"No Protein found for genename: {slug}")
                         protein = None
