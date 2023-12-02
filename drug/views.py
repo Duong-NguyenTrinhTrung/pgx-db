@@ -955,3 +955,4 @@ class DrugTargetInteractionByAtcBaseView:
             context['interactions_by_atc_code'] = returned_data
             print("context: ", context)
         return context
+    

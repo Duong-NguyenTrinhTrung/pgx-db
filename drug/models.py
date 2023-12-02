@@ -171,3 +171,6 @@ class Drug(models.Model):
         "drug.drugpubchemsubstance", on_delete=models.CASCADE)
     
     Clinical_status = models.IntegerField(null=True)
+
+    class Meta():
+        ordering = ('drug_bankID',)

@@ -175,4 +175,4 @@ REST_FRAMEWORK = {
 ENABLE_NEW_RELIC = config('ENABLE_NEW_RELIC', default=False)
 
 if ENABLE_NEW_RELIC:
-    newrelic_agent.initialize('newrelic.ini', 'development')
+    newrelic_agent.initialize()

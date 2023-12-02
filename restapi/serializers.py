@@ -1,7 +1,12 @@
 from rest_framework import serializers
 
 class GeneDetailSerializer(serializers.Serializer):
-    gene_id = serializers.CharField(
+    # gene_id = serializers.CharField(
+    #     required=True,
+    # )
+    pass
+class VariantSerializer(serializers.Serializer):
+    variant_marker = serializers.CharField(
         required=True,
     )
 class AtcDetailSerializer(serializers.Serializer):
