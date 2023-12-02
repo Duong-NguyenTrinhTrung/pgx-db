@@ -302,11 +302,13 @@ class GenebasedAssociationStatisticsRestApiView(GenebasedAssociationStatisticsVi
     def get(self, request, *args, **kwargs):
         serializer = VariantSerializer(data=self.kwargs)
         if serializer.is_valid():
-            data = self.get_association_statistics_by_variant_marker(serializer.validated_data.get('variant_marker'))
+            variant_marker = serializer.validated_data.get('variant_marker')
+            variant_marker = variant_marker[:-1] if variant_marker[-1] == "/" else variant_marker
+            data = self.get_association_statistics_by_variant_marker(variant_marker)
             if not data:
-                return Response({"error" : f"{serializer.validated_data.get('variant_marker')[:-1]} not found"}, status=400)
-            print("data = ",data)
-            print("variant_marker = ",self.kwargs)
+                return Response({"error" : f"{variant_marker} not found"}, status=404)
+            # print("data = ",data)
+            # print("variant_marker = ",self.kwargs)
             returned_data = []
             for index, row in data.get("association_statistics_data").iterrows():
                 temp = {
@@ -328,6 +330,6 @@ class GenebasedAssociationStatisticsRestApiView(GenebasedAssociationStatisticsVi
                     "Pvalue": row["Pvalue"],
                 }
                 returned_data.append(temp)
-            return Response({"Gene-based association statistics of "+self.kwargs.get("variant_marker"): returned_data})
+            return Response({"Gene-based association statistics of "+variant_marker: returned_data})
         else:
             return Response(serializer.errors, status=400)
