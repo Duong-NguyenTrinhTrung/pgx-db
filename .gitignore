@@ -99,7 +99,7 @@ venv
 .venv
 
 # New Relic files
-newrelic.ini
+#newrelic.ini
 
 # Pycharm files
 .idea/
