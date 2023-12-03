@@ -173,7 +173,10 @@ REST_FRAMEWORK = {
 }
 
 ENABLE_NEW_RELIC = bool(config('ENABLE_NEW_RELIC', default='False'))
+print('Enable newrelic {}'.format(ENABLE_NEW_RELIC))
+
 NEW_RELIC_LICENSE_KEY = config('NEW_RELIC_LICENSE_KEY', cast=str, default='')
 
 if ENABLE_NEW_RELIC:
+    print("Enabling New Relic")
     newrelic_agent.initialize()
