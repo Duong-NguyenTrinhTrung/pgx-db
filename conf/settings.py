@@ -172,7 +172,8 @@ REST_FRAMEWORK = {
     ]
 }
 
-ENABLE_NEW_RELIC = config('ENABLE_NEW_RELIC', default=False)
+ENABLE_NEW_RELIC = bool(config('ENABLE_NEW_RELIC', default='False'))
+NEW_RELIC_LICENSE_KEY = config('NEW_RELIC_LICENSE_KEY', cast=str, default='')
 
 if ENABLE_NEW_RELIC:
     newrelic_agent.initialize()
