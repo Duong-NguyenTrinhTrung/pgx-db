@@ -315,7 +315,7 @@ function svgToCanvas(svgData, callback) {
 
         if (xlinkHref) {
             //imgObj.src = "http://localhost:8000/" + xlinkHref;
-            imgObj.src = "https://pharmacogenomics-database-5pltq.ondigitalocean.app/" + xlinkHref;
+            imgObj.src = "https://pharmacogenomics-database-5pltq.ondigitalocean.app" + xlinkHref;
             
         } else {
             loadedCount++;
