@@ -259,7 +259,12 @@ function printChart() {
 // Download PNG
 function downloadPNG() {
   var svgElement = document.querySelector("#chart svg");
-  var svgData = getFilteredSvgContent(svgElement);
+
+  // Reset transformations by cloning the SVG element and removing any transformations
+  var clonedSvgElement = svgElement.cloneNode(true);
+  clonedSvgElement.setAttribute("transform", "");
+  
+  var svgData = getFilteredSvgContent(clonedSvgElement);
   svgData = addWhiteBackground(svgData);
 
   // First convert the SVG to canvas
@@ -271,14 +276,14 @@ function downloadPNG() {
 
       // Create the final canvas with extra width to accommodate the scaled legend
       var finalCanvas = document.createElement("canvas");
-      finalCanvas.width = chartCanvas.width + (legendCanvas.width * scaleFactor); // add double the legend's width to the chart's width
-      finalCanvas.height = chartCanvas.height; // keep the chart's height unchanged
+      finalCanvas.width = chartCanvas.width + (legendCanvas.width * scaleFactor);
+      finalCanvas.height = chartCanvas.height;
 
       var context = finalCanvas.getContext("2d");
-      context.fillStyle = 'white'; // Set background color to white
-      context.fillRect(0, 0, finalCanvas.width, finalCanvas.height); // Fill the canvas with white background
+      context.fillStyle = 'white';
+      context.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
 
-      // Draw the chart at its original size
+      // Draw the chart at its original size without zoom
       context.drawImage(chartCanvas, 0, 0);
 
       // Draw the scaled-up legend to the right of the chart
@@ -292,7 +297,6 @@ function downloadPNG() {
     });
   });
 }
-
 
 function svgToCanvas(svgData, callback) {
     var canvas = document.createElement("canvas");
@@ -719,7 +723,7 @@ function showDialog(title, parentNodeName) {
 
         // Your code to fetch the row where column name "name" = drugNameValue
         // Assuming you have the data in the global variable 'drug_xlsxData'
-        var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
+        var matchingRow = drug_xlsxData.find((row) => row.fields.name === drugNameValue);
 
         if (matchingRow) {
             var drugbank_id = matchingRow.drugbank_id;
@@ -751,6 +755,7 @@ function showDialog(title, parentNodeName) {
             tabContent.appendChild(defaultImage);
         }
     }
+    
 
     function showDrugDescription(selectedDrugName1) {
         var tabContent = document.querySelector(".tab-content");
@@ -758,7 +763,7 @@ function showDialog(title, parentNodeName) {
 
         // Your code to fetch the row where column name "name" matches selectedDrugName1
         // Assuming you have the data in the global variable 'drug_xlsxData'
-        var matchingRow = drug_xlsxData.find((row) => row.name === selectedDrugName1);
+        var matchingRow = drug_xlsxData.find((row) => row.fields.name === selectedDrugName1);
 
         if (matchingRow) {
             // Create a table to display the drug information
