@@ -1534,8 +1534,8 @@ function createChart(links) {
     console.log("Latest Edit CreateCHart_4_12_G");
     var container = d3.select("#chart");
     //debugger
-    // var containerWidth = [container.node().getBoundingClientRect().width] - 10;
-    // var containerHeight = [container.node().getBoundingClientRect().height] - 10;
+     var containerWidth = [container.node().getBoundingClientRect().width] - 10;
+     var containerHeight = [container.node().getBoundingClientRect().height] - 10;
     var containerWidth = 500;
     var containerHeight = 500;
     //console.log("Width : "+containerWidth+"  ----  Height : "+containerHeight);
