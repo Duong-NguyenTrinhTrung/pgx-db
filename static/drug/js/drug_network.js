@@ -265,24 +265,23 @@ function downloadPNG() {
   svgToCanvas(svgData, function(chartCanvas) {
     // Convert the HTML legends to canvas
     html2canvas(document.querySelector("#all-legends")).then(function(legendCanvas) {
-      // Double the size of the legend
+      // Set the scale factor to double the size of the legend
       var scaleFactor = 2;
-      var scaledLegendWidth = legendCanvas.width * scaleFactor;
-      var scaledLegendHeight = legendCanvas.height * scaleFactor;
 
-      // Adjust the final canvas size to include the scaled legend
+      // Create the final canvas with extra width to accommodate the scaled legend
       var finalCanvas = document.createElement("canvas");
-      finalCanvas.width = chartCanvas.width + scaledLegendWidth; // sum of the chart width and the double-sized legend width
-      finalCanvas.height = Math.max(chartCanvas.height, scaledLegendHeight); // the height should be the max of chart's height or double-sized legend's height
+      finalCanvas.width = chartCanvas.width + (legendCanvas.width * scaleFactor); // add double the legend's width to the chart's width
+      finalCanvas.height = chartCanvas.height; // keep the chart's height unchanged
 
       var context = finalCanvas.getContext("2d");
       context.fillStyle = 'white'; // Set background color to white
       context.fillRect(0, 0, finalCanvas.width, finalCanvas.height); // Fill the canvas with white background
 
-      context.drawImage(chartCanvas, 0, 0); // draw the chart as it is
+      // Draw the chart at its original size
+      context.drawImage(chartCanvas, 0, 0);
 
-      // Draw the legend on the right side of the chart, doubling its size
-      context.drawImage(legendCanvas, chartCanvas.width, 0, scaledLegendWidth, scaledLegendHeight);
+      // Draw the scaled-up legend to the right of the chart
+      context.drawImage(legendCanvas, chartCanvas.width, (chartCanvas.height - legendCanvas.height * scaleFactor) / 2, legendCanvas.width * scaleFactor, legendCanvas.height * scaleFactor);
 
       // Now you can save the combined canvas as PNG
       var a = document.createElement("a");
@@ -348,7 +347,44 @@ function svgToCanvas(svgData, callback) {
 }
 
 // Download JPEG
+
 function downloadJPEG() {
+  var svgElement = document.querySelector("#chart svg");
+  var svgData = getFilteredSvgContent(svgElement);
+  svgData = addWhiteBackground(svgData);
+
+  // First convert the SVG to canvas
+  svgToCanvas(svgData, function(chartCanvas) {
+    // Convert the HTML legends to canvas
+    html2canvas(document.querySelector("#all-legends")).then(function(legendCanvas) {
+      // Set the scale factor to double the size of the legend
+      var scaleFactor = 2;
+
+      // Create the final canvas with extra width to accommodate the scaled legend
+      var finalCanvas = document.createElement("canvas");
+      finalCanvas.width = chartCanvas.width + (legendCanvas.width * scaleFactor); // add double the legend's width to the chart's width
+      finalCanvas.height = chartCanvas.height; // keep the chart's height unchanged
+
+      var context = finalCanvas.getContext("2d");
+      context.fillStyle = 'white'; // Set background color to white
+      context.fillRect(0, 0, finalCanvas.width, finalCanvas.height); // Fill the canvas with white background
+
+      // Draw the chart at its original size
+      context.drawImage(chartCanvas, 0, 0);
+
+      // Draw the scaled-up legend to the right of the chart
+      context.drawImage(legendCanvas, chartCanvas.width, (chartCanvas.height - legendCanvas.height * scaleFactor) / 2, legendCanvas.width * scaleFactor, legendCanvas.height * scaleFactor);
+
+      // Now you can save the combined canvas as PNG
+      var a = document.createElement("a");
+      a.href = finalCanvas.toDataURL("image/jpeg", 0.9);
+      a.download = "chart.jpeg";
+      a.click();
+    });
+  });
+}
+
+function downloadJPEG1() {
   var svgElement = document.querySelector("#chart svg");
   var svgData = getFilteredSvgContent(svgElement);
   svgData = addWhiteBackground(svgData);
