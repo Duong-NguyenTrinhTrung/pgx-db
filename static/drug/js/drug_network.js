@@ -28,7 +28,7 @@ if (drug_bank_id){
     json_interactionData = "/drug_network/" + drug_bank_id + "/interaction_data";
 }
 
-$("#loading").show();
+$("#loading .spinner").show();
 console.log("json_GeneralFile ",json_GeneralFile);
 //***console.log("json_drugData "+json_drugData);
 //***console.log("json_proteinData "+json_proteinData);
@@ -1703,7 +1703,8 @@ function createChart(links) {
 
     console.log("Chart created."); 
     // Finish updating chart
-    $("#loading").hide();
+    $("#loading .spinner").hide();
+    //$("#loading").hide();
     updateChartVisibility();
 }
 
