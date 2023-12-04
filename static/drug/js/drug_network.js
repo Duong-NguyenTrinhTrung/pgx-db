@@ -28,7 +28,7 @@ if (drug_bank_id){
     json_interactionData = "/drug_network/" + drug_bank_id + "/interaction_data";
 }
 
-$("#loading").show();
+$("#loading .spinner").show();
 console.log("json_GeneralFile ",json_GeneralFile);
 //***console.log("json_drugData "+json_drugData);
 //***console.log("json_proteinData "+json_proteinData);
@@ -1489,7 +1489,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-    console.log("Latest Edit CreateCHart_1_12");
+    console.log("Latest Edit CreateCHart_4_12_b");
     var container = d3.select("#chart");
     //debugger
     // var containerWidth = [container.node().getBoundingClientRect().width] - 10;
@@ -1573,7 +1573,7 @@ function createChart(links) {
             console.log(d.type);
             showDialog_Links(d.type, d.type)
             //showDialog_Interaction(d.id, d.id);
-            console.log(d.type);
+            console.log(d.type)
             showDialog_Interaction(d.id, d.id)
         });
 
@@ -1622,8 +1622,8 @@ function createChart(links) {
         .attr("xlink:href", function (d) {
 
             var key = drugStatuses[d.Drug_status] + "|" + d.Drug_type;
-            console.log("key: ", key); // print the key
-            console.log("key: ", imagePaths[key]); // print the key
+            //console.log("key: ", key); // print the key
+           // console.log("key: ", imagePaths[key]); // print the key
             //return imagePaths[key];
 
             return imagePaths[key];
@@ -1703,7 +1703,8 @@ function createChart(links) {
 
     console.log("Chart created."); 
     // Finish updating chart
-    $("#loading").hide();
+    $("#loading .spinner").hide();
+    //$("#loading").hide();
     updateChartVisibility();
 }
 
