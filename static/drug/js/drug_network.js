@@ -1573,7 +1573,7 @@ function createChart(links) {
             console.log(d.type);
             showDialog_Links(d.type, d.type)
             //showDialog_Interaction(d.id, d.id);
-            console.log(d.type)l
+            console.log(d.type);
             showDialog_Interaction(d.id, d.id)
         });
 
