@@ -1691,16 +1691,19 @@ function createChart(links) {
         .text(function (d) { return d.id; })
         .attr("class", "node-label")
 
-    simulation.on("tick", function () {
-        link.attr("x1", function (d) { return d.source.x; })
-            .attr("y1", function (d) { return d.source.y; })
-            .attr("x2", function (d) { return d.target.x; })
-            .attr("y2", function (d) { return d.target.y; });
+  simulation.on("tick", function() {
+    link.attr("x1", function(d) { return d.source.x; })
+      .attr("y1", function(d) { return d.source.y; })
+      .attr("x2", function(d) { return d.target.x; })
+      .attr("y2", function(d) { return d.target.y; });
 
-        node.attr("transform", function (d) {
-            return "translate(" + d.x + "," + d.y + ")";
-        });
+    node.attr("transform", function(d) {
+      // Constrain the nodes to the SVG container
+      d.x = Math.max(d.radius, Math.min(containerWidth - d.radius, d.x));
+      d.y = Math.max(d.radius, Math.min(containerHeight - d.radius, d.y));
+      return "translate(" + d.x + "," + d.y + ")";
     });
+  });
 
     // Enable drag behavior for nodes
     function drag(simulation) {
