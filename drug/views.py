@@ -710,15 +710,37 @@ def get_drug_atc_association(request):
 
     # Convert queryset to a list of dictionaries
     associations_list = [
-        {"drug_bankID": assoc.drug_bankID, "name": assoc.name, "description": assoc.description}
+        {"drug_bankID": assoc.drug_bankID, "name": assoc.name, "description": assoc.description, "target_list": [ {"gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=assoc)]}
         for assoc in associations]
-
     # Create a JSON response with the data
     response_data = {
         "associations": associations_list,
         "atc_code": atc_code,
     }
     return JsonResponse(response_data)
+
+
+def get_drug_list_by_uniprotID(request):
+    uniprot_ID = request.GET.get("uniProt_ID")
+    interactions = Interaction.objects.filter(uniprot_ID=uniprot_ID)
+    noOfTargetTypes = len([interaction for interaction in interactions if interaction.interaction_type=="target" ])
+    noOfTransporterTypes = len([interaction for interaction in interactions if interaction.interaction_type=="transporter" ])
+    noOfCarrierTypes = len([interaction for interaction in interactions if interaction.interaction_type=="carrier" ])
+    noOfEnzymeTypes = len([interaction for interaction in interactions if interaction.interaction_type=="enzyme" ])
+    temp = {
+        "Target": uniprot_ID,
+        "NoOfDrugs": len(interactions),
+        "ListOfDrugs": list(interactions.values_list("drug_bankID", flat=True)),
+        "NoOfTargetTypes": noOfTargetTypes, 
+        "NoOfTransporterTypes": noOfTransporterTypes, 
+        "NoOfCarrierTypes": noOfCarrierTypes, 
+        "NoOfEnzymeTypes": noOfEnzymeTypes, 
+
+    }
+    print("get_drug_list_by_uniprotID returned data: ", temp)
+    return JsonResponse({ "response_data" : temp})
+   
+
 
 def retrieving_anatomical_group(atc_code):
     return list(AtcAnatomicalGroup.objects.filter(id__iexact=atc_code).values('id', 'name'))

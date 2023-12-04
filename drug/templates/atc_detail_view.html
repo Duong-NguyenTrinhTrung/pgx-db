@@ -6,6 +6,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="{% static 'drug/css/atc_lookup.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'drug/css/atc_detail.css' %}">
+    <style>
+        .tooltip {
+            background-color: #fff;
+            color: #333333;
+            font-weight: bolder;
+            padding: 2px 3px;
+            border-radius: 5px;
+            font-size: 14px;
+            position: absolute;
+            z-index: 999;
+            border: 1px solid #333333;
+            
+          }
+
+    </style>
+    
 {% endblock %}
 
 {% block content %}
@@ -26,6 +42,35 @@
                                                 margin-right: 5px;">
                     </iframe>
                 </div>
+
+                <div id="target-table" style="display: none;">
+                    <span style="font-style: italic; margin-bottom: 10px;" id="info-target-table"></span>
+                    <div id="associated_target_tbl">
+                        <table id="associated_target_tbl" >
+                            <thead style="text-align: left;">
+                                <tr style="background-color: #f2f2f2;">
+                                    <th style="white-space: nowrap;">Target &nbsp; &nbsp; &nbsp; &nbsp;</th>
+                                    <th style="white-space: nowrap;">No. of drugs &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th>
+                                    <th style="white-space: normal;">List of drugs &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th>
+                                    <th style="white-space: nowrap;">PGx information &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
+                                        &nbsp; &nbsp; &nbsp;</th>
+                                    <th>Other &nbsp; &nbsp;&nbsp;  &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp;</th>
+                                </tr>
+                            </thead>
+                            <tbody id="content-target-table">
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card-body text-center" style="margin-top: 20px;">
+                        <p style="font-style: italic; text-align: left;">Interaction types</p>
+                        <!--PieChart Code here-->
+                        <div id="chart-container-interaction-type" style="width: 300px; height: 300px;">
+                            <svg id="pie-chart-interaction-type"></svg>
+                        </div>
+                        <!--PieChart End here-->
+                    </div>
+                </div>
             </div>
         </div>
     {% endautoescape %}
@@ -33,12 +78,15 @@
 
 {% block addon_js %}
 
+    <script src="{% static 'home/js/d3.v7.min.js' %}"></script> 
+    <script src="{% static 'drug/js/target_table_statistics.js' %}"></script>  
+
     <script>
         // JavaScript for toggling the visibility of nested lists
         document.querySelectorAll('.tree .desc').forEach(function (el) {
             el.addEventListener('click', function () {
-                var parentLi = el.parentElement; // Get the parent <li> element
-                var ul = parentLi.querySelector('ul'); // Select the nested <ul>
+                var parentLi = el.parentElement; 
+                var ul = parentLi.querySelector('ul'); 
                 if (ul) {
                     if (ul.style.display === "" || ul.style.display === "none") {
                         ul.style.display = 'block';
@@ -53,6 +101,63 @@
     </script>
 
     <script>
+
+            function showTargetTable(uniProt_ID){
+                $.ajax(
+                    {
+                        url: "{% url 'get-drug-list-by-uniprotID' %}?uniProt_ID="+uniProt_ID,
+                        type: "GET",
+                        success: function (response) {
+                            console.log(response);
+                            displayDrugListByUniProt_ID(response.response_data);
+                            const data = [
+                                    { category: "Target", value: response.response_data.NoOfTargetTypes },
+                                    { category: "Enzyme", value: response.response_data.NoOfEnzymeTypes },
+                                    { category: "Transporter", value: response.response_data.NoOfTransporterTypes },
+                                    { category: "Carrier", value: response.response_data.NoOfCarrierTypes },
+                                ];
+                            console.log("Before createPieChartForTargetType: " + data.toString());
+                            createPieChartForTargetType(data);
+                        },
+                        error: function (xhr, status, error) {
+                            console.log('AJAX Error:', error);
+                        }
+                    });
+            }
+
+            function displayDrugListByUniProt_ID(data) {
+                $("#content-target-table").html('');
+
+                var target_area = document.getElementById('target-table');
+                $("#infor-target-table").html(`<i>More information of <b>${data.Target} </b>`);
+
+                    var drug_list = [];
+                    for (var j = 0; j<data.ListOfDrugs.length;j++) {
+                        var drug_url = "{% url 'drug_network' %}" + "?drug_bank_id=" + data.ListOfDrugs[j];
+                        drug_list.push(`<a href="#" class="associated_drug" 
+                                    data-drugbank_id="${data.ListOfDrugs[j]}"
+                                    onclick="toggleDivVisibility(this, '${drug_url}')" 
+                                    data-target="#atc_right"> ${data.ListOfDrugs[j]}`);
+                }
+
+                var tableHtml = `
+                        <tr style="white-space: nowrap; background-color: rgba(241, 124, 14, 0.2);">
+                            <td>${data.Target}</td>
+                            <td>${data.NoOfDrugs}</td>
+                            <td style="white-space: normal;"><div id="list_of_drug_cell">${drug_list}</div></td>
+                            <td style="white-space: normal;">Coming soon</td>
+                            <td class="long-content" >Coming soon</td>
+                        </tr>
+                        `;
+                $("#content-target-table").html(tableHtml);
+                $('html, body').animate({
+                    scrollTop: $('#content-target-table').offset().top
+                }, 2000);
+                $("#target-table").show();
+                var target_statistics_plot = document.createElement("div");
+                target_statistics_plot.setAttribute("id", "target_statistics_plot");
+            }
+                
             // Function to show visualization
             function toggleDivVisibility(element, url) {
                 var drugBankId = element.getAttribute('data-drugbank_id');
@@ -65,15 +170,6 @@
                 var element = $("#graphvisibility");
                 element.css('display', 'block');
                 element.css('color', 'grey');
-                // accessing the  content of d3
-                // iframe.onload = function () {
-                //     var iframeContentWindow = iframe.contentWindow;
-                //     if (iframeContentWindow) {
-                //         console.log("Found the iframe content");
-                //     } else {
-                //         console.log("Not finding the iframe content");
-                //     }
-                // };
             }
     </script>
 
@@ -99,27 +195,29 @@
                 var drug_bank_ids = [];
                 // Check if the 'associations' key exists in the JSON response
                 if (associations.length > 0) {
-                    var tableHtml = '<table id="associated_drug_tbl" ><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID</th><th>Drug name</th><th>Short description</th></tr></thead><tbody>';
+                    var tableHtml = '<table id="associated_drug_tbl" ><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID</th><th style="white-space: nowrap;">Drug name</th><th style="white-space: nowrap;">No. of target</th><th style="white-space: nowrap;">List of target &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th><th>Short description</th></tr></thead><tbody>';
                     // var atc_url = "{% url 'drugs_network' %}";
                     for (var i = 0; i < associations.length; i++) {
                         var row = associations[i];
                         drug_bank_ids.push(row.drug_bankID);
                         var drug_url = "{% url 'drug_network' %}" + "?drug_bank_id=" + row.drug_bankID;
+                        var targetLinks = [];
+                        for (var j = 0; j<row.target_list.length;j++) {
+                            targetLinks.push(`<a class="uniProt_ID" onmouseover="showTargetTable('${row.target_list[j].uniProt_ID}')" target="_blank" href="/gene/${row.target_list[j].gene_id}"> ${row.target_list[j].uniProt_ID}</a>`);
+                        }
                         tableHtml += `
                         <tr style="white-space: nowrap;">
                             <td>
                                 <a href="#" class="associated_drug" 
                                 data-drugbank_id="${row.drug_bankID}"
-                                data-json-general="{% static 'json-sample/json_GeneralFile.json' %}"
-                                data-json-drug="{% static 'json-sample/json_drugData.json' %}"
-                                data-json-protein="{% static 'json-sample/json_proteinData.json' %}"
-                                data-json-interaction="{% static 'json-sample/json_interactionData.json' %}"
                                 onclick="toggleDivVisibility(this, '${drug_url}')" 
                                 data-target="#atc_right">
                                 ${row.drug_bankID}
                                 </a> <a href="https://go.drugbank.com/drugs/${row.drug_bankID}" style="font-size:14px; color:grey; text-decoration: underline;" target="_blank";>[Ref]</a>
                             </td>
                             <td>${row.name}</td>
+                            <td>${row.target_list.length}</td>
+                            <td style="white-space: normal;">${targetLinks}</td>
                             <td class="long-content" >${row.description}</td>
                         </tr>
                         `
@@ -214,6 +312,23 @@
             function hideText(index) {
                 networkTextElements[index].style.display = "none";
             }
+
+            
+
+            $("a.uniProt_ID").hover(function() {
+                var uniProt_ID = $(this).text();
+                $.ajax(
+                    {
+                        url: "{% url 'get-drug-list-by-uniprotID' %}?uniProt_ID="+uniProt_ID,
+                        type: "GET",
+                        success: function (response) {
+                            console.log(response);
+                        },
+                        error: function (xhr, status, error) {
+                            console.log('AJAX Error:', error);
+                        }
+                    });
+            });
         });
 
     </script>
