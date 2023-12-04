@@ -1622,8 +1622,8 @@ function createChart(links) {
         .attr("xlink:href", function (d) {
 
             var key = drugStatuses[d.Drug_status] + "|" + d.Drug_type;
-            console.log("key: ", key); // print the key
-            console.log("key: ", imagePaths[key]); // print the key
+            //console.log("key: ", key); // print the key
+           // console.log("key: ", imagePaths[key]); // print the key
             //return imagePaths[key];
 
             return imagePaths[key];
