@@ -47,7 +47,8 @@ function readDrugJSON() {
         .then((response) => response.json())
         .then((jsonData) => {
             // Assuming your JSON data is an array of objects, adjust this code accordingly
-            drug_xlsxData = jsonData;
+            drug_xlsxData = jsonData.map(item => item.fields);
+           // drug_xlsxData = jsonData;
             console.log("DrugJSONDATA",drug_xlsxData);
             readProteinJSON();
         })
@@ -63,7 +64,7 @@ function readProteinJSON() {
         .then((response) => response.json())
         .then((jsonData) => {
             protein_xlsxData = jsonData;
-            console.log("ProteinData",protein_xlsxData);
+            //console.log("ProteinData",protein_xlsxData);
 
             readInteractionJSON();
         })
@@ -79,7 +80,7 @@ function readInteractionJSON() {
         .then((response) => response.json())
         .then((jsonData) => {
             interaction_xlsxData = jsonData;
-            console.log("InteractionData",interaction_xlsxData);
+            //console.log("InteractionData",interaction_xlsxData);
             console.log("End of Logs ");
             processData();
         })
