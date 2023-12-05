@@ -94,10 +94,6 @@ li.atc_checkbox:checked {
     border: 2px solid #4caf50; /* Border color when checked */
 }
 
-#target_statistics_plot{
-
-}
-
 
 #associated_target_tbl{
     width: 97%;

@@ -395,6 +395,7 @@ class GeneDetailBrowser(
         context = super().get_context_data(**kwargs)
         slug = kwargs.get('slug')
         context.update(self.get_gene_detail_data(slug))
+        # context.update(self.get_gene_detail_data(slug))
         return context
 
 

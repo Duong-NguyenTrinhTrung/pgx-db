@@ -64,6 +64,7 @@
                     
                     <div class="card-body text-center" style="margin-top: 20px;">
                         <p style="font-style: italic; text-align: left;">Interaction types</p>
+                        <button class="btn btn-success" style="float: right; margin-right: 70px;" onmouseover="goToUp()">Up</button>
                         <!--PieChart Code here-->
                         <div id="chart-container-interaction-type" style="width: 300px; height: 300px;">
                             <svg id="pie-chart-interaction-type"></svg>
@@ -101,7 +102,11 @@
     </script>
 
     <script>
-
+            function goToUp() {
+                $('html, body').animate({
+                    scrollTop: $('#atc_right').offset().top
+                }, 2000);
+            }
             function showTargetTable(uniProt_ID){
                 $.ajax(
                     {
