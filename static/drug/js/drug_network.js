@@ -80,6 +80,7 @@ function readInteractionJSON() {
         .then((jsonData) => {
             interaction_xlsxData = jsonData;
             console.log("InteractionData",interaction_xlsxData);
+            console.log("End of Logs ");
             processData();
         })
         .catch((error) => {
@@ -1535,7 +1536,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-    console.log("Latest Edit CreateCHart_4_12_K");
+    console.log("Latest Edit CreateCHart_4_12_M");
     var container = d3.select("#chart");
     //debugger
      var containerWidth = [container.node().getBoundingClientRect().width] - 10;
