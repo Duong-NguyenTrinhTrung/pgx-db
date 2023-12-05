@@ -724,7 +724,7 @@ function showDialog(title, parentNodeName) {
         // Your code to fetch the row where column name "name" = drugNameValue
         // Assuming you have the data in the global variable 'drug_xlsxData'
         console.log("drug_xlsxData");
-        consoolelog("",drug_xlsxData);
+        console.log("",drug_xlsxData);
         var matchingRow = drug_xlsxData.find((row) => row.fields.name === drugNameValue);
 
         if (matchingRow) {
@@ -1533,7 +1533,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-    console.log("Latest Edit CreateCHart_4_12_J");
+    console.log("Latest Edit CreateCHart_4_12_K");
     var container = d3.select("#chart");
     //debugger
      var containerWidth = [container.node().getBoundingClientRect().width] - 10;
