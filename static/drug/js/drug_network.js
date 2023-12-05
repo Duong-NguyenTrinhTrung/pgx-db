@@ -63,6 +63,7 @@ function readProteinJSON() {
         .then((response) => response.json())
         .then((jsonData) => {
             protein_xlsxData = jsonData;
+            console.log("ProteinData",protein_xlsxData);
 
             readInteractionJSON();
         })
@@ -78,6 +79,7 @@ function readInteractionJSON() {
         .then((response) => response.json())
         .then((jsonData) => {
             interaction_xlsxData = jsonData;
+            console.log("InteractionData",interaction_xlsxData);
             processData();
         })
         .catch((error) => {
