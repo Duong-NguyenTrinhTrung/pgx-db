@@ -512,7 +512,7 @@
             // var vep_table_body = document.querySelector("#structures_scrollable_wrapper .dataTables_scroll .dataTables_scrollBody .dataTable");
             // vep_table_body.style.width = "100%";
         }
-
+        
         function showAllVepScoreColumns() {
             var table = $('#structures_scrollable').DataTable();
             var start_col_index = 10
@@ -532,7 +532,17 @@
             // var vep_table_body = document.querySelector("#structures_scrollable_wrapper .dataTables_scroll .dataTables_scrollBody .dataTable");
             // vep_table_body.style.width = "100%";
         }
-
+        function getHeaderContent(element) {
+            var content = "";
+            element.childNodes.forEach(function(value){
+                if(value.nodeType === Node.TEXT_NODE) { 
+                    // console.log("Current textNode value is : ", value.nodeValue.trim());
+                    // sChildTextSum += value.nodeValue;
+                    content += ` ${value.nodeValue.trim()}`;
+                }
+            });
+            return content;
+        }
         var tableToExcel = (function () {
             var encabezado = '<html><head><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/><style> table, td {border:thin solid black} table {border-collapse:collapse}</style></head><body><table>';
 
@@ -540,7 +550,7 @@
             var header_th_els = header_el.find('th')
             var header = ''
             for (var th_i = 0; th_i < header_th_els.length; th_i++) {
-                header += '<th>' + header_th_els[th_i].textContent + '</th>'
+                header += '<th>' + getHeaderContent(header_th_els[th_i])+ '</th>'
             }
             header = '<tr>' + header + '</tr>'
             header = '<thead>' + header + '</thead>'
@@ -563,7 +573,7 @@
             var a = document.createElement("a");
             document.body.appendChild(a);
             a.href = url;
-            a.download = "DrugBrowserData.xls";
+            a.download = "{{slug}}.xls";
             a.click();
 
             setTimeout(function () {
