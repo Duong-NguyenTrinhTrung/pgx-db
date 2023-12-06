@@ -47,6 +47,7 @@ function readDrugJSON() {
         .then((response) => response.json())
         .then((jsonData) => {
             // Assuming your JSON data is an array of objects, adjust this code accordingly
+           // drug_xlsxData = jsonData.map(item => item.fields);
             drug_xlsxData = jsonData;
             console.log("DrugJSONDATA",drug_xlsxData);
             readProteinJSON();
@@ -63,6 +64,7 @@ function readProteinJSON() {
         .then((response) => response.json())
         .then((jsonData) => {
             protein_xlsxData = jsonData;
+            console.log("ProteinData",protein_xlsxData);
 
             readInteractionJSON();
         })
@@ -78,6 +80,8 @@ function readInteractionJSON() {
         .then((response) => response.json())
         .then((jsonData) => {
             interaction_xlsxData = jsonData;
+        console.log("InteractionData",interaction_xlsxData);
+            console.log("End of Logs ");
             processData();
         })
         .catch((error) => {
@@ -723,6 +727,8 @@ function showDialog(title, parentNodeName) {
 
         // Your code to fetch the row where column name "name" = drugNameValue
         // Assuming you have the data in the global variable 'drug_xlsxData'
+        console.log("drug_xlsxData");
+        console.log("",drug_xlsxData);
         var matchingRow = drug_xlsxData.find((row) => row.fields.name === drugNameValue);
 
         if (matchingRow) {
@@ -1534,7 +1540,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-    console.log("Latest Edit CreateCHart_4_12_I");
+    console.log("Latest Edit CreateCHart_4_12_N");
     var container = d3.select("#chart");
     //debugger
      var containerWidth = [container.node().getBoundingClientRect().width] - 10;
