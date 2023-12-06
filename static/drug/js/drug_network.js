@@ -47,8 +47,8 @@ function readDrugJSON() {
         .then((response) => response.json())
         .then((jsonData) => {
             // Assuming your JSON data is an array of objects, adjust this code accordingly
-            drug_xlsxData = jsonData.map(item => item.fields);
-           // drug_xlsxData = jsonData;
+           // drug_xlsxData = jsonData.map(item => item.fields);
+            drug_xlsxData = jsonData;
             console.log("DrugJSONDATA",drug_xlsxData);
             readProteinJSON();
         })
