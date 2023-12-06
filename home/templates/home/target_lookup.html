@@ -180,16 +180,23 @@
                 <th>Gene ID</th>
                 <th>Genename</th>
                 <th>Details</th>
+                <th style="width: 200px;">Drug-interacting agents </th>
             </tr>
         </thead>
         <tbody id="target-result-tbody">
-            {% for protein in proteins %}
+            {% for item in items %}
                 <tr>
-                    <td>{{ protein.uniprot_ID }}</td>
-                    <td>{{ protein.protein_name }}</td>
-                    <td>{{ protein.geneID }}</td>
-                    <td>{{ protein.genename }}</td>
-                    <td><a href="{% url 'gene:gene' slug=protein.geneID %}"  target="_blank" rel="noopener noreferrer">Link</a></td>
+                    <td>{{ item.uniprot_ID }}</td>
+                    <td>{{ item.protein_name }}</td>
+                    <td>{{ item.geneID }}</td>
+                    <td>{{ item.genename }}</td>
+                    <td><a href="{% url 'gene:gene' slug=item.geneID %}"  target="_blank" rel="noopener noreferrer">Link</a></td>
+                    var drug_list = [];
+                    {% for name in item.drug_names %}
+                        drug_list.append(name+", ")
+                    {% endfor %}
+                    <td>{{item.drug_names}}</td>
+
                 </tr>
             {% endfor %}
 
@@ -234,16 +241,25 @@
             $.ajax({
                     url: "{% url 'target_lookup' %}?target="+ $(this).val(),
                     success: function (data) {
-                        // console.log(data.proteins);
+                        console.log(data.items);
                         $("#target-result-tbody").html('');
                         var html_data = '';
-                        data.proteins.forEach(item => {
+                        data.items.forEach(item => {
+                            var drug_list = [];
+                            for (var j = 0; j<item.drug_names.length;j++) {
+                                var drug_url = "{% url 'drug_network' %}" + "?drug_bank_id=" + item.drug_ids[j];
+                                drug_list.push(`<a href="#" class="associated_drug" 
+                                            data-drugbank_id="${item.drug_ids[j]}"
+                                            onclick="toggleDivVisibility(this, '${drug_url}')" 
+                                            data-target="#atc_right"> ${item.drug_names[j]}`);
+                            }
                             html_data += `<tr>
                                 <td>${item.uniprot_ID}</td>
                                 <td>${item.protein_name}</td>
                                 <td>${item.geneID}</td>
                                 <td>${item.genename}</td>
                                 <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer">Link</a></td>
+                                <td>${drug_list}</td>
                             </tr>`;
                         });
                         
@@ -258,13 +274,22 @@
                         // console.log(data.proteins);
                         $("#target-result-tbody").html('');
                         var html_data = '';
-                        data.proteins.forEach(item => {
+                        data.items.forEach(item => {
+                            var drug_list = [];
+                            for (var j = 0; j<item.drug_names.length;j++) {
+                                var drug_url = "{% url 'drug_network' %}" + "?drug_bank_id=" + item.drug_ids[j];
+                                drug_list.push(`<a href="#" class="associated_drug" 
+                                            data-drugbank_id="${item.drug_ids[j]}"
+                                            onclick="toggleDivVisibility(this, '${drug_url}')" 
+                                            data-target="#atc_right"> ${item.drug_names[j]}`);
+                            }
                             html_data += `<tr>
                                 <td>${item.uniprot_ID}</td>
                                 <td>${item.protein_name}</td>
                                 <td>${item.geneID}</td>
                                 <td>${item.genename}</td>
                                 <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer">Link</a></td>
+                                <td>${drug_list}</td>
                             </tr>`;
                         });
                         $("#target-result-tbody").html(html_data);
@@ -281,13 +306,22 @@
                         console.log("data.proteins: "+data.proteins);
                         $("#target-result-tbody").html('');
                         var html_data = '';
-                        data.proteins.forEach(item => {
+                        data.items.forEach(item => {
+                            var drug_list = [];
+                            for (var j = 0; j<item.drug_names.length;j++) {
+                                var drug_url = "{% url 'drug_network' %}" + "?drug_bank_id=" + item.drug_ids[j];
+                                drug_list.push(`<a href="#" class="associated_drug" 
+                                            data-drugbank_id="${item.drug_ids[j]}"
+                                            onclick="toggleDivVisibility(this, '${drug_url}')" 
+                                            data-target="#atc_right"> ${item.drug_names[j]}`);
+                            }
                             html_data += `<tr>
                                 <td>${item.uniprot_ID}</td>
                                 <td>${item.protein_name}</td>
                                 <td>${item.geneID}</td>
                                 <td>${item.genename}</td>
                                 <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer">Link</a></td>
+                                <td>${drug_list}</td>
                             </tr>`;
                         });
                         $("#target-result-tbody").html(html_data);

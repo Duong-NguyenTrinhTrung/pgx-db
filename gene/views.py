@@ -406,7 +406,7 @@ class GenebassVariantListView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         genebass_variants_list = GenebassVariant.objects.filter(  # Filter to get all genebass variants for a gene
-            markerID__in=Variant.objects.filter(  # Filter to get all variants for a gene
+            markerID__in=Variant.objects.filter(  
                 Gene_ID=self.kwargs['pk']  # Gen Gene by gene_id
             ).values_list('VariantMarker', flat=True)
         ).values(
@@ -414,10 +414,10 @@ class GenebassVariantListView(TemplateView):
             'n_controls',
             'phenocode__description',
             'phenocode',
-            'n_cases_defined',
-            'n_cases_both_sexes',
-            'n_cases_females',
-            'n_cases_males',
+            # 'n_cases_defined',
+            # 'n_cases_both_sexes',
+            # 'n_cases_females',
+            # 'n_cases_males',
             'category',
             'AC',
             'AF',
@@ -428,7 +428,7 @@ class GenebassVariantListView(TemplateView):
             'Pvalue',
         )
 
-        genebass_variants_list = genebass_variants_list[:5000]
+        # genebass_variants_list = genebass_variants_list[:5000]
 
         phenotypes = GenebassVariant.objects.filter(  # Filter to get all genebass variants for a gene
             markerID__in=Variant.objects.filter(  # Filter to get all variants for a gene
@@ -453,10 +453,6 @@ class GenebassVariantListView(TemplateView):
 
 @require_http_methods(["GET"])
 def filter_gene_detail_page(request, id):
-    """
-    Filter gene detail page by
-    * mean_of_vep_score
-    """
     mean_vep_score = request.GET.get('mean_vep_score', 0.5)
     mean_vep_score = float(mean_vep_score)
     # Filter by mean_vep_score

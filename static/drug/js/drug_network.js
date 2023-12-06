@@ -1400,6 +1400,8 @@ var colorImageMap = {
 };
 
 ////Drugs Images Setting Variables
+//0 -> Nutraceutical, 1 - Experimental, 2- Investigational, 3- Approved , 4 - Vet approved, 5 - Illicit
+
 var drugStatuses = ["Nutraceutical", "Experimental", "Investigational", "Approved", "Vet-approved", "Illicit"];
 var drugTypes = ["Biotech", "Small Molecule"];
 
@@ -1448,6 +1450,7 @@ function processData() {
                 var drugName = row.drug_name;
                 var drugID = row.drugbank_id;
                 var protein = row.protein;
+                var genename = row.gene_name;
                 var interaction = row.interaction;
                 var drugStatus = row.Drug_status; // Get the "Drug_status" value
                 var drugType = row.drugtype; // Get the "Drug_status" value
