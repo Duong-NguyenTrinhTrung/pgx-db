@@ -103,9 +103,11 @@
 
     <script>
             function goToUp() {
+                console.log("up button is clicked");
                 $('html, body').animate({
-                    scrollTop: $('#atc_right').offset().top
-                }, 2000);
+                    // scrollTop: $('#atc_right').offset().top
+                    scrollTop: $('#content').offset().top
+                }, 1000);
             }
             function showTargetTable(uniProt_ID){
                 $.ajax(
@@ -147,7 +149,7 @@
 
                 var tableHtml = `
                         <tr style="white-space: nowrap; background-color: rgba(241, 124, 14, 0.2);">
-                            <td>${data.Target}</td>
+                            <td>${data.Genename}</td>
                             <td>${data.NoOfDrugs}</td>
                             <td style="white-space: normal;"><div id="list_of_drug_cell">${drug_list}</div></td>
                             <td style="white-space: normal;">Coming soon</td>
@@ -200,7 +202,7 @@
                 var drug_bank_ids = [];
                 // Check if the 'associations' key exists in the JSON response
                 if (associations.length > 0) {
-                    var tableHtml = '<table id="associated_drug_tbl" ><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID</th><th style="white-space: nowrap;">Drug name</th><th style="white-space: nowrap;">No. of target</th><th style="white-space: nowrap;">List of target &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th><th>Short description</th></tr></thead><tbody>';
+                    var tableHtml = '<table id="associated_drug_tbl" ><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID</th><th style="white-space: nowrap;">Drug name</th><th style="white-space: nowrap;">No. of target</th><th style="white-space: nowrap;">List of interacting proteins</br><i>(Show in genenames)</i> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th><th>Short description</th></tr></thead><tbody>';
                     // var atc_url = "{% url 'drugs_network' %}";
                     for (var i = 0; i < associations.length; i++) {
                         var row = associations[i];
@@ -208,7 +210,7 @@
                         var drug_url = "{% url 'drug_network' %}" + "?drug_bank_id=" + row.drug_bankID;
                         var targetLinks = [];
                         for (var j = 0; j<row.target_list.length;j++) {
-                            targetLinks.push(`<a class="uniProt_ID" onmouseover="showTargetTable('${row.target_list[j].uniProt_ID}')" target="_blank" href="/gene/${row.target_list[j].gene_id}"> ${row.target_list[j].uniProt_ID}</a>`);
+                            targetLinks.push(`<a class="uniProt_ID" onmouseover="showTargetTable('${row.target_list[j].uniProt_ID}')" target="_blank" href="/gene/${row.target_list[j].gene_id}"> ${row.target_list[j].genename}</a>`);
                         }
                         tableHtml += `
                         <tr style="white-space: nowrap;">

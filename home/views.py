@@ -19,6 +19,7 @@ from django.core.cache import cache
 
 from protein.models import Protein
 from variant.models import Variant
+from interaction.models import Interaction
 from gene.models import Gene
 from drug.models import Drug, DrugAtcAssociation
 from django.conf import settings
@@ -162,28 +163,38 @@ def target_lookup(request):
             )
         else:
             data = Protein.objects.all()[:10]
-        proteins = []
+        items = []
         for item in data:
-            proteins.append({
+            interactions = Interaction.objects.filter(uniprot_ID=item.uniprot_ID)
+            drug_names = [interaction.drug_bankID.name for interaction in interactions]
+            drug_ids = [interaction.drug_bankID.drug_bankID for interaction in interactions]
+            items.append({
                 'uniprot_ID': item.uniprot_ID,
                 'genename': item.genename,
                 'geneID': item.geneID,
-                'protein_name': item.protein_name
+                'protein_name': item.protein_name,
+                'drug_names': drug_names,
+                'drug_ids': drug_ids,
             })
 
-        return JsonResponse({'proteins': proteins})
+        return JsonResponse({'items': items})
     else:
         # If no target parameter provided, get 10 records
         data = Protein.objects.all()[:10]
-        proteins = []
+        items = []
         for item in data:
-            proteins.append({
+            interactions = Interaction.objects.filter(uniprot_ID=item.uniprot_ID)
+            drug_names = [interaction.drug_bankID.name for interaction in interactions]
+            drug_ids = [interaction.drug_bankID.drug_bankID for interaction in interactions]
+            items.append({
                 'uniprot_ID': item.uniprot_ID,
                 'genename': item.genename,
                 'geneID': item.geneID,
-                'protein_name': item.protein_name
+                'protein_name': item.protein_name,
+                'drug_names': drug_names,
+                'drug_ids': drug_ids,
             })
-        context["proteins"] = proteins
+        context["items"] = items
         return render(request, 'home/target_lookup.html', context)
     
     

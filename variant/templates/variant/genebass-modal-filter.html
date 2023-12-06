@@ -31,9 +31,12 @@
 
         // Variant
         column_filters = column_filters.concat(createYADCFfilters(0, 1, "multi_select", "select2", "Select", false, null, null));
-
+        // Description
+        column_filters = column_filters.concat(createYADCFfilters(3, 1, "multi_select", "select2", "Select", false, null, null));
         // Phenocode
         column_filters = column_filters.concat(createYADCFfilters(4, 1, "multi_select", "select2", "Select", false, null, null));
+        // Category
+        column_filters = column_filters.concat(createYADCFfilters(5, 1, "multi_select", "select2", "Select", false, null, null));
 
         yadcf.init(genebass_variant_table.draw(), column_filters, {
             cumulative_filtering: false

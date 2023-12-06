@@ -710,7 +710,7 @@ def get_drug_atc_association(request):
 
     # Convert queryset to a list of dictionaries
     associations_list = [
-        {"drug_bankID": assoc.drug_bankID, "name": assoc.name, "description": assoc.description, "target_list": [ {"gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=assoc)]}
+        {"drug_bankID": assoc.drug_bankID, "name": assoc.name, "description": assoc.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=assoc)]}
         for assoc in associations]
     # Create a JSON response with the data
     response_data = {
@@ -722,6 +722,7 @@ def get_drug_atc_association(request):
 
 def get_drug_list_by_uniprotID(request):
     uniprot_ID = request.GET.get("uniProt_ID")
+    genename = Protein.objects.get(uniprot_ID=uniprot_ID).genename
     interactions = Interaction.objects.filter(uniprot_ID=uniprot_ID)
     noOfTargetTypes = len([interaction for interaction in interactions if interaction.interaction_type=="target" ])
     noOfTransporterTypes = len([interaction for interaction in interactions if interaction.interaction_type=="transporter" ])
@@ -729,6 +730,7 @@ def get_drug_list_by_uniprotID(request):
     noOfEnzymeTypes = len([interaction for interaction in interactions if interaction.interaction_type=="enzyme" ])
     temp = {
         "Target": uniprot_ID,
+        "Genename": genename,
         "NoOfDrugs": len(interactions),
         "ListOfDrugs": list(interactions.values_list("drug_bankID", flat=True)),
         "NoOfTargetTypes": noOfTargetTypes, 
