@@ -25,6 +25,8 @@ from drug.models import Drug, DrugAtcAssociation
 from django.conf import settings
 from django.http import JsonResponse
 from django.db.models import Q
+from django.core.exceptions import ObjectDoesNotExist
+
 
 def protein_autocomplete_view(request):
     query = request.GET.get('query', '')
@@ -148,57 +150,74 @@ def drug_lookup(request):
             })
         context["drugs"] = drugs
         return render(request, 'home/drug_lookup.html', context)
+    
+def get_atc_code(drug_bankID):
+    try:
+        drug_atc_association = DrugAtcAssociation.objects.filter(drug_id=drug_bankID).first()
+        return drug_atc_association.atc_id.id if drug_atc_association else None
+    except ObjectDoesNotExist:
+        return None
 
 def target_lookup(request):
+    print("----------target lookup is called----------")
     target = request.GET.get('target')
     context = {}
     if target:
         if target != 'default':
             print("do we have target? :", target)
-            data = Protein.objects.filter(
+            proteins = Protein.objects.filter(
                 Q(uniprot_ID__icontains=target) |
                 Q(protein_name__icontains=target) |
                 Q(geneID__icontains=target) |
                 Q(genename__icontains=target)
             )
+            print("target is not default, get proteins filtered by target, length = ", len(proteins))
         else:
-            data = Protein.objects.all()[:10]
+            proteins = Protein.objects.all()[:10]
+            print("target is default, get 10 records")
         items = []
-        for item in data:
+        for item in proteins:
             interactions = Interaction.objects.filter(uniprot_ID=item.uniprot_ID)
-            drug_names = [interaction.drug_bankID.name for interaction in interactions]
-            drug_ids = [interaction.drug_bankID.drug_bankID for interaction in interactions]
             items.append({
                 'uniprot_ID': item.uniprot_ID,
                 'genename': item.genename,
                 'geneID': item.geneID,
                 'protein_name': item.protein_name,
-                'drug_names': drug_names,
-                'drug_ids': drug_ids,
+                "drug_data": [
+                    {
+                        "drug_id": interaction.drug_bankID.drug_bankID,
+                        "drug_name": interaction.drug_bankID.name.title(),
+                        "atc_code": get_atc_code(interaction.drug_bankID)
+                    }
+                    for interaction in interactions
+                ],
             })
-
+        print("in the case of target is provided, length items = ", len(items))
         return JsonResponse({'items': items})
     else:
         # If no target parameter provided, get 10 records
-        data = Protein.objects.all()[:10]
+        proteins = Protein.objects.all()[:10]
         items = []
-        for item in data:
+        for item in proteins:
             interactions = Interaction.objects.filter(uniprot_ID=item.uniprot_ID)
-            drug_names = [interaction.drug_bankID.name for interaction in interactions]
-            drug_ids = [interaction.drug_bankID.drug_bankID for interaction in interactions]
             items.append({
                 'uniprot_ID': item.uniprot_ID,
                 'genename': item.genename,
                 'geneID': item.geneID,
                 'protein_name': item.protein_name,
-                'drug_names': drug_names,
-                'drug_ids': drug_ids,
+                "drug_data": [
+                    {
+                        "drug_id": interaction.drug_bankID.drug_bankID,
+                        "drug_name": interaction.drug_bankID.name,
+                        "atc_code": get_atc_code(interaction.drug_bankID)
+                    }
+                    for interaction in interactions
+                ],
             })
         context["items"] = items
+        print("no target provided, get 10 records ")
         return render(request, 'home/target_lookup.html', context)
     
-    
-
 def target_statistics(request):
     context = {}
     return render(request, 'home/target_statistics.html', context)

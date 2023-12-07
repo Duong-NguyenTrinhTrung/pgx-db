@@ -94,33 +94,30 @@
         </li>
     </ul>
 </div>
+
 <script>
     var urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('detail')) { //  detail: query_string param
         var atcDetailString = urlParams.get('detail');
         var detailATC = $("ul.tree").find('li').filter(function() {
-        if ($(this).find('button').data('atc-code') == atcDetailString) {
-            return $(this);
-        }
-        });
-        detailATC.parent().css('display', 'block');
-        detailATC.parent().parent().css('display', 'block');
-        detailATC.parent().parent().parent().css('display', 'block');
-        detailATC.parent().parent().parent().parent().css('display', 'block');
-        detailATC.parent().parent().parent().parent().parent().css('display', 'block');
-        detailATC.parent().parent().parent().parent().parent().parent().css('display', 'block');
-        detailATC.parent().parent().parent().parent().parent().parent().parent().css('display', 'block');
-        $(document).ready(function() {
-            // Use setTimeout to introduce a delay
-            setTimeout(function() {
-                var buttonClick = detailATC.find('button');
-                console.log('ATC Code:', buttonClick.data('atc-code'));
-
-                // Trigger click event
-                buttonClick.trigger('click');
-            }, 1000);  // Adjust the delay (in milliseconds) as needed
-        });
-
+            if ($(this).find('button').data('atc-code') == atcDetailString) {
+                return $(this);
+            }
+            });
+            detailATC.parent().css('display', 'block');
+            detailATC.parent().parent().css('display', 'block');
+            detailATC.parent().parent().parent().css('display', 'block');
+            detailATC.parent().parent().parent().parent().css('display', 'block');
+            detailATC.parent().parent().parent().parent().parent().css('display', 'block');
+            detailATC.parent().parent().parent().parent().parent().parent().css('display', 'block');
+            detailATC.parent().parent().parent().parent().parent().parent().parent().css('display', 'block');
+            $(document).ready(function() {
+                // Use setTimeout to introduce a delay
+                setTimeout(function() {
+                    var buttonClick = detailATC.find('button');
+                    // Trigger click event
+                    buttonClick.trigger('click');
+                }, 1000);  
+            });
     }
-    
 </script>

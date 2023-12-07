@@ -17,9 +17,7 @@
             position: absolute;
             z-index: 999;
             border: 1px solid #333333;
-            
           }
-
     </style>
     
 {% endblock %}
@@ -29,7 +27,7 @@
         <div class="grid-container">
         {% include 'atc_detail/left_navigation.html' %}
             <div id="atc_right" class="col-8">
-                <!-- block for showing the table -->
+                <!-- block for showing the drug table -->
                 <div id='drug-table'>
                 </div>
                 <!-- block for showing network -->
@@ -42,9 +40,10 @@
                                                 margin-right: 5px;">
                     </iframe>
                 </div>
-
+                <!-- block for showing the target table -->
                 <div id="target-table" style="display: none;">
                     <span style="font-style: italic; margin-bottom: 10px;" id="info-target-table"></span>
+                    <!-- table  -->
                     <div id="associated_target_tbl">
                         <table id="associated_target_tbl" >
                             <thead style="text-align: left;">
@@ -61,7 +60,7 @@
                             </tbody>
                         </table>
                     </div>
-                    
+                    <!-- plots below the table  -->
                     <div class="card-body text-center" style="margin-top: 20px;">
                         <p style="font-style: italic; text-align: left;">Interaction types</p>
                         <button class="btn btn-success" style="float: right; margin-right: 70px;" onmouseover="goToUp()">Up</button>
@@ -103,9 +102,7 @@
 
     <script>
             function goToUp() {
-                console.log("up button is clicked");
                 $('html, body').animate({
-                    // scrollTop: $('#atc_right').offset().top
                     scrollTop: $('#content').offset().top
                 }, 1000);
             }
@@ -115,7 +112,6 @@
                         url: "{% url 'get-drug-list-by-uniprotID' %}?uniProt_ID="+uniProt_ID,
                         type: "GET",
                         success: function (response) {
-                            console.log(response);
                             displayDrugListByUniProt_ID(response.response_data);
                             const data = [
                                     { category: "Target", value: response.response_data.NoOfTargetTypes },
@@ -123,7 +119,6 @@
                                     { category: "Transporter", value: response.response_data.NoOfTransporterTypes },
                                     { category: "Carrier", value: response.response_data.NoOfCarrierTypes },
                                 ];
-                            console.log("Before createPieChartForTargetType: " + data.toString());
                             createPieChartForTargetType(data);
                         },
                         error: function (xhr, status, error) {
@@ -203,7 +198,6 @@
                 // Check if the 'associations' key exists in the JSON response
                 if (associations.length > 0) {
                     var tableHtml = '<table id="associated_drug_tbl" ><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID</th><th style="white-space: nowrap;">Drug name</th><th style="white-space: nowrap;">No. of target</th><th style="white-space: nowrap;">List of interacting proteins</br><i>(Show in genenames)</i> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th><th>Short description</th></tr></thead><tbody>';
-                    // var atc_url = "{% url 'drugs_network' %}";
                     for (var i = 0; i < associations.length; i++) {
                         var row = associations[i];
                         drug_bank_ids.push(row.drug_bankID);
@@ -261,13 +255,13 @@
 
             // Get all the network buttons and their corresponding network text elements
             const networkButtons = document.querySelectorAll(".network-button");
-            const networkTextElements = document.querySelectorAll(".atc-network");
+            // const networkTextElements = document.querySelectorAll(".atc-network");
 
             // Add event listeners to each button
             networkButtons.forEach((button, index) => {
                 button.addEventListener("click", () => showATCLevelNetwork(index));
-                button.addEventListener("mouseover", () => showText(index));
-                button.addEventListener("mouseout", () => hideText(index));
+                // button.addEventListener("mouseover", () => showText(index));
+                // button.addEventListener("mouseout", () => hideText(index));
             });
 
             // Function to show the ATC level drug-target network 
@@ -276,7 +270,6 @@
                 const atcCode = button.getAttribute("data-atc-code");
                 
                 const url = button.getAttribute('data-remote-url');
-                console.log("begin");
                 $.ajax(
                     {
                         url: url,
@@ -287,7 +280,6 @@
                         success: function (response) {
                             list_associated_drugs_in_table(response);
                             draw_atc_level_network(button, response);
-                            console.log("done");
                         },
                         error: function (xhr, status, error) {
                             console.log('AJAX Error:', error);
@@ -308,34 +300,17 @@
                         toggleDivVisibility(button, atc_url)
                     }
                 }
-            
 
             // Function to show the text based on the button index
-            function showText(index) {
-                networkTextElements[index].style.display = "inline";
-            }
+            // function showText(index) {
+            //     networkTextElements[index].style.display = "inline";
+            // }
 
-            // Function to hide the text based on the button index
-            function hideText(index) {
-                networkTextElements[index].style.display = "none";
-            }
+            // // Function to hide the text based on the button index
+            // function hideText(index) {
+            //     networkTextElements[index].style.display = "none";
+            // }
 
-            
-
-            $("a.uniProt_ID").hover(function() {
-                var uniProt_ID = $(this).text();
-                $.ajax(
-                    {
-                        url: "{% url 'get-drug-list-by-uniprotID' %}?uniProt_ID="+uniProt_ID,
-                        type: "GET",
-                        success: function (response) {
-                            console.log(response);
-                        },
-                        error: function (xhr, status, error) {
-                            console.log('AJAX Error:', error);
-                        }
-                    });
-            });
         });
 
     </script>
