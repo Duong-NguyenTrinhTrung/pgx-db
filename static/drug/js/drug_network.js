@@ -189,6 +189,7 @@ function createExportOption(optionText) {
 function handleExportOption(option) {
     switch (option) {
         case 'View In Full Screen':
+            
             viewFullScreen();
             break;
 
@@ -1540,7 +1541,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-    console.log("Latest Edit CreateCHart_4_12_Q");
+    console.log("Latest Edit CreateCHart_4_12_R");
     var container = d3.select("#chart");
     //debugger
      var containerWidth = [container.node().getBoundingClientRect().width] - 10;
