@@ -321,7 +321,8 @@ class GeneDetailBaseView(object):
                         *self.list_necessary_columns)
                     for vep_variant in vep_variants:
                         data_subset = self.parse_marker_data(marker, vep_variant)
-                        table = table.append(data_subset, ignore_index=True)
+                        if data_subset["primary"]=="YES":
+                            table = table.append(data_subset, ignore_index=True)
 
                 table.fillna('', inplace=True)
 
