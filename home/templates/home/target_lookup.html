@@ -198,7 +198,9 @@
                                 >{{drug.drug_name}}</br>
                             </a>
                         {% else %}
-                            {{drug.drug_name}}</br>
+                            <a href="{% url 'atc-detail-view' %}?drug_id={{drug.drug_id}}"
+                                >{{drug.drug_name}}</br>
+                            </a>
                         {% endif %}
                     {% endfor %}
                     </td>
@@ -259,7 +261,7 @@
                                 }
                                 else
                                 {
-                                    drug_list.push(`${item.drug_data[j].drug_name}</br>`);
+                                    drug_list.push(`<a href="{% url 'atc-detail-view' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
                                 }
                             }
                             html_data += `<tr>
@@ -292,7 +294,7 @@
                                 }
                                 else
                                 {
-                                    drug_list.push(`${item.drug_data[j].drug_name}</br>`);
+                                    drug_list.push(`<a href="{% url 'atc-detail-view' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
                                 }
                             }
                             html_data += `<tr>
@@ -327,7 +329,7 @@
                                 }
                                 else
                                 {
-                                    drug_list.push(`${item.drug_data[j].drug_name}</br>`);
+                                    drug_list.push(`<a href="{% url 'atc-detail-view' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
                                 }
                             }
                             html_data += `<tr>

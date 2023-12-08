@@ -719,6 +719,24 @@ def get_drug_atc_association(request):
     }
     return JsonResponse(response_data)
 
+def get_drug_association(request):
+    drug_id = request.GET.get("drug_id")
+    # drug_bank_id = request.GET.get('drug_bank_id')
+
+    # Retrieve the drug object based on the drugbank_id
+    try:
+        drug = Drug.objects.get(drug_bankID=drug_id)
+    except Drug.DoesNotExist:
+        raise Http404("Drug does not exist")
+    associations_list = [
+        {"drug_bankID": drug_id, "name": drug.name, "description": drug.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=drug_id)]}
+        ]
+    # Create a JSON response with the data
+    response_data = {
+        "associations": associations_list,
+    }
+    return JsonResponse(response_data)
+    # return render(request, 'drug_network.html', context)
 
 def get_drug_list_by_uniprotID(request):
     uniprot_ID = request.GET.get("uniProt_ID")

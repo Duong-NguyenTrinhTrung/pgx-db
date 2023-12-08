@@ -63,7 +63,7 @@
                     <!-- plots below the table  -->
                     <div class="card-body text-center" style="margin-top: 20px;">
                         <p style="font-style: italic; text-align: left;">Interaction types</p>
-                        <button class="btn btn-success" style="float: right; margin-right: 70px;" onmouseover="goToUp()">Up</button>
+                        <a class="btn btn-success" style="float: right; margin-right: 70px;" href="#atc_right">Up</a>
                         <!--PieChart Code here-->
                         <div id="chart-container-interaction-type" style="width: 300px; height: 300px;">
                             <svg id="pie-chart-interaction-type"></svg>
@@ -101,11 +101,14 @@
     </script>
 
     <script>
-            function goToUp() {
-                $('html, body').animate({
-                    scrollTop: $('#content').offset().top
-                }, 1000);
-            }
+            
+            
+            // function goToUp() {
+            //     $('html, body').animate({
+            //         scrollTo: $('#content').offset().top
+            //     }, 500);
+            //     // window.scrollTo(0,0)
+            // }
             function showTargetTable(uniProt_ID){
                 $.ajax(
                     {
@@ -255,13 +258,10 @@
 
             // Get all the network buttons and their corresponding network text elements
             const networkButtons = document.querySelectorAll(".network-button");
-            // const networkTextElements = document.querySelectorAll(".atc-network");
 
             // Add event listeners to each button
             networkButtons.forEach((button, index) => {
                 button.addEventListener("click", () => showATCLevelNetwork(index));
-                // button.addEventListener("mouseover", () => showText(index));
-                // button.addEventListener("mouseout", () => hideText(index));
             });
 
             // Function to show the ATC level drug-target network 
@@ -301,17 +301,37 @@
                     }
                 }
 
-            // Function to show the text based on the button index
-            // function showText(index) {
-            //     networkTextElements[index].style.display = "inline";
-            // }
-
-            // // Function to hide the text based on the button index
-            // function hideText(index) {
-            //     networkTextElements[index].style.display = "none";
-            // }
-
+            var urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('drug_id')) { //  detail: query_string param
+                var drug_id = urlParams.get('drug_id')
+                console.log("drug_id: " + drug_id);
+                const button = networkButtons[0];
+                $.ajax(
+                    {
+                        url: "{% url 'get-drug-association' %}?drug_id="+drug_id,
+                        type: "GET",
+                        success: function (response) {
+                            console.log(response);
+                            list_associated_drugs_in_table(response);
+                            draw_atc_level_network(button, response);
+                            // var aTag = $("#associated_drug_tbl").find('tbody').find('tr').eq(0).find('td').eq(0).find('a');
+                            $("#drug-table").find('span').text('This drug is not associated with any ATC code')
+                            $(document).ready(function() {
+                                // Use setTimeout to introduce a delay
+                                setTimeout(function() {
+                                    var buttonClick = $("#associated_drug_tbl").find('tbody').find('tr').eq(0).find('td').eq(0).find('a');
+                                    console.log('buttonClick' + buttonClick);
+                                    // Trigger click event
+                                    buttonClick.trigger('click');
+                                }, 1000);  
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.log('AJAX Error:', error);
+                        }
+                    });
+                }
         });
-
+        
     </script>
 {% endblock %}
