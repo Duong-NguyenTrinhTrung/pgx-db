@@ -21,6 +21,7 @@ urlpatterns = [
 
     path('atc-detail-view/', views.atc_detail_view, name='atc-detail-view'),
     path('get_drug_atc_association/', views.get_drug_atc_association, name='get-drug-atc-association'),
+    path('get_drug_association/', views.get_drug_association, name='get-drug-association'),
     path('get_drug_list_by_uniprotID/', views.get_drug_list_by_uniprotID, name='get-drug-list-by-uniprotID'),
     path('get_drug_network/', views.get_drug_network, name='get-drug-network'),
     path('get-atc-sub-levels/', views.get_atc_sub_levels, name='get-atc-sub-levels'),
