@@ -39,9 +39,7 @@ warnings.filterwarnings('ignore')
 class GenebasedAssociationStatisticsView:
     def get_association_statistics_by_variant_marker(self, slug):
         context = {}
-        print("get_association_statistics_by_variant_marker: slug: ", slug)
         if slug is not None:
-            print("cached:", cache.__dict__)
             if cache.get("association_statistics_data_" + slug) is not None:
                 table = cache.get("association_statistics_data_" + slug)
             else:
@@ -84,15 +82,11 @@ class DrugByGeneBaseView(object):
                     try:
                         protein = Protein.objects.get(geneID=slug)
                     except ObjectDoesNotExist:
-                        print(f"No Protein found for geneID: {slug}")
                         protein = None
                 else:
                     try:
-                        print("geneID:", slug)
                         protein = Protein.objects.get(genename=slug.upper())
-                        print("Data query geneID: ", protein.__dict__)
                     except ObjectDoesNotExist:
-                        print(f"No Protein found for genename: {slug}")
                         protein = None
                 if protein:
                     protein_ID = protein.uniprot_ID

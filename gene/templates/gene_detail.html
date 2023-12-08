@@ -20,12 +20,12 @@
     {% autoescape off %}
         <div>
         <div class="col-md-2" style="background-color: rgba(224, 225, 221, 0.3); height: inherit;">
-            <p style="font-size: 14px; display: block; margin-bottom: 10px;"><strong>UniProt ID:</strong> <span
+            <p style="text-align: left; font-size: 14px; display: block; margin-bottom: 10px;margin-top: 10px;"><strong>Gene name:</strong> <span
+                style="color: #B69121">{{ gene }}</span></p>
+            <p style="text-align: left; font-size: 14px; display: block; margin-bottom: 10px;"><strong>Ensembl Gene ID:</strong> <span
+                style="color: #B69121">{{ geneID }}</span></p>
+            <p style="text-align: left; font-size: 14px; display: block; margin-bottom: 10px;"><strong>UniProt ID:</strong> <span
                 style="color: #B69121">{{ protein_name }}</span></p>
-            <p style="font-size: 14px; display: block; margin-bottom: 10px;"><strong>Gene name:</strong> <span
-                    style="color: #B69121">{{ gene }}</span></p>
-            <p style="font-size: 14px; display: block; margin-bottom: 40px;"><strong>Ensembl Gene ID:</strong> <span
-                    style="color: #B69121">{{ geneID }}</span></p>
         </div>
         <div class="col-md-10">
             <div class="row">
@@ -328,33 +328,48 @@
                 order: [[0, "asc"]],
                 pagingType: 'full_numbers',
                 lengthMenu: [
-                    [10, 25, 50, 100, 200, -1],
-                    [10, 25, 50, 100, 200, 'All'],
+                    [5, 10, 15, 20, 25],
+                    [5, 10, 15, 20, 25],
                 ],
+                drawCallback: function(){
+                    $('.paginate_button:not(.disabled)', this.api().table().container())          
+                        .on('click', function(){
+                            var variant_maker_list = [];
+                            $("#structures_scrollable_body").find('tr').each(function() {
+                                variant_maker_list.push($(this).find('.variant').text());
+                            });
+                            variant_maker_list = [...new Set(variant_maker_list)];
+                            $.ajax(
+                                {
+                                    url: "/plot-variants/?variant_maker_list="+variant_maker_list.toString(),
+                                    type: "GET",
+                                    
+                                    success: function (response) {
+                                        draw_multiple_variant_plot(response.variant_maker_list_data);
+                                    },
+                                    error: function (response) {
+                                        console.log(response)
+                                    },
+                                }
+                            );
+                        });       
+                }
             })
-
-            // get data currently seen in the table to make multiple violin plot 
-
-            var variant_maker_list = [];
-            // $("#structures_scrollable_body").find('tr').each(function() {
-            //     var variantMarkerText = $(this).find(':nth-child(1)').text();
-            //     variant_maker_list.push(variantMarkerText);
-            // });
             
+            // get data currently seen in the table to make multiple violin plot 
+            var variant_maker_list = [];
             var variant_maker_list = [];
             $("#structures_scrollable_body").find('tr').each(function() {
                 variant_maker_list.push($(this).find('.variant').text());
             });
             variant_maker_list = [...new Set(variant_maker_list)];
-            // var variant_maker_data_draw_plot = [];
-            // variant_maker_list = ['1_101238989_G/T', '1_101238991_C/A', '1_101238997_A/G', '1_101239000_G/A', '1_101239004_C/A', '1_101239007_T/C', '1_101239016_C/A', '1_101239020_C/A', '1_101239021_C/G', '1_101239028_C/T'];
             $.ajax(
                 {
                     url: "/plot-variants/?variant_maker_list="+variant_maker_list.toString(),
                     type: "GET",
                     
                     success: function (response) {
-                        console.log("response = "+JSON.stringify(response));
+                        // console.log("response = "+JSON.stringify(response));
                         // variant_maker_data_draw_plot.push([response, variant_marker]);
                         draw_multiple_variant_plot(response.variant_maker_list_data);
                     },
@@ -389,7 +404,10 @@
             // update filters
             yadcf.init(
                 oTable1,column_filters, {
-			    cumulative_filtering: false
+                    cumulative_filtering: false,
+                    rowCallBack: function(row, data) {
+                        console.log("row");
+                    }
 		        }
             );
             // yadcf.exFilterColumn(oTable1, [[2, ["YES"]]], true);
@@ -397,19 +415,92 @@
             // let table = $('#structures_scrollable').DataTable();
             // console.log("Change Canonical: "+ yadcf.exGetColumnFilterVal(oTable1, 2));
         })
+        $(document).ready(function() {
 
-        $('#_select').on('change', function () {
-        console.log("changed");
-        var selectedTypeIds = yadcf.exGetColumnFilterVal(logTable, 2);
-        console.log("selected", selectedTypeIds);
-        });
+            // update plot when user change input of rows per display
+            $('select[name="structures_scrollable_length"]').on('change', function()
+                {
+                    // var selectedValue = $(this).val();
+                    // alert(selectedValue);
+                    setTimeout(function(){
+                        let variant_maker_list = [];
+                        $("#structures_scrollable_body").find('tr').each(function() {
+                            variant_maker_list.push($(this).find('.variant').text());
+                        });
+                        variant_maker_list = [...new Set(variant_maker_list)];
+                        $.ajax(
+                            {
+                                url: "/plot-variants/?variant_maker_list="+variant_maker_list.toString(),
+                                type: "GET",
+                                
+                                success: function (response) {
+                                    draw_multiple_variant_plot(response.variant_maker_list_data);
+                                },
+                                error: function (response) {
+                                    console.log(response)
+                                },
+                            }
+                        );
+                    }, 500);
+                });
 
-        // $("#yadcf-filter--structures_scrollable-2").on('change', function() {
-        //     console.log("Change Canonical: "+ $(this).val());
-        // });
-        // $("#yadcf-filter--structures_scrollable-2").on('click', function() {
-        //     console.log("Click Canonical: "+ $(this).val());
-        // });
+            // update plot when user input data on input filter
+            $('.yadcf-filter-wrapper').find('input').each(function() {
+                $(this).on('change', function() {
+                    setTimeout(function(){
+                        let variant_maker_list = [];
+                        $("#structures_scrollable_body").find('tr').each(function() {
+                            variant_maker_list.push($(this).find('.variant').text());
+                        });
+                        variant_maker_list = [...new Set(variant_maker_list)];
+                        $.ajax(
+                            {
+                                url: "/plot-variants/?variant_maker_list="+variant_maker_list.toString(),
+                                type: "GET",
+                                
+                                success: function (response) {
+                                    draw_multiple_variant_plot(response.variant_maker_list_data);
+                                },
+                                error: function (response) {
+                                    console.log(response)
+                                },
+                            }
+                        );
+                    }, 500);
+                });
+            });
+
+            // update plot when user select data on select filter
+            $('.yadcf-filter-wrapper').find('select').each(function() {
+                $(this).on('change', function() {
+                    setTimeout(function(){
+                        let variant_maker_list = [];
+                        $("#structures_scrollable_body").find('tr').each(function() {
+                            variant_maker_list.push($(this).find('.variant').text());
+                        });
+                        variant_maker_list = [...new Set(variant_maker_list)];
+                        // alert("Select change" + variant_maker_list.toString());
+                        $.ajax(
+                            {
+                                url: "/plot-variants/?variant_maker_list="+variant_maker_list.toString(),
+                                type: "GET",
+                                
+                                success: function (response) {
+                                    // console.log("response = "+JSON.stringify(response));
+                                    // variant_maker_data_draw_plot.push([response, variant_marker]);
+                                    draw_multiple_variant_plot(response.variant_maker_list_data);
+                                },
+                                error: function (response) {
+                                    console.log(response)
+                                },
+                            }
+                        );
+                    }, 500);
+                    
+                });
+            });
+        })
+        
 
         function hideAllVepScoreColumns() {
             var table = $('#structures_scrollable').DataTable();
@@ -565,7 +656,6 @@
                     const meanValue = v.reduce((acc, val) => acc + val, 0) /        v.length;
                     // Generate red shades based on mean value
                     // const color = `rgba(${255**meanValue}, 50, 0, 0.6)`; 
-                    // const color = d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), v.length)[index];
                     // const color = d3.quantize(t => d3.interpolateSpectral(t * 0.5 + 0.1), v.length)[index];
                     const color = d3.range(10).map(d => d3.interpolateRainbow(d /10))[index];
                     return {
@@ -579,13 +669,6 @@
                     boxpoints: 'all'
                     };
             });
-
-            // Layout settings
-            // const layout = {
-            //     title: 'Violin Plots',
-            //     yaxis: { title: 'VEP score' },
-            //     xaxis: { title: 'Variant', tickangle: 15 } // Set tickangle to 45 degrees
-            // };
 
             let layout = {
             xaxis: {
@@ -615,8 +698,8 @@
                 zeroline: false, // Show the y-axis zero line
             },
             margin: {
-                t: 10, // Increase the top margin for the title and plot container
-                b: 150, // Bottom margin for the x-axis labels and title
+                t: 30, // Increase the top margin for the title and plot container
+                b: 100, // Bottom margin for the x-axis labels and title
                 l: 60, // Left margin for the y-axis labels and title
                 r: 40, // Right margin
             }
@@ -670,7 +753,7 @@
                 ],
                 {
                     cumulative_filtering: false
-                }
+                },
             );
 
             gray_scale_table(genebass_table);
