@@ -64,13 +64,6 @@ function copyListToClipboard(selected, delimiter = " ") {
  * Arg list: createYADCFfilters(start_column, num_cols, filter_type, select_type*, filter_default_label*, filter_reset_button_text*, filter_match_mode*, column_data_type*, width*, html5_data*)
  * The asterisk indicates an optional function argument
  */
-function myFilterOnSelect(filterValue, columnValue) {
-  const items = columnValue.split(";");
-  console.log("myFilterOnSelect: "+items);
-  return items.some(function(arrVal) {
-    return filterValue === arrVal;
-  })
-}
 
 function createYADCFfilters(start_column, num_cols, filter_type, select_type = null, filter_default_label = "", filter_reset_button_text = false, filter_match_mode = null, column_data_type = null, width = null, html5_data=null) {
   let filters = [];
@@ -83,7 +76,6 @@ function createYADCFfilters(start_column, num_cols, filter_type, select_type = n
     };
     if (select_type !== null) {
       filter["select_type"] = select_type;
-      filter["custom_func"] = myFilterOnSelect;
      }
     if (filter_match_mode !== null) {
       filter["filter_match_mode"] = filter_match_mode;
