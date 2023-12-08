@@ -189,6 +189,7 @@ function createExportOption(optionText) {
 function handleExportOption(option) {
     switch (option) {
         case 'View In Full Screen':
+            
             viewFullScreen();
             break;
 
@@ -1061,10 +1062,10 @@ function showDialog_Child(title, childName) {
 
         // Your code to fetch the row where column name "name" = drugNameValue
         // Assuming you have the data in the global variable 'drug_xlsxData'
-        var matchingRow = protein_xlsxData.find((row) => row.uniprot_ID === drugNameValue);
+        var matchingRow = protein_xlsxData.find((row) => row.gene_name === drugNameValue);
         // console.log(matchingRow)
         if (matchingRow) {
-            var drugbank_id = matchingRow.uniprot_ID;
+            var drugbank_id = matchingRow.gene_name;
 
             // Create an img element
             var image = document.createElement("img");
@@ -1101,7 +1102,7 @@ function showDialog_Child(title, childName) {
 
         // Your code to fetch the row where column name "name" matches selectedDrugName1
         // Assuming you have the data in the global variable 'protein_xlsxData'
-        var matchingRow = protein_xlsxData.find((row) => row.uniprot_ID === proteinName11111);
+        var matchingRow = protein_xlsxData.find((row) => row.gene_name === proteinName11111);
         console.log(matchingRow);
         if (matchingRow) {
             // Create a table to display the protein structure information
@@ -1474,7 +1475,7 @@ function processData() {
 
                 if (!nodes.find(function (node) { return node.id === protein; })) {
 
-                    nodes.push({ id: protein, isParent: false, radius: 5, Protein_Class: proteinClass }); // Include the "Protein_Class" value in the node object
+                    nodes.push({ id: protein, isParent: false, radius: 5, Protein_Class: genename }); // Include the "Protein_Class" value in the node object
                 }
 
                 if (!nodes.find(function (node) { return node.id === drugName; })) {
@@ -1540,7 +1541,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-    console.log("Latest Edit CreateCHart_4_12_N");
+    console.log("Latest Edit CreateCHart_4_12_R");
     var container = d3.select("#chart");
     //debugger
      var containerWidth = [container.node().getBoundingClientRect().width] - 10;
