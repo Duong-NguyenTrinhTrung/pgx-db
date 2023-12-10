@@ -137,8 +137,11 @@ def get_drugs_general_data(request):
 
     drug_bank_ids = request.GET.get('drug_bank_ids')
     drug_bank_ids = drug_bank_ids.split(',')
-
-    data = DrugsNetworkGetDataService(drug_bank_ids=drug_bank_ids).get_general_data()
+    if cache.get("drugs_general_data_" + "_".join(drug_bank_ids)) is not None:
+        data = cache.get("drugs_general_data_" + "_".join(drug_bank_ids))
+    else:
+        data = DrugsNetworkGetDataService(drug_bank_ids=drug_bank_ids).get_general_data()
+        cache.set("drugs_general_data_" + "_".join(drug_bank_ids), data, 60 * 60)
 
     return JsonResponse(data, safe=False)
 
@@ -721,9 +724,6 @@ def get_drug_atc_association(request):
 
 def get_drug_association(request):
     drug_id = request.GET.get("drug_id")
-    # drug_bank_id = request.GET.get('drug_bank_id')
-
-    # Retrieve the drug object based on the drugbank_id
     try:
         drug = Drug.objects.get(drug_bankID=drug_id)
     except Drug.DoesNotExist:
@@ -731,12 +731,10 @@ def get_drug_association(request):
     associations_list = [
         {"drug_bankID": drug_id, "name": drug.name, "description": drug.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=drug_id)]}
         ]
-    # Create a JSON response with the data
     response_data = {
         "associations": associations_list,
     }
     return JsonResponse(response_data)
-    # return render(request, 'drug_network.html', context)
 
 def get_drug_list_by_uniprotID(request):
     uniprot_ID = request.GET.get("uniProt_ID")
@@ -750,14 +748,14 @@ def get_drug_list_by_uniprotID(request):
         "Target": uniprot_ID,
         "Genename": genename,
         "NoOfDrugs": len(interactions),
-        "ListOfDrugs": list(interactions.values_list("drug_bankID", flat=True)),
+        "ListOfDrugIDs": [interaction.drug_bankID.drug_bankID for interaction in interactions],
+        "ListOfDrugNames": [interaction.drug_bankID.name for interaction in interactions],
         "NoOfTargetTypes": noOfTargetTypes, 
         "NoOfTransporterTypes": noOfTransporterTypes, 
         "NoOfCarrierTypes": noOfCarrierTypes, 
         "NoOfEnzymeTypes": noOfEnzymeTypes, 
-
     }
-    print("get_drug_list_by_uniprotID returned data: ", temp)
+    print(" get_drug_list_by_uniprotID - returned data = ", temp)
     return JsonResponse({ "response_data" : temp})
    
 

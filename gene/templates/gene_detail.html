@@ -14,6 +14,11 @@
     <link rel="stylesheet" href="{% static 'home/css/construct_browser.css' %}" type="text/css"/>
 
     <link rel="stylesheet" href="{% static 'gene/css/gene-detail.css' %}" type="text/css"/>
+    <style>
+        th.width-80px {
+            width: 80px;
+        }
+    </style>
 {% endblock addon_css %}
 
 {% block content %}
@@ -47,7 +52,7 @@
                             <th rowspan="2">Mutant AA</th>
                             <th rowspan="2">Codons</th>
                             <th rowspan="2">Consequence</th>
-                            <th rowspan="2">Mean <br> VEP scores</th>
+                            <th rowspan="2" style="width: 80px !important;" class="width-80px">Mean <br> VEP scores</th>
                             <th rowspan="2"><a id="show-all-vep-score" href="#">Show VEP Scores</a></th>
                             <th colspan="41">VEP scores from different algorithms <a href="#" id="vep-score-algorithms">Hide VEP scores</a></th>
                         </tr>

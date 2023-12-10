@@ -49,7 +49,7 @@ function readDrugJSON() {
             // Assuming your JSON data is an array of objects, adjust this code accordingly
            // drug_xlsxData = jsonData.map(item => item.fields);
             drug_xlsxData = jsonData;
-            console.log("DrugJSONDATA",drug_xlsxData);
+            // console.log("DrugJSONDATA",drug_xlsxData);
             readProteinJSON();
         })
         .catch((error) => {
@@ -80,8 +80,8 @@ function readInteractionJSON() {
         .then((response) => response.json())
         .then((jsonData) => {
             interaction_xlsxData = jsonData;
-        console.log("InteractionData",interaction_xlsxData);
-            console.log("End of Logs ");
+        // console.log("InteractionData",interaction_xlsxData);
+            // console.log("End of Logs ");
             processData();
         })
         .catch((error) => {
@@ -728,8 +728,8 @@ function showDialog(title, parentNodeName) {
 
         // Your code to fetch the row where column name "name" = drugNameValue
         // Assuming you have the data in the global variable 'drug_xlsxData'
-        console.log("drug_xlsxData");
-        console.log("",drug_xlsxData);
+        // console.log("drug_xlsxData");
+        // console.log("",drug_xlsxData);
         var matchingRow = drug_xlsxData.find((row) => row.fields.name === drugNameValue);
 
         if (matchingRow) {
@@ -1103,7 +1103,7 @@ function showDialog_Child(title, childName) {
         // Your code to fetch the row where column name "name" matches selectedDrugName1
         // Assuming you have the data in the global variable 'protein_xlsxData'
         var matchingRow = protein_xlsxData.find((row) => row.gene_name === proteinName11111);
-        console.log(matchingRow);
+        // console.log(matchingRow);
         if (matchingRow) {
             // Create a table to display the protein structure information
             var proteinStructureTable = document.createElement('div');
@@ -1571,7 +1571,7 @@ function createChart(links) {
     var distanceBetweenNodes = 60;
     var noOfTotalNodes11 = links.length;
 
-    console.log("HHHHHHHH" + noOfTotalNodes11);
+    // console.log("HHHHHHHH" + noOfTotalNodes11);
 
     if (noOfTotalNodes11 < 100) {
         chargeStrength = -100

@@ -3,6 +3,7 @@
 
 
 {% block addon_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 <style>
     #target, #target-result{
@@ -194,11 +195,11 @@
                     <td>
                     {% for drug in item.drug_data %}
                         {% if drug.atc_code %}
-                            <a href="{% url 'atc-detail-view' %}?group_id={{drug.atc_code.0}}&detail={{drug.atc_code}}"
+                            <i class="fa-solid fa-pills"></i> <a href="{% url 'atc-detail-view' %}?group_id={{drug.atc_code.0}}&detail={{drug.atc_code}}"
                                 >{{drug.drug_name}}</br>
                             </a>
                         {% else %}
-                            <a href="{% url 'atc-detail-view' %}?drug_id={{drug.drug_id}}"
+                            <i class="fa-solid fa-pills"></i> <a href="{% url 'atc-detail-view' %}?drug_id={{drug.drug_id}}"
                                 >{{drug.drug_name}}</br>
                             </a>
                         {% endif %}
@@ -257,11 +258,11 @@
                             for (var j = 0; j<item.drug_data.length;j++) {
                                 if (item.drug_data[j].atc_code)
                                 {
-                                    drug_list.push(`<a href="{% url 'atc-detail-view' %}?group_id=${item.drug_data[j].atc_code.charAt(0)}&detail=${item.drug_data[j].atc_code}"> ${item.drug_data[j].drug_name}</a></br>`);
+                                    drug_list.push(`<i class="fa-solid fa-pills"></i> <a href="{% url 'atc-detail-view' %}?group_id=${item.drug_data[j].atc_code.charAt(0)}&detail=${item.drug_data[j].atc_code}"> ${item.drug_data[j].drug_name}</a></br>`);
                                 }
                                 else
                                 {
-                                    drug_list.push(`<a href="{% url 'atc-detail-view' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
+                                    drug_list.push(`<i class="fa-solid fa-pills"></i> <a href="{% url 'atc-detail-view' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
                                 }
                             }
                             html_data += `<tr>
@@ -290,11 +291,11 @@
                             for (var j = 0; j<item.drug_data.length;j++) {
                                 if (item.drug_data[j].atc_code)
                                 {
-                                    drug_list.push(`<a href="{% url 'atc-detail-view' %}?group_id=${item.drug_data[j].atc_code.charAt(0)}&detail=${item.drug_data[j].atc_code}"> ${item.drug_data[j].drug_name}</a></br>`);
+                                    drug_list.push(`<i class="fa-solid fa-pills"></i> <a href="{% url 'atc-detail-view' %}?group_id=${item.drug_data[j].atc_code.charAt(0)}&detail=${item.drug_data[j].atc_code}"> ${item.drug_data[j].drug_name}</a></br>`);
                                 }
                                 else
                                 {
-                                    drug_list.push(`<a href="{% url 'atc-detail-view' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
+                                    drug_list.push(`<i class="fa-solid fa-pills"></i> <a href="{% url 'atc-detail-view' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
                                 }
                             }
                             html_data += `<tr>
@@ -325,11 +326,11 @@
                             for (var j = 0; j<item.drug_data.length;j++) {
                                 if (item.drug_data[j].atc_code)
                                 {
-                                    drug_list.push(`<a href="{% url 'atc-detail-view' %}?group_id=${item.drug_data[j].atc_code.charAt(0)}&detail=${item.drug_data[j].atc_code}">${item.drug_data[j].drug_name}</a></br>`);
+                                    drug_list.push(`<i class="fa-solid fa-pills"></i> <a href="{% url 'atc-detail-view' %}?group_id=${item.drug_data[j].atc_code.charAt(0)}&detail=${item.drug_data[j].atc_code}"> ${item.drug_data[j].drug_name}</a></br>`);
                                 }
                                 else
                                 {
-                                    drug_list.push(`<a href="{% url 'atc-detail-view' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
+                                    drug_list.push(`<i class="fa-solid fa-pills"></i> <a href="{% url 'atc-detail-view' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
                                 }
                             }
                             html_data += `<tr>

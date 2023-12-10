@@ -19,5 +19,8 @@ class Interaction(models.Model):
     )  
     pubmed_ids = models.TextField(default="None")
 
+    class Meta:
+        ordering = ["drug_bankID__name"]
+
     def __str__(self):
         return self.uniprot_ID.uniprot_ID + " acts as a " + self.interaction_type + " for drug " + self.drug_bankID.drug_bankID
