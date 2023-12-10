@@ -113,9 +113,6 @@ def get_variant_vep_scores_and_plot(request):
         list_vep_scores = list(filter(lambda value: not math.isnan(value), list_vep_scores))
         variant_maker_list_data.append({"category":variant_marker, "values": list_vep_scores})
 
-        print("list_vep_scores: ", list_vep_scores[:5])
-        print("len list_vep_scores: ", len(list_vep_scores))
-
     return JsonResponse(
         {
             "variant_maker_list_data": variant_maker_list_data,

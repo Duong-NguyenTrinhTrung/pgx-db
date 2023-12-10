@@ -82,11 +82,15 @@ class DrugByGeneBaseView(object):
                     try:
                         protein = Protein.objects.get(geneID=slug)
                     except ObjectDoesNotExist:
+                        print(f"No Protein found for geneID: {slug}")
                         protein = None
                 else:
                     try:
+                        print("geneID:", slug)
                         protein = Protein.objects.get(genename=slug.upper())
+                        print("Data query geneID: ", protein.__dict__)
                     except ObjectDoesNotExist:
+                        print(f"No Protein found for genename: {slug}")
                         protein = None
                 if protein:
                     protein_ID = protein.uniprot_ID
