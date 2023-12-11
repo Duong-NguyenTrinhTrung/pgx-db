@@ -52,6 +52,7 @@
                             <th rowspan="2">Mutant AA</th>
                             <th rowspan="2">Codons</th>
                             <th rowspan="2">Consequence</th>
+                            <th rowspan="2">Allele<br>frequency</th>
                             <th rowspan="2" style="width: 80px !important;" class="width-80px">Mean <br> VEP scores</th>
                             <th rowspan="2"><a id="show-all-vep-score" href="#">Show VEP Scores</a></th>
                             <th colspan="41">VEP scores from different algorithms <a href="#" id="vep-score-algorithms">Hide VEP scores</a></th>
@@ -112,6 +113,7 @@
                                 <td class="align-left">{{ value.6|slice:"2:3" }}</td> <!-- Mutant  -->
                                 <td class="align-left">{{ value.7 }}</td> <!-- Codons  -->
                                 <td class="align-left">{{ value.2 }}</td> <!--Consequence   -->
+                                <td class="align-left">Coming soon</td> <!--  Mean VEP scores -->
                                 <td class="align-left">{{ value|last }}</td> <!--  Mean VEP scores -->
                                 <td><a href="#" class="variant_associate_statistics"
                                        data-remote-url="{% url 'variant:get-genebass-tables' %}"
@@ -363,7 +365,6 @@
             
             // get data currently seen in the table to make multiple violin plot 
             var variant_maker_list = [];
-            var variant_maker_list = [];
             $("#structures_scrollable_body").find('tr').each(function() {
                 variant_maker_list.push($(this).find('.variant').text());
             });
@@ -403,8 +404,10 @@
             column_filters = column_filters.concat(createYADCFfilters(6, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
             //Consequence
             column_filters = column_filters.concat(createYADCFfilters(7, 1, "select", null, "Select", false, null, null, "80px"));
+            //AF
+            column_filters = column_filters.concat(createYADCFfilters(8, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
             //Score columns
-            column_filters = column_filters.concat(createYADCFfilters(8, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"))
+            column_filters = column_filters.concat(createYADCFfilters(9, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"))
 
             // update filters
             yadcf.init(
@@ -416,7 +419,7 @@
 		        }
             );
             // yadcf.exFilterColumn(oTable1, [[2, ["YES"]]], true);
-            oTable1.column(9).visible(false); // Hide the column `Show all VEP Scores` initially
+            oTable1.column(10).visible(false); // Hide the column `Show all VEP Scores` initially
             // let table = $('#structures_scrollable').DataTable();
             // console.log("Change Canonical: "+ yadcf.exGetColumnFilterVal(oTable1, 2));
             $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').parentsUntil('th').css('width', '80x');
@@ -431,8 +434,6 @@
             // update plot when user change input of rows per display
             $('select[name="structures_scrollable_length"]').on('change', function()
                 {
-                    // var selectedValue = $(this).val();
-                    // alert(selectedValue);
                     setTimeout(function(){
                         let variant_maker_list = [];
                         $("#structures_scrollable_body").find('tr').each(function() {
@@ -515,24 +516,24 @@
 
         function hideAllVepScoreColumns() {
             var table = $('#structures_scrollable').DataTable();
-            var start_col_index = 10;
-            var end_col_index = 50;
+            var start_col_index = 11;
+            var end_col_index = 51;
             for (col_index = start_col_index; col_index <= end_col_index; col_index++) {
                 var column = table.column(col_index);
                 column.visible(false);
             }
-            table.column(9).visible(true);
+            table.column(10).visible(true);
         }
         
         function showAllVepScoreColumns() {
             var table = $('#structures_scrollable').DataTable();
-            var start_col_index = 10
-            var end_col_index = 50
+            var start_col_index = 11
+            var end_col_index = 51
             for (col_index = start_col_index; col_index <= end_col_index; col_index++) {
                 var column = table.column(col_index);
                 column.visible(true);
             }
-            table.column(9).visible(false);
+            table.column(10).visible(false);
         }
         function getHeaderContent(element) {
             var content = "";

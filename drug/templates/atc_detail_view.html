@@ -105,46 +105,19 @@
     </script>
 
     <script>
-            // function goToUp() {
-            //     $('html, body').animate({
-            //         scrollTo: $('#content').offset().top
-            //     }, 500);
-            //     // window.scrollTo(0,0)
-            // }
 
-            // ondblclick="showTargetTable('${row.target_list[j].uniProt_ID}')"
-            const targetLinks = document.querySelectorAll(".uniProt_ID");
-
-            // Add event listeners to each target link
-            targetLinks.forEach((link, index) => {
-                // link.addEventListener('dblclick', () => {
-                //     // Add a delay of 200 milliseconds
-                //     setTimeout(() => {
-                //     alert("link is double clicked");
-                //     showTargetTable("P14867");
-                //     }, 200);
-                // });
-                link.addEventListener('click', function() {
-                    alert('Clicked !');
-                });
-                link.addEventListener('dblclick', function() {
-                    alert('Double Clicked !');
-                })
-            });
             var countClick=0;
             var timer = null;
             function showData(event, uniProt_ID) {
                 countClick++;
                 if (countClick === 1) {
                     timer = setTimeout(function() {
-                        console.log('single clicked');
                         countClick = 0;
                         var urlOpen = event.getAttribute("data-href");
                         window.open(urlOpen, "_blank");
                     }, 500);
                 } else {
                     clearTimeout(timer);
-                    console.log('Double cliked');
                     showTargetTable(uniProt_ID)
                     countClick =0 ;
                 }
@@ -362,25 +335,11 @@
                             draw_atc_level_network(button, response);
                             $(document).ready(function() {
                                 // Use setTimeout to introduce a delay
-                                // setTimeout(function() {
+                                setTimeout(function() {
                                     var linkToClick = $("#associated_drug_tbl").find('tbody').find('tr').eq(0).find('td').eq(0).find('a');
                                     // Trigger click event
-                                    // linkToClick.trigger('click');
-                                    // $("#drug-table").find('span').text(`This drug is not associated with any ATC code. The table and network below show drug-protein interaction information
-                                    // </br> <i>** In the 4th column, on each gene name, <u>click</u> to open the gene detail page; <u>double click</u> to roll to the view of target-drug</i> `);
-                                    // var right_panel_text = document.createElement("span");
-                                    // right_panel_text.style.fontSize = "16px";
-                                    // right_panel_text.style.color = '#337ab7'; 
-                                    // right_panel_text.style.fontWeight = "bold";
-                                    // var right_panel_text_guide = document.createElement("span");
-                                    // right_panel_text_guide.style.fontSize = "14px";
-                                    // right_panel_text_guide.style.fontWeight = "italic";
-                                    // right_panel_text_guide.style.display = "block";
-                                    // right_panel_text_guide.style.marginBottom = "10px";
-                                    // right_panel_text_guide.innerHTML = `</br> <i>** In the 4th column, on each gene name, <u>click</u> to open the gene detail page; <u>double click</u> to roll to the view of target-drug</i> `;
-                                    // right_panel_text.appendChild(right_panel_text_guide);
-                                    // $("#drug-table").appendChild(right_panel_text);
-                                    // }, 1000);  
+                                    linkToClick.trigger('click');
+                                    }, 1000);  
                                     
                             });
                         },
