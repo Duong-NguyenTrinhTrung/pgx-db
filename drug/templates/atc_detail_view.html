@@ -18,6 +18,9 @@
             z-index: 999;
             border: 1px solid #333333;
           }
+          a:hover {
+            cursor: pointer;
+            }
     </style>
     
 {% endblock %}
@@ -239,6 +242,7 @@
                 // Check if the 'associations' key exists in the JSON response
                 if (associations.length > 0) {
                     var tableHtml = '<table id="associated_drug_tbl" ><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID</th><th style="white-space: nowrap;">Drug name</th><th style="white-space: nowrap;">No. of interacting proteins</th><th style="white-space: nowrap;">List of interacting proteins</br><i>(Show in gene names)</i> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th><th>Short description</th></tr></thead><tbody>';
+                    
                     for (var i = 0; i < associations.length; i++) {
                         var row = associations[i];
                         drug_bank_ids.push(row.drug_bankID);
@@ -267,13 +271,11 @@
                     tableHtml += '</tbody></table>';
                     var verb = "";
                     if (associations.length == 1) {
-                        right_panel_text.innerHTML = "Drug '"+associations[0].name + "' is associated with " + response.atc_code;
+                        right_panel_text.innerHTML = "Drug '"+associations[0].name + "' and " + response.total_interaction + " proteins are in the network associated with " + response.atc_code;
                     } else {
-                        right_panel_text.innerHTML = "There are " + associations.length + " drugs associated with " + response.atc_code;
+                        right_panel_text.innerHTML = "There are " + associations.length + " drugs, " +  response.total_interaction + " proteins in the network associated with " + response.atc_code;
                     }
                     var atc_url = "{% url 'drugs_network' %}"+"?drug_bank_ids="+drug_bank_ids.toString();
-                    right_panel_text_guide.innerHTML = `</br> <i>** In the 1st column, click on each Drugbank ID to show the individual network for that specific drug or click <a onclick="toggleDivVisibility(this, '${atc_url}')">here</a> to switch back to the ATC level network of </i> ${response.atc_code}
-                    </br> <i>** In the 4th column, on each gene name, <u>click</u> to open the gene detail page; <u>double click</u> to roll to the view of target-drug</i> `;
                     right_panel_text_guide.style.fontWeight = "italic";
                     right_panel_text_guide.style.display = "block";
                     right_panel_text_guide.style.marginBottom = "10px";
@@ -283,8 +285,13 @@
                     right_panel_content.innerHTML = tableHtml;
                     right_panel.appendChild(right_panel_text);
                     if (associations.length > 1) {
-                        right_panel.appendChild(right_panel_text_guide);
+                        right_panel_text_guide.innerHTML = `</br> <i>** In the 1st column, click on each Drugbank ID to show the individual network for that specific drug or click <a onclick="toggleDivVisibility(this, '${atc_url}')">here</a> to switch back to the ATC level network of </i> ${response.atc_code}
+                        </br> <i>** In the 4th column, on each gene name, <u>click</u> to open the gene detail page; <u>double click</u> to roll to the view of target-drug</i> `;
                     }
+                    else{
+                        right_panel_text_guide.innerHTML = `</br> <i>** In the 4th column, on each gene name, <u>click</u> to open the gene detail page; <u>double click</u> to roll to the view of target-drug</i> `;
+                    }
+                    right_panel.appendChild(right_panel_text_guide);
                     right_panel.appendChild(right_panel_content);
 
                 } else {
@@ -351,18 +358,30 @@
                         url: "{% url 'get-drug-association' %}?drug_id="+drug_id,
                         type: "GET",
                         success: function (response) {
-                            console.log("response data when a drug with no atc code is clicked = ",response);
                             list_associated_drugs_in_table(response);
                             draw_atc_level_network(button, response);
-                            $("#drug-table").find('span').text('Although this drug is not associated with any ATC code, the table and network below show drug-protein interaction information');
                             $(document).ready(function() {
                                 // Use setTimeout to introduce a delay
-                                setTimeout(function() {
+                                // setTimeout(function() {
                                     var linkToClick = $("#associated_drug_tbl").find('tbody').find('tr').eq(0).find('td').eq(0).find('a');
-                                    console.log('linkToClick' + linkToClick);
                                     // Trigger click event
-                                    linkToClick.trigger('click');
-                                }, 1000);  
+                                    // linkToClick.trigger('click');
+                                    // $("#drug-table").find('span').text(`This drug is not associated with any ATC code. The table and network below show drug-protein interaction information
+                                    // </br> <i>** In the 4th column, on each gene name, <u>click</u> to open the gene detail page; <u>double click</u> to roll to the view of target-drug</i> `);
+                                    // var right_panel_text = document.createElement("span");
+                                    // right_panel_text.style.fontSize = "16px";
+                                    // right_panel_text.style.color = '#337ab7'; 
+                                    // right_panel_text.style.fontWeight = "bold";
+                                    // var right_panel_text_guide = document.createElement("span");
+                                    // right_panel_text_guide.style.fontSize = "14px";
+                                    // right_panel_text_guide.style.fontWeight = "italic";
+                                    // right_panel_text_guide.style.display = "block";
+                                    // right_panel_text_guide.style.marginBottom = "10px";
+                                    // right_panel_text_guide.innerHTML = `</br> <i>** In the 4th column, on each gene name, <u>click</u> to open the gene detail page; <u>double click</u> to roll to the view of target-drug</i> `;
+                                    // right_panel_text.appendChild(right_panel_text_guide);
+                                    // $("#drug-table").appendChild(right_panel_text);
+                                    // }, 1000);  
+                                    
                             });
                         },
                         error: function (xhr, status, error) {

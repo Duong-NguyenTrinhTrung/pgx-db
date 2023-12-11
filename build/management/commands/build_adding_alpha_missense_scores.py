@@ -1,15 +1,17 @@
 
 from django.core.management.base import BaseCommand
-from protein.models import Protein
+from variant.models import VepVariant
 from django.conf import settings
 import os
 import logging
+from django.db.models import Q
+
 
 class Command(BaseCommand):
-    help = 'Add data to the protein class column'
+    help = 'Add data to the VEPVariant alphamissense column'
 
     # source file directory
-    protein_data_dir = os.sep.join([settings.DATA_DIR, "protein_data"])
+    vep_data_dir = os.sep.join([settings.DATA_DIR, "vep_variant_data"])
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -30,24 +32,26 @@ class Command(BaseCommand):
         if not filenames:
             filenames = [
                 fn
-                for fn in os.listdir(self.protein_data_dir)
-                if fn.endswith("protein_data_with_protein_class.csv")
+                for fn in os.listdir(self.vep_data_dir)
+                if fn.endswith("VEP_alpha_missense.csv")
             ]
             print(filenames)
         count=0
         for filename in filenames:
-            filepath = os.sep.join([self.protein_data_dir, filename])
+            filepath = os.sep.join([self.vep_data_dir, filename])
             with open(filepath, "r") as f:
                 lines = f.readlines()
                 for line in lines[1:]:
                     values=line[:-1].split(";")
-                    protein_id = values[0]
-                    protein_class = values[-1]
+                    variant_marker = values[0]
+                    transcript_id = values[1]
+                    am_score = values[-1]
 
                     # Code to add values to the new field
-                    obj = Protein.objects.get(uniprot_ID=protein_id)
-                    obj.Protein_class = protein_class
+                    obj = VepVariant.objects.get(
+                        Q(Variant_marker=variant_marker) & Q(Transcript_ID=transcript_id)
+                    )
+                    obj.AM_pathogenicity = am_score
                     obj.save()
-                    print(protein_id, " with class is saved")
 
 

@@ -713,18 +713,18 @@ def get_drug_atc_association(request):
         drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
         undup_drugs = list(set(drugs))
         associations = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
-        total = 0
+        total_interaction = 0
 
         associations_list = [
             {"drug_bankID": assoc.drug_bankID, "name": assoc.name, "description": assoc.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=assoc)]}
             for assoc in associations]
         for association in associations_list:
-            total+=len(association.get("target_list"))
+            total_interaction+=len(association.get("target_list"))
         # Create a JSON response with the data
         response_data = {
             "associations": associations_list,
             "atc_code": atc_code,
-            "total_interaction": total,
+            "total_interaction": total_interaction,
         }
         cache.set("get_drug_atc_association_"+atc_code, response_data, 60*60)
     return JsonResponse(response_data)
@@ -738,8 +738,13 @@ def get_drug_association(request):
     associations_list = [
         {"drug_bankID": drug_id, "name": drug.name, "description": drug.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=drug_id)]}
         ]
+    total_interaction = 0
+    for association in associations_list:
+            total_interaction+=len(association.get("target_list"))
     response_data = {
         "associations": associations_list,
+        "total_interaction": total_interaction,
+        "atc_code": "unassigned ATC code",
     }
     return JsonResponse(response_data)
 
