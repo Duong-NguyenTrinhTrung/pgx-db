@@ -65,14 +65,37 @@
                         </table>
                     </div>
                     <!-- plots below the table  -->
-                    <div class="card-body text-center" style="margin-top: 20px;">
-                        <p style="font-style: italic; text-align: left;">Interaction types</p>
-                        <!-- <a class="btn btn-success" style="float: right; margin-right: 70px;" href="#atc_right">Up</a> -->
-                        <!--PieChart Code here-->
-                        <div id="chart-container-interaction-type" style="width: 300px; height: 300px;">
-                            <svg id="pie-chart-interaction-type"></svg>
+                    <div class="row">
+                        <div class="col-md-3 col-sm-12" >
+                            <div class="card-body text-center" style="margin-top: 20px;">
+                                <p style="font-style: italic; text-align: left;">Interaction types</p>
+                                <!--PieChart Code here-->
+                                <div id="chart-container-interaction-type" style="width: 300px; height: 300px;">
+                                    <svg id="pie-chart-interaction-type"></svg>
+                                </div>
+                                <!--PieChart End here-->
+                            </div>
                         </div>
-                        <!--PieChart End here-->
+                        <div class="col-md-3 col-sm-12" >
+                            <div class="card-body text-center" style="margin-top: 20px;">
+                                <p style="font-style: italic; text-align: left;">Drug type</p>
+                                <!--PieChart Code here-->
+                                <div id="chart-container-drug-type" style="width: 300px; height: 300px;">
+                                    <svg id="pie-chart-drug-type"></svg>
+                                </div>
+                                <!--PieChart End here-->
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-12" >
+                            <div class="card-body text-center" style="margin-top: 20px;">
+                                <p style="font-style: italic; text-align: left;">Drug clinical status</p>
+                                <!--PieChart Code here-->
+                                <div id="chart-container-drug-status" style="width: 300px; height: 300px;">
+                                    <svg id="pie-chart-drug-status"></svg>
+                                </div>
+                                <!--PieChart End here-->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -129,13 +152,27 @@
                         type: "GET",
                         success: function (response) {
                             displayDrugListByUniProt_ID(response.response_data);
-                            const data = [
+                            const target_type_data = [
                                     { category: "Target", value: response.response_data.NoOfTargetTypes },
                                     { category: "Enzyme", value: response.response_data.NoOfEnzymeTypes },
                                     { category: "Transporter", value: response.response_data.NoOfTransporterTypes },
                                     { category: "Carrier", value: response.response_data.NoOfCarrierTypes },
                                 ];
-                            createPieChartForTargetType(data);
+                            createPieChartForTargetType(target_type_data);
+                            const drug_type_data = [
+                                    { category: "Small Molecule", value: response.response_data.NoOfSmallMolecule },
+                                    { category: "Biotech", value: response.response_data.NoOfBiotech },
+                                ];
+                            createPieChartForDrugType(drug_type_data);
+                            const drug_status_data = [
+                                    { category: "Nutraceutical", value: response.response_data.NoOfNutraceuticalDrug },
+                                    { category: "Experimental", value: response.response_data.NoOfExperimentalDrug },
+                                    { category: "Investigational", value: response.response_data.NoOfInvestigationalDrug },
+                                    { category: "Approved", value: response.response_data.NoOfApprovedDrug },
+                                    { category: "VetApproved", value: response.response_data.NoOfVetApprovedDrug },
+                                    { category: "Illicit", value: response.response_data.NoOfIllicitDrug },
+                                ];
+                            createPieChartForDrugStatus(drug_status_data);
                         },
                         error: function (xhr, status, error) {
                             console.log('AJAX Error:', error);
@@ -174,6 +211,8 @@
                 $("#target-table").show();
                 var target_statistics_plot = document.createElement("div");
                 target_statistics_plot.setAttribute("id", "target_statistics_plot");
+                var drug_type_statistics_plot = document.createElement("div");
+                drug_type_statistics_plot.setAttribute("id", "drug_type_statistics_plot");
             }
                 
             // Function to show visualization
