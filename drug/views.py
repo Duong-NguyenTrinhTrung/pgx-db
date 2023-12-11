@@ -756,6 +756,17 @@ def get_drug_list_by_uniprotID(request):
     noOfTransporterTypes = len([interaction for interaction in interactions if interaction.interaction_type=="transporter" ])
     noOfCarrierTypes = len([interaction for interaction in interactions if interaction.interaction_type=="carrier" ])
     noOfEnzymeTypes = len([interaction for interaction in interactions if interaction.interaction_type=="enzyme" ])
+    #0 -> Nutraceutical, 1 - Experimental, 2- Investigational, 3- Approved , 4 - Vet approved, 5 - Illicit
+
+    noOfNutraceuticalDrug = len([interaction for interaction in interactions if interaction.drug_bankID.Clinical_status==0])
+    noOfExperimentalDrug = len([interaction for interaction in interactions if interaction.drug_bankID.Clinical_status==1])
+    noOfInvestigationalDrug = len([interaction for interaction in interactions if interaction.drug_bankID.Clinical_status==2])
+    noOfApprovedDrug = len([interaction for interaction in interactions if interaction.drug_bankID.Clinical_status==3])
+    noOfVetApprovedDrug = len([interaction for interaction in interactions if interaction.drug_bankID.Clinical_status==4])
+    noOfIllicitDrug = len([interaction for interaction in interactions if interaction.drug_bankID.Clinical_status==5])
+    noOfIllicitDrug = len([interaction for interaction in interactions if interaction.drug_bankID.Clinical_status==5])
+    noOfSmallMolecule = len([interaction for interaction in interactions if interaction.drug_bankID.drugtype.type_detail=="Small Molecule"])
+    noOfBiotech = len([interaction for interaction in interactions if interaction.drug_bankID.drugtype.type_detail=="Biotech"])
     temp = {
         "Target": uniprot_ID,
         "Genename": genename,
@@ -766,6 +777,15 @@ def get_drug_list_by_uniprotID(request):
         "NoOfTransporterTypes": noOfTransporterTypes, 
         "NoOfCarrierTypes": noOfCarrierTypes, 
         "NoOfEnzymeTypes": noOfEnzymeTypes, 
+        "NoOfNutraceuticalDrug": noOfNutraceuticalDrug,
+        "NoOfExperimentalDrug": noOfExperimentalDrug,
+        "NoOfInvestigationalDrug":noOfInvestigationalDrug,
+        "NoOfApprovedDrug": noOfApprovedDrug,
+        "NoOfVetApprovedDrug": noOfVetApprovedDrug,
+        "NoOfIllicitDrug":noOfIllicitDrug,
+        "NoOfSmallMolecule":noOfSmallMolecule,
+        "NoOfBiotech":noOfBiotech,
+
     }
     print(" get_drug_list_by_uniprotID - returned data = ", temp)
     return JsonResponse({ "response_data" : temp})
