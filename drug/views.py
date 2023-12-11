@@ -744,7 +744,7 @@ def get_drug_association(request):
     response_data = {
         "associations": associations_list,
         "total_interaction": total_interaction,
-        "atc_code": "unassigned ATC code",
+        "atc_code": "no ATC code",
     }
     return JsonResponse(response_data)
 
