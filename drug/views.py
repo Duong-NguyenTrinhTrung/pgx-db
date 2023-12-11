@@ -705,21 +705,28 @@ def atc_search_view(request):
 
 def get_drug_atc_association(request):
     atc_code = request.GET.get("atc_code")
-    allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
-    chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
-    drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
-    undup_drugs = list(set(drugs))
-    associations = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+    if cache.get("get_drug_atc_association_"+atc_code):
+        response_data = cache.get("get_drug_atc_association_"+atc_code)
+    else:
+        allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+        chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+        drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+        undup_drugs = list(set(drugs))
+        associations = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+        total = 0
 
-    # Convert queryset to a list of dictionaries
-    associations_list = [
-        {"drug_bankID": assoc.drug_bankID, "name": assoc.name, "description": assoc.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=assoc)]}
-        for assoc in associations]
-    # Create a JSON response with the data
-    response_data = {
-        "associations": associations_list,
-        "atc_code": atc_code,
-    }
+        associations_list = [
+            {"drug_bankID": assoc.drug_bankID, "name": assoc.name, "description": assoc.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=assoc)]}
+            for assoc in associations]
+        for association in associations_list:
+            total+=len(association.get("target_list"))
+        # Create a JSON response with the data
+        response_data = {
+            "associations": associations_list,
+            "atc_code": atc_code,
+            "total_interaction": total,
+        }
+        cache.set("get_drug_atc_association_"+atc_code, response_data, 60*60)
     return JsonResponse(response_data)
 
 def get_drug_association(request):

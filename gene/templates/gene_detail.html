@@ -388,11 +388,11 @@
             let column_filters = [];
             // createYADCFfilters(start_column, num_cols, filter_type, select_type = null, filter_default_label = "", filter_reset_button_text = false, filter_match_mode = null, column_data_type = null, width = null)
             // Variant
-            column_filters = column_filters.concat(createYADCFfilters(0, 1, "auto_complete", null, "Select", false, null, null, "60px"));
+            column_filters = column_filters.concat(createYADCFfilters(0, 1, "auto_complete", null, "select", false, null, null, "60px"));
             //Transcript
-            column_filters = column_filters.concat(createYADCFfilters(1, 1, "auto_complete", null, "Select", false, null, null, "60px"));
+            column_filters = column_filters.concat(createYADCFfilters(1, 1, "auto_complete", null, "select", false, null, null, "60px"));
             //Canonical
-            column_filters = column_filters.concat(createYADCFfilters(2, 1, "select", null, "Select", "YES", null, null, "80px"));
+            column_filters = column_filters.concat(createYADCFfilters(2, 1, "select", null, "select", "YES", null, null, "80px"));
             //Sequence position
             column_filters = column_filters.concat(createYADCFfilters(3, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
             //Wildtype position
@@ -419,6 +419,12 @@
             oTable1.column(9).visible(false); // Hide the column `Show all VEP Scores` initially
             // let table = $('#structures_scrollable').DataTable();
             // console.log("Change Canonical: "+ yadcf.exGetColumnFilterVal(oTable1, 2));
+            $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').parentsUntil('th').css('width', '80x');
+            $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').parentsUntil('td').css('width', '80x');
+            $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '15');
+            $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').parentsUntil('th').css('width', '80x');
+            $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').parentsUntil('td').css('width', '80x');
+            $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').attr('size', '15');
         })
         $(document).ready(function() {
 
@@ -770,7 +776,7 @@
 
         // <!-- Script for filtering options of 3d-structure  -->
         var structureDisplay = document.getElementById('structure_display');
-        let positionsToColor = [...new Set(list_vep_variants_pos)];
+        // let positionsToColor = [...new Set(list_vep_variants_pos)];
 
         viewer_bkup = viewer;
 
@@ -802,14 +808,14 @@
             viewer.render();
         });
 
-        let colorVariantPosition = function (atom, color1, color2) {
-            // Check if the current residue position is in the list
-            if (positionsToColor.includes(atom.resi)) {
-                return color1;
-            } else {
-                return color2;
-            }
-        };
+        // let colorVariantPosition = function (atom, color1, color2) {
+        //     // Check if the current residue position is in the list
+        //     if (positionsToColor.includes(atom.resi)) {
+        //         return color1;
+        //     } else {
+        //         return color2;
+        //     }
+        // };
 
         const resiLabelSelect = document.getElementById('resiLabelSelect');
         let toremoveLabel = null;
