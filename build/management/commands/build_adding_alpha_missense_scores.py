@@ -33,7 +33,7 @@ class Command(BaseCommand):
             filenames = [
                 fn
                 for fn in os.listdir(self.vep_data_dir)
-                if fn.endswith("VEP_alpha_missense.csv")
+                if fn.endswith("20231212-VariantAndAlphaMissenseScores.csv")
             ]
             print(filenames)
         count=0
@@ -43,15 +43,23 @@ class Command(BaseCommand):
                 lines = f.readlines()
                 for line in lines[1:]:
                     values=line[:-1].split(";")
-                    variant_marker = values[0]
-                    transcript_id = values[1]
+                    variant_marker = values[1]
+                    transcript_id = values[2]
                     am_score = values[-1]
-
+                    # print("variant_marker = ",variant_marker)
+                    # print("transcript_id = ",transcript_id)
                     # Code to add values to the new field
-                    obj = VepVariant.objects.get(
-                        Q(Variant_marker=variant_marker) & Q(Transcript_ID=transcript_id)
-                    )
-                    obj.AM_pathogenicity = am_score
-                    obj.save()
+                    try:
+                        obj = VepVariant.objects.get(
+                            Q(Variant_marker=variant_marker) & Q(Transcript_ID=transcript_id)
+                        )
+                        obj.AM_pathogenicity = am_score
+                        obj.save()
+                    except VepVariant.DoesNotExist:
+                        # Handle the case when the object does not exist
+                        print(f"Object not found for Variant_marker: {variant_marker} and Transcript_ID: {transcript_id}")
+                        count+=1
+        print("---- end of adding data, number of case not found: ", count)
+
 
 

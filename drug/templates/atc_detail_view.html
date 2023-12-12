@@ -18,9 +18,20 @@
             z-index: 999;
             border: 1px solid #333333;
           }
+        
           a:hover {
             cursor: pointer;
             }
+        #atc_level_network_statistics{
+            height: 400px;
+            display: none;
+            width: 98%;
+        }
+        #atc_level_network_statistics span{
+            font-size: 16px;
+            color: #337ab7; 
+            font-weight: bold;
+        }
     </style>
     
 {% endblock %}
@@ -33,12 +44,60 @@
                 <!-- block for showing the drug table -->
                 <div id='drug-table'>
                 </div>
+                <!-- block for showing the atc level network statistics -->
+                <div id='atc_level_network_statistics'>
+                    <p>
+                        <span id="atc_level_network_statistics_text"> </span>
+                    </p>
+                    <div class="row">
+                        <div class="col-md-2 col-sm-12" >
+                            <div class="card-body text-center" style="margin-top: 20px;">
+                                <p style="font-style: italic; text-align: left;">Mode of action</p>
+                                <!--PieChart Code here-->
+                                <div id="chart-container-ATC-interaction-type" style="width: 200px; height: 200px;">
+                                    <svg id="pie-chart-ATC-interaction-type"></svg>
+                                </div>
+                                <!--PieChart End here-->
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-12" >
+                            <div class="card-body text-center" style="margin-top: 20px;">
+                                <p style="font-style: italic; text-align: left;">Drug type</p>
+                                <!--PieChart Code here-->
+                                <div id="chart-container-ATC-drug-type" style="width: 200px; height: 200px;">
+                                    <svg id="pie-chart-ATC-drug-type"></svg>
+                                </div>
+                                <!--PieChart End here-->
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-sm-12" >
+                            <div class="card-body text-center" style="margin-top: 20px;">
+                                <p style="font-style: italic; text-align: left;">Drug clinical status</p>
+                                <!--PieChart Code here-->
+                                <div id="chart-container-ATC-drug-status" style="width: 200px; height: 200px;">
+                                    <svg id="pie-chart-ATC-drug-status"></svg>
+                                </div>
+                                <!--PieChart End here-->
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-12" >
+                            <div class="card-body text-center" style="margin-top: 20px;">
+                                <p style="font-style: italic; text-align: left;">Gene-based burden distribution</p>
+                                <!--PieChart Code here-->
+                                <div id="chart-container-ATC-gene-based-burden" style="width: 600px; height: 200px; background-color: bisque">
+                                    <svg id="pie-chart-ATC-gene-based-burden"></svg>
+                                </div>
+                                <!--PieChart End here-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <!-- block for showing network -->
-                <div class="forcenetworkgraph" id="graphvisibility" style="display: none; width: 97%; margin: 10px 0; height: 90%">
+                <div class="forcenetworkgraph" id="graphvisibility" style="display: none; width: 100%; margin: 10px 0; height: 90%">
                     <p> <span style="color: red;" id="network_overview"></span> </p>
                     <iframe id="myIframe" style="
                                                 display: none;
-                                                width: 97%;
+                                                width: 98%;
                                                 height: 100%;
                                                 border: 1px solid black;
                                                 margin-right: 5px;">
@@ -64,33 +123,33 @@
                             </tbody>
                         </table>
                     </div>
-                    <!-- plots below the table  -->
+                    <!-- plots below the target table  -->
                     <div class="row">
-                        <div class="col-md-3 col-sm-12" >
+                        <div class="col-md-2 col-sm-12" >
                             <div class="card-body text-center" style="margin-top: 20px;">
-                                <p style="font-style: italic; text-align: left;">Interaction types</p>
+                                <p style="font-style: italic; text-align: left;">Mode of action</p>
                                 <!--PieChart Code here-->
-                                <div id="chart-container-interaction-type" style="width: 300px; height: 300px;">
+                                <div id="chart-container-interaction-type" style="width: 200px; height: 200px;">
                                     <svg id="pie-chart-interaction-type"></svg>
                                 </div>
                                 <!--PieChart End here-->
                             </div>
                         </div>
-                        <div class="col-md-3 col-sm-12" >
+                        <div class="col-md-2 col-sm-12" >
                             <div class="card-body text-center" style="margin-top: 20px;">
                                 <p style="font-style: italic; text-align: left;">Drug type</p>
                                 <!--PieChart Code here-->
-                                <div id="chart-container-drug-type" style="width: 300px; height: 300px;">
+                                <div id="chart-container-drug-type" style="width: 200px; height: 200px;">
                                     <svg id="pie-chart-drug-type"></svg>
                                 </div>
                                 <!--PieChart End here-->
                             </div>
                         </div>
-                        <div class="col-md-3 col-sm-12" >
+                        <div class="col-md-2 col-sm-12" >
                             <div class="card-body text-center" style="margin-top: 20px;">
                                 <p style="font-style: italic; text-align: left;">Drug clinical status</p>
                                 <!--PieChart Code here-->
-                                <div id="chart-container-drug-status" style="width: 300px; height: 300px;">
+                                <div id="chart-container-drug-status" style="width: 200px; height: 200px;">
                                     <svg id="pie-chart-drug-status"></svg>
                                 </div>
                                 <!--PieChart End here-->
@@ -107,6 +166,7 @@
 
     <script src="{% static 'home/js/d3.v7.min.js' %}"></script> 
     <script src="{% static 'drug/js/target_table_statistics.js' %}"></script>  
+    <script src="{% static 'drug/js/atc_network_statistics.js' %}"></script>  
 
     <script>
         // JavaScript for toggling the visibility of nested lists
@@ -136,12 +196,12 @@
                 if (countClick === 1) {
                     timer = setTimeout(function() {
                         countClick = 0;
-                        var urlOpen = event.getAttribute("data-href");
-                        window.open(urlOpen, "_blank");
+                        showTargetTable(uniProt_ID)
                     }, 500);
                 } else {
                     clearTimeout(timer);
-                    showTargetTable(uniProt_ID)
+                    var urlOpen = event.getAttribute("data-href");
+                    window.open(urlOpen, "_blank");
                     countClick =0 ;
                 }
             }
@@ -180,6 +240,54 @@
                     });
             }
 
+            function showAtcLevelNetworkStatistics(atc_code){
+                $.ajax(
+                    {
+                        url: "{% url 'get-statistics-by-atc' %}?atc_code="+atc_code,
+                        type: "GET",
+                        success: function (response) {
+                            // displayStatisticsByAtcCode(response.response_data);
+                            const target_type_data = [
+                                    { category: "Target", value: response.NoOfTargetTypes },
+                                    { category: "Enzyme", value: response.NoOfEnzymeTypes },
+                                    { category: "Transporter", value: response.NoOfTransporterTypes },
+                                    { category: "Carrier", value: response.NoOfCarrierTypes },
+                                ];
+                            createPieChartForATCTargetType(target_type_data);
+                            const drug_type_data = [
+                                    { category: "Small Molecule", value: response.NoOfSmallMolecule },
+                                    { category: "Biotech", value: response.NoOfBiotech },
+                                ];
+                            createPieChartForATCDrugType(drug_type_data);
+                            const drug_status_data = [
+                                    { category: "Nutraceutical", value: response.NoOfNutraceuticalDrug },
+                                    { category: "Experimental", value: response.NoOfExperimentalDrug },
+                                    { category: "Investigational", value: response.NoOfInvestigationalDrug },
+                                    { category: "Approved", value: response.NoOfApprovedDrug },
+                                    { category: "VetApproved", value: response.NoOfVetApprovedDrug },
+                                    { category: "Illicit", value: response.NoOfIllicitDrug },
+                                ];
+                            createPieChartForATCDrugStatus(drug_status_data);
+
+                            //chart-container-ATC-gene-based-burden
+                            const ATC_gene_based_burden_data = [
+                                    { category: "p_value_target", value: response.p_value_target },
+                                    { category: "p_value_transporter", value: response.p_value_transporter },
+                                    { category: "p_value_carrier", value: response.p_value_carrier },
+                                    { category: "p_value_enzyme", value: response.p_value_enzyme },
+                                    { category: "beta_value_target", value: response.beta_value_target },
+                                    { category: "beta_value_transporter", value: response.beta_value_transporter },
+                                    { category: "beta_value_carrier", value: response.beta_value_carrier },
+                                    { category: "beta_value_enzyme", value: response.beta_value_enzyme },
+                                ];
+                            createPieChartForATCGeneBasedBurden(ATC_gene_based_burden_data);
+                        },
+                        error: function (xhr, status, error) {
+                            console.log('AJAX Error:', error);
+                        }
+                    });
+            }
+
             function displayDrugListByUniProt_ID(data) {
                 $("#content-target-table").html('');
 
@@ -211,6 +319,7 @@
                 $("#target-table").show();
                 var target_statistics_plot = document.createElement("div");
                 target_statistics_plot.setAttribute("id", "target_statistics_plot");
+
                 var drug_type_statistics_plot = document.createElement("div");
                 drug_type_statistics_plot.setAttribute("id", "drug_type_statistics_plot");
             }
@@ -253,7 +362,7 @@
                 var drug_bank_ids = [];
                 // Check if the 'associations' key exists in the JSON response
                 if (associations.length > 0) {
-                    var tableHtml = '<table id="associated_drug_tbl" ><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID</th><th style="white-space: nowrap;">Drug name</th><th style="white-space: nowrap;">No. of interacting proteins</th><th style="white-space: nowrap;">List of interacting proteins</br><i>(Show in gene names)</i> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th><th>Short description</th></tr></thead><tbody>';
+                    var tableHtml = '<table id="associated_drug_tbl" ><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID</th><th style="white-space: nowrap;">Drug name</th><th style="white-space: nowrap; text-align: center;">No. of interacting proteins</th><th style="white-space: nowrap;">List of interacting proteins</br><i>(Show in gene names)</i> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th><th>Short description</th></tr></thead><tbody>';
                     
                     for (var i = 0; i < associations.length; i++) {
                         var row = associations[i];
@@ -274,7 +383,7 @@
                                 </a> <a href="https://go.drugbank.com/drugs/${row.drug_bankID}" style="font-size:14px; color:grey; text-decoration: underline;" target="_blank";>[Ref]</a>
                             </td>
                             <td style="vertical-align: top;" >${row.name}</td>
-                            <td style="vertical-align: top;">${row.target_list.length}</td>
+                            <td style="vertical-align: top; text-align: center;">${row.target_list.length}</td>
                             <td style="white-space: normal;">${targetLinks}</td>
                             <td class="long-content" style="vertical-align: top;">${row.description}</td>
                         </tr>
@@ -298,13 +407,21 @@
                     right_panel.appendChild(right_panel_text);
                     if (associations.length > 1) {
                         right_panel_text_guide.innerHTML = `</br> <i>** In the 1st column, click on each Drugbank ID to show the individual network for that specific drug or click <a onclick="toggleDivVisibility(this, '${atc_url}')">here</a> to switch back to the ATC level network of </i> ${response.atc_code}
-                        </br> <i>** In the 4th column, on each gene name, <u>click</u> to open the gene detail page; <u>double click</u> to roll to the view of target-drug</i> `;
+                        </br> <i>** In the 4th column, on each gene name, <u>click</u> to roll to the view of target-drug; <u>double click</u> to open the gene detail page; </i> `;
                     }
                     else{
-                        right_panel_text_guide.innerHTML = `</br> <i>** In the 4th column, on each gene name, <u>click</u> to open the gene detail page; <u>double click</u> to roll to the view of target-drug</i> `;
+                        right_panel_text_guide.innerHTML = `</br> <i>** In the 4th column, on each gene name, <u>click</u> to roll to the view of target-drug; <u>double click</u> to open the gene detail page; </i> `;
                     }
                     right_panel.appendChild(right_panel_text_guide);
                     right_panel.appendChild(right_panel_content);
+                    
+                    // Adding the atc_level_network_statistics if there is drug associated with this ATC code
+                    var atc_level_network_statistics = document.getElementById("atc_level_network_statistics");
+                    atc_level_network_statistics.style.display="block";
+                    showAtcLevelNetworkStatistics(response.atc_code);
+
+                    var atc_level_network_statistics_text = document.getElementById("atc_level_network_statistics_text");
+                    atc_level_network_statistics_text.innerHTML="Network statistics for "+response.atc_code;
 
                 } else {
                     right_panel_text.innerHTML = "There is no targeting drugs associated with " + response.atc_code;

@@ -729,6 +729,89 @@ def get_drug_atc_association(request):
         cache.set("get_drug_atc_association_"+atc_code, response_data, 60*60)
     return JsonResponse(response_data)
 
+def get_data_from_genebass(gene_id, field):
+    pass
+
+def get_gene_based_burden_data_by_atc(request):
+    atc_code = request.GET.get("atc_code")
+    if cache.get("get_gene_based_burden_data_by_atc_"+atc_code):
+        response_data = cache.get("get_gene_based_burden_data_by_atc_"+atc_code)
+    else:
+        allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+        chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+        drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+        undup_drugs = list(set(drugs))
+        drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+        target_gene = []
+        transporter_gene = []
+        carrier_gene = []
+        enzyme_gene = []
+        for drug in drug_objs:
+            interactions = Interaction.objects.filter(drug_bankID=drug)
+            for interaction in interactions:
+                gene_id = interaction.uniprot_ID.geneID
+                if interaction.interaction_type=="target":
+                    target_gene.append(gene_id)
+                if interaction.interaction_type=="transporter":
+                    transporter_gene.append(gene_id)
+                if interaction.interaction_type=="carrier":
+                    carrier_gene.append(gene_id)
+                if interaction.interaction_type=="enzyme":
+                    enzyme_gene.append(gene_id)
+
+
+def get_statistics_by_atc(request):
+    atc_code = request.GET.get("atc_code")
+    if cache.get("get_statistics_by_atc_"+atc_code):
+        response_data = cache.get("get_statistics_by_atc_"+atc_code)
+    else:
+        allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+        chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+        drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+        undup_drugs = list(set(drugs))
+        drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+        interaction_all = []
+        for drug in drug_objs:
+            interactions = Interaction.objects.filter(drug_bankID=drug)
+            interaction_all+=interactions
+        interaction_all = list(set(interaction_all))
+        noOfTargetTypes = len([interaction for interaction in interaction_all if interaction.interaction_type=="target" ])
+        noOfTransporterTypes = len([interaction for interaction in interaction_all if interaction.interaction_type=="transporter" ])
+        noOfCarrierTypes = len([interaction for interaction in interaction_all if interaction.interaction_type=="carrier" ])
+        noOfEnzymeTypes = len([interaction for interaction in interaction_all if interaction.interaction_type=="enzyme" ])
+
+        #0 -> Nutraceutical, 1 - Experimental, 2- Investigational, 3- Approved , 4 - Vet approved, 5 - Illicit
+        noOfNutraceuticalDrug = len([drug for drug in drug_objs if drug.Clinical_status==0])
+        noOfExperimentalDrug = len([drug for drug in drug_objs if drug.Clinical_status==1])
+        noOfInvestigationalDrug = len([drug for drug in drug_objs if drug.Clinical_status==2])
+        noOfApprovedDrug = len([drug for drug in drug_objs if drug.Clinical_status==3])
+        noOfVetApprovedDrug = len([drug for drug in drug_objs if drug.Clinical_status==4])
+        noOfIllicitDrug = len([drug for drug in drug_objs if drug.Clinical_status==5])
+        noOfIllicitDrug = len([drug for drug in drug_objs if drug.Clinical_status==5])
+        noOfSmallMolecule = len([drug for drug in drug_objs if drug.drugtype.type_detail=="Small Molecule"])
+        noOfBiotech = len([drug for drug in drug_objs if drug.drugtype.type_detail=="Biotech"])
+
+        response_data = {
+            "no of drugs": len(drug_objs),
+            "atc_code": atc_code,
+            "NoOfAllInteractions": len(interaction_all),
+            "NoOfTargetTypes": noOfTargetTypes, 
+            "NoOfTransporterTypes": noOfTransporterTypes, 
+            "NoOfCarrierTypes": noOfCarrierTypes, 
+            "NoOfEnzymeTypes": noOfEnzymeTypes, 
+            "NoOfNutraceuticalDrug": noOfNutraceuticalDrug,
+            "NoOfExperimentalDrug": noOfExperimentalDrug,
+            "NoOfInvestigationalDrug":noOfInvestigationalDrug,
+            "NoOfApprovedDrug": noOfApprovedDrug,
+            "NoOfVetApprovedDrug": noOfVetApprovedDrug,
+            "NoOfIllicitDrug":noOfIllicitDrug,
+            "NoOfSmallMolecule":noOfSmallMolecule,
+            "NoOfBiotech":noOfBiotech,
+            }
+        print("------get_statistics_by_atc: response_data: ", response_data)
+        cache.set("get_statistics_by_atc_"+atc_code, response_data, 60*60)
+    return JsonResponse(response_data)
+
 def get_drug_association(request):
     drug_id = request.GET.get("drug_id")
     try:
@@ -747,6 +830,7 @@ def get_drug_association(request):
         "atc_code": "no ATC code",
     }
     return JsonResponse(response_data)
+
 
 def get_drug_list_by_uniprotID(request):
     uniprot_ID = request.GET.get("uniProt_ID")
