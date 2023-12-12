@@ -2,7 +2,7 @@ from django.urls import path, re_path
 from django.views.decorators.cache import cache_page
 from .views import SelectionAutocomplete, DrugStatistics, DrugStatistics2
 from . import views
-from .views import search_drugs, drug_atc_expansion, atc_lookup, atc_detail_view, atc_search_view, get_drug_atc_association, get_drug_network, get_drugs_network
+from .views import search_drugs, drug_atc_expansion, atc_lookup, atc_detail_view, atc_search_view, get_drug_atc_association, get_drug_network, get_drugs_network, get_statistics_by_atc, get_gene_based_burden_data_by_atc
 
 urlpatterns = [
     path('search_drugs', views.search_drugs, name='search_drugs'),
@@ -23,6 +23,8 @@ urlpatterns = [
     path('get_drug_atc_association/', views.get_drug_atc_association, name='get-drug-atc-association'),
     path('get_drug_association/', views.get_drug_association, name='get-drug-association'),
     path('get_drug_list_by_uniprotID/', views.get_drug_list_by_uniprotID, name='get-drug-list-by-uniprotID'),
+    path('get_statistics_by_atc/', views.get_statistics_by_atc, name='get-statistics-by-atc'),
+    path('get_gene_based_burden_data_by_atc/', views.get_gene_based_burden_data_by_atc, name='get-gene-based-burden-data-by-atc'),
     path('get_drug_network/', views.get_drug_network, name='get-drug-network'),
     path('get-atc-sub-levels/', views.get_atc_sub_levels, name='get-atc-sub-levels'),
     path('drugbrowser', views.drugbrowser, name='drugbrowser'),  # load all the drugs - cached but still slow - might need to remove
