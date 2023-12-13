@@ -1475,7 +1475,7 @@ function processData() {
 
                 if (!nodes.find(function (node) { return node.id === protein; })) {
 
-                    nodes.push({ id: protein, isParent: false, radius: 5, Protein_Class: genename }); // Include the "Protein_Class" value in the node object
+                    nodes.push({ id: protein, isParent: false, radius: 5, Protein_Class: proteinClass }); // Include the "Protein_Class" value in the node object
                 }
 
                 if (!nodes.find(function (node) { return node.id === drugName; })) {
