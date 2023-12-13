@@ -1062,10 +1062,10 @@ function showDialog_Child(title, childName) {
 
         // Your code to fetch the row where column name "name" = drugNameValue
         // Assuming you have the data in the global variable 'drug_xlsxData'
-        var matchingRow = protein_xlsxData.find((row) => row.gene_name === drugNameValue);
+        var matchingRow = protein_xlsxData.find((row) => row.uniprot_ID === drugNameValue);
         // console.log(matchingRow)
         if (matchingRow) {
-            var drugbank_id = matchingRow.gene_name;
+            var drugbank_id = matchingRow.uniprot_ID;
 
             // Create an img element
             var image = document.createElement("img");
@@ -1102,7 +1102,7 @@ function showDialog_Child(title, childName) {
 
         // Your code to fetch the row where column name "name" matches selectedDrugName1
         // Assuming you have the data in the global variable 'protein_xlsxData'
-        var matchingRow = protein_xlsxData.find((row) => row.gene_name === proteinName11111);
+        var matchingRow = protein_xlsxData.find((row) => row.uniprot_ID === proteinName11111);
         // console.log(matchingRow);
         if (matchingRow) {
             // Create a table to display the protein structure information
@@ -1475,7 +1475,7 @@ function processData() {
 
                 if (!nodes.find(function (node) { return node.id === protein; })) {
 
-                    nodes.push({ id: protein, isParent: false, radius: 5, Protein_Class: proteinClass }); // Include the "Protein_Class" value in the node object
+                    nodes.push({ id: protein, isParent: false, radius: 5, Protein_Class: proteinClass, gene_name: genename}); // Include the "Protein_Class" value in the node object
                 }
 
                 if (!nodes.find(function (node) { return node.id === drugName; })) {
@@ -1703,7 +1703,7 @@ function createChart(links) {
         .append("text")
         .attr("dx", 10)
         .attr("dy", ".25em")
-        .text(function (d) { return d.id; })
+        .text(function (d) { return d.gene_name; })
         .attr("class", "node-label")
 
  simulation.on("tick", function() {
