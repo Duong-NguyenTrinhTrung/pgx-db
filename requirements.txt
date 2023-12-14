@@ -7,7 +7,6 @@ django-environ==0.9.0
 marshmallow==3.19.0
 environs==9.5.0
 packaging==21.3
-psycopg2-binary==2.9.3
 pyparsing==3.0.9
 python-dotenv==0.21.0
 sqlparse==0.4.3
@@ -30,3 +29,4 @@ drf-yasg[validation]
 newrelic==9.1.0
 django-filter
 django-jsonapi
+psycopg2-binary==2.9.3
