@@ -1,7 +1,7 @@
 # Created by https://www.gitignore.io
 
-d3/
-static/d3/
+
+
 
 ### OSX ###
 .DS_Store
@@ -99,7 +99,7 @@ venv
 .venv
 
 # New Relic files
-newrelic.ini
+#newrelic.ini
 
 # Pycharm files
 .idea/

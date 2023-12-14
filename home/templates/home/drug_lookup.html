@@ -1,0 +1,311 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+
+{% block addon_css %}
+
+<style>
+    #drug, #drug-result{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 80px;
+    }
+
+    #drug-result{
+        margin-top: 20px;
+        width: 70%;
+        margin: 20px auto;
+    }
+
+    #drug-result-table {
+        border-radius: 5px;
+        min-width: 100%;
+    }
+
+    #drug-result-table th:first-child{
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+    }
+
+    #drug-result-table th:last-child {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+
+
+
+    #drug-result-table th{
+        height: 40px;
+        text-align: left;
+        background-color: rgba(255, 203, 119); 
+        font-weight: normal;
+        color: #9c6644;
+        font-size: 14px;
+    }
+
+    #drug-result-table th, td {
+        /* border: 1px solid rgb(91, 142, 188);
+        border: 1px solid rgb(91, 142, 188); */
+        padding: 0 7px;
+    }
+
+    /* Apply alternating row colors */
+    #drug-result-table tr:nth-child(even) {
+        background-color: rgba(255, 203, 119, 0.4); /* Color 1 for even rows */
+    }
+
+    #drug-result-table tr:nth-child(odd) {
+        /* background-color: rgba(241, 124, 14, 0.2); */
+        background-color: white; /* Color 2 for odd rows */
+    }
+
+    /* Add background colors to the form and the paragraph */
+    #drug p
+   {
+        display: block;
+        width: 70%;
+        background-color: rgb(255, 203, 119);
+        /* Use your desired pastel background color */
+        padding: 10px;
+        /* Add some padding to the paragraph */
+        border-radius: 5px;
+        /* Optional: Add rounded corners to the paragraph */
+    }
+
+    #drug form
+    {
+        background-color: #F2F5F6;
+        /* Use a different pastel background color for the form if desired */
+        padding: 3px;
+        /* Add some padding to the form */
+        border-radius: 5px;
+        /* Optional: Add rounded corners to the form */
+        width: 70%;
+        height: 95px
+    }
+
+    /* Style the input elements and buttons */
+    #drug input
+    {
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    /* Add some spacing between buttons */
+    #drug_search,
+    #drug_reset
+     {
+        margin-right: 10px;
+    }
+
+    input.form-control {
+        width: 650px;
+    }
+
+    td {
+        /* text-align: center;  */
+        vertical-align: middle;
+        /* Vertically center the content within the td */
+    }
+
+    .autocomplete-outer{
+        display: none;
+        width: 650px;
+        max-height: 400px;
+        background-color: white;
+        border: 1px solid #ccc;
+        padding: 5px;
+        position: absolute;
+        top: 100%;
+        left: 0;
+    }
+
+    #protein-autocomplete-results,
+    #gene-autocomplete-results {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div id="drug">
+    <p>Search by <i><span style="color:#9c6644;">Drugbank ID</span></i> or <i><span style="color:#9c6644;">drug name</span></i></p>
+    <form method="get" action="">
+        <table class="table table-bordered table-gray table-fulltext-two-rows">
+            <tbody>
+                <tr>
+                    <td>
+                        <div style="position: relative;">
+                            <input id="search_drug"
+                                class="form-text form-type-textfield form-control optional ui-autocomplete-input" style="width:100%;" size="70%"
+                                autocomplete="on" />
+                            <div class="autocomplete-outer">
+                                <div id="drug-autocomplete-results">
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="h-center"><input id="submit_drug" type="submit" value="Search"
+                            class="button js-form-submit form-submit form-type-submit btn btn-default btn-block"></td>
+                    <td class="h-center"><input id="reset_drug" type="reset" value="Reset"
+                            class="button js-form-submit form-submit form-type-submit btn btn-default btn-block"></td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: left; padding-left: 30px;">Examples: <a
+                            href="https://go.drugbank.com/drugs/DB00002" target='_blank' hreflang="en">DB00002</a>; 
+                            <a href="https://go.drugbank.com/drugs/DB00002" target='_blank' hreflang="en">Cetuximab</a>;
+                            ... </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<div id="drug-result">
+
+    <table id="drug-result-table">
+        <thead>
+            <tr>
+                <th>Drugbank ID</th>
+                <th>Drug name</th>
+                <th>ATC code</th>
+                <th>Pharmacogenomics note</th>
+                <th>Clinical status</th>
+                <th>Reference</th>
+            </tr>
+        </thead>
+        <tbody id="drug-result-tbody">
+            {% for drug in drugs %}
+                <tr>
+                    <td>{{ drug.drug_bankID }}</td>
+                    <td>{{ drug.name }}</td>
+                    <!-- <td><a href="#">{{ drug.atc_code }}</a></td> -->
+                    {% if drug.atc_code != 'N/A' %}
+                        <td><a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id={{ drug.atc_code.0 }}&detail={{ drug.atc_code }}">{{ drug.atc_code }}</a></td>
+                    {% else %}
+                        <td>{{ drug.atc_code }}</td>
+                    {% endif %}
+                    <td>{{ drug.pharmacogenomics_note }}</td>
+                    <td>{{ drug.Clinical_status }}</td>
+                    <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ drug.drug_bankID }}"  target="_blank" rel="noopener noreferrer">Link</a></td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}
+{% block addon_js %}
+<script>
+    $(document).ready(function () {
+        var autocompleteResults = $('#drug-autocomplete-results');
+        $('#search_drug').autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "{% url 'drug_autocomplete_view' %}",
+                    data: {
+                        query: request.term
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        response(data.suggestions);
+                    }
+                });
+            },
+            autoFocus: true,
+            minLength: 3,
+            select: function (event, ui) {
+                $('#search_drug').val(ui.item.value);
+                return false;
+            },
+            open: function (event, ui) {
+                autocompleteResults.show(); 
+            },
+            close: function (event, ui) {
+                autocompleteResults.hide(); 
+            }
+        });
+        // Hide autocomplete results when clicking outside of the input and results
+        $("#search_drug").on('keyup', function() {
+            $.ajax({
+                    url: "{% url 'drug_lookup' %}?drug="+ $(this).val(),
+                    success: function (data) {
+                        $("#drug-result-tbody").html('');
+                        var html_data = '';
+                        data.drugs.forEach(item => {
+                            html_data += `<tr>
+                                <td>${item.drug_bankID}</td>
+                                <td>${item.name}</td>
+                                <td><a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id=${item.atc_code.charAt(0)}&detail=${item.atc_code}">${item.atc_code}</a></td>
+                                <td>${item.pharmacogenomics_note}</td>
+                                <td>${item.Clinical_status}</td>
+                                <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ item.drug_bankID }}"   target="_blank" rel="noopener noreferrer">Link</a></td>
+                            </tr>`;
+                        });
+                        
+                        $("#drug-result-tbody").html(html_data);
+                    }
+                });
+        });
+        $("#submit_drug").click(function() {
+            $.ajax({
+                    url: "{% url 'drug_lookup' %}?drug="+ $("#search_drug").val(),
+                    success: function (data) {
+                        // console.log(data.drugs);
+                        $("#drug-result-tbody").html('');
+                        var html_data = '';
+                        data.drugs.forEach(item => {
+                            html_data += `<tr>
+                                <td>${item.drug_bankID}</td>
+                                <td>${item.name}</td>
+                                <td><a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id=${item.atc_code.charAt(0)}&detail=${item.atc_code}">${item.atc_code}</a></td>
+                                <td>${item.pharmacogenomics_note}</td>
+                                <td>${item.Clinical_status}</td>
+                                <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ item.drug_bankID }}"   target="_blank" rel="noopener noreferrer">Link</a></td>
+                            </tr>`;
+                        });
+                        $("#drug-result-tbody").html(html_data);
+                    }
+                });
+        });
+        
+        $("#reset_drug").click(function() {
+            $.ajax({
+                    url: "{% url 'drug_lookup' %}?drug=default",
+                    // method: "GET",
+                    // dataType: "html", // Specify the expected response type
+                    success: function (data) {
+                        console.log("data.drugs: "+data.drugs);
+                        $("#drug-result-tbody").html('');
+                        var html_data = '';
+                        data.drugs.forEach(item => {
+                            html_data += `<tr>
+                                <td>${item.drug_bankID}</td>
+                                <td>${item.name}</td>
+                                <td><a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id=${item.atc_code.charAt(0)}&detail=${item.atc_code}">${item.atc_code}</a></td>
+                                <td>${item.pharmacogenomics_note}</td>
+                                <td>${item.Clinical_status}</td>
+                                <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ item.drug_bankID }}"   target="_blank" rel="noopener noreferrer">Link</a></td>
+                            </tr>`;
+                        });
+                        $("#drug-result-tbody").html(html_data);
+                    }
+                });
+        });
+
+        // Handle the form submission when the form is submitted
+        $("form").submit(function (event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+        });
+
+    });
+</script>
+
+{% endblock %}

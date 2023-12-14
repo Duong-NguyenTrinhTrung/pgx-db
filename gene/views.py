@@ -1,7 +1,6 @@
 import decimal
 import random
 import warnings
-
 from django.core.cache import cache
 from django.db.models import (
     F,
@@ -16,24 +15,97 @@ from django.views import View
 from django.views.decorators.http import require_http_methods
 from django.views.generic import TemplateView
 from django.shortcuts import render
-
 import numpy as np
 import pandas as pd
 from gene.models import Gene
 from protein.models import Protein
+from interaction.models import Interaction
+from drug.models import Drug 
 from variant.models import (
     GenebassVariant,
     Variant,
     VepVariant,
+    GenebassCategory,
+    VariantPhenocode
 )
-
 import urllib.request as urlreq
-
-# gene/views.py
 import urllib.request as urlreq
 from django.shortcuts import render
+from django.core.exceptions import ObjectDoesNotExist
+
+
 warnings.filterwarnings('ignore')
 
+class GenebasedAssociationStatisticsView:
+    def get_association_statistics_by_variant_marker(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("association_statistics_data_" + slug) is not None:
+                table = cache.get("association_statistics_data_" + slug)
+            else:
+                table = pd.DataFrame()
+                
+                data = GenebassVariant.objects.filter(markerID_id=slug).values_list("markerID", "phenocode", "n_cases", "n_controls", "n_cases_defined", \
+                                                                                "n_cases_both_sexes", "n_cases_females", "n_cases_males", "category", \
+                                                                                "AC", "AF", "BETA", "SE", \
+                                                                                "AF_Cases", "AF_Controls", "Pvalue")
+                if len(data) == 0:
+                    return dict()
+
+                for row in data:
+                    temp = pd.DataFrame([row])
+                    phenocode = temp.iloc[0, 1]
+                    temp.iloc[0, 1] = VariantPhenocode.objects.get(phenocode=phenocode).description_more
+                    category = temp.iloc[0, 8]
+                    temp.iloc[0, 8] = GenebassCategory.objects.get(category_code=category).category_description
+
+                    table = table.append(temp, ignore_index=True)
+                table.fillna('', inplace=True)
+                table.columns=["markerID", "phenocode", "n_cases", "n_controls", "n_cases_defined", "n_cases_both_sexes", "n_cases_females", \
+                                "n_cases_males", "category", "AC", "AF", "BETA", "SE", "AF_Cases", "AF_Controls", "Pvalue"]
+                context = dict()
+                cache.set("association_statistics_data_" + slug, table, 60 * 60)
+            context['association_statistics_data'] = table
+        return context
+
+
+class DrugByGeneBaseView(object):
+    def get_drug_by_gene_data(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("drug_data_" + slug) is not None:
+                table = cache.get("drug_data_" + slug)
+            else:
+                table = pd.DataFrame()
+
+                if slug.upper().startswith("ENSG"):
+                    try:
+                        protein = Protein.objects.get(geneID=slug)
+                    except ObjectDoesNotExist:
+                        print(f"No Protein found for geneID: {slug}")
+                        protein = None
+                else:
+                    try:
+                        print("geneID:", slug)
+                        protein = Protein.objects.get(genename=slug.upper())
+                        print("Data query geneID: ", protein.__dict__)
+                    except ObjectDoesNotExist:
+                        print(f"No Protein found for genename: {slug}")
+                        protein = None
+                if protein:
+                    protein_ID = protein.uniprot_ID
+
+                    drugs = Interaction.objects.filter(
+                        uniprot_ID=protein_ID).values_list("drug_bankID", "actions", "known_action", "interaction_type")
+                    for drug in drugs:
+                        drug_df = pd.DataFrame([drug])
+                        table = table.append(drug_df, ignore_index=True)
+                    table.fillna('', inplace=True)
+                    table.columns=["drug_bankID", "actions", "known_action", "interaction_type"]
+                    context = dict()
+                    cache.set("drug_data_" + slug, table, 60 * 60)
+            context['list_of_targeting_drug'] = table
+        return context
 
 class GeneDetailBaseView(object):
     browser_columns = [
@@ -224,7 +296,6 @@ class GeneDetailBaseView(object):
         if slug is not None:
             if cache.get("variant_data_" + slug) is not None:
                 table_with_protein_pos_int = cache.get("variant_data_" + slug)
-                print("cache hit")
             else:
                 browser_columns = self.browser_columns
 
@@ -248,7 +319,8 @@ class GeneDetailBaseView(object):
                         *self.list_necessary_columns)
                     for vep_variant in vep_variants:
                         data_subset = self.parse_marker_data(marker, vep_variant)
-                        table = table.append(data_subset, ignore_index=True)
+                        if data_subset["primary"]=="YES":
+                            table = table.append(data_subset, ignore_index=True)
 
                 table.fillna('', inplace=True)
 
@@ -277,7 +349,6 @@ class GeneDetailBaseView(object):
                         pass
 
                 cache.set("variant_data_" + slug, table_with_protein_pos_int, 60 * 60)
-
             context['array'] = table_with_protein_pos_int
             context['length'] = len(table_with_protein_pos_int)
             context["name_dic"] = self.name_dic
@@ -323,6 +394,7 @@ class GeneDetailBrowser(
         context = super().get_context_data(**kwargs)
         slug = kwargs.get('slug')
         context.update(self.get_gene_detail_data(slug))
+        # context.update(self.get_gene_detail_data(slug))
         return context
 
 
@@ -333,7 +405,7 @@ class GenebassVariantListView(TemplateView):
         context = super().get_context_data(**kwargs)
 
         genebass_variants_list = GenebassVariant.objects.filter(  # Filter to get all genebass variants for a gene
-            markerID__in=Variant.objects.filter(  # Filter to get all variants for a gene
+            markerID__in=Variant.objects.filter(  
                 Gene_ID=self.kwargs['pk']  # Gen Gene by gene_id
             ).values_list('VariantMarker', flat=True)
         ).values(
@@ -341,10 +413,10 @@ class GenebassVariantListView(TemplateView):
             'n_controls',
             'phenocode__description',
             'phenocode',
-            'n_cases_defined',
-            'n_cases_both_sexes',
-            'n_cases_females',
-            'n_cases_males',
+            # 'n_cases_defined',
+            # 'n_cases_both_sexes',
+            # 'n_cases_females',
+            # 'n_cases_males',
             'category',
             'AC',
             'AF',
@@ -355,7 +427,7 @@ class GenebassVariantListView(TemplateView):
             'Pvalue',
         )
 
-        genebass_variants_list = genebass_variants_list[:5000]
+        # genebass_variants_list = genebass_variants_list[:5000]
 
         phenotypes = GenebassVariant.objects.filter(  # Filter to get all genebass variants for a gene
             markerID__in=Variant.objects.filter(  # Filter to get all variants for a gene
@@ -380,10 +452,6 @@ class GenebassVariantListView(TemplateView):
 
 @require_http_methods(["GET"])
 def filter_gene_detail_page(request, id):
-    """
-    Filter gene detail page by
-    * mean_of_vep_score
-    """
     mean_vep_score = request.GET.get('mean_vep_score', 0.5)
     mean_vep_score = float(mean_vep_score)
     # Filter by mean_vep_score

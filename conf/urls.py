@@ -44,7 +44,7 @@ urlpatterns = [
     path("", include("home.urls")),
     path("", include("drug.urls")),
     path("", include("gene.urls")),
-    path("", include("sitesearch.urls")),
+    # path("", include("sitesearch.urls")),
     path("", include("variant.urls")),
     path("api/", include("api.urls")),
     path('api-auth/', include('rest_framework.urls')),
