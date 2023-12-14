@@ -8,7 +8,9 @@
 
 <div id="atc-right-network">
     <div id="loading">
-        <div class="spinner" style="display: none;"></div>
+        <div class="spinner"></div>
+    </div>    
+   
         <div id="overlay"></div>
 
         <div id="dialog" style="display: none;">
@@ -124,9 +126,10 @@
             <button type="button" id="exportButton" class="btn btn-light d-flex btmbar">Export</button>
             <button type="button" id="redrawChart" class="btn btn-light d-flex btmbar">Redraw</button>
         </div>
-    </div>
+         
 </div>
 
+<!--Network Chart End-->
 {% block addon_js %}
     <script src="https://d3js.org/d3.v6.min.js"></script>
     <script src="https://d3js.org/d3.v7.min.js"></script>

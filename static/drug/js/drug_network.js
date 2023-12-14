@@ -3,12 +3,11 @@ $(function () {
         containment: "window"
     });
 });
-
 //Pass jsonFiles Here
-// var json_GeneralFile = "static/json-sample/json_GeneralFile.json";
-// var json_drugData = "static/json-sample/json_drugData.json";
-// var json_proteinData = "static/json-sample/json_proteinData.json";
-// var json_interactionData = "static/json-sample/json_interactionData.json"
+// var json_GeneralFile = "/static/json-sample/json_GeneralFile.json";
+// var json_drugData = "/static/json-sample/json_drugData.json";
+// var json_proteinData = "/static/json-sample/json_proteinData.json";
+// var json_interactionData = "/static/json-sample/json_interactionData.json"
 
 var json_GeneralFile="";
 var json_drugData = "";
@@ -29,12 +28,12 @@ if (drug_bank_id){
     json_interactionData = "/drug_network/" + drug_bank_id + "/interaction_data";
 }
 
-$("#loading .spinner").show();
-console.log("json_GeneralFile "+json_GeneralFile);
-console.log("json_drugData "+json_drugData);
-console.log("json_proteinData "+json_proteinData);
-console.log("json_interactionData "+json_interactionData);
-console.log("Saad");
+$("#loading").show();
+console.log("json_GeneralFile ",json_GeneralFile);
+//***console.log("json_drugData "+json_drugData);
+//***console.log("json_proteinData "+json_proteinData);
+//***console.log("json_interactionData "+json_interactionData);
+//***console.log("Saad");
 let drug_xlsxData;
 let protein_xlsxData;
 let interaction_xlsxData;
@@ -48,7 +47,9 @@ function readDrugJSON() {
         .then((response) => response.json())
         .then((jsonData) => {
             // Assuming your JSON data is an array of objects, adjust this code accordingly
+           // drug_xlsxData = jsonData.map(item => item.fields);
             drug_xlsxData = jsonData;
+            // console.log("DrugJSONDATA",drug_xlsxData);
             readProteinJSON();
         })
         .catch((error) => {
@@ -63,6 +64,7 @@ function readProteinJSON() {
         .then((response) => response.json())
         .then((jsonData) => {
             protein_xlsxData = jsonData;
+            console.log("ProteinData",protein_xlsxData);
 
             readInteractionJSON();
         })
@@ -78,8 +80,9 @@ function readInteractionJSON() {
         .then((response) => response.json())
         .then((jsonData) => {
             interaction_xlsxData = jsonData;
+        // console.log("InteractionData",interaction_xlsxData);
+            // console.log("End of Logs ");
             processData();
-            //console.log(interaction_xlsxData)
         })
         .catch((error) => {
             console.error("Error reading the file:", error);
@@ -102,7 +105,7 @@ function getDrugJsonData(drugBankId) {
         type: 'GET',
         url: url + '?drugbank_id=' + drugBankId,
     }, function (data) {
-        console.log(data);
+        //console.log(data);
     })
 
     // call process data
@@ -186,11 +189,14 @@ function createExportOption(optionText) {
 function handleExportOption(option) {
     switch (option) {
         case 'View In Full Screen':
+            
             viewFullScreen();
             break;
 
         case 'Download PNG':
+            console.log("PNG Export Clikced");
             downloadPNG();
+            
             break;
         case 'Download JPEG':
             downloadJPEG();
@@ -257,34 +263,44 @@ function printChart() {
 // Download PNG
 // Download PNG
 function downloadPNG() {
-    console.log("downloadPNG")
-    var svgElement = document.querySelector("#chart svg");
-    var svgData = getFilteredSvgContent(svgElement);
-    svgData = addWhiteBackground(svgData);
+  var svgElement = document.querySelector("#chart svg");
 
-    // First convert the SVG to canvas
-    svgToCanvas(svgData, function (chartCanvas) {
-        // Convert the HTML legends to canvas
-        html2canvas(document.querySelector("#all-legends")).then(function (legendCanvas) {
-            // Calculate the scale factor to match the height of the chart
-            var scaleFactor = chartCanvas.height / legendCanvas.height;
+  // Reset transformations by cloning the SVG element and removing any transformations
+  var clonedSvgElement = svgElement.cloneNode(true);
+  clonedSvgElement.setAttribute("transform", "");
+  
+  var svgData = getFilteredSvgContent(clonedSvgElement);
+  svgData = addWhiteBackground(svgData);
 
-            // Adjust the final canvas width to consider the scaled width of the legends
-            var finalCanvas = document.createElement("canvas");
-            finalCanvas.width = chartCanvas.width + (legendCanvas.width * scaleFactor); // sum of the chart width and the scaled legend width
-            finalCanvas.height = chartCanvas.height; // using chart's height
+  // First convert the SVG to canvas
+  svgToCanvas(svgData, function(chartCanvas) {
+    // Convert the HTML legends to canvas
+    html2canvas(document.querySelector("#all-legends")).then(function(legendCanvas) {
+      // Set the scale factor to double the size of the legend
+      var scaleFactor = 2;
 
-            var context = finalCanvas.getContext("2d");
-            context.drawImage(chartCanvas, 0, 0);
-            context.drawImage(legendCanvas, chartCanvas.width, 0, legendCanvas.width * scaleFactor, chartCanvas.height);
+      // Create the final canvas with extra width to accommodate the scaled legend
+      var finalCanvas = document.createElement("canvas");
+      finalCanvas.width = chartCanvas.width + (legendCanvas.width * scaleFactor);
+      finalCanvas.height = chartCanvas.height;
 
-            // Now you can save the combined canvas as PNG
-            var a = document.createElement("a");
-            a.href = finalCanvas.toDataURL("image/png");
-            a.download = "chart.png";
-            a.click();
-        });
+      var context = finalCanvas.getContext("2d");
+      context.fillStyle = 'white';
+      context.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+
+      // Draw the chart at its original size without zoom
+      context.drawImage(chartCanvas, 0, 0);
+
+      // Draw the scaled-up legend to the right of the chart
+      context.drawImage(legendCanvas, chartCanvas.width, (chartCanvas.height - legendCanvas.height * scaleFactor) / 2, legendCanvas.width * scaleFactor, legendCanvas.height * scaleFactor);
+
+      // Now you can save the combined canvas as PNG
+      var a = document.createElement("a");
+      a.href = finalCanvas.toDataURL("image/png");
+      a.download = "chart.png";
+      a.click();
     });
+  });
 }
 
 function svgToCanvas(svgData, callback) {
@@ -307,7 +323,9 @@ function svgToCanvas(svgData, callback) {
         };
 
         if (xlinkHref) {
-            imgObj.src = "https://entertainmentbuz.com/visual/d3/" + xlinkHref;
+            //imgObj.src = "http://localhost:8000/" + xlinkHref;
+            imgObj.src = "https://pharmacogenomics-database-5pltq.ondigitalocean.app" + xlinkHref;
+            
         } else {
             loadedCount++;
         }
@@ -339,34 +357,78 @@ function svgToCanvas(svgData, callback) {
 }
 
 // Download JPEG
+
 function downloadJPEG() {
-    var svgElement = document.querySelector("#chart svg");
-    var svgData = getFilteredSvgContent(svgElement);
-    svgData = addWhiteBackground(svgData);
+  var svgElement = document.querySelector("#chart svg");
+  var svgData = getFilteredSvgContent(svgElement);
+  svgData = addWhiteBackground(svgData);
 
-    // First convert the SVG to canvas
-    svgToCanvas(svgData, function (chartCanvas) {
-        // Convert the HTML legends to canvas
-        html2canvas(document.querySelector("#all-legends")).then(function (legendCanvas) {
-            // Calculate the scale factor to match the height of the chart
-            var scaleFactor = chartCanvas.height / legendCanvas.height;
+  // First convert the SVG to canvas
+  svgToCanvas(svgData, function(chartCanvas) {
+    // Convert the HTML legends to canvas
+    html2canvas(document.querySelector("#all-legends")).then(function(legendCanvas) {
+      // Set the scale factor to double the size of the legend
+      var scaleFactor = 2;
 
-            // Adjust the final canvas width to consider the scaled width of the legends
-            var finalCanvas = document.createElement("canvas");
-            finalCanvas.width = chartCanvas.width + (legendCanvas.width * scaleFactor);
-            finalCanvas.height = chartCanvas.height;
+      // Create the final canvas with extra width to accommodate the scaled legend
+      var finalCanvas = document.createElement("canvas");
+      finalCanvas.width = chartCanvas.width + (legendCanvas.width * scaleFactor); // add double the legend's width to the chart's width
+      finalCanvas.height = chartCanvas.height; // keep the chart's height unchanged
 
-            var context = finalCanvas.getContext("2d");
-            context.drawImage(chartCanvas, 0, 0);
-            context.drawImage(legendCanvas, chartCanvas.width, 0, legendCanvas.width * scaleFactor, chartCanvas.height);
+      var context = finalCanvas.getContext("2d");
+      context.fillStyle = 'white'; // Set background color to white
+      context.fillRect(0, 0, finalCanvas.width, finalCanvas.height); // Fill the canvas with white background
 
-            // Now you can save the combined canvas as JPEG
-            var a = document.createElement("a");
-            a.href = finalCanvas.toDataURL("image/jpeg", 0.9);  // 0.9 is the quality factor (0 to 1)
-            a.download = "chart.jpeg";
-            a.click();
-        });
+      // Draw the chart at its original size
+      context.drawImage(chartCanvas, 0, 0);
+
+      // Draw the scaled-up legend to the right of the chart
+      context.drawImage(legendCanvas, chartCanvas.width, (chartCanvas.height - legendCanvas.height * scaleFactor) / 2, legendCanvas.width * scaleFactor, legendCanvas.height * scaleFactor);
+
+      // Now you can save the combined canvas as PNG
+      var a = document.createElement("a");
+      a.href = finalCanvas.toDataURL("image/jpeg", 0.9);
+      a.download = "chart.jpeg";
+      a.click();
     });
+  });
+}
+
+function downloadJPEG1() {
+  var svgElement = document.querySelector("#chart svg");
+  var svgData = getFilteredSvgContent(svgElement);
+  svgData = addWhiteBackground(svgData);
+
+  // First convert the SVG to canvas
+  svgToCanvas(svgData, function(chartCanvas) {
+    // Convert the HTML legends to canvas
+    html2canvas(document.querySelector("#all-legends")).then(function(legendCanvas) {
+      // Double the size of the legend
+      var scaleFactor = 2;
+      var scaledLegendWidth = legendCanvas.width * scaleFactor;
+      var scaledLegendHeight = legendCanvas.height * scaleFactor;
+
+      // Adjust the final canvas size to include the scaled legend
+      var finalCanvas = document.createElement("canvas");
+      finalCanvas.width = chartCanvas.width + scaledLegendWidth; // sum of the chart width and the double-sized legend width
+      finalCanvas.height = Math.max(chartCanvas.height, scaledLegendHeight); // the height should be the max of chart's height or double-sized legend's height
+
+      var context = finalCanvas.getContext("2d");
+      context.fillStyle = 'white'; // Set background color to white
+      context.fillRect(0, 0, finalCanvas.width, finalCanvas.height); // Fill the canvas with white background
+
+      context.drawImage(chartCanvas, 0, 0); // draw the chart as it is
+
+      // Draw the legend on the right side of the chart, doubling its size
+      context.drawImage(legendCanvas, chartCanvas.width, 0, scaledLegendWidth, scaledLegendHeight);
+
+      // Now you can save the combined canvas as JPEG
+      var a = document.createElement("a");
+      a.href = finalCanvas.toDataURL("image/jpeg", 0.9);  // 0.9 is the quality factor (0 to 1)
+      a.download = "chart.jpeg";
+      a.click();
+    });
+  });
 }
 
 // Helper function to add a white background rectangle to the SVG
@@ -410,7 +472,8 @@ function downloadPDF() {
 
         // Use the href attribute for the image path
         if (xlinkHref) {
-            imgObj.src = "https://entertainmentbuz.com/visual/d3/" + xlinkHref;
+            //imgObj.src = "http://localhost:8000/" + xlinkHref;
+             imgObj.src = "https://pharmacogenomics-database-5pltq.ondigitalocean.app/" + xlinkHref;
         } else {
             loadedCount++;
         }
@@ -484,7 +547,7 @@ function downloadXLS() {
     //console.log(filteredLinks)
     // Load the XLSX
     var req = new XMLHttpRequest();
-    req.open("GET", "data_export_file.xlsx", true);
+    req.open("GET", "/static/d3/data_export_file.xlsx", true);
     req.responseType = "arraybuffer";
 
     req.onload = function (e) {
@@ -494,19 +557,19 @@ function downloadXLS() {
         var firstSheetName = workbook.SheetNames[0];
         var worksheet = workbook.Sheets[firstSheetName];
         var rows = XLSX.utils.sheet_to_json(worksheet);
-        console.log(rows);
+       // console.log(rows);
         // Filter the rows based on the filtered links
         var filteredRows = rows.filter(row =>
             filteredLinks.some(link =>
                 link.source.id === row.drug_name &&
-                link.source.Drug_type === row.drugtype &&
+                link.source.Drug_type.toLowerCase() === row.drugtype.toLowerCase() &&
                 link.target.id === row.protein &&
                 link.target.Protein_Class === row.Protein_Class
             )
         );
 
         // Create a new worksheet with the filtered rows
-        console.log(filteredRows)
+       // console.log(filteredRows)
         var newWs = XLSX.utils.json_to_sheet(filteredRows);
         var newWb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(newWb, newWs, firstSheetName);
@@ -665,7 +728,9 @@ function showDialog(title, parentNodeName) {
 
         // Your code to fetch the row where column name "name" = drugNameValue
         // Assuming you have the data in the global variable 'drug_xlsxData'
-        var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
+        // console.log("drug_xlsxData");
+        // console.log("",drug_xlsxData);
+        var matchingRow = drug_xlsxData.find((row) => row.fields.name === drugNameValue);
 
         if (matchingRow) {
             var drugbank_id = matchingRow.drugbank_id;
@@ -676,7 +741,7 @@ function showDialog(title, parentNodeName) {
             // Check if the image exists
             image.onerror = function () {
                 // If the image does not exist, set the default image path
-                image.src = "static/d3/drug_images/imagenotfound.png";
+                image.src = "/static/d3/drug_images/imagenotfound.png";
                 // Add the CSS classes to center the image and set the maximum height
                 image.classList.add("center-image", "first-tab-image");
                 // Append the image to the tabContent
@@ -684,7 +749,7 @@ function showDialog(title, parentNodeName) {
             };
 
             // Set the src attribute to the drug image path
-            image.src = "static/d3/drug_images/" + drugbank_id + ".png";
+            image.src = "/static/d3/drug_images/" + drugbank_id + ".png";
             // Add the CSS classes to center the image and set the maximum height
             image.classList.add("center-image", "first-tab-image");
             // Append the image to the tabContent
@@ -692,11 +757,12 @@ function showDialog(title, parentNodeName) {
         } else {
             // If the drugNameValue is not found in the data, display a default image
             var defaultImage = document.createElement("img");
-            defaultImage.src = "static/d3/drug_images/imagenotfound.png";
+            defaultImage.src = "/static/d3/drug_images/imagenotfound.png";
             defaultImage.classList.add("center-image", "first-tab-image");
             tabContent.appendChild(defaultImage);
         }
     }
+    
 
     function showDrugDescription(selectedDrugName1) {
         var tabContent = document.querySelector(".tab-content");
@@ -704,7 +770,7 @@ function showDialog(title, parentNodeName) {
 
         // Your code to fetch the row where column name "name" matches selectedDrugName1
         // Assuming you have the data in the global variable 'drug_xlsxData'
-        var matchingRow = drug_xlsxData.find((row) => row.name === selectedDrugName1);
+        var matchingRow = drug_xlsxData.find((row) => row.fields.name === selectedDrugName1);
 
         if (matchingRow) {
             // Create a table to display the drug information
@@ -786,7 +852,7 @@ function showDialog(title, parentNodeName) {
     // Function to convert drugtype reference number into meaningful labels
     function convertDrugType(drugType) {
         if (drugType === 0) {
-            return "Biologic";
+            return "Biotech";
         } else if (drugType === 1) {
             return "Small Molecule";
         } else {
@@ -982,7 +1048,7 @@ function showDialog_Child(title, childName) {
 
         // Create an img element
         var image = document.createElement("img");
-        image.src = "static/d3/drug_images/imagenotfound.png"
+        image.src = "/static/d3/drug_images/imagenotfound.png"
         image.classList.add("center-image", "first-tab-image"); // Add CSS classes
 
         // Append the image to the tabContent
@@ -1007,7 +1073,7 @@ function showDialog_Child(title, childName) {
             // Check if the image exists
             image.onerror = function () {
                 // If the image does not exist, set the default image path
-                image.src = "static/d3/protein_images/imagenotfound.png";
+                image.src = "/static/d3/protein_images/imagenotfound.png";
                 // Add the CSS classes to center the image and set the maximum height
                 image.classList.add("center-image", "first-tab-image");
                 // Append the image to the tabContent
@@ -1015,7 +1081,7 @@ function showDialog_Child(title, childName) {
             };
 
             // Set the src attribute to the drug image path
-            image.src = "static/d3/protein_images/" + drugbank_id + ".png";
+            image.src = "/static/d3/protein_images/" + drugbank_id + ".png";
             // Add the CSS classes to center the image and set the maximum height
             image.classList.add("center-image", "first-tab-image");
             // Append the image to the tabContent
@@ -1023,7 +1089,7 @@ function showDialog_Child(title, childName) {
         } else {
             // If the drugNameValue is not found in the data, display a default image
             var defaultImage = document.createElement("img");
-            defaultImage.src = "static/d3/protein_images/imagenotfound.png";
+            defaultImage.src = "/static/d3/protein_images/imagenotfound.png";
             defaultImage.classList.add("center-image", "first-tab-image");
             tabContent.appendChild(defaultImage);
         }
@@ -1037,7 +1103,7 @@ function showDialog_Child(title, childName) {
         // Your code to fetch the row where column name "name" matches selectedDrugName1
         // Assuming you have the data in the global variable 'protein_xlsxData'
         var matchingRow = protein_xlsxData.find((row) => row.uniprot_ID === proteinName11111);
-        console.log(matchingRow);
+        // console.log(matchingRow);
         if (matchingRow) {
             // Create a table to display the protein structure information
             var proteinStructureTable = document.createElement('div');
@@ -1286,12 +1352,12 @@ var interaction_source = "";
 var interaction_target = "";
 
 var imagePaths11 = {
-    Nutraceutical: "static/d3/images/left0.png",
-    Experimental: "static/d3/images/left1.png",
-    Investigational: "static/d3/images/left2.png",
-    Approved: "static/d3/images/left3.png",
-    'Vet-approved': "images/left4.png",
-    Illicit: "static/d3/images/left5.png"
+    Nutraceutical: "/static/d3/images/capsules/left0.png",
+    Experimental: "/static/d3/images/capsules/left1.png",
+    Investigational: "/static/d3/images/capsules/left2.png",
+    Approved: "/static/d3/images/capsules/left3.png",
+    'Vet-approved': "/static/d3/images/capsules/left4.png",
+    Illicit: "/static/d3/images/capsules/left5.png"
 };
 
 var colorOptions = ["#e71f73", "#d5a100", "#0a5517", "#061755", "#941a4c", "#3d3d3d"];
@@ -1306,50 +1372,52 @@ var colorCodes = {
 };
 
 var colorCodesDrugType = {
-    Biologic: "#03A9F4",
+    "Biotech": "#03A9F4",
     "Small Molecule": "#ff5722"
 };
 var colorCodesDrugType_images = {
-    "#03A9F4": "static/d3/images/right0.png",
-    "#ff5722": "static/d3/images/right1.png"
+    "#03A9F4": "/static/d3/images/capsules/right0.png",
+    "#ff5722": "/static/d3/images/capsules/right1.png"
 };
 var colorCodesDrugType = {
-    Biologic: "#03A9F4",
+    "Biotech": "#03A9F4",
     "Small Molecule": "#ff5722"
 };
 var colorPaletteDrugType = {
-    "#03A9F4": "#03A9F4",  // Biologic
+    "#03A9F4": "#03A9F4",  // Biotech
     "#ff5722": "#ff5722"   // Small molecule
 };
 
 var colorPalette = {
-    "#e71f73": "static/d3/images/left0.png",
-    "#d5a100": "static/d3/images/left1.png",
-    "#0a5517": "static/d3/images/left2.png",
-    "#061755": "static/d3/images/left3.png",
-    "#941a4c": "images/left4.png",
-    "#3d3d3d": "images/left5.png"
+    "#e71f73": "/static/d3/images/capsules/left0.png",
+    "#d5a100": "/static/d3/images/capsules/left1.png",
+    "#0a5517": "/static/d3/images/capsules/left2.png",
+    "#061755": "/static/d3/images/capsules/left3.png",
+    "#941a4c": "/static/d3/images/capsules/left4.png",
+    "#3d3d3d": "/static/d3/images/capsules/left5.png"
 };
 
 var colorImageMap = {
-    "#e71f73": "images/left0.png",
-    "#d5a100": "images/left1.png",
-    "#0a5517": "images/left2.png",
-    "#061755": "images/left3.png",
-    "#941a4c": "images/left4.png",
-    "#3d3d3d": "images/left5.png"
+    "#e71f73": "/static/d3/images/capsules/left0.png",
+    "#d5a100": "/static/d3/images/capsules/left1.png",
+    "#0a5517": "/static/d3/images/capsules/left2.png",
+    "#061755": "/static/d3/images/capsules/left3.png",
+    "#941a4c": "/static/d3/images/capsules/left4.png",
+    "#3d3d3d": "/static/d3/images/capsules/left5.png"
 };
 
 ////Drugs Images Setting Variables
+//0 -> Nutraceutical, 1 - Experimental, 2- Investigational, 3- Approved , 4 - Vet approved, 5 - Illicit
+
 var drugStatuses = ["Nutraceutical", "Experimental", "Investigational", "Approved", "Vet-approved", "Illicit"];
-var drugTypes = ["Biologic", "Small Molecule"];
+var drugTypes = ["Biotech", "Small Molecule"];
 
 // Generate all combinations of leftXrightY.png for the image paths
 var imagePaths = {};
 Object.keys(colorCodes).forEach((key, i) => {
     Object.keys(colorCodesDrugType).forEach((key2, j) => {
         var keyCombo = key + "|" + key2;
-        imagePaths[keyCombo] = `static/d3/images/capsules/left${i}right${j}.png`;
+        imagePaths[keyCombo] = `/static/d3/images/capsules/left${i}right${j}.png`;
     });
 });
 
@@ -1375,27 +1443,31 @@ function xlsxToJson(file, callback) {
 
 function processData() {
     const jsonFilePath = json_GeneralFile; // JSON file path
-    console.log("ProcessData"+jsonFilePath);
-    console.log("Saad");
+    //console.log("Inside Process Data Function11");
     fetch(jsonFilePath)
         .then((response) => response.json())
         .then((data) => {
             // Extract nodes and links from the JSON data
-            console.log("inside processData: "+ data);
+           // console.log("inside processData: ", data);
             chartDataJ = data;
             data.forEach(function (row) {
-                console.log("ProcessData");
-                console.log("ProcessData"+row);
+              //  console.log("ProcessData");
+               // console.log("ProcessData: ", row);
+               // console.log("ProcessData: " + JSON.stringify(row));
                 var drugName = row.drug_name;
                 var drugID = row.drugbank_id;
                 var protein = row.protein;
+                var genename = row.gene_name;
                 var interaction = row.interaction;
                 var drugStatus = row.Drug_status; // Get the "Drug_status" value
                 var drugType = row.drugtype; // Get the "Drug_status" value
                 var proteinClass = row.Protein_Class;
-                console.log("Temp DrugId");
-                console.log("printing Drug_D"+drugID);
-                console.log("printing Drug_D");
+              //  console.log("Temp DrugId");
+                 
+               // console.log("printing Clinical Status :"+drugStatus);
+              //  console.log("printing Product Type :"+drugType);
+              //  console.log("printing Drug_ID:"+drugID);
+              //  console.log("printing Drug_D");
                 if (!nodes.find(function (node) { return node.id === drugName; })) {
 
                     nodes.push({ id: drugName, isParent: true, radius: 10, Drug_status: drugStatus, Drug_type: drugType, Drug_ID: drugID }); // Include the "Drug_status" value in the node object
@@ -1403,7 +1475,7 @@ function processData() {
 
                 if (!nodes.find(function (node) { return node.id === protein; })) {
 
-                    nodes.push({ id: protein, isParent: false, radius: 5, Protein_Class: proteinClass }); // Include the "Protein_Class" value in the node object
+                    nodes.push({ id: protein, isParent: false, radius: 5, Protein_Class: proteinClass, gene_name: genename}); // Include the "Protein_Class" value in the node object
                 }
 
                 if (!nodes.find(function (node) { return node.id === drugName; })) {
@@ -1469,13 +1541,13 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-
+    console.log("Latest Edit CreateCHart_13_12_A");
     var container = d3.select("#chart");
     //debugger
-    // var containerWidth = [container.node().getBoundingClientRect().width] - 10;
-    // var containerHeight = [container.node().getBoundingClientRect().height] - 10;
-    var containerWidth = 500;
-    var containerHeight = 500;
+     var containerWidth = [container.node().getBoundingClientRect().width] - 10;
+     var containerHeight = [container.node().getBoundingClientRect().height] - 10;
+    //var containerWidth = 500;
+    //var containerHeight = 500;
     //console.log("Width : "+containerWidth+"  ----  Height : "+containerHeight);
 
     var zoom = d3.zoom()
@@ -1499,27 +1571,28 @@ function createChart(links) {
     var distanceBetweenNodes = 60;
     var noOfTotalNodes11 = links.length;
 
-    console.log("HHHHHHHH" + noOfTotalNodes11);
+    // console.log("HHHHHHHH" + noOfTotalNodes11);
 
     if (noOfTotalNodes11 < 100) {
-        chargeStrength = -500
-        var distanceBetweenNodes = 100;
+        chargeStrength = -100
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 99 && noOfTotalNodes11 < 200) {
-        chargeStrength = -150
-        var distanceBetweenNodes = 100;
+        chargeStrength = -100
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 199 && noOfTotalNodes11 < 250) {
-        chargeStrength = -150
-        var distanceBetweenNodes = 100;
+        chargeStrength = -100
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 249 && noOfTotalNodes11 < 300) {
         chargeStrength = -100
-        var distanceBetweenNodes = 80;
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 299 && noOfTotalNodes11 < 350) {
         chargeStrength = -100
-        var distanceBetweenNodes = 80;
+        var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 349 && noOfTotalNodes11 < 400) {
         chargeStrength = -100
         var distanceBetweenNodes = 60;
     } else if (noOfTotalNodes11 > 399) {
+        chargeStrength = -100
         var distanceBetweenNodes = 60;
     }
 
@@ -1552,6 +1625,8 @@ function createChart(links) {
             console.log(d.type);
             showDialog_Links(d.type, d.type)
             //showDialog_Interaction(d.id, d.id);
+            console.log(d.type)
+            showDialog_Interaction(d.id, d.id)
         });
 
     node = svg.selectAll(".node")
@@ -1600,7 +1675,7 @@ function createChart(links) {
 
             var key = drugStatuses[d.Drug_status] + "|" + d.Drug_type;
             //console.log("key: ", key); // print the key
-            //console.log("key: ", imagePaths[key]); // print the key
+           // console.log("key: ", imagePaths[key]); // print the key
             //return imagePaths[key];
 
             return imagePaths[key];
@@ -1628,19 +1703,29 @@ function createChart(links) {
         .append("text")
         .attr("dx", 10)
         .attr("dy", ".25em")
-        .text(function (d) { return d.id; })
+        .text(function (d) { return d.gene_name; })
         .attr("class", "node-label")
 
-    simulation.on("tick", function () {
-        link.attr("x1", function (d) { return d.source.x; })
-            .attr("y1", function (d) { return d.source.y; })
-            .attr("x2", function (d) { return d.target.x; })
-            .attr("y2", function (d) { return d.target.y; });
+ simulation.on("tick", function() {
+  // Constrain node positions within the SVG boundaries
+  node.each(function(d) {
+    d.x = Math.max(d.radius, Math.min(containerWidth - d.radius, d.x));
+    d.y = Math.max(d.radius, Math.min(containerHeight - d.radius, d.y));
+  });
 
-        node.attr("transform", function (d) {
-            return "translate(" + d.x + "," + d.y + ")";
-        });
+  // Update link positions to follow nodes
+  link
+    .attr("x1", function(d) { return d.source.x; })
+    .attr("y1", function(d) { return d.source.y; })
+    .attr("x2", function(d) { return d.target.x; })
+    .attr("y2", function(d) { return d.target.y; });
+
+  // Update node positions
+  node
+    .attr("transform", function(d) {
+      return "translate(" + d.x + "," + d.y + ")";
     });
+});
 
     // Enable drag behavior for nodes
     function drag(simulation) {
@@ -1680,7 +1765,8 @@ function createChart(links) {
 
     console.log("Chart created."); 
     // Finish updating chart
-    $("#loading .spinner").hide();
+    $("#loading").hide();
+    //$("#loading").hide();
     updateChartVisibility();
 }
 
@@ -2273,7 +2359,7 @@ function changeNodeImage(status, selectedColor) {
             // Extract drugTypeIndex from the current image path
             let drugTypeIndex = currentImagePath.match(/right(\d+)/)[1];
 
-            const correctImagePath = `static/d3/images/capsules/left${drugStatusIndex}right${drugTypeIndex}.png`;
+            const correctImagePath = `/static/d3/images/capsules/left${drugStatusIndex}right${drugTypeIndex}.png`;
             console.log(correctImagePath);
             nodeImages[node.id] = correctImagePath;
             d3.select(this)
@@ -2291,7 +2377,7 @@ function changeNodeImage(status, selectedColor) {
 function createLegend_drugType() {
     var legendContent = d3.select("#legend_drug_type-content");
 
-    var drugTypeArray = ["Biologic", "Small Molecule"];
+    var drugTypeArray = ["Biotech", "Small Molecule"];
     var uniqueDrugType = new Set();
 
     links.forEach(function (link) {
@@ -2402,7 +2488,7 @@ function changeNodeImageForDrugType(drugType, selectedColor) {
             // Extract drugStatusIndex from the current image path
             let drugStatusIndex = currentImagePath.match(/left(\d+)/)[1];
 
-            const correctImagePath = `static/d3/images/capsules/left${drugStatusIndex}right${drugTypeIndex}.png`;
+            const correctImagePath = `/static/d3/images/capsules/left${drugStatusIndex}right${drugTypeIndex}.png`;
             console.log(correctImagePath);
             nodeImages[node.id] = correctImagePath;
             d3.select(this)

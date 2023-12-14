@@ -1,6 +1,6 @@
 import json
 from django.core import serializers
-
+import pandas as pd
 from django.core.cache import cache
 from django.db.models import (
     Count,
@@ -27,10 +27,12 @@ from drug.models import (
     AtcChemicalSubstance,
     AtcPharmacologicalGroup,
     AtcTherapeuticGroup,
+    DrugAtcAssociation,
 )
 from gene.models import Gene
 from interaction.models import Interaction
 from protein.models import Protein
+from variant.models import GenebassVariant, GenebassPGx
 
 from .models import (
     Drug,
@@ -136,8 +138,11 @@ def get_drugs_general_data(request):
 
     drug_bank_ids = request.GET.get('drug_bank_ids')
     drug_bank_ids = drug_bank_ids.split(',')
-
-    data = DrugsNetworkGetDataService(drug_bank_ids=drug_bank_ids).get_general_data()
+    if cache.get("drugs_general_data_" + "_".join(drug_bank_ids)) is not None:
+        data = cache.get("drugs_general_data_" + "_".join(drug_bank_ids))
+    else:
+        data = DrugsNetworkGetDataService(drug_bank_ids=drug_bank_ids).get_general_data()
+        cache.set("drugs_general_data_" + "_".join(drug_bank_ids), data, 60 * 60)
 
     return JsonResponse(data, safe=False)
 
@@ -600,15 +605,8 @@ def atc_lookup(request):
     # Uppercase the names before returning
     for group in atc_groups:
         group.name = group.name.upper()
-
-    # group2s = AtcTherapeuticGroup.objects.all()
-    # # Uppercase the names before returning
-    # for group in group2s:
-    #     group.name = group.name.upper()
-
     context = {
         'atc_groups': atc_groups,
-        # 'group2s': group2s
     }
     return render(request, 'atc_code_lookup.html', context)
 
@@ -701,23 +699,213 @@ def atc_search_view(request):
 
 def get_drug_atc_association(request):
     atc_code = request.GET.get("atc_code")
-    allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
-    chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
-    drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
-    undup_drugs = list(set(drugs))
-    associations = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+    if cache.get("get_drug_atc_association_"+atc_code):
+        response_data = cache.get("get_drug_atc_association_"+atc_code)
+    else:
+        allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+        chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+        drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+        undup_drugs = list(set(drugs))
+        associations = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+        total_interaction = 0
+        interacted_protein = []
+        associations_list = [
+            {"drug_bankID": assoc.drug_bankID, "name": assoc.name, "description": assoc.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=assoc)]}
+            for assoc in associations]
+        for association in associations_list:
+            total_interaction+=len(association.get("target_list"))
+            for target in association.get("target_list"):
+                interacted_protein.append(target.get("uniProt_ID"))
+        interacted_protein = list(set(interacted_protein))
 
-    # Convert queryset to a list of dictionaries
+        burden_data = get_gene_based_burden_data_by_atc(atc_code)
+        # Create a JSON response with the data
+        response_data = {
+            "associations": associations_list,
+            "atc_code": atc_code,
+            "total_interaction": total_interaction,
+            "no_of_interacted_protein":len(interacted_protein),
+            "burden_data": burden_data,
+        }
+        cache.set("get_drug_atc_association_"+atc_code, response_data, 60*60)
+    return JsonResponse(response_data)
+
+# a helper function
+def get_data_from_genebass(gene_id):
+    gb_rows = GenebassPGx.objects.filter(gene_id=gene_id)
+    return gb_rows
+
+# a helper function, not a view function
+def get_gene_based_burden_data_by_atc(atc_code):
+    if cache.get("get_gene_based_burden_data_by_atc_"+atc_code):
+        response_data = cache.get("get_gene_based_burden_data_by_atc_"+atc_code)
+    else:
+        allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+        chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+        drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+        undup_drugs = list(set(drugs))
+        drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+        response_data=[]
+        for drug in drug_objs:
+            interactions = Interaction.objects.filter(drug_bankID=drug)
+            for interaction in interactions:
+                gene_id = interaction.uniprot_ID.geneID
+                gene_name = interaction.uniprot_ID.genename
+                data_genebass = get_data_from_genebass(gene_id)
+                print("type of data_genebass :", type(data_genebass))
+                print("type of data_genebass item:", type(data_genebass[0]))
+                if len(data_genebass) != 0:
+                        response_data.append({
+                                "gene_name": gene_name,
+                                "drug_id": drug.drug_bankID,
+                                "moa": interaction.interaction_type,
+                                "burden_data": [
+                                    {
+                                        "phenocode": genebass.phenocode.phenocode,
+                                        "Pvalue": genebass.Pvalue,
+                                        "Pvalue_Burden": genebass.Pvalue_Burden,
+                                        "Pvalue_SKAT": genebass.Pvalue_SKAT,
+                                        "BETA_Burden": genebass.BETA_Burden,
+                                        "SE_Burden": genebass.SE_Burden,
+                                    } 
+                                    for genebass in data_genebass
+                                    if all(
+                                        value not in [float('inf'), float('-inf')] and value is not None
+                                        for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
+                                    )
+                                ]
+                        })
+                   
+        print("------get_gene_based_burden_data_by_atc: ", atc_code, ", len response_data: ", len(response_data))
+        if len(response_data)>0:
+            print("------len response_data 1st item: ", len(response_data[0].get("burden_data")))
+        cache.set("get_gene_based_burden_data_by_atc_"+atc_code, response_data, 60*60)
+    return response_data
+        
+
+
+def get_statistics_by_atc(request):
+    atc_code = request.GET.get("atc_code")
+    if cache.get("get_statistics_by_atc_"+atc_code):
+        response_data = cache.get("get_statistics_by_atc_"+atc_code)
+    else:
+        allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+        chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+        drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+        undup_drugs = list(set(drugs))
+        drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+        interaction_all = []
+        for drug in drug_objs:
+            interactions = Interaction.objects.filter(drug_bankID=drug)
+            interaction_all+=interactions
+        interaction_all = list(set(interaction_all))
+        noOfTargetTypes = len([interaction for interaction in interaction_all if interaction.interaction_type=="target" ])
+        noOfTransporterTypes = len([interaction for interaction in interaction_all if interaction.interaction_type=="transporter" ])
+        noOfCarrierTypes = len([interaction for interaction in interaction_all if interaction.interaction_type=="carrier" ])
+        noOfEnzymeTypes = len([interaction for interaction in interaction_all if interaction.interaction_type=="enzyme" ])
+
+        #0 -> Nutraceutical, 1 - Experimental, 2- Investigational, 3- Approved , 4 - Vet approved, 5 - Illicit
+        noOfNutraceuticalDrug = len([drug for drug in drug_objs if drug.Clinical_status==0])
+        noOfExperimentalDrug = len([drug for drug in drug_objs if drug.Clinical_status==1])
+        noOfInvestigationalDrug = len([drug for drug in drug_objs if drug.Clinical_status==2])
+        noOfApprovedDrug = len([drug for drug in drug_objs if drug.Clinical_status==3])
+        noOfVetApprovedDrug = len([drug for drug in drug_objs if drug.Clinical_status==4])
+        noOfIllicitDrug = len([drug for drug in drug_objs if drug.Clinical_status==5])
+        noOfIllicitDrug = len([drug for drug in drug_objs if drug.Clinical_status==5])
+        noOfSmallMolecule = len([drug for drug in drug_objs if drug.drugtype.type_detail=="Small Molecule"])
+        noOfBiotech = len([drug for drug in drug_objs if drug.drugtype.type_detail=="Biotech"])
+
+        response_data = {
+            "no of drugs": len(drug_objs),
+            "atc_code": atc_code,
+            "NoOfAllInteractions": len(interaction_all),
+            "NoOfTargetTypes": noOfTargetTypes, 
+            "NoOfTransporterTypes": noOfTransporterTypes, 
+            "NoOfCarrierTypes": noOfCarrierTypes, 
+            "NoOfEnzymeTypes": noOfEnzymeTypes, 
+            "NoOfNutraceuticalDrug": noOfNutraceuticalDrug,
+            "NoOfExperimentalDrug": noOfExperimentalDrug,
+            "NoOfInvestigationalDrug":noOfInvestigationalDrug,
+            "NoOfApprovedDrug": noOfApprovedDrug,
+            "NoOfVetApprovedDrug": noOfVetApprovedDrug,
+            "NoOfIllicitDrug":noOfIllicitDrug,
+            "NoOfSmallMolecule":noOfSmallMolecule,
+            "NoOfBiotech":noOfBiotech,
+            }
+        print("------get_statistics_by_atc: response_data: ", response_data)
+        cache.set("get_statistics_by_atc_"+atc_code, response_data, 60*60)
+    return JsonResponse(response_data)
+
+def get_drug_association(request):
+    drug_id = request.GET.get("drug_id")
+    try:
+        drug = Drug.objects.get(drug_bankID=drug_id)
+    except Drug.DoesNotExist:
+        raise Http404("Drug does not exist")
     associations_list = [
-        {"drug_bankID": assoc.drug_bankID, "name": assoc.name, "description": assoc.description}
-        for assoc in associations]
-
-    # Create a JSON response with the data
+        {"drug_bankID": drug_id, "name": drug.name, "description": drug.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=drug_id)]}
+        ]
+    total_interaction = 0
+    interacted_protein = []
+    for association in associations_list:
+            total_interaction+=len(association.get("target_list"))
+            for target in association.get("target_list"):
+                interacted_protein.append(target.get("uniProt_ID"))
+    interacted_protein = list(set(interacted_protein))
     response_data = {
         "associations": associations_list,
-        "atc_code": atc_code,
+        "total_interaction": total_interaction,
+        "no_of_interacted_protein": len(interacted_protein),
+        "atc_code": "no ATC code",
     }
+
+    print("response_data: ", response_data)
     return JsonResponse(response_data)
+
+
+def get_drug_list_by_uniprotID(request):
+    uniprot_ID = request.GET.get("uniProt_ID")
+    genename = Protein.objects.get(uniprot_ID=uniprot_ID).genename
+    interactions = Interaction.objects.filter(uniprot_ID=uniprot_ID)
+    noOfTargetTypes = len([interaction for interaction in interactions if interaction.interaction_type=="target" ])
+    noOfTransporterTypes = len([interaction for interaction in interactions if interaction.interaction_type=="transporter" ])
+    noOfCarrierTypes = len([interaction for interaction in interactions if interaction.interaction_type=="carrier" ])
+    noOfEnzymeTypes = len([interaction for interaction in interactions if interaction.interaction_type=="enzyme" ])
+    #0 -> Nutraceutical, 1 - Experimental, 2- Investigational, 3- Approved , 4 - Vet approved, 5 - Illicit
+
+    noOfNutraceuticalDrug = len([interaction for interaction in interactions if interaction.drug_bankID.Clinical_status==0])
+    noOfExperimentalDrug = len([interaction for interaction in interactions if interaction.drug_bankID.Clinical_status==1])
+    noOfInvestigationalDrug = len([interaction for interaction in interactions if interaction.drug_bankID.Clinical_status==2])
+    noOfApprovedDrug = len([interaction for interaction in interactions if interaction.drug_bankID.Clinical_status==3])
+    noOfVetApprovedDrug = len([interaction for interaction in interactions if interaction.drug_bankID.Clinical_status==4])
+    noOfIllicitDrug = len([interaction for interaction in interactions if interaction.drug_bankID.Clinical_status==5])
+    noOfIllicitDrug = len([interaction for interaction in interactions if interaction.drug_bankID.Clinical_status==5])
+    noOfSmallMolecule = len([interaction for interaction in interactions if interaction.drug_bankID.drugtype.type_detail=="Small Molecule"])
+    noOfBiotech = len([interaction for interaction in interactions if interaction.drug_bankID.drugtype.type_detail=="Biotech"])
+    temp = {
+        "Target": uniprot_ID,
+        "Genename": genename,
+        "NoOfDrugs": len(interactions),
+        "ListOfDrugIDs": [interaction.drug_bankID.drug_bankID for interaction in interactions],
+        "ListOfDrugNames": [interaction.drug_bankID.name for interaction in interactions],
+        "NoOfTargetTypes": noOfTargetTypes, 
+        "NoOfTransporterTypes": noOfTransporterTypes, 
+        "NoOfCarrierTypes": noOfCarrierTypes, 
+        "NoOfEnzymeTypes": noOfEnzymeTypes, 
+        "NoOfNutraceuticalDrug": noOfNutraceuticalDrug,
+        "NoOfExperimentalDrug": noOfExperimentalDrug,
+        "NoOfInvestigationalDrug":noOfInvestigationalDrug,
+        "NoOfApprovedDrug": noOfApprovedDrug,
+        "NoOfVetApprovedDrug": noOfVetApprovedDrug,
+        "NoOfIllicitDrug":noOfIllicitDrug,
+        "NoOfSmallMolecule":noOfSmallMolecule,
+        "NoOfBiotech":noOfBiotech,
+
+    }
+    print(" get_drug_list_by_uniprotID - returned data = ", temp)
+    return JsonResponse({ "response_data" : temp})
+   
+
 
 def retrieving_anatomical_group(atc_code):
     return list(AtcAnatomicalGroup.objects.filter(id__iexact=atc_code).values('id', 'name'))
@@ -784,3 +972,174 @@ def get_atc_sub_levels(request):
     reorganized_data["atc_code"] = atc_code
     return JsonResponse(reorganized_data, safe=False)
 
+
+class TargetByAtcBaseView:
+    def get_target_by_atc_code(self, slug):
+        print("checkpoint 1 in get_target_by_atc_code func of TargetByAtcBaseView, self = ", self, " slug = ", slug)
+
+        context = {}
+        if slug is not None:
+            print("checkpoint 2 when slug is not None in get_target_by_atc_code func of TargetByAtcBaseView")
+            if cache.get("target_by_atc_data_" + slug) is not None:
+                table = cache.get("target_by_atc_data_" + slug)
+            else:
+                print("checkpoint 3 when not cached in get_target_by_atc_code func of TargetByAtcBaseView")
+                table = pd.DataFrame()
+                data = {"chemical_substance": retrieving_chemical_substance(slug)}
+                for value in data.get('chemical_substance'):
+                    chemical_substance_code = value.get("id")
+                    drugs = DrugAtcAssociation.objects.filter(
+                        atc_id=chemical_substance_code).values_list("drug_id")
+                    for drug in drugs:
+                        drug_df = pd.DataFrame([drug])
+                        table = table.append(drug_df, ignore_index=True)
+                table.columns = ["DrugbankID"]
+                table.fillna('', inplace=True)
+                context = dict()
+                cache.set("target_by_atc_data_" + slug, table, 60 * 60)
+            context['list_of_targets'] = table
+        return context
+    
+def retrieving_atc_description(atc_code):
+    if len(atc_code)==1:
+        return AtcAnatomicalGroup.objects.get(id__iexact=atc_code)
+    else:
+        if len(atc_code)==3:
+            return AtcTherapeuticGroup.objects.get(id__iexact=atc_code)
+        else:
+            if len(atc_code)==4:
+                return AtcPharmacologicalGroup.objects.get(id__iexact=atc_code)
+            else:
+                if len(atc_code)==5:
+                    return AtcChemicalGroup.objects.get(id__iexact=atc_code)
+                else:
+                    return AtcChemicalSubstance.objects.get(id__iexact=atc_code)
+
+
+class DescriptionByAtcBaseView:
+    def get_description_by_atc_code(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("description_by_atc_data_" + slug) is not None:
+                description = cache.get("description_by_atc_data_" + slug)
+            else:
+                description = retrieving_atc_description(slug).name
+                context = dict()
+                cache.set("description_by_atc_data_" + slug, description, 60 * 60)
+            context['description'] = description
+            print("context : ", context)
+        return context
+
+
+def retrieving_atc_description(level):
+    if level.lower()=="anatomical":
+        return list(AtcAnatomicalGroup.objects.all().values_list("id", "name"))
+    else:
+        if level.lower()=="therapeutic":
+            return list(AtcTherapeuticGroup.objects.all().values_list("id", "name"))
+        else:
+            if level.lower()=="pharmacological":
+                return list(AtcPharmacologicalGroup.objects.all().values_list("id", "name"))
+            else:
+                if level.lower()=="chemical":
+                    return list(AtcChemicalGroup.objects.all().values_list("id", "name"))
+                else:
+                    return list(AtcChemicalSubstance.objects.all().values_list("id", "name"))
+
+class AtcCodesByLevelBaseView:
+    def get_atc_codes_by_level(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("atc_codes_by_level_" + slug) is not None:
+                list_of_codes = cache.get("atc_codes_by_level_" + slug)
+            else:
+                list_of_codes = retrieving_atc_description(slug)
+                context = dict()
+                cache.set("atc_codes_by_level_" + slug, list_of_codes, 60 * 60)
+            context['list_of_codes'] = list_of_codes
+            print("context : ", context)
+        return context
+    
+class TargetsByDrugBaseView:
+    def get_targets_by_drug(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("targets_by_drug_" + slug) is not None:
+                list_of_targets = cache.get("targets_by_drug_" + slug)
+            else:
+                list_of_targets_id = Interaction.objects.filter(drug_bankID = slug).values_list("uniprot_ID", flat=True)
+                list_of_targets = Protein.objects.filter(uniprot_ID__in=list_of_targets_id).values_list("uniprot_ID", "protein_name", "geneID", "genename")
+                context = dict()
+                cache.set("targets_by_drug_" + slug, list_of_targets, 60 * 60)
+            context['list_of_targets'] = list_of_targets
+            print("context : ", context)
+        return context
+    
+class AtcCodesByDrugView:
+    def get_atc_codes_by_drug(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("atc_codes_by_drug_" + slug) is not None:
+                returned_data = cache.get("atc_codes_by_drug_" + slug)
+            else:
+                list_of_atc_codes = list(DrugAtcAssociation.objects.filter(
+                        drug_id=slug).values_list("atc_id"))
+                returned_data = []
+                for code in list_of_atc_codes:
+                    name = AtcChemicalSubstance.objects.get(id=code[0]).name
+                    returned_data.append({"Atc code": code, "Description": name })
+
+                context = dict()
+                cache.set("atc_codes_by_drug_" + slug, returned_data, 60 * 60)
+            context['list_of_atc_codes'] = returned_data
+            print("context : ", context)
+        return context
+    
+
+class PGxByAtcCodeView:
+    def get_pgx_by_atc_code(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("pgx_by_atc_codes_" + slug) is not None:
+                returned_data = cache.get("pgx_by_atc_codes_" + slug)
+            else:
+                pgx = ""
+                returned_data = []
+                # for code in pgx:
+                #     name = AtcChemicalSubstance.objects.get(id=code[0]).name
+                #     returned_data.append({"Atc code": code, "Description": name })
+
+                context = dict()
+                cache.set("pgx_by_atc_codes_" + slug, returned_data, 60 * 60)
+            context['pgx'] = returned_data
+            print("context : ", context)
+        return context
+    
+class DrugTargetInteractionByAtcBaseView:
+    def get_interaction_by_atc_code(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("interactions_by_atc_code_" + slug) is not None:
+                returned_data = cache.get("interactions_by_atc_code_" + slug)
+            else:
+                drug_ids = DrugAtcAssociation.objects.filter(atc_id=slug).values_list("drug_id", flat=True)
+                returned_data = []
+                for drug_id in drug_ids:
+                    interactions = Interaction.objects.filter(drug_bankID=drug_id).values_list("uniprot_ID", "actions", "known_action", "interaction_type")
+                    # print("interactions: ", interactions)
+                    for interaction in interactions:
+                        # print("--- interaction: ", interaction)
+                        temp={
+                            "drug_bankID":drug_id,
+                            "uniprot_ID":interaction[0],
+                            "actions":interaction[1],
+                            "known_action":interaction[2],
+                            "interaction_type":interaction[3],
+                        }
+                        returned_data.append(temp)
+                context = dict()
+                cache.set("interactions_by_atc_code_" + slug, returned_data, 60 * 60)
+            context['interactions_by_atc_code'] = returned_data
+            print("context: ", context)
+        return context
+    

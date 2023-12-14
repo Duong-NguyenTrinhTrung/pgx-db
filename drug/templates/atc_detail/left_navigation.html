@@ -14,11 +14,19 @@
             left: -1%; /* Move the text to the left by half of its width */
             transform: translateX(-50%); /* Center the text horizontally */
         }
+        #new_atc_search {
+
+        }
 
     </style>
 {% endblock %}
 
 <div id="atc_left" class="col-4">
+    <div id="new_atc_search">
+        <a href="{% url 'atc-lookup' %}" style="color: #f17c0e;
+        text-decoration: underline;
+        text-decoration-color: #f17c0e;" >&lt;&lt; Return to ATC tree rooot</a>
+    </div>
     <!-- show data in level 1 -->
     <ul class="tree" style="margin-top: 10px;">
         <li>{{ group_id }} - <a href="#" class="desc">{{ group_name }}</a><button data-atc-code={{group_id}} data-remote-url="{% url 'get-drug-atc-association' %}" title="Click to show network" class="network-button"></button>
@@ -86,3 +94,32 @@
         </li>
     </ul>
 </div>
+
+<script>
+    var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('detail')) { //  detail: query_string param
+        var atcDetailString = urlParams.get('detail');
+        var detailATC = $("ul.tree").find('li').filter(function() {
+            if ($(this).find('button').data('atc-code') == atcDetailString) {
+                return $(this);
+            }
+            });
+            detailATC.parent().css('display', 'block');
+            detailATC.parent().parent().css('display', 'block');
+            detailATC.parent().parent().parent().css('display', 'block');
+            detailATC.parent().parent().parent().parent().css('display', 'block');
+            detailATC.parent().parent().parent().parent().parent().css('display', 'block');
+            detailATC.parent().parent().parent().parent().parent().parent().css('display', 'block');
+            detailATC.parent().parent().parent().parent().parent().parent().parent().css('display', 'block');
+            $(document).ready(function() {
+                // Use setTimeout to introduce a delay
+                setTimeout(function() {
+                    var buttonClick = detailATC.find('button');
+                    // Trigger click event
+                    buttonClick.trigger('click');
+                }, 2000);
+
+                
+            });
+    }
+</script>

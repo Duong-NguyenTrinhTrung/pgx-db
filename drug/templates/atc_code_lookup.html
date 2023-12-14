@@ -50,7 +50,7 @@
         </div>
         <div id="atc-l1">
             {% for group in atc_groups %}
-                <p><a href="{% url 'atc-detail-view' %}?group_id={{ group.id }}" target="_blank">{{ group.id }}: {{ group.name }}</a></p>
+                <p><a href="{% url 'atc-detail-view' %}?group_id={{ group.id }}">{{ group.id }}: {{ group.name }}</a></p>
             {% empty %}
                 <p>No data available</p>
             {% endfor %}

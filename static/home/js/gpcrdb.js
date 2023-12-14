@@ -64,6 +64,7 @@ function copyListToClipboard(selected, delimiter = " ") {
  * Arg list: createYADCFfilters(start_column, num_cols, filter_type, select_type*, filter_default_label*, filter_reset_button_text*, filter_match_mode*, column_data_type*, width*, html5_data*)
  * The asterisk indicates an optional function argument
  */
+
 function createYADCFfilters(start_column, num_cols, filter_type, select_type = null, filter_default_label = "", filter_reset_button_text = false, filter_match_mode = null, column_data_type = null, width = null, html5_data=null) {
   let filters = [];
   for (let i = 0; i < num_cols; i++) {
@@ -75,7 +76,7 @@ function createYADCFfilters(start_column, num_cols, filter_type, select_type = n
     };
     if (select_type !== null) {
       filter["select_type"] = select_type;
-    }
+     }
     if (filter_match_mode !== null) {
       filter["filter_match_mode"] = filter_match_mode;
     }

@@ -1,5 +1,6 @@
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
+from django.core.cache import cache
 from django.shortcuts import render
 import numpy as np
 import json
@@ -21,83 +22,100 @@ class VepVariantListView(generics.ListAPIView):
         queryset = VepVariant.objects.filter(Variant_marker__Gene_ID__gene_id=gene_id)
         return queryset
 
-
+#get VEP from a variant marker
+class VEPFromVariantBaseView:
+    def get_vep_from_variant(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("vep_by_variant_marker_" + slug) is not None:
+                returned_data = cache.get("vep_by_variant_marker_" + slug)
+            else:
+                vep = VepVariant.objects.get(Variant_marker=slug)
+                returned_data = []
+                context = dict()
+                cache.set("vep_by_variant_marker_" + slug, returned_data, 60 * 60)
+            context['vep'] = returned_data
+            print("context : ", context)
+        return context
+    
 def get_variant_vep_scores_and_plot(request):
     """
         Get the vep scores for a specific variant
     """
-    variant_marker = request.GET.get("variant_marker")
+    variant_maker_list = request.GET.get("variant_maker_list").split(',')
+    variant_maker_list_data = []
 
     # Get variant
-    try:
-        variant = Variant.objects.filter(VariantMarker=variant_marker).first()
-    except Variant.DoesNotExist:
-        variant = None
+    for variant_marker in variant_maker_list:
+        try:
+            variant = Variant.objects.filter(VariantMarker=variant_marker).first()
+        except Variant.DoesNotExist:
+            variant = None
 
-    # Get gene
-    if variant:
-        gene = variant.Gene_ID
-    else:
-        gene = None
+        # Get gene
+        if variant:
+            gene = variant.Gene_ID
+        else:
+            gene = None
 
-    # Get transcript
-    transcript_ids = VepVariant.objects.filter(Variant_marker=variant_marker).values_list('Transcript_ID', flat=True)
+        transcript_ids = VepVariant.objects.filter(Variant_marker=variant_marker).values_list('Transcript_ID', flat=True)
 
-    list_vep_scores = VepVariant.objects.filter(Variant_marker=variant_marker).values(
-                    "BayesDel_addAF_rankscore",
-                    "BayesDel_noAF_rankscore",
-                    "CADD_raw_rankscore",
-                    "ClinPred_rankscore",
-                    "DANN_rankscore",
-                    "DEOGEN2_rankscore",
-                    "Eigen_PC_raw_coding_rankscore",
-                    "Eigen_raw_coding_rankscore",
-                    "FATHMM_converted_rankscore",
-                    "GERP_RS_rankscore",
-                    "GM12878_fitCons_rankscore",
-                    "GenoCanyon_rankscore",
-                    "H1_hESC_fitCons_rankscore",
-                    "HUVEC_fitCons_rankscore",
-                    "LIST_S2_rankscore",
-                    "LRT_converted_rankscore",
-                    "M_CAP_rankscore",
-                    "MPC_rankscore",
-                    "MVP_rankscore",
-                    "MetaLR_rankscore",
-                    "MetaRNN_rankscore",
-                    "MetaSVM_rankscore",
-                    "MutPred_rankscore",
-                    "MutationAssessor_rankscore",
-                    "MutationTaster_converted_rankscore",
-                    "PROVEAN_converted_rankscore",
-                    "Polyphen2_HDIV_rankscore",
-                    "Polyphen2_HVAR_rankscore",
-                    "PrimateAI_rankscore",
-                    "REVEL_rankscore",
-                    "SIFT4G_converted_rankscore",
-                    "SIFT_converted_rankscore",
-                    "SiPhy_29way_logOdds_rankscore",
-                    "VEST4_rankscore",
-                    "bStatistic_converted_rankscore",
-                    "Fathmm_MKL_coding_rankscore",
-                    "Fathmm_XF_coding_rankscore",
-                    "Integrated_fitCons_rankscore",
-                    "PhastCons30way_mammalian_rankscore",
-                    "PhyloP30way_mammalian_rankscore",
-                    "LINSIGHT_rankscore",
-    ).first()
+        list_vep_scores = VepVariant.objects.filter(Variant_marker=variant_marker).values(
+                        "BayesDel_addAF_rankscore",
+                        "BayesDel_noAF_rankscore",
+                        "CADD_raw_rankscore",
+                        "ClinPred_rankscore",
+                        "DANN_rankscore",
+                        "DEOGEN2_rankscore",
+                        "Eigen_PC_raw_coding_rankscore",
+                        "Eigen_raw_coding_rankscore",
+                        "FATHMM_converted_rankscore",
+                        "GERP_RS_rankscore",
+                        "GM12878_fitCons_rankscore",
+                        "GenoCanyon_rankscore",
+                        "H1_hESC_fitCons_rankscore",
+                        "HUVEC_fitCons_rankscore",
+                        "LIST_S2_rankscore",
+                        "LRT_converted_rankscore",
+                        "M_CAP_rankscore",
+                        "MPC_rankscore",
+                        "MVP_rankscore",
+                        "MetaLR_rankscore",
+                        "MetaRNN_rankscore",
+                        "MetaSVM_rankscore",
+                        "MutPred_rankscore",
+                        "MutationAssessor_rankscore",
+                        "MutationTaster_converted_rankscore",
+                        "PROVEAN_converted_rankscore",
+                        "Polyphen2_HDIV_rankscore",
+                        "Polyphen2_HVAR_rankscore",
+                        "PrimateAI_rankscore",
+                        "REVEL_rankscore",
+                        "SIFT4G_converted_rankscore",
+                        "SIFT_converted_rankscore",
+                        "SiPhy_29way_logOdds_rankscore",
+                        "VEST4_rankscore",
+                        "bStatistic_converted_rankscore",
+                        "Fathmm_MKL_coding_rankscore",
+                        "Fathmm_XF_coding_rankscore",
+                        "Integrated_fitCons_rankscore",
+                        "PhastCons30way_mammalian_rankscore",
+                        "PhyloP30way_mammalian_rankscore",
+                        "LINSIGHT_rankscore",
+        ).first()
 
-    if list_vep_scores:
-        list_vep_scores = list(list_vep_scores.values())
-    else:
-        list_vep_scores = []
+        if list_vep_scores:
+            list_vep_scores = list(list_vep_scores.values())
+        else:
+            list_vep_scores = []
 
-    # Remove NaN values
-    list_vep_scores = list(filter(lambda value: not math.isnan(value), list_vep_scores))
+        # Remove NaN values
+        list_vep_scores = list(filter(lambda value: not math.isnan(value), list_vep_scores))
+        variant_maker_list_data.append({"category":variant_marker, "values": list_vep_scores})
 
     return JsonResponse(
         {
-            "list_vep_scores": list_vep_scores,
+            "variant_maker_list_data": variant_maker_list_data,
         }
     )
 
@@ -127,10 +145,10 @@ def get_genebass_tables(request):
         'n_controls',
         'phenocode__description',
         'phenocode',
-        'n_cases_defined',
-        'n_cases_both_sexes',
-        'n_cases_females',
-        'n_cases_males',
+        # 'n_cases_defined',
+        # 'n_cases_both_sexes',
+        # 'n_cases_females',
+        # 'n_cases_males',
         'category__category_description',
         'AC',
         'AF',

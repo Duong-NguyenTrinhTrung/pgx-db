@@ -82,6 +82,7 @@ class DrugNetworkGetDataService(object):
                 "interaction_id": interaction.interaction_id,
                 "drug_bankID": interaction.drug_bankID.drug_bankID,
                 "uniprot_ID": interaction.uniprot_ID.uniprot_ID,
+                "gene_name": interaction.uniprot_ID.genename,
                 "actions": interaction.actions,
                 "known_action": interaction.known_action,
                 "interaction_type": interaction.interaction_type,
@@ -97,7 +98,7 @@ class DrugNetworkGetDataService(object):
         for protein in proteins:
             protein_dict = {
                 "uniprot_ID": protein.uniprot_ID,
-                "genename": protein.genename,
+                "gene_name": protein.genename,
                 "geneID": protein.geneID,
                 "entry_name": protein.entry_name,
                 "protein_name": protein.protein_name,
@@ -193,6 +194,7 @@ class DrugsNetworkGetDataService:
                 "interaction_id": interaction.interaction_id,
                 "drug_bankID": interaction.drug_bankID.drug_bankID,
                 "uniprot_ID": interaction.uniprot_ID.uniprot_ID,
+                "gene_name": interaction.uniprot_ID.genename,
                 "actions": interaction.actions,
                 "known_action": interaction.known_action,
                 "interaction_type": interaction.interaction_type,
@@ -211,7 +213,7 @@ class DrugsNetworkGetDataService:
         for protein in proteins:
             protein_dict = {
                 "uniprot_ID": protein.uniprot_ID,
-                "genename": protein.genename,
+                "gene_name": protein.genename,
                 "geneID": protein.geneID,
                 "entry_name": protein.entry_name,
                 "protein_name": protein.protein_name,

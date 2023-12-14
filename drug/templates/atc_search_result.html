@@ -20,7 +20,7 @@
                 {% for rs in search_result %}
                     <li>
                         {{ rs.id }} - <a href="#" class="desc atc_sub_levels"
-                        data-remote-url="{% url 'get-atc-sub-levels' %}"
+                        data-remote-url="{% url 'atc-detail-view' %}"
                         data-atc-code="{{ rs.id }}" 
                         data-target="#query_result">{{ rs.name }} </a>
                     </li>
@@ -35,31 +35,33 @@
 {% block addon_js %}
     <script>
         $('.atc_sub_levels').click(function (e) {
-            alert("we are here");
             e.preventDefault();
             let atc_code = $(this).data('atc-code');
             let url = $(this).data('remote-url');
-            
-            // Pass the clicked element as an argument to handleAjaxResponse
-            handleAjaxResponse(this, url, atc_code);
-        });
+            // Construct the URL with the atc_code parameter
+            let fullUrl = url + '?group_id=' + atc_code[0];
 
-        function handleAjaxResponse(clickedElement, url, atc_code) {
-            $.ajax({
-                url: url,
-                type: "GET",
-                data: {
-                    'atc_code': atc_code,
-                },
-                success: function (response) {
-                    // Append sub unordered list to the clicked element
-                    var subList = '<ul><li>Subitem 1</li><li>Subitem 2</li></ul>';
-                    $(clickedElement).append(subList);
-                },
-                error: function (xhr, status, error) {
-                    alert('AJAX Error:', error);
-                }
-            });
-}
+            // Redirect the browser to the constructed URL
+            window.location.href = fullUrl;
+            
+        //     // Pass the clicked element as an argument to handleAjaxResponse
+        //     handleAjaxResponse(this, url, atc_code);
+        // });
+
+        // function handleAjaxResponse(clickedElement, url, atc_code) {
+        //     $.ajax({
+        //         url: url,
+        //         type: "GET",
+        //         data: {
+        //             'atc_code': atc_code,
+        //         },
+        //         success: function (response) {
+                    
+        //         },
+        //         error: function (xhr, status, error) {
+        //             alert('AJAX Error:', error);
+        //         }
+            // });
+        });
     </script>
 {% endblock %}
