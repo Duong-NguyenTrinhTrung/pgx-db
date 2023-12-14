@@ -32,6 +32,7 @@ from drug.models import (
 from gene.models import Gene
 from interaction.models import Interaction
 from protein.models import Protein
+from variant.models import GenebassVariant, GenebassPGx
 
 from .models import (
     Drug,
@@ -604,15 +605,8 @@ def atc_lookup(request):
     # Uppercase the names before returning
     for group in atc_groups:
         group.name = group.name.upper()
-
-    # group2s = AtcTherapeuticGroup.objects.all()
-    # # Uppercase the names before returning
-    # for group in group2s:
-    #     group.name = group.name.upper()
-
     context = {
         'atc_groups': atc_groups,
-        # 'group2s': group2s
     }
     return render(request, 'atc_code_lookup.html', context)
 
@@ -714,26 +708,35 @@ def get_drug_atc_association(request):
         undup_drugs = list(set(drugs))
         associations = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
         total_interaction = 0
-
+        interacted_protein = []
         associations_list = [
             {"drug_bankID": assoc.drug_bankID, "name": assoc.name, "description": assoc.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=assoc)]}
             for assoc in associations]
         for association in associations_list:
             total_interaction+=len(association.get("target_list"))
+            for target in association.get("target_list"):
+                interacted_protein.append(target.get("uniProt_ID"))
+        interacted_protein = list(set(interacted_protein))
+
+        burden_data = get_gene_based_burden_data_by_atc(atc_code)
         # Create a JSON response with the data
         response_data = {
             "associations": associations_list,
             "atc_code": atc_code,
             "total_interaction": total_interaction,
+            "no_of_interacted_protein":len(interacted_protein),
+            "burden_data": burden_data,
         }
         cache.set("get_drug_atc_association_"+atc_code, response_data, 60*60)
     return JsonResponse(response_data)
 
-def get_data_from_genebass(gene_id, field):
-    pass
+# a helper function
+def get_data_from_genebass(gene_id):
+    gb_rows = GenebassPGx.objects.filter(gene_id=gene_id)
+    return gb_rows
 
-def get_gene_based_burden_data_by_atc(request):
-    atc_code = request.GET.get("atc_code")
+# a helper function, not a view function
+def get_gene_based_burden_data_by_atc(atc_code):
     if cache.get("get_gene_based_burden_data_by_atc_"+atc_code):
         response_data = cache.get("get_gene_based_burden_data_by_atc_"+atc_code)
     else:
@@ -742,22 +745,43 @@ def get_gene_based_burden_data_by_atc(request):
         drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
         undup_drugs = list(set(drugs))
         drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
-        target_gene = []
-        transporter_gene = []
-        carrier_gene = []
-        enzyme_gene = []
+        response_data=[]
         for drug in drug_objs:
             interactions = Interaction.objects.filter(drug_bankID=drug)
             for interaction in interactions:
                 gene_id = interaction.uniprot_ID.geneID
-                if interaction.interaction_type=="target":
-                    target_gene.append(gene_id)
-                if interaction.interaction_type=="transporter":
-                    transporter_gene.append(gene_id)
-                if interaction.interaction_type=="carrier":
-                    carrier_gene.append(gene_id)
-                if interaction.interaction_type=="enzyme":
-                    enzyme_gene.append(gene_id)
+                gene_name = interaction.uniprot_ID.genename
+                data_genebass = get_data_from_genebass(gene_id)
+                print("type of data_genebass :", type(data_genebass))
+                print("type of data_genebass item:", type(data_genebass[0]))
+                if len(data_genebass) != 0:
+                        response_data.append({
+                                "gene_name": gene_name,
+                                "drug_id": drug.drug_bankID,
+                                "moa": interaction.interaction_type,
+                                "burden_data": [
+                                    {
+                                        "phenocode": genebass.phenocode.phenocode,
+                                        "Pvalue": genebass.Pvalue,
+                                        "Pvalue_Burden": genebass.Pvalue_Burden,
+                                        "Pvalue_SKAT": genebass.Pvalue_SKAT,
+                                        "BETA_Burden": genebass.BETA_Burden,
+                                        "SE_Burden": genebass.SE_Burden,
+                                    } 
+                                    for genebass in data_genebass
+                                    if all(
+                                        value not in [float('inf'), float('-inf')] and value is not None
+                                        for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
+                                    )
+                                ]
+                        })
+                   
+        print("------get_gene_based_burden_data_by_atc: ", atc_code, ", len response_data: ", len(response_data))
+        if len(response_data)>0:
+            print("------len response_data 1st item: ", len(response_data[0].get("burden_data")))
+        cache.set("get_gene_based_burden_data_by_atc_"+atc_code, response_data, 60*60)
+    return response_data
+        
 
 
 def get_statistics_by_atc(request):
@@ -822,13 +846,20 @@ def get_drug_association(request):
         {"drug_bankID": drug_id, "name": drug.name, "description": drug.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=drug_id)]}
         ]
     total_interaction = 0
+    interacted_protein = []
     for association in associations_list:
             total_interaction+=len(association.get("target_list"))
+            for target in association.get("target_list"):
+                interacted_protein.append(target.get("uniProt_ID"))
+    interacted_protein = list(set(interacted_protein))
     response_data = {
         "associations": associations_list,
         "total_interaction": total_interaction,
+        "no_of_interacted_protein": len(interacted_protein),
         "atc_code": "no ATC code",
     }
+
+    print("response_data: ", response_data)
     return JsonResponse(response_data)
 
 
