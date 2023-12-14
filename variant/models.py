@@ -1,6 +1,7 @@
 from django.db import models
 
 from gene.models import Gene
+from drug.models import Drug
 
 
 class Variant(models.Model):
@@ -18,6 +19,20 @@ class VariantPhenocode(models.Model):
 
     def __str__(self):
         return "Phenocode: " + self.phenocode + "\n --- Description: " + self.description
+
+    def to_json(self):
+        return {
+                "phenocode": self.phenocode, 
+                "pheno_sex": self.pheno_sex, 
+                "description": self.description, 
+                "description_more": self.description_more, 
+                }
+
+class DrugPhenocode(models.Model):
+    phenocode = models.ForeignKey("variant.VariantPhenocode", on_delete=models.CASCADE)
+    coding_description = models.TextField(null=True)
+    drugname_in_coding_description = models.CharField(max_length=100, null=True)
+    
 
 
 class VepVariant(models.Model):
@@ -80,6 +95,31 @@ class VepVariant(models.Model):
     LINSIGHT_rankscore = models.FloatField()
 
 
+class GenebassPGx(models.Model):
+    gene_id = models.ForeignKey(
+        Gene,
+        on_delete=models.CASCADE,
+        null=True,
+    )
+    n_cases = models.FloatField()
+    n_controls = models.FloatField()
+    phenocode = models.ForeignKey(
+        VariantPhenocode,
+        on_delete=models.CASCADE,
+        null=True,
+    )
+    coding_description = models.TextField(null=True)
+    Pvalue = models.FloatField()
+    Pvalue_Burden = models.FloatField()
+    Pvalue_SKAT = models.FloatField()
+    BETA_Burden = models.FloatField()
+    SE_Burden = models.FloatField()
+    drugbank_id = models.ForeignKey(
+        Drug,
+        on_delete=models.CASCADE,
+        null=True,
+    )
+
 class GenebassCategory(models.Model):
     category_code = models.IntegerField(primary_key=True)
     category_description = models.TextField(null=True)
@@ -120,3 +160,4 @@ class GenebassVariant(models.Model):
     AF_Cases = models.FloatField()
     AF_Controls = models.FloatField()
     Pvalue = models.FloatField()
+
