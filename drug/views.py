@@ -718,21 +718,21 @@ def get_drug_atc_association(request):
                 interacted_protein.append(target.get("uniProt_ID"))
         interacted_protein = list(set(interacted_protein))
 
-        burden_data = get_gene_based_burden_data_by_atc(atc_code)
+        gene_based_burden_data = get_gene_based_burden_data_by_atc(atc_code)
         # Create a JSON response with the data
         response_data = {
             "associations": associations_list,
             "atc_code": atc_code,
             "total_interaction": total_interaction,
             "no_of_interacted_protein":len(interacted_protein),
-            "burden_data": burden_data,
+            "gene_based_burden_data": gene_based_burden_data,
         }
         cache.set("get_drug_atc_association_"+atc_code, response_data, 60*60)
     return JsonResponse(response_data)
 
 # a helper function
-def get_data_from_genebass(gene_id):
-    gb_rows = GenebassPGx.objects.filter(gene_id=gene_id)
+def get_genebased_data_from_genebass(gene_id, drug_bankID):
+    gb_rows = GenebassPGx.objects.filter(Q(gene_id=gene_id)&Q(drugbank_id=drug_bankID))
     return gb_rows
 
 # a helper function, not a view function
@@ -746,22 +746,25 @@ def get_gene_based_burden_data_by_atc(atc_code):
         undup_drugs = list(set(drugs))
         drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
         response_data=[]
+        interaction_data = []
         for drug in drug_objs:
             interactions = Interaction.objects.filter(drug_bankID=drug)
             for interaction in interactions:
                 gene_id = interaction.uniprot_ID.geneID
                 gene_name = interaction.uniprot_ID.genename
-                data_genebass = get_data_from_genebass(gene_id)
-                print("type of data_genebass :", type(data_genebass))
-                print("type of data_genebass item:", type(data_genebass[0]))
+                data_genebass = get_genebased_data_from_genebass(gene_id, drug.drug_bankID)
+                print("pair: geneid = ", gene_id, " drug id = ", drug.drug_bankID, " length of genebass returned ", len(data_genebass))
                 if len(data_genebass) != 0:
                         response_data.append({
                                 "gene_name": gene_name,
                                 "drug_id": drug.drug_bankID,
-                                "moa": interaction.interaction_type,
+                                "moa": interaction.interaction_type.title(),
                                 "burden_data": [
                                     {
                                         "phenocode": genebass.phenocode.phenocode,
+                                        "annotation": genebass.annotation,
+                                        "n_cases": genebass.n_cases,
+                                        "n_controls": genebass.n_controls,
                                         "Pvalue": genebass.Pvalue,
                                         "Pvalue_Burden": genebass.Pvalue_Burden,
                                         "Pvalue_SKAT": genebass.Pvalue_SKAT,
@@ -769,17 +772,17 @@ def get_gene_based_burden_data_by_atc(atc_code):
                                         "SE_Burden": genebass.SE_Burden,
                                     } 
                                     for genebass in data_genebass
-                                    if all(
-                                        value not in [float('inf'), float('-inf')] and value is not None
-                                        for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
-                                    )
+                                    # if all(
+                                    #     value not in [float('inf'), float('-inf')] and value is not None
+                                    #     for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
+                                    # )
                                 ]
                         })
                    
         print("------get_gene_based_burden_data_by_atc: ", atc_code, ", len response_data: ", len(response_data))
         if len(response_data)>0:
             print("------len response_data 1st item: ", len(response_data[0].get("burden_data")))
-        cache.set("get_gene_based_burden_data_by_atc_"+atc_code, response_data, 60*60)
+            cache.set("get_gene_based_burden_data_by_atc_"+atc_code, response_data, 60*60)
     return response_data
         
 

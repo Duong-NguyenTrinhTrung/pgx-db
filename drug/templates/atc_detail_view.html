@@ -33,7 +33,7 @@
             font-weight: bold;
         }
 
-        #genebased-burden-distribution{
+        #genebased-burden-distribution-area{
             display: none;
         }
     </style>
@@ -49,27 +49,28 @@
                 <div id='drug-table'>
                 </div>
                 <!-- block for showing the atc level network statistics -->
-                <div id='atc_level_network_statistics'>
+                <div id='atc_level_network_statistics' style="border: #b4b1b1 1px solid">
                     <p>
                         <span id="atc_level_network_statistics_text"> </span>
                     </p>
                     <div class="row">
-                        <div class="col-md-4 col-sm-12" >
-                            <div style="display: flex; flex-direction: row;">
-                                    <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
-                                        <p style="font-style: italic; text-align: left;">Mode of action</p>
-                                        <div id="chart-container-ATC-interaction-type" style="width: 150px; height: 150px;">
-                                            <svg id="pie-chart-ATC-interaction-type"></svg>
-                                        </div>
+                        <div class="col-md-2 col-sm-12" >
+                                <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
+                                    <p style="font-style: italic; text-align: left;">Mode of action</p>
+                                    <div id="chart-container-ATC-interaction-type" style="width: 150px; height: 150px;">
+                                        <svg id="pie-chart-ATC-interaction-type"></svg>
                                     </div>
-                                    <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
-                                        <p style="font-style: italic; text-align: left;">Drug type</p>
-                                        <div id="chart-container-ATC-drug-type" style="width: 150px; height: 150px;">
-                                            <svg id="pie-chart-ATC-drug-type"></svg>
-                                        </div>
-                                    </div>
+                                </div>
+                        </div>
+                        <div class="col-md-2 col-sm-12" >
+                            <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
+                                <p style="font-style: italic; text-align: left;">Drug type</p>
+                                <div id="chart-container-ATC-drug-type" style="width: 150px; height: 150px;">
+                                    <svg id="pie-chart-ATC-drug-type"></svg>
+                                </div>
                             </div>
-                            <div class="row">
+                        </div>
+                        <div class="col-md-2 col-sm-12" >
                                 <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
                                     <p style="font-style: italic; text-align: left;">Drug clinical status</p>
                                     <!--PieChart Code here-->
@@ -77,11 +78,32 @@
                                         <svg id="pie-chart-ATC-drug-status"></svg>
                                     </div>
                                 </div>
-                            </div>
                         </div>
-                        <div id="genebased-burden-distribution" class="col-md-8 col-sm-12" >
-                            {% include '_buttons.html' %}
-                            <p style="font-style: italic; text-align: left;">Gene-based burden distribution</p>
+                    </div>
+                    <div class="row" id="genebased-burden-distribution-area">
+                        <div id="genebased-burden-distribution" class="col-md-12 col-sm-12" >
+                            <div style="display: flex; flex-direction: column;">
+                                <p style="font-style: italic; text-align: center; width:100%; margin-top: 30px; font-weight: bold;">Burden association information</p>
+                                <div style="display: flex; gap: 10px;" >
+                                    <button
+                                        onclick="tableToExcel()"
+                                        type="button"
+                                        class="btn btn-primary"
+                                        style="width: 120px;"
+                                        >
+                                        Export to Excel
+                                    </button>
+
+                                    <div class="burden-data-control-div">
+                                        <span id="burden-data-control" class="">
+                                            <input id="genebased-burden-data-control" data-atc-code="" name="burden-control" type="radio" value="gene-based" checked="">
+                                            <label for="genebased-burden-data-control">Gene-base</label>
+                                            <input id="variant-based-burden-data-control" data-atc-code="" name="burden-control" type="radio" value="variant-based">
+                                            <label for="variant-based-burden-data-control">Variant-based</label>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
                             <!-- A datatable here  -->
                             <div  id="genebased-burden-distribution-div" style="margin-top: 20px;">
                             </div>
@@ -90,13 +112,13 @@
                     
                 </div>
                 <!-- block for showing network -->
-                <div class="forcenetworkgraph" id="graphvisibility" style="display: none; width: 100%; margin: 10px 0; height: 90%">
+                <div class="forcenetworkgraph" id="graphvisibility" style="display: none; width: 100%; margin: 10px 0; height: 90%; ">
                     <p> <span style="color: red;" id="network_overview"></span> </p>
                     <iframe id="myIframe" style="
                                                 display: none;
                                                 width: 98%;
                                                 height: 100%;
-                                                border: 1px solid black;
+                                                border: #b4b1b1 1px solid;
                                                 margin-right: 5px;">
                     </iframe>
                 </div>
@@ -442,96 +464,117 @@
 
                     var atc_level_network_statistics_text = document.getElementById("atc_level_network_statistics_text");
                     atc_level_network_statistics_text.innerHTML="Network statistics for "+response.atc_code;
+                    atc_level_network_statistics_text.style.marginLeft = "10px";
+                    atc_level_network_statistics_text.style.marginTop = "10px";
 
-                    var burden_data = response.burden_data;
-                    var tableHtml = '<table class="display compact text-nowrap" id="genebased-burden-distribution-table"><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>SKAT&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
-                    
-                    for (var k=0; k<burden_data.length; k++){
-                        row = burden_data[k];
-                        for (var l=0; l<row.burden_data.length; l++){
-                            value = row.burden_data[l];
-                            tableHtml+=`
-                            <tr>
-                                <td style="vertical-align: top;" >${row.drug_id}</td>
-                                <td style="vertical-align: top;" >${row.gene_name}</td>
-                                <td style="vertical-align: top;" >${row.moa}</td>
-                                <td style="vertical-align: top;" >${Number(value.Pvalue).toFixed(3)}</td>
-                                <td style="vertical-align: top;" >${Number(value.Pvalue_Burden).toFixed(3)}</td>
-                                <td style="vertical-align: top;" >${Number(value.Pvalue_SKAT).toFixed(3)}</td>
-                                <td style="vertical-align: top;" >${Number(value.BETA_Burden).toFixed(3)}</td>
-                            </tr>`;
-                        }
-                    }
-                    tableHtml += '</tbody></table>';
-                    var genebased_burden_distribution_div = document.getElementById("genebased-burden-distribution-div");
-                    genebased_burden_distribution_div.innerHTML = tableHtml;
-                    let structures_scrollable = $("#genebased-burden-distribution-table");
-                    structures_scrollable.show();
-                    let oTable1 = structures_scrollable.DataTable({
-                        deferRender: true,
-                        scrollY: true,
-                        scrollX: true,
-                        scrollCollapse: true,
-                        scroller: true,
-                        paging: true,
-                        bSortCellsTop: false, //prevent sort arrows going on bottom row
-                        aaSorting: [],
-                        autoWidth: true,
-                        bInfo: true,
-                        order: [[0, "asc"]],
-                        pagingType: 'full_numbers',
-                        lengthMenu: [
-                            [10, 20, 30, 40, 50],
-                            [10, 20, 30, 40, 50],
-                        ],
-                    })
-
-                    // draw_multiple_variant_plot(variant_maker_data_draw_plot);
-                    let column_filters = [];
-                    // createYADCFfilters(start_column, num_cols, filter_type, select_type = null, filter_default_label = "", filter_reset_button_text = false, filter_match_mode = null, column_data_type = null, width = null)
-                    // Drug id
-                    column_filters = column_filters.concat(createYADCFfilters(0, 1, "auto_complete", null, "select", false, null, null, "60px"));
-                    //Gene
-                    column_filters = column_filters.concat(createYADCFfilters(1, 1, "auto_complete", null, "select", false, null, null, "60px"));
-                    //MOA
-                    column_filters = column_filters.concat(createYADCFfilters(2, 1, "auto_complete", null, "select", false, null, null, "60px"));
-                    //Phenocode
-                    // column_filters = column_filters.concat(createYADCFfilters(3, 1, "auto_complete", null, "select", false, null, null, "60px"));
-                    //p_value
-                    column_filters = column_filters.concat(createYADCFfilters(3, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"));
-                    //p_value burden
-                    column_filters = column_filters.concat(createYADCFfilters(4, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"));
-                    //p_value SKAT
-                    column_filters = column_filters.concat(createYADCFfilters(5, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"));
-                    //BETA burden
-                    column_filters = column_filters.concat(createYADCFfilters(6, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"));
-
-                    // update filters
-                    yadcf.init(
-                        oTable1,column_filters, {
-                            cumulative_filtering: false,
-                            rowCallBack: function(row, data) {
-                                console.log("row");
+                    var gene_based_burden_data = response.gene_based_burden_data;
+                    if (gene_based_burden_data.length>0){
+                        var tableHtml = '<table class="display compact text-nowrap" id="genebased-burden-distribution-table"><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
+                        
+                        for (var k=0; k<gene_based_burden_data.length; k++){
+                            row = gene_based_burden_data[k];
+                            for (var l=0; l<row.burden_data.length; l++){
+                                value = row.burden_data[l];
+                                tableHtml+=`
+                                <tr>
+                                    <td style="vertical-align: top;" >${row.drug_id}</td>
+                                    <td style="vertical-align: top;" >${row.gene_name}</td>
+                                    <td style="vertical-align: top;" >${row.moa}</td>
+                                    <td style="vertical-align: top;" >${value.annotation}</td>
+                                    <td style="vertical-align: top;" >${value.n_cases}</td>
+                                    <td style="vertical-align: top;" >${value.n_controls}</td>
+                                    <td style="vertical-align: top;" >${Number(value.Pvalue_Burden).toFixed(3)}</td>
+                                    <td style="vertical-align: top;" >${Number(value.BETA_Burden).toFixed(3)}</td>
+                                </tr>`;
                             }
                         }
-                    );
-                    $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').attr('size', '4');
-                    $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '10')
-                    $("#genebased-burden-distribution-table_filter").find("input").css("margin-left", "10px");
+                        tableHtml += '</tbody></table>';
+                        var genebased_burden_distribution_div = document.getElementById("genebased-burden-distribution-div");
+                        genebased_burden_distribution_div.innerHTML = tableHtml;
+                        let structures_scrollable = $("#genebased-burden-distribution-table");
+                        structures_scrollable.show();
+                        let oTable1 = structures_scrollable.DataTable({
+                            deferRender: true,
+                            scrollY: true,
+                            scrollX: true,
+                            scrollCollapse: true,
+                            scroller: true,
+                            paging: true,
+                            bSortCellsTop: false, //prevent sort arrows going on bottom row
+                            aaSorting: [],
+                            autoWidth: true,
+                            bInfo: true,
+                            order: [[0, "asc"]],
+                            pagingType: 'full_numbers',
+                            lengthMenu: [
+                                [5, 10],
+                                [5, 10],
+                            ],
+                        })
 
-                    // var span_seperators = $("span.yadcf-filter-range-number-seperator");
-                    // alert("span_seperators "+span_seperators.length);
-                    // for (var i = 0; i < span_separators.length; i++) {
-                    //     span_separators[i].innerHTML = "</br>";
-                    // }
+                        // draw_multiple_variant_plot(variant_maker_data_draw_plot);
+                        let column_filters = [];
+                        // createYADCFfilters(start_column, num_cols, filter_type, select_type = null, filter_default_label = "", filter_reset_button_text = false, filter_match_mode = null, column_data_type = null, width = null)
+                        // Drug id
+                        column_filters = column_filters.concat(createYADCFfilters(0, 1, "select", null, "select", false, null, null, "60px"));
+                        //Gene
+                        column_filters = column_filters.concat(createYADCFfilters(1, 1, "select", null, "select", false, null, null, "60px"));
+                        //MOA
+                        column_filters = column_filters.concat(createYADCFfilters(2, 1, "select", null, "select", false, null, null, "60px"));
+                        //Annotation
+                        column_filters = column_filters.concat(createYADCFfilters(3, 1, "select", null, "select", false, null, null, "60px"));
+                        //n_cases
+                        column_filters = column_filters.concat(createYADCFfilters(4, 1, "select", null, "select", false, null, null, "60px"));
+                        //n_controls
+                        column_filters = column_filters.concat(createYADCFfilters(5, 1, "select", null, "select", false, null, null, "60px"));
+                        //p_value
+                        // column_filters = column_filters.concat(createYADCFfilters(6, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"));
+                        //p_value burden
+                        column_filters = column_filters.concat(createYADCFfilters(6, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"));
+                        //p_value SKAT
+                        // column_filters = column_filters.concat(createYADCFfilters(8, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"));
+                        //BETA burden
+                        column_filters = column_filters.concat(createYADCFfilters(7, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"));
 
+                        // update filters
+                        yadcf.init(
+                            oTable1,column_filters, {
+                                cumulative_filtering: false,
+                                rowCallBack: function(row, data) {
+                                }
+                            }
+                        );
+                        $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').attr('size', '4');
+                        $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '10')
+                        $("#genebased-burden-distribution-table_filter").find("input").css("margin-left", "10px");
 
+                        $(".yadcf-filter-wrapper").find('span.yadcf-filter-range-number-seperator').each(function () {
+                            console.log("after created ---",$(this));
+                            $(this).html('<br>');
+                        })
+
+                        var genebased_burden_distribution_area = document.getElementById("genebased-burden-distribution-area");
+                        genebased_burden_distribution_area.style.display="block";
+                        $("#genebased-burden-distribution-area").find('input[name="burden-control"]').attr('data-atc-code', response.atc_code);
+
+                    }
                 } else {
                     right_panel_text.innerHTML = "There is no targeting drugs associated with " + response.atc_code;
                     right_panel.appendChild(right_panel_text);
                     clean_drug_network()
                 }
             }
+            $('input[name="burden-control"]').change(function() {
+                var value_burden_control = $('input[name="burden-control"]').filter(":checked").val();
+                var atc_code = $('input[name="burden-control"]').filter(":checked").data('atc-code');
+                if (value_burden_control == "gene-based"){
+                    alert("gene based, atc code "+atc_code);
+                    // "{% url 'get-drug-atc-association' %}
+                }
+                if (value_burden_control == "variant-based"){
+                    alert("variant based, atc code "+atc_code);
+                }
+            })
             $(document).ready(function() {
                 $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').parentsUntil('th').css('width', '40px');
                 $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').parentsUntil('td').css('width', '40px');
@@ -539,6 +582,16 @@
                 $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').parentsUntil('th').css('width', '40px');
                 $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').parentsUntil('td').css('width', '40px');
                 $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').attr('size', '10');
+                // $("span.yadcf-filter-range-number-seperator").html("<br>");
+                // $(".yadcf-filter-wrapper").find('span.yadcf-filter-range-number-seperator').each(function () {
+                //     console.log($(this));
+                //     $(this).html('<br>');
+                // })
+                // var span_seperators = $("span.yadcf-filter-range-number-seperator");
+                // alert("span_seperators "+span_seperators.length);
+                // for (var i = 0; i < span_separators.length; i++) {
+                //     span_separators[i].innerHTML = "</br>";
+                // }
             });
             // Get all the network buttons defined in left_navigation.html
             const networkButtons = document.querySelectorAll(".network-button");
