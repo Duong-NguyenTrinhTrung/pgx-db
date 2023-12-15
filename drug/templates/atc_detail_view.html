@@ -54,37 +54,32 @@
                         <span id="atc_level_network_statistics_text"> </span>
                     </p>
                     <div class="row">
-                        <div class="col-md-2 col-sm-12" >
-                            <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
-                                <p style="font-style: italic; text-align: left;">Mode of action</p>
-                                <!--PieChart Code here-->
-                                <div id="chart-container-ATC-interaction-type" style="width: 150px; height: 150px;">
-                                    <svg id="pie-chart-ATC-interaction-type"></svg>
+                        <div class="col-md-4 col-sm-12" >
+                            <div style="display: flex; flex-direction: row;">
+                                    <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
+                                        <p style="font-style: italic; text-align: left;">Mode of action</p>
+                                        <div id="chart-container-ATC-interaction-type" style="width: 150px; height: 150px;">
+                                            <svg id="pie-chart-ATC-interaction-type"></svg>
+                                        </div>
+                                    </div>
+                                    <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
+                                        <p style="font-style: italic; text-align: left;">Drug type</p>
+                                        <div id="chart-container-ATC-drug-type" style="width: 150px; height: 150px;">
+                                            <svg id="pie-chart-ATC-drug-type"></svg>
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="row">
+                                <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
+                                    <p style="font-style: italic; text-align: left;">Drug clinical status</p>
+                                    <!--PieChart Code here-->
+                                    <div id="chart-container-ATC-drug-status" style="width: 150px; height: 150px;">
+                                        <svg id="pie-chart-ATC-drug-status"></svg>
+                                    </div>
                                 </div>
-                                <!--PieChart End here-->
                             </div>
                         </div>
-                        <div class="col-md-2 col-sm-12" >
-                            <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
-                                <p style="font-style: italic; text-align: left;">Drug type</p>
-                                <!--PieChart Code here-->
-                                <div id="chart-container-ATC-drug-type" style="width: 150px; height: 150px;">
-                                    <svg id="pie-chart-ATC-drug-type"></svg>
-                                </div>
-                                <!--PieChart End here-->
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-sm-12" >
-                            <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
-                                <p style="font-style: italic; text-align: left;">Drug clinical status</p>
-                                <!--PieChart Code here-->
-                                <div id="chart-container-ATC-drug-status" style="width: 150px; height: 150px;">
-                                    <svg id="pie-chart-ATC-drug-status"></svg>
-                                </div>
-                                <!--PieChart End here-->
-                            </div>
-                        </div>
-                        <div id="genebased-burden-distribution" class="col-md-6 col-sm-12" >
+                        <div id="genebased-burden-distribution" class="col-md-8 col-sm-12" >
                             {% include '_buttons.html' %}
                             <p style="font-style: italic; text-align: left;">Gene-based burden distribution</p>
                             <!-- A datatable here  -->
@@ -449,7 +444,7 @@
                     atc_level_network_statistics_text.innerHTML="Network statistics for "+response.atc_code;
 
                     var burden_data = response.burden_data;
-                    var tableHtml = '<table class="display compact text-nowrap" id="genebased-burden-distribution-table"><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA&nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;  </th><th>P-value </br>SKAT&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; </th></tr></thead><tbody>';
+                    var tableHtml = '<table class="display compact text-nowrap" id="genebased-burden-distribution-table"><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>SKAT&nbsp; &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
                     
                     for (var k=0; k<burden_data.length; k++){
                         row = burden_data[k];
@@ -486,8 +481,8 @@
                         order: [[0, "asc"]],
                         pagingType: 'full_numbers',
                         lengthMenu: [
-                            [5, 10],
-                            [5, 10],
+                            [10, 20, 30, 40, 50],
+                            [10, 20, 30, 40, 50],
                         ],
                     })
 
@@ -521,7 +516,15 @@
                         }
                     );
                     $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').attr('size', '4');
-                    $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '8')
+                    $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '10')
+                    $("#genebased-burden-distribution-table_filter").find("input").css("margin-left", "10px");
+
+                    // var span_seperators = $("span.yadcf-filter-range-number-seperator");
+                    // alert("span_seperators "+span_seperators.length);
+                    // for (var i = 0; i < span_separators.length; i++) {
+                    //     span_separators[i].innerHTML = "</br>";
+                    // }
+
 
                 } else {
                     right_panel_text.innerHTML = "There is no targeting drugs associated with " + response.atc_code;

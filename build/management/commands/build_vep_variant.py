@@ -57,7 +57,7 @@ class Command(BaseCommand):
             filenames = [
                 fn
                 for fn in os.listdir(self.vepvariant_data_dir)
-                if fn.endswith("vep_variant_data.csv")
+                if fn.endswith("vep_variant_data_wo_alpha_missense.csv")
             ]
 
         for filename in filenames:

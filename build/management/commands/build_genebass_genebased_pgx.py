@@ -58,7 +58,7 @@ class Command(BaseCommand):
             filenames = [
                 fn
                 for fn in os.listdir(self.gb_pgx_data_dir)
-                if fn.endswith("PGx_data_from_genebass.csv")
+                if fn.endswith("PGx_burden_genebased_data_from_genebass.csv")
             ]
             print(filenames)
         
@@ -69,6 +69,7 @@ class Command(BaseCommand):
 
             for index, row in enumerate(data.iterrows()):
                 gene_id = data[index: index + 1]["gene_id"].values[0]
+                annotation = data[index: index + 1]["annotation"].values[0]
                 n_cases = data[index: index + 1]["n_cases"].values[0]
                 n_controls = data[index: index + 1]["n_controls"].values[0]
                 phenocode = data[index: index + 1]["phenocode"].values[0]
@@ -115,6 +116,7 @@ class Command(BaseCommand):
 
                 pgx, created = GenebassPGx.objects.get_or_create(
                     gene_id = g,
+                    annotation = annotation,
                     n_cases = n_cases,
                     n_controls = n_controls,
                     phenocode = p,
