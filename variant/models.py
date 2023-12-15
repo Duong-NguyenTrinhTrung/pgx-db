@@ -101,6 +101,7 @@ class GenebassPGx(models.Model):
         on_delete=models.CASCADE,
         null=True,
     )
+    annotation = models.CharField(max_length=100)
     n_cases = models.FloatField()
     n_controls = models.FloatField()
     phenocode = models.ForeignKey(
