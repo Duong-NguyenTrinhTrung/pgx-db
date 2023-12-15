@@ -120,7 +120,7 @@
                                        data-variant-marker="{{ value.0 }}" data-toggle="modal"
                                        data-target="#genebassModal">Show variant's associate statistics</a></td> <!--41 col span for VEP scores  -->
 
-                                       {% render_variant_values_in_color_ranges 0 %} <!-- Temporary alpha missense-->
+                                       {% render_variant_values_in_color_ranges value.50 %} <!-- Alpha missense-->
                                        {% render_variant_values_in_color_ranges value.10 %} <!-- BayesDeladdAF-->
                                        {% render_variant_values_in_color_ranges value.11 %} <!-- BayesDel(noAF)-->
                                        {% render_variant_values_in_color_ranges value.44 %} <!-- bStatistic-->
@@ -336,7 +336,7 @@
                 pagingType: 'full_numbers',
                 lengthMenu: [
                     [5, 10, 15, 20, 25, 50],
-                    [5, 10, 15, 20, 25,],
+                    [5, 10, 15, 20, 25, 50],
                 ],
                 drawCallback: function(){
                     $('.paginate_button:not(.disabled)', this.api().table().container())          

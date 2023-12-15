@@ -159,6 +159,7 @@ class GeneDetailBaseView(object):
         "Integrated_fitCons_rankscore",
         "PhastCons30way_mammalian_rankscore",
         "PhyloP30way_mammalian_rankscore",
+        "AM_pathogenicity",
     ]
 
     list_necessary_columns = [
@@ -211,6 +212,7 @@ class GeneDetailBaseView(object):
         "Integrated_fitCons_rankscore",
         "PhastCons30way_mammalian_rankscore",
         "PhyloP30way_mammalian_rankscore",
+        "AM_pathogenicity",
     ]
 
     name_dic = {'NMD': 'NMD_transcript', 'cse': 'coding_sequence', 'fsh': 'frameshift',
@@ -286,6 +288,7 @@ class GeneDetailBaseView(object):
         data_subset["Integrated_fitCons_rankscore"] = vep_variant[46]
         data_subset["PhastCons30way_mammalian_rankscore"] = vep_variant[47]
         data_subset["PhyloP30way_mammalian_rankscore"] = vep_variant[48]
+        data_subset["AM_pathogenicity"] = vep_variant[49]
         data_subset["primary"] = is_primary_ts(vep_variant[0])
 
         return data_subset
