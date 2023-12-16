@@ -94,7 +94,7 @@ class VepVariant(models.Model):
     PhyloP30way_mammalian_rankscore = models.FloatField()
     LINSIGHT_rankscore = models.FloatField()
 
-
+#definition for pgx data from gene-based burden from Genebass
 class GenebassPGx(models.Model):
     gene_id = models.ForeignKey(
         Gene,
@@ -115,6 +115,33 @@ class GenebassPGx(models.Model):
     Pvalue_SKAT = models.FloatField()
     BETA_Burden = models.FloatField()
     SE_Burden = models.FloatField()
+    drugbank_id = models.ForeignKey(
+        Drug,
+        on_delete=models.CASCADE,
+        null=True,
+    )
+
+
+#definition for pgx data from variant-based burden from Genebass
+class GenebassVariantPGx(models.Model):
+    genename = models.CharField(max_length=100)
+    variant_marker = models.ForeignKey(Variant,
+        on_delete=models.CASCADE,
+        null=True,)
+    annotation = models.CharField(max_length=100)
+    n_cases = models.FloatField()
+    n_controls = models.FloatField()
+    phenocode = models.ForeignKey(
+        VariantPhenocode,
+        on_delete=models.CASCADE,
+        null=True,
+    )
+    coding_description = models.TextField(null=True)
+    description = models.TextField(null=True)
+    AC = models.FloatField()
+    AF = models.FloatField()
+    Pvalue = models.FloatField()
+    BETA = models.FloatField()
     drugbank_id = models.ForeignKey(
         Drug,
         on_delete=models.CASCADE,
