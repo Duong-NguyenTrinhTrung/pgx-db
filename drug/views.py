@@ -32,7 +32,7 @@ from drug.models import (
 from gene.models import Gene
 from interaction.models import Interaction
 from protein.models import Protein
-from variant.models import GenebassVariant, GenebassPGx
+from variant.models import GenebassVariant, GenebassPGx, GenebassVariantPGx, Variant
 
 from .models import (
     Drug,
@@ -718,7 +718,7 @@ def get_drug_atc_association(request):
                 interacted_protein.append(target.get("uniProt_ID"))
         interacted_protein = list(set(interacted_protein))
 
-        gene_based_burden_data = get_gene_based_burden_data_by_atc(atc_code)
+        gene_based_burden_data = get_genebased_data_from_genebass(atc_code)
         # Create a JSON response with the data
         response_data = {
             "associations": associations_list,
@@ -731,14 +731,10 @@ def get_drug_atc_association(request):
     return JsonResponse(response_data)
 
 # a helper function
-def get_genebased_data_from_genebass(gene_id, drug_bankID):
-    gb_rows = GenebassPGx.objects.filter(Q(gene_id=gene_id)&Q(drugbank_id=drug_bankID))
-    return gb_rows
-
-# a helper function, not a view function
-def get_gene_based_burden_data_by_atc(atc_code):
-    if cache.get("get_gene_based_burden_data_by_atc_"+atc_code):
-        response_data = cache.get("get_gene_based_burden_data_by_atc_"+atc_code)
+def get_genebased_data_from_genebass(atc_code):
+    cache_str = "gene_based_burden_data_by_atc_"+atc_code
+    if cache.get(cache_str):
+        response_data = cache.get(cache_str)
     else:
         allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
         chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
@@ -752,8 +748,7 @@ def get_gene_based_burden_data_by_atc(atc_code):
             for interaction in interactions:
                 gene_id = interaction.uniprot_ID.geneID
                 gene_name = interaction.uniprot_ID.genename
-                data_genebass = get_genebased_data_from_genebass(gene_id, drug.drug_bankID)
-                print("pair: geneid = ", gene_id, " drug id = ", drug.drug_bankID, " length of genebass returned ", len(data_genebass))
+                data_genebass = GenebassPGx.objects.filter(Q(gene_id=gene_id)&Q(drugbank_id=drug.drug_bankID))
                 if len(data_genebass) != 0:
                         response_data.append({
                                 "gene_name": gene_name,
@@ -772,19 +767,77 @@ def get_gene_based_burden_data_by_atc(atc_code):
                                         "SE_Burden": genebass.SE_Burden,
                                     } 
                                     for genebass in data_genebass
-                                    # if all(
-                                    #     value not in [float('inf'), float('-inf')] and value is not None
-                                    #     for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
-                                    # )
+                                    if all(
+                                        value not in [float('inf'), float('-inf')] and value is not None
+                                        for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
+                                    )
                                 ]
                         })
                    
-        print("------get_gene_based_burden_data_by_atc: ", atc_code, ", len response_data: ", len(response_data))
         if len(response_data)>0:
-            print("------len response_data 1st item: ", len(response_data[0].get("burden_data")))
-            cache.set("get_gene_based_burden_data_by_atc_"+atc_code, response_data, 60*60)
+            cache.set(cache_str, response_data, 60*60)
+    # print("finish helper function, response_data = ", response_data)
     return response_data
-        
+
+def get_gene_based_burden_data_by_atc(request):
+    atc_code = request.GET.get("atc_code")
+    response_data = get_genebased_data_from_genebass(atc_code)
+    return JsonResponse(response_data, safe=False)
+
+
+def get_variant_based_burden_data_by_atc(request):
+    atc_code = request.GET.get("atc_code")
+    print("atc_code = ", atc_code)
+    if cache.get("get_variant_based_data_by_atc_"+atc_code):
+        response_data = cache.get("get_variant_based_data_by_atc_"+atc_code)
+    else:
+        allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+        chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+        drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+        undup_drugs = list(set(drugs))
+        drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+        response_data=[]
+        for drug in drug_objs:
+            interactions = Interaction.objects.filter(drug_bankID=drug)
+            for interaction in interactions:
+                gene_id = interaction.uniprot_ID.geneID
+                gene_name = interaction.uniprot_ID.genename
+                variant_markers = Variant.objects.filter(Gene_ID=gene_id)
+                for variant_marker in variant_markers:
+                    data_genebass = GenebassVariantPGx.objects.filter(Q(variant_marker=variant_marker)&Q(drugbank_id=drug.drug_bankID))
+                    if len(data_genebass) != 0:
+                            response_data.append({
+                                    "gene_name": gene_name,
+                                    "drug_id": drug.drug_bankID,
+                                    "MOA": interaction.interaction_type.title(),
+                                    "variant_marker": variant_marker.VariantMarker,
+                                    "burden_data": [
+                                        {
+                                            "coding_description": genebass.coding_description,
+                                            "description": genebass.description,
+                                            "annotation": genebass.annotation.title(),
+                                            "n_cases": genebass.n_cases,
+                                            "n_controls": genebass.n_controls,
+                                            "Pvalue": genebass.Pvalue,
+                                            "BETA": genebass.BETA,
+                                            "AC": genebass.AC,
+                                            "AF": genebass.AF,
+                                        } 
+                                        for genebass in data_genebass
+                                        if all(
+                                            value not in [float('inf'), float('-inf')] and value is not None
+                                            for value in [genebass.Pvalue, genebass.Pvalue, genebass.BETA, genebass.AC, genebass.AF]
+                                        )
+                                    ]
+                            })
+                    
+        if len(response_data)>0:
+            print("len response data = ", len(response_data))
+            print("sample response data = ", response_data[0])
+            cache.set("get_variant_based_data_by_atc_"+atc_code, response_data, 60*60)
+        else:
+            print("no variant pgx data")
+    return JsonResponse(response_data, safe=False)
 
 
 def get_statistics_by_atc(request):
@@ -835,7 +888,7 @@ def get_statistics_by_atc(request):
             "NoOfSmallMolecule":noOfSmallMolecule,
             "NoOfBiotech":noOfBiotech,
             }
-        print("------get_statistics_by_atc: response_data: ", response_data)
+        # print("------get_statistics_by_atc: response_data: ", response_data)
         cache.set("get_statistics_by_atc_"+atc_code, response_data, 60*60)
     return JsonResponse(response_data)
 
@@ -862,7 +915,7 @@ def get_drug_association(request):
         "atc_code": "no ATC code",
     }
 
-    print("response_data: ", response_data)
+    # print("response_data: ", response_data)
     return JsonResponse(response_data)
 
 
@@ -905,7 +958,7 @@ def get_drug_list_by_uniprotID(request):
         "NoOfBiotech":noOfBiotech,
 
     }
-    print(" get_drug_list_by_uniprotID - returned data = ", temp)
+    # print(" get_drug_list_by_uniprotID - returned data = ", temp)
     return JsonResponse({ "response_data" : temp})
    
 
@@ -978,15 +1031,15 @@ def get_atc_sub_levels(request):
 
 class TargetByAtcBaseView:
     def get_target_by_atc_code(self, slug):
-        print("checkpoint 1 in get_target_by_atc_code func of TargetByAtcBaseView, self = ", self, " slug = ", slug)
+        # print("checkpoint 1 in get_target_by_atc_code func of TargetByAtcBaseView, self = ", self, " slug = ", slug)
 
         context = {}
         if slug is not None:
-            print("checkpoint 2 when slug is not None in get_target_by_atc_code func of TargetByAtcBaseView")
+            # print("checkpoint 2 when slug is not None in get_target_by_atc_code func of TargetByAtcBaseView")
             if cache.get("target_by_atc_data_" + slug) is not None:
                 table = cache.get("target_by_atc_data_" + slug)
             else:
-                print("checkpoint 3 when not cached in get_target_by_atc_code func of TargetByAtcBaseView")
+                # print("checkpoint 3 when not cached in get_target_by_atc_code func of TargetByAtcBaseView")
                 table = pd.DataFrame()
                 data = {"chemical_substance": retrieving_chemical_substance(slug)}
                 for value in data.get('chemical_substance'):
@@ -1030,7 +1083,7 @@ class DescriptionByAtcBaseView:
                 context = dict()
                 cache.set("description_by_atc_data_" + slug, description, 60 * 60)
             context['description'] = description
-            print("context : ", context)
+            # print("context : ", context)
         return context
 
 
@@ -1060,7 +1113,7 @@ class AtcCodesByLevelBaseView:
                 context = dict()
                 cache.set("atc_codes_by_level_" + slug, list_of_codes, 60 * 60)
             context['list_of_codes'] = list_of_codes
-            print("context : ", context)
+            # print("context : ", context)
         return context
     
 class TargetsByDrugBaseView:
@@ -1075,7 +1128,7 @@ class TargetsByDrugBaseView:
                 context = dict()
                 cache.set("targets_by_drug_" + slug, list_of_targets, 60 * 60)
             context['list_of_targets'] = list_of_targets
-            print("context : ", context)
+            # print("context : ", context)
         return context
     
 class AtcCodesByDrugView:
@@ -1095,7 +1148,7 @@ class AtcCodesByDrugView:
                 context = dict()
                 cache.set("atc_codes_by_drug_" + slug, returned_data, 60 * 60)
             context['list_of_atc_codes'] = returned_data
-            print("context : ", context)
+            # print("context : ", context)
         return context
     
 
@@ -1115,7 +1168,7 @@ class PGxByAtcCodeView:
                 context = dict()
                 cache.set("pgx_by_atc_codes_" + slug, returned_data, 60 * 60)
             context['pgx'] = returned_data
-            print("context : ", context)
+            # print("context : ", context)
         return context
     
 class DrugTargetInteractionByAtcBaseView:
@@ -1143,6 +1196,6 @@ class DrugTargetInteractionByAtcBaseView:
                 context = dict()
                 cache.set("interactions_by_atc_code_" + slug, returned_data, 60 * 60)
             context['interactions_by_atc_code'] = returned_data
-            print("context: ", context)
+            # print("context: ", context)
         return context
     
