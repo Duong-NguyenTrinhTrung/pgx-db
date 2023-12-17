@@ -90,6 +90,7 @@ local_settings.py
 # Database files
 db.sqlite3
 docker/pgdata
+db.json
 
 # Sample data folder
 data/
@@ -110,3 +111,7 @@ venv
 .idea
 
 .ipynb_checkpoints
+
+
+# log file
+LogForBuildVariantBasedPGx.txt
