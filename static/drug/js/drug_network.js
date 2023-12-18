@@ -1548,7 +1548,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-    console.log("Latest Edit CreateCHart_18_12_C");
+    console.log("Latest Edit CreateCHart_18_12_D");
     var container = d3.select("#chart");
     //debugger
      var containerWidth = [container.node().getBoundingClientRect().width] - 10;
@@ -1569,7 +1569,8 @@ function createChart(links) {
     svg = container.append("svg")
         .attr("width", containerWidth)
         .attr("height", containerHeight)
-        .call(zoom);
+        .call(zoom)
+        .append("g"); // Append group element to SVG
 
     chart = svg.append("g") // Assign the group element to the 'chart' variable
         .attr("class", "chart");
