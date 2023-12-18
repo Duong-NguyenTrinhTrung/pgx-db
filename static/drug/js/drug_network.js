@@ -48,10 +48,20 @@ function readDrugJSON() {
         .then((jsonData) => {
             // Assuming your JSON data is an array of objects, adjust this code accordingly
            // drug_xlsxData = jsonData.map(item => item.fields);
-            drug_xlsxData = jsonData;
-            console.log(typeof drug_xlsxData, Array.isArray(drug_xlsxData), drug_xlsxData);
-            var matchingRow = drug_xlsxData.find((row) => row.fields.name === "Sennosides").fields;
-            console.log("matching row", matchingRow)
+             if (typeof jsonData === 'string') {
+                try {
+                    drug_xlsxData = JSON.parse(jsonData);
+                    console.log("Data type is string, Parsing data",drug_xlsxData );
+                     var matchingRow = drug_xlsxData.find((row) => row.fields.name === "Sennosides").fields;
+                        console.log("matching row", matchingRow)
+                } catch (error) {
+                    console.error("Error parsing JSON string:", error);
+                    return;
+                }
+            } else {
+                drug_xlsxData = jsonData;
+            }
+           
 
 
             
