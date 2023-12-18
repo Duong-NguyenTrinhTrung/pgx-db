@@ -50,6 +50,20 @@ function readDrugJSON() {
            // drug_xlsxData = jsonData.map(item => item.fields);
             drug_xlsxData = jsonData;
              console.log("DrugJSONDATA",drug_xlsxData);
+            console.log("Working on Drug Data");
+             if (Array.isArray(jsonData)) {
+                console.log("Data is in array");
+                drug_xlsxData = jsonData;
+            } else if (typeof jsonData === 'object' && jsonData.someArrayProperty) {
+                // Data is an object containing an array in 'someArrayProperty'
+                 console.log("Data as object");
+                drug_xlsxData = jsonData.someArrayProperty;
+            } else {
+                // Data is in a different format, handle accordingly
+                console.error("Unexpected JSON format:", jsonData);
+            }
+
+            
             readProteinJSON();
         })
         .catch((error) => {
@@ -1548,7 +1562,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-    console.log("Latest Edit CreateCHart_18_12_F");
+    console.log("Latest Edit CreateCHart_18_12_G");
     var container = d3.select("#chart");
     //debugger
      var containerWidth = [container.node().getBoundingClientRect().width] - 10;
