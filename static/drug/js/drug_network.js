@@ -48,8 +48,23 @@ function readDrugJSON() {
         .then((jsonData) => {
             // Assuming your JSON data is an array of objects, adjust this code accordingly
            // drug_xlsxData = jsonData.map(item => item.fields);
-            drug_xlsxData = jsonData;
-            // console.log("DrugJSONDATA",drug_xlsxData);
+             if (typeof jsonData === 'string') {
+                try {
+                    drug_xlsxData = JSON.parse(jsonData);
+                    console.log("Data type is string, Parsing data",drug_xlsxData );
+                     var matchingRow = drug_xlsxData.find((row) => row.fields.name === "Sennosides").fields;
+                        console.log("matching row", matchingRow)
+                } catch (error) {
+                    console.error("Error parsing JSON string:", error);
+                    return;
+                }
+            } else {
+                drug_xlsxData = jsonData;
+            }
+           
+
+
+            
             readProteinJSON();
         })
         .catch((error) => {
@@ -97,7 +112,7 @@ window.onload = function () {
 
 function getDrugJsonData(drugBankId) {
     // Call to Server to get the data
-    // drug_xlsxData
+    // 
     // protein_xlsxData
     // interaction_xlsxData
     var url = '/get-drug-network'
@@ -728,10 +743,9 @@ function showDialog(title, parentNodeName) {
 
         // Your code to fetch the row where column name "name" = drugNameValue
         // Assuming you have the data in the global variable 'drug_xlsxData'
-        // console.log("drug_xlsxData");
-        // console.log("",drug_xlsxData);
-        var matchingRow = drug_xlsxData.find((row) => row.fields.name === drugNameValue);
-
+    
+        var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
+       // var matchingRow = drug_xlsxData.find((row) => row.fields.name === drugNameValue).fields;
         if (matchingRow) {
             var drugbank_id = matchingRow.drugbank_id;
 
@@ -770,7 +784,8 @@ function showDialog(title, parentNodeName) {
 
         // Your code to fetch the row where column name "name" matches selectedDrugName1
         // Assuming you have the data in the global variable 'drug_xlsxData'
-        var matchingRow = drug_xlsxData.find((row) => row.fields.name === selectedDrugName1);
+       var matchingRow = drug_xlsxData.find((row) => row.name === selectedDrugName1);
+        //var matchingRow = drug_xlsxData.find((row) => row.fields.name === selectedDrugName1).fields;
 
         if (matchingRow) {
             // Create a table to display the drug information
@@ -867,6 +882,7 @@ function showDialog(title, parentNodeName) {
         // Your code to fetch the row where column name "name" matches selectedDrugName1
         // Assuming you have the data in the global variable 'drug_xlsxData'
         var matchingRow = drug_xlsxData.find((row) => row.name === selectedDrugName1);
+       // var matchingRow = drug_xlsxData.find((row) => row.fields.name === selectedDrugName1).fields;
 
         if (matchingRow) {
             // Create a table to display the drug structure information
@@ -1392,9 +1408,9 @@ var colorPalette = {
     "#e71f73": "/static/d3/images/capsules/left0.png",
     "#d5a100": "/static/d3/images/capsules/left1.png",
     "#0a5517": "/static/d3/images/capsules/left2.png",
-    "#061755": "/static/d3/images/capsules/left3.png",
+    "#3d3d3d": "/static/d3/images/capsules/left3.png",
     "#941a4c": "/static/d3/images/capsules/left4.png",
-    "#3d3d3d": "/static/d3/images/capsules/left5.png"
+    "#061755": "/static/d3/images/capsules/left5.png"
 };
 
 var colorImageMap = {
@@ -1405,7 +1421,14 @@ var colorImageMap = {
     "#941a4c": "/static/d3/images/capsules/left4.png",
     "#3d3d3d": "/static/d3/images/capsules/left5.png"
 };
-
+var clinicalStatusMap = {
+    0: "Nutraceutical",
+    1: "Experimental",
+    2: "Investigational",
+    3: "Approved",
+    4: "Vet-approved",
+    5: "Illicit"
+};
 ////Drugs Images Setting Variables
 //0 -> Nutraceutical, 1 - Experimental, 2- Investigational, 3- Approved , 4 - Vet approved, 5 - Illicit
 
@@ -1459,12 +1482,13 @@ function processData() {
                 var protein = row.protein;
                 var genename = row.gene_name;
                 var interaction = row.interaction;
-                var drugStatus = row.Drug_status; // Get the "Drug_status" value
+                //var drugStatus = row.Drug_status; // Get the "Drug_status" value
+                var drugStatus = clinicalStatusMap[row.Drug_status];
                 var drugType = row.drugtype; // Get the "Drug_status" value
                 var proteinClass = row.Protein_Class;
               //  console.log("Temp DrugId");
                  
-               // console.log("printing Clinical Status :"+drugStatus);
+                console.log("printing Clinical Status :"+drugStatus);
               //  console.log("printing Product Type :"+drugType);
               //  console.log("printing Drug_ID:"+drugID);
               //  console.log("printing Drug_D");
@@ -1541,7 +1565,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-    console.log("Latest Edit CreateCHart_13_12_A");
+    console.log("Latest Edit CreateCHart_18_12_Tabi");
     var container = d3.select("#chart");
     //debugger
      var containerWidth = [container.node().getBoundingClientRect().width] - 10;
@@ -1562,7 +1586,8 @@ function createChart(links) {
     svg = container.append("svg")
         .attr("width", containerWidth)
         .attr("height", containerHeight)
-        .call(zoom);
+        .call(zoom)
+        .append("g"); // Append group element to SVG
 
     chart = svg.append("g") // Assign the group element to the 'chart' variable
         .attr("class", "chart");
@@ -1666,16 +1691,17 @@ function createChart(links) {
             console.log(d.id);
             showDialog_Child(d.id, d.id);
         });
-    var drugStatuses = ["Nutraceutical", "Experimental", "Investigational", "Approved", "Vet-approved", "Illicit"];
+    //var drugStatuses = ["Nutraceutical", "Experimental", "Investigational", "Approved", "Vet-approved", "Illicit"];
     node.filter(function (d) { return d.isParent; })
         .attr("class", "node-parent")
         .append("image")
         .attr("class", "node-image")
         .attr("xlink:href", function (d) {
 
-            var key = drugStatuses[d.Drug_status] + "|" + d.Drug_type;
-            //console.log("key: ", key); // print the key
-           // console.log("key: ", imagePaths[key]); // print the key
+            var key = d.Drug_status + "|" + d.Drug_type;
+            console.log("key Drug Status", d.Drug_status);
+            console.log("key: ", key); // print the key
+            console.log("key: ", imagePaths[key]); // print the key
             //return imagePaths[key];
 
             return imagePaths[key];
