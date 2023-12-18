@@ -1407,9 +1407,9 @@ var colorPalette = {
     "#e71f73": "/static/d3/images/capsules/left0.png",
     "#d5a100": "/static/d3/images/capsules/left1.png",
     "#0a5517": "/static/d3/images/capsules/left2.png",
-    "#061755": "/static/d3/images/capsules/left3.png",
+    "#3d3d3d": "/static/d3/images/capsules/left3.png",
     "#941a4c": "/static/d3/images/capsules/left4.png",
-    "#3d3d3d": "/static/d3/images/capsules/left5.png"
+    "#061755": "/static/d3/images/capsules/left5.png"
 };
 
 var colorImageMap = {
