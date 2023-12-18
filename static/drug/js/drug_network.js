@@ -49,7 +49,7 @@ function readDrugJSON() {
             // Assuming your JSON data is an array of objects, adjust this code accordingly
            // drug_xlsxData = jsonData.map(item => item.fields);
             drug_xlsxData = jsonData;
-            // console.log("DrugJSONDATA",drug_xlsxData);
+             console.log("DrugJSONDATA",drug_xlsxData);
             readProteinJSON();
         })
         .catch((error) => {
@@ -1464,7 +1464,7 @@ function processData() {
                 var proteinClass = row.Protein_Class;
               //  console.log("Temp DrugId");
                  
-               // console.log("printing Clinical Status :"+drugStatus);
+                console.log("printing Clinical Status :"+drugStatus);
               //  console.log("printing Product Type :"+drugType);
               //  console.log("printing Drug_ID:"+drugID);
               //  console.log("printing Drug_D");
@@ -1541,7 +1541,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-    console.log("Latest Edit CreateCHart_13_12_A");
+    console.log("Latest Edit CreateCHart_18_12_A");
     var container = d3.select("#chart");
     //debugger
      var containerWidth = [container.node().getBoundingClientRect().width] - 10;
