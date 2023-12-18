@@ -1,4 +1,5 @@
 import json
+import numpy as np
 from django.core import serializers
 import pandas as pd
 from django.core.cache import cache
@@ -710,7 +711,7 @@ def get_drug_atc_association(request):
         total_interaction = 0
         interacted_protein = []
         associations_list = [
-            {"drug_bankID": assoc.drug_bankID, "name": assoc.name, "description": assoc.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=assoc)]}
+            {"drug_bankID": assoc.drug_bankID, "name": assoc.name, "description": assoc.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "moa": item.interaction_type,  "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=assoc)]}
             for assoc in associations]
         for association in associations_list:
             total_interaction+=len(association.get("target_list"))
@@ -758,30 +759,138 @@ def get_genebased_data_from_genebass(atc_code):
                                     {
                                         "phenocode": genebass.phenocode.phenocode,
                                         "annotation": genebass.annotation,
-                                        "n_cases": genebass.n_cases,
-                                        "n_controls": genebass.n_controls,
-                                        "Pvalue": genebass.Pvalue,
-                                        "Pvalue_Burden": genebass.Pvalue_Burden,
-                                        "Pvalue_SKAT": genebass.Pvalue_SKAT,
-                                        "BETA_Burden": genebass.BETA_Burden,
-                                        "SE_Burden": genebass.SE_Burden,
+                                        "n_cases": str(genebass.n_cases),
+                                        "n_controls": str(genebass.n_controls),
+                                        "Pvalue": str(genebass.Pvalue),
+                                        "Pvalue_Burden": str(genebass.Pvalue_Burden),
+                                        "Pvalue_SKAT": str(genebass.Pvalue_SKAT),
+                                        "BETA_Burden": str(genebass.BETA_Burden),
+                                        "SE_Burden": str(genebass.SE_Burden),
                                     } 
                                     for genebass in data_genebass
-                                    if all(
-                                        value not in [float('inf'), float('-inf')] and value is not None
-                                        for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
-                                    )
+                                    #     print("gene_name", gene_name)
+                                    #     print("drug_id",drug.drug_bankID)
+                                    #     print([genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden])
+                                    # if all( 
+                                    #     value is not None and float(value) 
+                                    #     for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
+                                    # )
+                                    # if all(
+                                    #     value not in [float('inf'), float('-inf')] and value is not None
+                                    #     for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
+                                    # )
                                 ]
                         })
-                   
+        print("Response data", response_data)          
         if len(response_data)>0:
             cache.set(cache_str, response_data, 60*60)
     # print("finish helper function, response_data = ", response_data)
     return response_data
 
+# a helper function
+def get_genebased_data_from_genebass_by_drug(drug_id):
+    cache_str = "get_genebased_data_from_genebass_by_drug_"+drug_id
+    if cache.get(cache_str):
+        response_data = cache.get(cache_str)
+    else:   
+            response_data = []
+            interactions = Interaction.objects.filter(drug_bankID=drug_id)
+            for interaction in interactions:
+                gene_id = interaction.uniprot_ID.geneID
+                gene_name = interaction.uniprot_ID.genename
+                data_genebass = GenebassPGx.objects.filter(Q(gene_id=gene_id)&Q(drugbank_id=drug_id))
+                if len(data_genebass) != 0:
+                        response_data.append({
+                                "gene_name": gene_name,
+                                "drug_id": drug_id,
+                                "moa": interaction.interaction_type.title(),
+                                "burden_data": [
+                                    {
+                                        "phenocode": genebass.phenocode.phenocode,
+                                        "annotation": genebass.annotation,
+                                        "n_cases": str(genebass.n_cases),
+                                        "n_controls": str(genebass.n_controls),
+                                        "Pvalue": str(genebass.Pvalue),
+                                        "Pvalue_Burden": str(genebass.Pvalue_Burden),
+                                        "Pvalue_SKAT": str(genebass.Pvalue_SKAT),
+                                        "BETA_Burden": str(genebass.BETA_Burden),
+                                        "SE_Burden": str(genebass.SE_Burden),
+                                    } 
+                                    for genebass in data_genebass
+                                    #     print("gene_name", gene_name)
+                                    #     print("drug_id",drug.drug_bankID)
+                                    #     print([genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden])
+                                    # if all( 
+                                    #     value is not None and float(value) 
+                                    #     for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
+                                    # )
+                                    # if all(
+                                    #     value not in [float('inf'), float('-inf')] and value is not None
+                                    #     for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
+                                    # )
+                                ]
+                        })
+    if len(response_data)>0:
+        cache.set(cache_str, response_data, 60*60)
+    print("finish helper function, response_data = ", response_data)
+    return response_data
+
+def get_gene_based_burden_data_by_drug(request):
+    drug_id = request.GET.get("drug_id")
+    response_data = get_genebased_data_from_genebass_by_drug(drug_id)
+    return JsonResponse(response_data, safe=False)
+
 def get_gene_based_burden_data_by_atc(request):
     atc_code = request.GET.get("atc_code")
     response_data = get_genebased_data_from_genebass(atc_code)
+    return JsonResponse(response_data, safe=False)
+
+def get_variant_based_burden_data_by_drug(request):
+    drug_id = request.GET.get("drug_id")
+    print("drug_id = ", drug_id)
+    if cache.get("get_variant_based_burden_data_by_drug_"+drug_id):
+        response_data = cache.get("get_variant_based_burden_data_by_drug_"+drug_id)
+    else:
+        response_data=[]
+        interactions = Interaction.objects.filter(drug_bankID=drug_id)
+        for interaction in interactions:
+            gene_id = interaction.uniprot_ID.geneID
+            gene_name = interaction.uniprot_ID.genename
+            variant_markers = Variant.objects.filter(Gene_ID=gene_id)
+            for variant_marker in variant_markers:
+                data_genebass = GenebassVariantPGx.objects.filter(Q(variant_marker=variant_marker)&Q(drugbank_id=drug_id))
+                if len(data_genebass) != 0:
+                        response_data.append({
+                                "gene_name": gene_name,
+                                "drug_id": drug_id,
+                                "MOA": interaction.interaction_type.title(),
+                                "variant_marker": variant_marker.VariantMarker,
+                                "burden_data": [
+                                    {
+                                        "coding_description": genebass.coding_description,
+                                        "description": genebass.description,
+                                        "annotation": genebass.annotation.title(),
+                                        "n_cases": str(genebass.n_cases),
+                                        "n_controls": str(genebass.n_controls),
+                                        "Pvalue": str(genebass.Pvalue),
+                                        "BETA": str(genebass.BETA),
+                                        "AC": str(genebass.AC),
+                                        "AF": str(genebass.AF),
+                                    } 
+                                    for genebass in data_genebass
+                                    # if all(
+                                    #     value not in [float('inf'), float('-inf')] and value is not None
+                                    #     for value in [genebass.Pvalue, genebass.Pvalue, genebass.BETA, genebass.AC, genebass.AF]
+                                    # )
+                                ]
+                        })
+                    
+        if len(response_data)>0:
+            print("len response data = ", len(response_data))
+            print("sample response data = ", response_data[0])
+            cache.set("get_variant_based_burden_data_by_drug_"+drug_id, response_data, 60*60)
+        else:
+            print("no variant pgx data")
     return JsonResponse(response_data, safe=False)
 
 
@@ -816,12 +925,12 @@ def get_variant_based_burden_data_by_atc(request):
                                             "coding_description": genebass.coding_description,
                                             "description": genebass.description,
                                             "annotation": genebass.annotation.title(),
-                                            "n_cases": genebass.n_cases,
-                                            "n_controls": genebass.n_controls,
-                                            "Pvalue": genebass.Pvalue,
-                                            "BETA": genebass.BETA,
-                                            "AC": genebass.AC,
-                                            "AF": genebass.AF,
+                                            "n_cases": str(genebass.n_cases),
+                                            "n_controls": str(genebass.n_controls),
+                                            "Pvalue": str(genebass.Pvalue),
+                                            "BETA": str(genebass.BETA),
+                                            "AC": str(genebass.AC),
+                                            "AF": str(genebass.AF),
                                         } 
                                         for genebass in data_genebass
                                         if all(
@@ -892,6 +1001,44 @@ def get_statistics_by_atc(request):
         cache.set("get_statistics_by_atc_"+atc_code, response_data, 60*60)
     return JsonResponse(response_data)
 
+#this is a helper function, not a view
+def get_network_statistics_by_drug(drug_id):
+    if cache.get("get_network_statistics_by_drug_"+drug_id):
+        data = cache.get("get_network_statistics_by_drug_"+drug_id)
+    else:
+        interactions = Interaction.objects.filter(drug_bankID=drug_id)
+        noOfTargetTypes = len([interaction for interaction in interactions if interaction.interaction_type=="target" ])
+        noOfTransporterTypes = len([interaction for interaction in interactions if interaction.interaction_type=="transporter" ])
+        noOfCarrierTypes = len([interaction for interaction in interactions if interaction.interaction_type=="carrier" ])
+        noOfEnzymeTypes = len([interaction for interaction in interactions if interaction.interaction_type=="enzyme" ])
+        drug = Drug.objects.get(drug_bankID=drug_id)
+
+        noOfNutraceuticalDrug = int(drug.Clinical_status == 0)
+        noOfExperimentalDrug = int(drug.Clinical_status == 1)
+        noOfInvestigationalDrug = int(drug.Clinical_status == 2)
+        noOfApprovedDrug = int(drug.Clinical_status == 3)
+        noOfVetApprovedDrug = int(drug.Clinical_status == 4)
+        noOfIllicitDrug = int(drug.Clinical_status == 5)
+        noOfSmallMolecule = int(drug.drugtype.type_detail=="Small Molecule")
+        noOfBiotech = int(drug.drugtype.type_detail=="Biotech")
+
+        data = {
+            "NoOfTargetTypes": noOfTargetTypes, 
+            "NoOfTransporterTypes": noOfTransporterTypes, 
+            "NoOfCarrierTypes": noOfCarrierTypes, 
+            "NoOfEnzymeTypes": noOfEnzymeTypes, 
+            "NoOfNutraceuticalDrug": noOfNutraceuticalDrug,
+            "NoOfExperimentalDrug": noOfExperimentalDrug,
+            "NoOfInvestigationalDrug":noOfInvestigationalDrug,
+            "NoOfApprovedDrug": noOfApprovedDrug,
+            "NoOfVetApprovedDrug": noOfVetApprovedDrug,
+            "NoOfIllicitDrug":noOfIllicitDrug,
+            "NoOfSmallMolecule":noOfSmallMolecule,
+            "NoOfBiotech":noOfBiotech,
+            }
+        cache.set("get_network_statistics_by_drug_"+drug_id, data, 60*60)
+    return data
+
 def get_drug_association(request):
     drug_id = request.GET.get("drug_id")
     try:
@@ -901,6 +1048,8 @@ def get_drug_association(request):
     associations_list = [
         {"drug_bankID": drug_id, "name": drug.name, "description": drug.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=drug_id)]}
         ]
+    data = get_network_statistics_by_drug(drug_id)
+    print("----- inside get_drug_association, data = ", data)
     total_interaction = 0
     interacted_protein = []
     for association in associations_list:
@@ -908,11 +1057,26 @@ def get_drug_association(request):
             for target in association.get("target_list"):
                 interacted_protein.append(target.get("uniProt_ID"))
     interacted_protein = list(set(interacted_protein))
+    gene_based_burden_data = get_genebased_data_from_genebass_by_drug(drug_id)
     response_data = {
+        "drug_id":drug_id,
         "associations": associations_list,
         "total_interaction": total_interaction,
         "no_of_interacted_protein": len(interacted_protein),
         "atc_code": "no ATC code",
+        "NoOfTargetTypes": data.get("NoOfTargetTypes"), 
+        "NoOfTransporterTypes": data.get("NoOfTransporterTypes"), 
+        "NoOfCarrierTypes": data.get("NoOfCarrierTypes"), 
+        "NoOfEnzymeTypes": data.get("NoOfEnzymeTypes"), 
+        "NoOfNutraceuticalDrug": data.get("NoOfNutraceuticalDrug"),
+        "NoOfExperimentalDrug": data.get("NoOfExperimentalDrug"),
+        "NoOfInvestigationalDrug": data.get("NoOfInvestigationalDrug"),
+        "NoOfApprovedDrug": data.get("NoOfApprovedDrug"),
+        "NoOfVetApprovedDrug": data.get("NoOfVetApprovedDrug"),
+        "NoOfIllicitDrug": data.get("NoOfIllicitDrug"),
+        "NoOfSmallMolecule": data.get("NoOfSmallMolecule"),
+        "NoOfBiotech": data.get("NoOfBiotech"),
+        "gene_based_burden_data": gene_based_burden_data,
     }
 
     # print("response_data: ", response_data)
