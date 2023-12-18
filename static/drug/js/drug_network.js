@@ -49,19 +49,10 @@ function readDrugJSON() {
             // Assuming your JSON data is an array of objects, adjust this code accordingly
            // drug_xlsxData = jsonData.map(item => item.fields);
             drug_xlsxData = jsonData;
-             console.log("DrugJSONDATA",drug_xlsxData);
-            console.log("Working on Drug Data");
-             if (Array.isArray(jsonData)) {
-                console.log("Data is in array");
-                drug_xlsxData = jsonData;
-            } else if (typeof jsonData === 'object' && jsonData.fields) {
-                // Data is an object containing an array in 'someArrayProperty'
-                 console.log("Data as object");
-                drug_xlsxData = jsonData.fields;
-            } else {
-                // Data is in a different format, handle accordingly
-                console.error("Unexpected JSON format:", jsonData);
-            }
+            console.log(typeof drug_xlsxData, Array.isArray(drug_xlsxData), drug_xlsxData);
+            var matchingRow = drug_xlsxData.find((row) => row.fields.name === "Sennosides").fields;
+            console.log("matching row", matchingRow)
+
 
             
             readProteinJSON();
