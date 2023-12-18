@@ -1548,7 +1548,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-    console.log("Latest Edit CreateCHart_18_12_D");
+    console.log("Latest Edit CreateCHart_18_12_E");
     var container = d3.select("#chart");
     //debugger
      var containerWidth = [container.node().getBoundingClientRect().width] - 10;
@@ -1682,8 +1682,8 @@ function createChart(links) {
         .attr("xlink:href", function (d) {
 
             var key = drugStatuses[d.Drug_status] + "|" + d.Drug_type;
-            //console.log("key: ", key); // print the key
-           // console.log("key: ", imagePaths[key]); // print the key
+            console.log("key: ", key); // print the key
+            console.log("key: ", imagePaths[key]); // print the key
             //return imagePaths[key];
 
             return imagePaths[key];
