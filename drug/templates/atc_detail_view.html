@@ -3,6 +3,7 @@
 {% csrf_token %}
 
 {% block addon_css %}
+    <link rel="stylesheet" href="{% static 'home/css/jquery.dataTables.min.css' %}" type="text/css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" type="text/css" href="{% static 'drug/css/atc_lookup.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'drug/css/atc_detail.css' %}">
@@ -36,6 +37,84 @@
         #genebased-burden-distribution-area{
             display: none;
         }
+        fieldset { 
+            display: block;
+            margin-left: 2px;
+            margin-right: 2px;
+            padding-top: 0.35em;
+            padding-bottom: 0.625em;
+            padding-left: 0.75em;
+            padding-right: 0.75em;
+            border: 2px groove (internal value);
+            }
+        legend {
+            border-bottom: unset;
+        }
+
+        .spinner {
+            border: 4px solid #c0bdbd;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .carrier{
+            background-color: #f9c80e;
+        }
+        .target{
+            background-color: #ff99c8;
+        }
+        .transporter{
+            background-color: #662e9b;
+        }
+        .enzyme{
+            background-color: #43bccd;
+        }
+
+        /* .text {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 100px;
+            vertical-align: middle;
+            padding: 30px;
+        } */
+
+        .text.target {
+            background: #ff99c8;
+            color: white;
+        }
+        .text.transporter {
+            background: #662e9b;
+            color: white;
+        }
+        .text.carrier {
+            background: #f9c80e;
+            color: white;
+        }
+        .text.enzyme {
+            background: #43bccd;
+            color: white;
+        }
+
+        mark {
+            background-color: yellow;
+            border: 1px solid black;
+            }
+        
     </style>
     
 {% endblock %}
@@ -82,27 +161,37 @@
                     </div>
                     <div class="row" id="genebased-burden-distribution-area">
                         <div id="genebased-burden-distribution" class="col-md-12 col-sm-12" >
-                            <div style="display: flex; flex-direction: column;">
-                                <p style="font-style: italic; text-align: center; width:100%; margin-top: 30px; font-weight: bold;">Burden association information</p>
-                                <div style="display: flex; gap: 10px;" >
-                                    <button
-                                        onclick="tableToExcel($(this))"
-                                        type="button"
-                                        class="btn btn-primary exportBtn"
-                                        style="width: 120px;"
-                                        >
-                                        Export to Excel
-                                    </button>
-
+                                <button
+                                    onclick="tableToExcel($(this))"
+                                    type="button"
+                                    class="btn btn-primary exportBtn"
+                                    style="width: 120px; float: left; margin-right: 20px; "
+                                    >
+                                    Export to Excel
+                                </button>
+                                <div style="display: flex; gap: 10px; flex-direction: row;" >
                                     <div class="burden-data-control-div">
-                                        <span id="burden-data-control" class="">
-                                            <input id="genebased-burden-data-control" data-atc-code="" name="burden-control" type="radio" value="gene-based" checked="">
-                                            <label for="genebased-burden-data-control">Gene-base</label>
-                                            <input id="variant-based-burden-data-control" data-atc-code="" name="burden-control" type="radio" value="variant-based">
-                                            <label for="variant-based-burden-data-control">Variant-based</label>
-                                        </span>
+                                        <fieldset style="width:250px; border-radius: 5px;">
+                                          <legend style="font-size: 14px; margin-bottom:0; text-decoration: none; color: #337ab7;">Burden data</legend>
+                                          <input id="genebased-burden-control" data-atc-code="" name="burden-control" type="radio" value="gene-based" checked="">
+                                          <label for="genebased-burden-control">Gene-based</label>
+                                          <input id="variant-based-burden-control" data-atc-code="" name="burden-control" type="radio" value="variant-based">
+                                          <label for="variant-based-burden-control">Variant-based</label>
+                                        </fieldset>
                                     </div>
-                                </div>
+                                    <div class="clinical-pgx-data-control-div">
+                                        <fieldset style="width:250px; border-radius: 5px;">
+                                          <legend style="font-size: 14px; margin-bottom:0; text-decoration: none; color: #337ab7;">Clinical PGx data</legend>
+                                          <input id="genebased-clinical-pgx-control" data-atc-code="" name="clinical-pgx-control" type="radio" value="gene-based-clinical-pgx" checked="">
+                                          <label for="genebased-clinical-pgx-control">Gene-based</label>
+                                          <input id="variant-based-clinical-pgx-control" data-atc-code="" name="clinical-pgx-control" type="radio" value="variant-based-clinical-pgx">
+                                          <label for="variant-based-clinical-pgx-control">Variant-based</label>
+                                        </fieldset>
+                                    </div>
+                            </div>
+                            
+                            <p id="waiting-prompt" style="text-align: center; display: none"><i> <mark>Please kindly wait when the data is being loaded! </i></mark> </p>
+                            <div class="spinner" style="display: none; margin: auto;">
                             </div>
                             <!-- A datatable here  -->
                             <div  id="genebased-burden-distribution-div" style="margin-top: 20px;">
@@ -241,8 +330,8 @@
                             const target_type_data = [
                                     { category: "Target", value: response.response_data.NoOfTargetTypes },
                                     { category: "Enzyme", value: response.response_data.NoOfEnzymeTypes },
-                                    { category: "Transporter", value: response.response_data.NoOfTransporterTypes },
                                     { category: "Carrier", value: response.response_data.NoOfCarrierTypes },
+                                    { category: "Transporter", value: response.response_data.NoOfTransporterTypes },
                                 ];
                             createPieChartForTargetType(target_type_data);
                             const drug_type_data = [
@@ -266,6 +355,41 @@
                     });
             }
 
+            function showOneDrugLevelNetworkStatistics(drug_id){
+                $.ajax(
+                    {
+                        url: "{% url 'get-drug-association' %}?drug_id="+drug_id,
+                        type: "GET",
+                        success: function (response) {
+                            // displayStatisticsByAtcCode(response.response_data);
+                            const target_type_data = [
+                                    { category: "Target", value: response.NoOfTargetTypes },
+                                    { category: "Enzyme", value: response.NoOfEnzymeTypes },
+                                    { category: "Carrier", value: response.NoOfCarrierTypes },
+                                    { category: "Transporter", value: response.NoOfTransporterTypes },
+                                ];
+                            createPieChartForATCTargetType(target_type_data);
+                            const drug_type_data = [
+                                    { category: "Small Molecule", value: response.NoOfSmallMolecule },
+                                    { category: "Biotech", value: response.NoOfBiotech },
+                                ];
+                            createPieChartForATCDrugType(drug_type_data);
+                            const drug_status_data = [
+                                    { category: "Nutraceutical", value: response.NoOfNutraceuticalDrug },
+                                    { category: "Experimental", value: response.NoOfExperimentalDrug },
+                                    { category: "Investigational", value: response.NoOfInvestigationalDrug },
+                                    { category: "Approved", value: response.NoOfApprovedDrug },
+                                    { category: "VetApproved", value: response.NoOfVetApprovedDrug },
+                                    { category: "Illicit", value: response.NoOfIllicitDrug },
+                                ];
+                            createPieChartForATCDrugStatus(drug_status_data);
+                        },
+                        error: function (xhr, status, error) {
+                            console.log('AJAX Error:', error);
+                        }
+                    });
+            }
+
             function showAtcLevelNetworkStatistics(atc_code){
                 $.ajax(
                     {
@@ -276,8 +400,8 @@
                             const target_type_data = [
                                     { category: "Target", value: response.NoOfTargetTypes },
                                     { category: "Enzyme", value: response.NoOfEnzymeTypes },
-                                    { category: "Transporter", value: response.NoOfTransporterTypes },
                                     { category: "Carrier", value: response.NoOfCarrierTypes },
+                                    { category: "Transporter", value: response.NoOfTransporterTypes },
                                 ];
                             createPieChartForATCTargetType(target_type_data);
                             const drug_type_data = [
@@ -336,7 +460,7 @@
                         var drug_url = "{% url 'drug_network' %}" + "?drug_bank_id=" + data.ListOfDrugIDs[j];
                         drug_list.push(`<i class="fa-solid fa-pills"><a href="#" class="associated_drug" 
                                     data-drugbank_id="${data.ListOfDrugIDs[j]}"
-                                    onclick="toggleDivVisibility(this, '${drug_url}')" 
+                                    onclick="toggleDivVisibility(this, '${drug_url}'); #chart" 
                                     data-target="#atc_right"> <span style="font-style: normal; font-family: 'Helvetica', 'Arial', sans-serif;">${data.ListOfDrugNames[j]}</span></a></br>`);
                 }
 
@@ -374,6 +498,18 @@
                 element.css('display', 'block');
                 element.css('color', 'grey');
             }
+
+            function getHeaderContent(element) {
+            var content = "";
+            element.childNodes.forEach(function(value){
+                if(value.nodeType === Node.TEXT_NODE) { 
+                    // console.log("Current textNode value is : ", value.nodeValue.trim());
+                    // sChildTextSum += value.nodeValue;
+                    content += ` ${value.nodeValue.trim()}`;
+                }
+            });
+            return content;
+        }
 
             function tableToExcel(element){
                 atc_code = element.data('atc-code');
@@ -449,7 +585,18 @@
                         var drug_url = "{% url 'drug_network' %}" + "?drug_bank_id=" + row.drug_bankID;
                         var targetLinks = [];
                         for (var j = 0; j<row.target_list.length;j++) {
-                            targetLinks.push(`<a class="uniProt_ID" onclick="showData(this, '${row.target_list[j].uniProt_ID}')" target="_blank" data-href="/gene/${row.target_list[j].gene_id}"> ${row.target_list[j].genename}</a>`);
+                            var className = "enzyme"
+                            if (row.target_list[j].moa=="target"){
+                                className="target";
+                            }
+                            else if(row.target_list[j].moa=="transporter")
+                            {
+                                className="transporter";   
+                            }
+                            else if(row.target_list[j].moa=="carrier"){
+                                className = "carrier";
+                            }
+                            targetLinks.push(`<a style="color: white;" class="uniProt_ID ${className}" onclick="showData(this, '${row.target_list[j].uniProt_ID}')" target="_blank" data-href="/gene/${row.target_list[j].gene_id}"> ${row.target_list[j].genename}</a>`);
                         }
                         tableHtml += `
                         <tr style="white-space: nowrap;">
@@ -486,10 +633,12 @@
                     right_panel.appendChild(right_panel_text);
                     if (associations.length > 1) {
                         right_panel_text_guide.innerHTML = `</br> <i>** In the 1st column, click on each Drugbank ID to show the individual network for that specific drug or click <a onclick="toggleDivVisibility(this, '${atc_url}')">here</a> to switch back to the ATC level network of </i> ${response.atc_code}
-                        </br> <i>** In the 4th column, on each gene name, <u>click</u> to roll to the view of target-drug; <u>double click</u> to open the gene detail page; </i> `;
+                        </br> <i>** In the 4th column, on each gene name, <u>click</u> to roll to the view of target-drug; <u>double click</u> to open the gene detail page; </i>
+                        </br> <i>*** Also in the 4th column, on each gene name, its color indicates type of interaction, as <span class="text target"/> target </span>, <span class="text transporter"/> transporter </span>, <span class="text carrier"/> carrier </span>, and <span class="text enzyme"/> enzyme </span>`;
                     }
                     else{
-                        right_panel_text_guide.innerHTML = `</br> <i>** In the 4th column, on each gene name, <u>click</u> to roll to the view of target-drug; <u>double click</u> to open the gene detail page; </i> `;
+                        right_panel_text_guide.innerHTML = `</br> <i>** In the 4th column, on each gene name, <u>click</u> to roll to the view of target-drug; <u>double click</u> to open the gene detail page; </i> 
+                        </br> <i>*** Also in the 4th column, on each gene name, its color indicates type of interaction, as <span class="text target"/> target </span>, <span class="text transporter"/> transporter </span>, <span class="text carrier"/> carrier </span>, and <span class="text enzyme"/> enzyme </span>`;
                     }
                     right_panel.appendChild(right_panel_text_guide);
                     right_panel.appendChild(right_panel_content);
@@ -497,25 +646,32 @@
                     // Adding the atc_level_network_statistics if there is drug associated with this ATC code
                     var atc_level_network_statistics = document.getElementById("atc_level_network_statistics");
                     atc_level_network_statistics.style.display="block";
-                    showAtcLevelNetworkStatistics(response.atc_code);
-
+                    
                     var atc_level_network_burden = document.getElementById("genebased-burden-distribution");
                     atc_level_network_burden.style.display="block";
-
+                    
                     var atc_level_network_statistics_text = document.getElementById("atc_level_network_statistics_text");
-                    atc_level_network_statistics_text.innerHTML="Network statistics for "+response.atc_code;
                     atc_level_network_statistics_text.style.marginLeft = "10px";
                     atc_level_network_statistics_text.style.marginTop = "10px";
-
+                    
                     $("#genebased-burden-distribution-area").find('input[name="burden-control"]').attr('data-atc-code', response.atc_code);
                     $("#genebased-burden-distribution-area").find('button.exportBtn').attr('data-atc-code', response.atc_code);
-
                     var genebased_burden_distribution_area = document.getElementById("genebased-burden-distribution-area");
-                    genebased_burden_distribution_area.style.display="block";
+
+                    if (response.atc_code!="no ATC code")
+                    {
+                        atc_level_network_statistics_text.innerHTML="Network statistics for "+response.atc_code;
+                        showAtcLevelNetworkStatistics(response.atc_code);
+                    }else{
+                        atc_level_network_statistics_text.innerHTML="Network statistics";
+                        showOneDrugLevelNetworkStatistics(response.drug_id);
+                        }
+
                     var gene_based_burden_data = response.gene_based_burden_data;
                     if (gene_based_burden_data.length>0)
                     {
-                        var tableHtml = '<table class="display compact text-nowrap" id="genebased-burden-distribution-table"><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
+                        genebased_burden_distribution_area.style.display="block";
+                        var tableHtml = '<table class="display compact text-nowrap" id="genebased-burden-distribution-table"><thead id="headers" style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
                         
                         for (var k=0; k<gene_based_burden_data.length; k++){
                             row = gene_based_burden_data[k];
@@ -594,10 +750,13 @@
                     right_panel_text.innerHTML = "There is no targeting drugs associated with " + response.atc_code;
                     right_panel.appendChild(right_panel_text);
                     clean_drug_network()
+                    var atc_level_network_statistics = document.getElementById("atc_level_network_statistics");
+                    atc_level_network_statistics.style.display="none";
                 }
             }
             
             $('input[name="burden-control"]').change(function() {
+                
                 var value_burden_control = $('input[name="burden-control"]').filter(":checked").val();
                 var atc_code = $('input[name="burden-control"]').filter(":checked").data('atc-code');
                 if (value_burden_control == "gene-based"){
@@ -607,7 +766,8 @@
                         url: url,
                         type: "GET",
                         success: function (response) {
-                            create_pgx_genebased_table(response)
+                            create_pgx_genebased_table(response);
+                            // $(".spinner").hide();
                         },
                         error: function (xhr, status, error) {
                             console.log('variant based pgx- AJAX Error:', error);
@@ -615,6 +775,9 @@
                     })
                 }
                 if (value_burden_control == "variant-based"){
+                    $("#waiting-prompt").show();
+                    $(".spinner").show();
+                    $("#genebased-burden-distribution-div").hide();
                     var url = "{% url 'get-variant-based-burden-data-by-atc' %}?atc_code="+atc_code;
                     
                     $.ajax(
@@ -623,12 +786,16 @@
                         type: "GET",
                         success: function (response) {
                             create_pgx_variant_based_table(response);
+                            $(".spinner").hide();
+                            $("#waiting-prompt").hide();
+                            $("#genebased-burden-distribution-div").show();
                         },
                         error: function (xhr, status, error) {
                             console.log('AJAX Error:', error);
                         }
                     })
                 }
+                
             });
 
             function create_pgx_genebased_table(response){
@@ -637,7 +804,7 @@
                 genebased_burden_distribution_area.style.display="block";
                 var gene_based_burden_data = response;
                 if (gene_based_burden_data.length>0){
-                    var tableHtml = '<table class="display compact text-nowrap" id="genebased-burden-distribution-table"><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
+                    var tableHtml = '<table class="display compact text-nowrap" id="genebased-burden-distribution-table"><thead id="headers" style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
                     
                     for (var k=0; k<gene_based_burden_data.length; k++){
                         row = gene_based_burden_data[k];
@@ -723,7 +890,7 @@
                 genebased_burden_distribution_area.style.display="block";
                 var gene_based_burden_data = response;
                 if (gene_based_burden_data.length>0){
-                    var tableHtml = '<table class="display compact text-nowrap" id="genebased-burden-distribution-table"><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">VariantID &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>AC </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>AF </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
+                    var tableHtml = '<table class="display compact text-nowrap" id="genebased-burden-distribution-table"><thead id="headers" style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">VariantID &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>AC </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>AF </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
                     
                     for (var k=0; k<gene_based_burden_data.length; k++){
                         row = gene_based_burden_data[k];
