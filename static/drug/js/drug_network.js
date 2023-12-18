@@ -1405,7 +1405,14 @@ var colorImageMap = {
     "#941a4c": "/static/d3/images/capsules/left4.png",
     "#3d3d3d": "/static/d3/images/capsules/left5.png"
 };
-
+var clinicalStatusMap = {
+    0: "Nutraceutical",
+    1: "Experimental",
+    2: "Investigational",
+    3: "Approved",
+    4: "Vet-approved",
+    5: "Illicit"
+};
 ////Drugs Images Setting Variables
 //0 -> Nutraceutical, 1 - Experimental, 2- Investigational, 3- Approved , 4 - Vet approved, 5 - Illicit
 
@@ -1459,7 +1466,8 @@ function processData() {
                 var protein = row.protein;
                 var genename = row.gene_name;
                 var interaction = row.interaction;
-                var drugStatus = row.Drug_status; // Get the "Drug_status" value
+                //var drugStatus = row.Drug_status; // Get the "Drug_status" value
+                var drugStatus = drugStatusMap[row.Drug_status];
                 var drugType = row.drugtype; // Get the "Drug_status" value
                 var proteinClass = row.Protein_Class;
               //  console.log("Temp DrugId");
@@ -1541,7 +1549,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-    console.log("Latest Edit CreateCHart_18_12_A");
+    console.log("Latest Edit CreateCHart_18_12_B");
     var container = d3.select("#chart");
     //debugger
      var containerWidth = [container.node().getBoundingClientRect().width] - 10;
