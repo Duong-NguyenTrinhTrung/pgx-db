@@ -728,10 +728,9 @@ function showDialog(title, parentNodeName) {
 
         // Your code to fetch the row where column name "name" = drugNameValue
         // Assuming you have the data in the global variable 'drug_xlsxData'
-        // console.log("drug_xlsxData");
-        // console.log("",drug_xlsxData);
-        var matchingRow = drug_xlsxData.find((row) => row.fields.name === drugNameValue);
-
+    
+      //  var matchingRow = drug_xlsxData.find((row) => row.fields.name === drugNameValue);
+        var matchingRow = drug_xlsxData.find((row) => row.fields.name === drugNameValue).fields;
         if (matchingRow) {
             var drugbank_id = matchingRow.drugbank_id;
 
@@ -770,7 +769,7 @@ function showDialog(title, parentNodeName) {
 
         // Your code to fetch the row where column name "name" matches selectedDrugName1
         // Assuming you have the data in the global variable 'drug_xlsxData'
-        var matchingRow = drug_xlsxData.find((row) => row.fields.name === selectedDrugName1);
+        var matchingRow = drug_xlsxData.find((row) => row.fields.name === selectedDrugName1).fields;
 
         if (matchingRow) {
             // Create a table to display the drug information
@@ -866,7 +865,7 @@ function showDialog(title, parentNodeName) {
 
         // Your code to fetch the row where column name "name" matches selectedDrugName1
         // Assuming you have the data in the global variable 'drug_xlsxData'
-        var matchingRow = drug_xlsxData.find((row) => row.name === selectedDrugName1);
+        var matchingRow = drug_xlsxData.find((row) => row.fields.name === selectedDrugName1).fields;
 
         if (matchingRow) {
             // Create a table to display the drug structure information
@@ -1467,7 +1466,7 @@ function processData() {
                 var genename = row.gene_name;
                 var interaction = row.interaction;
                 //var drugStatus = row.Drug_status; // Get the "Drug_status" value
-                var drugStatus = drugStatusMap[row.Drug_status];
+                var drugStatus = clinicalStatusMap[row.Drug_status];
                 var drugType = row.drugtype; // Get the "Drug_status" value
                 var proteinClass = row.Protein_Class;
               //  console.log("Temp DrugId");
