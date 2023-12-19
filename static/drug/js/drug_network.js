@@ -50,10 +50,17 @@ function readDrugJSON() {
            // drug_xlsxData = jsonData.map(item => item.fields);
              if (typeof jsonData === 'string') {
                 try {
-                    drug_xlsxData = JSON.parse(jsonData);
-                    console.log("Data type is string, Parsing data",drug_xlsxData );
-                     var matchingRow = drug_xlsxData.find((row) => row.fields.name === "Sennosides").fields;
-                        console.log("matching row", matchingRow)
+                   var drug_xlsxData1 = JSON.parse(jsonData);
+                    //console.log("Data type is string, Parsing data",drug_xlsxData );
+                    // var matchingRow = drug_xlsxData.find((row) => row.fields.name === "Sennosides").fields;
+                     //   console.log("matching row", matchingRow)
+                    var drug_xlsxData = drug_xlsxData1.map(item => {
+                        if (item && item.fields && item.pk) {
+                            item.fields.pk = item.pk;
+                        }
+                        return item.fields;
+                    });
+                    console.log("Final Drug Data", drug_xlsxData);
                 } catch (error) {
                     console.error("Error parsing JSON string:", error);
                     return;
@@ -743,11 +750,10 @@ function showDialog(title, parentNodeName) {
 
         // Your code to fetch the row where column name "name" = drugNameValue
         // Assuming you have the data in the global variable 'drug_xlsxData'
-    
+       // var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
         var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
-       // var matchingRow = drug_xlsxData.find((row) => row.fields.name === drugNameValue).fields;
         if (matchingRow) {
-            var drugbank_id = matchingRow.drugbank_id;
+            var drugbank_id = matchingRow.pk;
 
             // Create an img element
             var image = document.createElement("img");
@@ -794,10 +800,10 @@ function showDialog(title, parentNodeName) {
             getDrugStatusName(selectedDrugName1)
             // Create table rows and cells for each field
             var fields = [
-                { label: "Drug ID", key: "drugbank_id" },
+                { label: "Drug ID", key: "pk" },
                 { label: "Drug Name", key: "name" },
                 { label: "Drug Type", key: "drugtype", isConvert: true },
-                { label: "Drug Approval Status", key: "Drug_status", valueForDialog: drugStatusNameForDialog }, // Add Drug_status field with value for dialog
+                { label: "Drug Approval Status", key: "Clinical_status", valueForDialog: drugStatusNameForDialog }, // Add Drug_status field with value for dialog
                 { label: "Description", key: "description" }, // Move Description to the end
                 // Add more fields as needed
             ];
@@ -813,7 +819,7 @@ function showDialog(title, parentNodeName) {
 
                 var valueCell = document.createElement("div");
                 valueCell.classList.add("drug-info-cell");
-                if (field.key === "drugbank_id") {
+                if (field.key === "pk") {
                     var drugbankIdValue = matchingRow[field.key];
                     var drugbankIdLink = "https://go.drugbank.com/drugs/" + drugbankIdValue;
 
