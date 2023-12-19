@@ -751,7 +751,14 @@ function showDialog(title, parentNodeName) {
         // Your code to fetch the row where column name "name" = drugNameValue
         // Assuming you have the data in the global variable 'drug_xlsxData'
        // var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
-        var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
+
+        const findObjectByName = (array, targetName) => {
+            return (array.find(item => item.name === targetName));
+        };
+        //var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
+        const matchingRow = findObjectByName(drug_xlsxData, drugNameValue);
+         console.log("Matching Row Drug ImageTab", matchingRow);
+        
         if (matchingRow) {
             var drugbank_id = matchingRow.pk;
 
@@ -790,9 +797,14 @@ function showDialog(title, parentNodeName) {
 
         // Your code to fetch the row where column name "name" matches selectedDrugName1
         // Assuming you have the data in the global variable 'drug_xlsxData'
-       var matchingRow = drug_xlsxData.find((row) => row.name === selectedDrugName1);
-        //var matchingRow = drug_xlsxData.find((row) => row.fields.name === selectedDrugName1).fields;
-
+    
+       
+      // var matchingRow = drug_xlsxData.find((row) => row.name === selectedDrugName1);
+        const findObjectByName = (array, targetName) => {
+            return (array.find(item => item.name === targetName));
+        };
+        const matchingRow = findObjectByName(drug_xlsxData, selectedDrugName1);
+        console.log("Matching Row Description", matchingRow);
         if (matchingRow) {
             // Create a table to display the drug information
             var drugInfoTable = document.createElement("div");
@@ -886,9 +898,14 @@ function showDialog(title, parentNodeName) {
         tabContent.innerHTML = ''; // Clear the existing content
 
         // Your code to fetch the row where column name "name" matches selectedDrugName1
-        // Assuming you have the data in the global variable 'drug_xlsxData'
-        var matchingRow = drug_xlsxData.find((row) => row.name === selectedDrugName1);
-       // var matchingRow = drug_xlsxData.find((row) => row.fields.name === selectedDrugName1).fields;
+        // Assuming you have the data in the global variable 'drug_xlsxData
+        
+        //var matchingRow = drug_xlsxData.find((row) => row.name === selectedDrugName1);
+     const findObjectByName = (array, targetName) => {
+            return (array.find(item => item.name === targetName));
+        };
+        const matchingRow = findObjectByName(drug_xlsxData, selectedDrugName1);
+        console.log("Matching Row Drug Structure", matchingRow);
 
         if (matchingRow) {
             // Create a table to display the drug structure information
