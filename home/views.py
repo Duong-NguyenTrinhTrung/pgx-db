@@ -18,7 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.cache import cache
 
 from protein.models import Protein
-from variant.models import Variant
+from variant.models import Variant, VepVariant, GenebassPGx, GenebassVariantPGx, Pharmgkb
 from interaction.models import Interaction
 from gene.models import Gene
 from drug.models import Drug, DrugAtcAssociation
@@ -65,7 +65,24 @@ def drug_autocomplete_view(request):
 
 class Home(TemplateView):
     template_name = 'index_pharmcodb.html'
-    context = {}
+    # no_of_drugs = len(Drug.objects.all())
+    # no_of_proteins = len(Protein.objects.all())
+    # no_of_interactions = len(Interaction.objects.all())
+    # no_of_vm = len(Variant.objects.all())
+    # no_of_vep_variant = len(VepVariant.objects.all())
+    # no_of_genebase_pgx = len(GenebassPGx.objects.all())
+    # no_of_variant_based_pgx = len(GenebassVariantPGx.objects.all())
+    # no_of_pharmgkb = len(Pharmgkb.objects.all())
+    context = {
+                # "no_of_drugs": no_of_drugs,
+                # "no_of_proteins": no_of_proteins,
+                # "no_of_interactions": no_of_interactions,
+                # "no_of_vm": no_of_vm,
+                # "no_of_vep_variant": no_of_vep_variant,
+                # "no_of_genebase_pgx": no_of_genebase_pgx,
+                # "no_of_variant_based_pgx": no_of_variant_based_pgx,
+                # "no_of_pharmgkb": no_of_pharmgkb,
+               }
 
 def common_menu(request):
     context = {

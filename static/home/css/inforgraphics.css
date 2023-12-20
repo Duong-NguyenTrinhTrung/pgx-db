@@ -42,8 +42,8 @@
 
 .olcards li .content {
   width: 100%;
-  margin-right: 50px;
-  height: 65px;
+  margin-right: 20px;
+  height: 70px;
   background-color: var(--cardColor);
   --inlinePadding: 0.3em;
   --boxPadding: 0.3em;

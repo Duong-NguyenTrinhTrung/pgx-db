@@ -20,7 +20,7 @@ class Command(BaseCommand):
     help = "Build genebass pgx data"
 
     # source file directory
-    vb_pgx_data_dir = os.sep.join([settings.DATA_DIR, "genebass_variant_data/genebass_variant_based_PGx_data/input-16-Dec"])
+    vb_pgx_data_dir = os.sep.join([settings.DATA_DIR, "genebass_variant_data/genebass_variant_based_PGx_data/input-17-Dec"])
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -67,9 +67,9 @@ class Command(BaseCommand):
             lines=fi.readlines()
             for line in lines:
                 file_done.append(line[:-1])
-        with open("Gene_done_for_PGx_variant_based_data.txt", "w") as ff:
+        with open("Gene_done_for_PGx_variant_based_data.txt", "a") as ff:
             with open("LogForBuildVariantBasedPGx.txt", "w") as f:
-                for i, filename in enumerate(filenames):
+                for i, filename in enumerate(filenames[:70]):
                     if not filename in file_done:
                         filepath = os.sep.join([self.vb_pgx_data_dir, filename])
                         data = pd.read_csv(filepath, low_memory=False,
@@ -99,7 +99,7 @@ class Command(BaseCommand):
                                     "Gene not found for genename {}".format(
                                         genename)
                                 )
-                                f.write("Gene not found for genename {}".format(genename))
+                                f.write("\nGene not found for genename {}".format(genename))
                                 continue
 
                             # fetch variant
@@ -138,7 +138,7 @@ class Command(BaseCommand):
                                     "Drug not found for drugname {}".format(
                                         drugname)
                                 )
-                                f.write("Drug not found for drugname {}".format(drugname))
+                                f.write("\nDrug not found for drugname {}".format(drugname))
                                 continue
 
                             pgx = GenebassVariantPGx(
@@ -156,7 +156,7 @@ class Command(BaseCommand):
                                 AF=AF,
                                 drugbank_id=d,
                             )
-                            pgx_objects.appendpgx()
+                            pgx_objects.append(pgx)
 
                         GenebassVariantPGx.objects.bulk_create(pgx_objects)
                         print(i, " --> data from file ", filename, " has been saved")

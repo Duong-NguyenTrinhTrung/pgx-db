@@ -189,3 +189,34 @@ class GenebassVariant(models.Model):
     AF_Controls = models.FloatField()
     Pvalue = models.FloatField()
 
+
+class Pharmgkb(models.Model):
+    #;Variant Annotation ID;Variant/Haplotypes;PMID;Phenotype Category;Significance;Notes;Sentence;Alleles;P Value;Biogeographical Groups;Study Type;Study Cases;Study Controls;Direction of effect;PD/PK terms;Metabolizer types;drugbank_id;drugname;genename;geneid
+    VariantAnnotationID = models.CharField(max_length=100)
+    Variant_or_Haplotypes = models.TextField()
+    PMID= models.CharField(max_length=100)
+    Phenotype_Category = models.TextField()
+    Significance = models.TextField()
+    Notes = models.TextField()
+    Sentence = models.TextField()
+    Alleles = models.TextField()
+    P_Value = models.CharField(max_length=100)
+    Biogeographical_Groups = models.TextField()
+    Study_Type = models.CharField(max_length=100)
+    Study_Cases= models.FloatField()
+    Study_Controls= models.FloatField()
+    Direction_of_effect = models.TextField()
+    PD_PK_terms = models.TextField()
+    Metabolizer_types = models.TextField()
+    drugbank_id = models.ForeignKey(
+        Drug,
+        on_delete=models.CASCADE,
+        null=True,
+    )
+    geneid = models.ForeignKey(
+        Gene,
+        on_delete=models.CASCADE,
+        null=True,
+    )
+
+

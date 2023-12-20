@@ -22,8 +22,7 @@ from django.views.generic import TemplateView, ListView
 
 from django_filters.views import FilterView
 from drug.filters import AtcAnatomicalGroupFilter
-from drug.models import (
-    AtcAnatomicalGroup,
+from drug.models import (AtcAnatomicalGroup,
     AtcChemicalGroup,
     AtcChemicalSubstance,
     AtcPharmacologicalGroup,
