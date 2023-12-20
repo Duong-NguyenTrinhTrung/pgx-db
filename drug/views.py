@@ -531,15 +531,18 @@ def SelectionAutocomplete(request):
 
 
 # Create your views here.
-class DrugStatistics(TemplateView):
-    template_name = 'drugstatistics.html'
+class DrugStatistics2(TemplateView):
+    template_name = 'drugstatistics-not use.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
 
-class DrugStatistics2(TemplateView):
-    template_name = 'drugstatistics2.html'
+
+# Create your views here.
+class DrugStatistics(TemplateView):
+    template_name = 'drugstatistics.html'
+    # template_name = 'drugstatistics-not use.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -694,6 +697,7 @@ def atc_search_view(request):
             rs["name"] = format_atc_name(rs["name"])
         context = {"query_option": query_option, "search_result": results, "input": inp}
         return render(request, 'atc_search_result.html', context)
+    print("atc_search_View = ", results)
     return render(request, 'atc_search_result.html', {"results": results})
 
 
