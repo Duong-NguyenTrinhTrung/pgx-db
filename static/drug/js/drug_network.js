@@ -753,6 +753,7 @@ function showDialog(title, parentNodeName) {
        // var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
 
         const findObjectByName = (array, targetName) => {
+            console.log("Array is ",array);
             return (array.find(item => item.name === targetName));
         };
         //var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
