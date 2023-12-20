@@ -31,6 +31,7 @@ urlpatterns = [
     path('get-atc-sub-levels/', views.get_atc_sub_levels, name='get-atc-sub-levels'),
     path('drugbrowser', views.drugbrowser, name='drugbrowser'),  # load all the drugs - cached but still slow - might need to remove
     path('drugstatistic', (DrugStatistics.as_view()), name='drugstatistic'),  # okie but with dummy data
+    path('drugstatistic2', (DrugStatistics2.as_view()), name='drugstatistic2'),  # okie but with dummy data
     path('drug/autocomplete', (SelectionAutocomplete), name='autocomplete'),
     path('drug/<str:drugbank_id>/', views.drug_atc_expansion, name='drug_detail'),  # still ok but template does not have much info
     # path('get-drug-network-frame', views.get_drug_network_frame, name='get-drug-network-frame'),
