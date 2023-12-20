@@ -54,7 +54,7 @@ function readDrugJSON() {
                     //console.log("Data type is string, Parsing data",drug_xlsxData );
                     // var matchingRow = drug_xlsxData.find((row) => row.fields.name === "Sennosides").fields;
                      //   console.log("matching row", matchingRow)
-                    var drug_xlsxData = drug_xlsxData1.map(item => {
+                    drug_xlsxData = drug_xlsxData1.map(item => {
                         if (item && item.fields && item.pk) {
                             item.fields.pk = item.pk;
                         }
@@ -757,8 +757,8 @@ function showDialog(title, parentNodeName) {
             return (array.find(item => item.name === targetName));
         };
         console.log("data Drug Type of", typeof drug_xlsxData);
-        var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
-       // const matchingRow = findObjectByName(drug_xlsxData, drugNameValue);
+      //  var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
+        const matchingRow = findObjectByName(drug_xlsxData, drugNameValue);
          console.log("Matching Row Drug ImageTab", matchingRow);
         
         if (matchingRow) {
