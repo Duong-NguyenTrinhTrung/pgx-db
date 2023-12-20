@@ -191,7 +191,6 @@ class GenebassVariant(models.Model):
 
 
 class Pharmgkb(models.Model):
-    #;Variant Annotation ID;Variant/Haplotypes;PMID;Phenotype Category;Significance;Notes;Sentence;Alleles;P Value;Biogeographical Groups;Study Type;Study Cases;Study Controls;Direction of effect;PD/PK terms;Metabolizer types;drugbank_id;drugname;genename;geneid
     VariantAnnotationID = models.CharField(max_length=100)
     Variant_or_Haplotypes = models.TextField()
     PMID= models.CharField(max_length=100)
