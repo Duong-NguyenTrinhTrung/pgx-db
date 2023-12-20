@@ -756,8 +756,9 @@ function showDialog(title, parentNodeName) {
             console.log("Array is ",array);
             return (array.find(item => item.name === targetName));
         };
-        //var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
-        const matchingRow = findObjectByName(drug_xlsxData, drugNameValue);
+        console.log("data Drug Type of", typeof drug_xlsxData);
+        var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
+       // const matchingRow = findObjectByName(drug_xlsxData, drugNameValue);
          console.log("Matching Row Drug ImageTab", matchingRow);
         
         if (matchingRow) {
