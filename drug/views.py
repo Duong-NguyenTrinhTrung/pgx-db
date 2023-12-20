@@ -809,7 +809,6 @@ def _get_clinical_pgx_data_by_atc(atc_code):
         undup_drugs = list(set(drugs))
         drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
         response_data=[]
-        interaction_data = []
         for drug in drug_objs:
             interactions = Interaction.objects.filter(drug_bankID=drug)
             for interaction in interactions:
