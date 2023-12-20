@@ -32,7 +32,7 @@ from drug.models import (AtcAnatomicalGroup,
 from gene.models import Gene
 from interaction.models import Interaction
 from protein.models import Protein
-from variant.models import GenebassVariant, GenebassPGx, GenebassVariantPGx, Variant
+from variant.models import GenebassVariant, GenebassPGx, GenebassVariantPGx, Variant, Pharmgkb
 
 from .models import (
     Drug,
@@ -723,6 +723,7 @@ def get_drug_atc_association(request):
         interacted_protein = list(set(interacted_protein))
 
         gene_based_burden_data = get_genebased_data_from_genebass(atc_code)
+        pgx_clinical_data = _get_clinical_pgx_data_by_atc(atc_code)
         # Create a JSON response with the data
         response_data = {
             "associations": associations_list,
@@ -730,9 +731,138 @@ def get_drug_atc_association(request):
             "total_interaction": total_interaction,
             "no_of_interacted_protein":len(interacted_protein),
             "gene_based_burden_data": gene_based_burden_data,
+            "pgx_clinical_data": pgx_clinical_data,
         }
         cache.set("get_drug_atc_association_"+atc_code, response_data, 60*60)
     return JsonResponse(response_data)
+
+
+#helper function
+def _get_clinical_pgx_data_by_drug(drug_id):
+    cache_str = "get_clinical_pgx_data_by_drug_"+drug_id
+    if cache.get(cache_str):
+        response_data = cache.get(cache_str)
+    else:
+        interactions = Interaction.objects.filter(drug_bankID=drug_id)
+        response_data = []
+        # drug = Drug.objects.get()
+        for interaction in interactions:
+            gene_id = interaction.uniprot_ID.geneID
+            gene_name = interaction.uniprot_ID.genename
+            pharmgkb_data = Pharmgkb.objects.filter(Q(geneid=gene_id)&Q(drugbank_id=drug_id))
+            if len(pharmgkb_data) != 0:
+                    response_data.append({
+                            "gene_name": gene_name,
+                            "drug_id": drug_id,
+                            "moa": interaction.interaction_type.title(),
+                            "clinical_data": [
+                                {
+                                    "Variant_or_Haplotypes": item.Variant_or_Haplotypes,
+                                    "PMID": item.PMID,
+                                    "Phenotype_Category": str(item.Phenotype_Category),
+                                    "Significance": str(item.Significance),
+                                    "Notes": str(item.Notes),
+                                    "Sentence": str(item.Sentence),
+                                    "Alleles": str(item.Alleles),
+                                    "P_Value": str(item.P_Value),
+                                    "Biogeographical_Groups": str(item.Biogeographical_Groups),
+                                    "Study_Type": str(item.Study_Type),
+                                    "Study_Cases": str(item.Study_Cases),
+                                    "Study_Controls": str(item.Study_Controls),
+                                    "Direction_of_effect": str(item.Direction_of_effect),
+                                    "PD_PK_terms": str(item.PD_PK_terms),
+                                    "Metabolizer_types": str(item.Metabolizer_types),
+                                } 
+                                for item in pharmgkb_data
+                                #     print("gene_name", gene_name)
+                                #     print("drug_id",drug.drug_bankID)
+                                #     print([genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden])
+                                # if all( 
+                                #     value is not None and float(value) 
+                                #     for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
+                                # )
+                                # if all(
+                                #     value not in [float('inf'), float('-inf')] and value is not None
+                                #     for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
+                                # )
+                            ]
+                    })
+        if len(response_data)>0:
+            cache.set(cache_str, response_data, 60*60)
+    print("_get_clinical_pgx_data_by_atc --> Response data", response_data)          
+    return response_data
+
+def get_clinical_pgx_data_by_drug(request):
+    drug_id = request.GET.get("drug_id")
+    response_data = _get_clinical_pgx_data_by_drug(drug_id)
+    return JsonResponse(response_data, safe=False)
+
+#helper function
+def _get_clinical_pgx_data_by_atc(atc_code):
+    cache_str = "get_clinical_pgx_data_by_atc_"+atc_code
+    if cache.get(cache_str):
+        response_data = cache.get(cache_str)
+    else:
+        allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+        chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+        drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+        undup_drugs = list(set(drugs))
+        drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+        response_data=[]
+        interaction_data = []
+        for drug in drug_objs:
+            interactions = Interaction.objects.filter(drug_bankID=drug)
+            for interaction in interactions:
+                gene_id = interaction.uniprot_ID.geneID
+                gene_name = interaction.uniprot_ID.genename
+                pharmgkb_data = Pharmgkb.objects.filter(Q(geneid=gene_id)&Q(drugbank_id=drug))
+                if len(pharmgkb_data) != 0:
+                        response_data.append({
+                                "gene_name": gene_name,
+                                "drug_id": drug.drug_bankID,
+                                "moa": interaction.interaction_type.title(),
+                                "clinical_data": [
+                                    {
+                                        "Variant_or_Haplotypes": item.Variant_or_Haplotypes,
+                                        "PMID": item.PMID,
+                                        "Phenotype_Category": str(item.Phenotype_Category),
+                                        "Significance": str(item.Significance),
+                                        "Notes": str(item.Notes),
+                                        "Sentence": str(item.Sentence),
+                                        "Alleles": str(item.Alleles),
+                                        "P_Value": str(item.P_Value),
+                                        "Biogeographical_Groups": str(item.Biogeographical_Groups),
+                                        "Study_Type": str(item.Study_Type),
+                                        "Study_Cases": str(item.Study_Cases),
+                                        "Study_Controls": str(item.Study_Controls),
+                                        "Direction_of_effect": str(item.Direction_of_effect),
+                                        "PD_PK_terms": str(item.PD_PK_terms),
+                                        "Metabolizer_types": str(item.Metabolizer_types),
+                                    } 
+                                    for item in pharmgkb_data
+                                    #     print("gene_name", gene_name)
+                                    #     print("drug_id",drug.drug_bankID)
+                                    #     print([genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden])
+                                    # if all( 
+                                    #     value is not None and float(value) 
+                                    #     for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
+                                    # )
+                                    # if all(
+                                    #     value not in [float('inf'), float('-inf')] and value is not None
+                                    #     for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
+                                    # )
+                                ]
+                        })
+        print("_get_clinical_pgx_data_by_atc --> Response data", response_data)          
+        if len(response_data)>0:
+            cache.set(cache_str, response_data, 60*60)
+    return response_data
+
+def get_clinical_pgx_data_by_atc(request):
+    atc_code = request.GET.get("atc_code")
+    response_data = _get_clinical_pgx_data_by_atc(atc_code)
+    return JsonResponse(response_data, safe=False)
+
 
 # a helper function
 def get_genebased_data_from_genebass(atc_code):
@@ -1061,6 +1191,7 @@ def get_drug_association(request):
                 interacted_protein.append(target.get("uniProt_ID"))
     interacted_protein = list(set(interacted_protein))
     gene_based_burden_data = get_genebased_data_from_genebass_by_drug(drug_id)
+    pgx_clinical_data = _get_clinical_pgx_data_by_drug(drug_id)
     response_data = {
         "drug_id":drug_id,
         "associations": associations_list,
@@ -1080,6 +1211,7 @@ def get_drug_association(request):
         "NoOfSmallMolecule": data.get("NoOfSmallMolecule"),
         "NoOfBiotech": data.get("NoOfBiotech"),
         "gene_based_burden_data": gene_based_burden_data,
+        "pgx_clinical_data": pgx_clinical_data,
     }
 
     # print("response_data: ", response_data)

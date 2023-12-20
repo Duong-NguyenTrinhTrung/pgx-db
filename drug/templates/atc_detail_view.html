@@ -172,20 +172,20 @@
                                 <div style="display: flex; gap: 10px; flex-direction: row;" >
                                     <div class="burden-data-control-div">
                                         <fieldset style="width:250px; border-radius: 5px;">
+                                          <legend style="font-size: 14px; margin-bottom:0; text-decoration: none; color: #337ab7;">Clinical PGx data</legend>
+                                          <input id="variant-based-clinical-pgx-control" data-atc-code="" name="clinical-pgx-control" type="radio" value="variant-based-clinical-pgx" checked>
+                                          <label for="variant-based-clinical-pgx-control">Variant-based</label>
+                                        </fieldset>
+                                    </div>
+                                        <fieldset style="width:250px; border-radius: 5px;">
                                           <legend style="font-size: 14px; margin-bottom:0; text-decoration: none; color: #337ab7;">Burden data</legend>
-                                          <input id="genebased-burden-control" data-atc-code="" name="burden-control" type="radio" value="gene-based" checked="">
+                                          <input id="genebased-burden-control" data-atc-code="" name="burden-control" type="radio" value="gene-based" ="">
                                           <label for="genebased-burden-control">Gene-based</label>
                                           <input id="variant-based-burden-control" data-atc-code="" name="burden-control" type="radio" value="variant-based">
                                           <label for="variant-based-burden-control">Variant-based</label>
                                         </fieldset>
                                     </div>
                                     <div class="clinical-pgx-data-control-div">
-                                        <fieldset style="width:250px; border-radius: 5px;">
-                                          <legend style="font-size: 14px; margin-bottom:0; text-decoration: none; color: #337ab7;">Clinical PGx data</legend>
-                                          <input id="variant-based-clinical-pgx-control" data-atc-code="" name="clinical-pgx-control" type="radio" value="variant-based-clinical-pgx">
-                                          <label for="variant-based-clinical-pgx-control">Variant-based</label>
-                                        </fieldset>
-                                    </div>
                             </div>
                             
                             <p id="waiting-prompt" style="text-align: center; display: none"><i> <mark>Please kindly wait when the data is being loaded! </i></mark> </p>
@@ -665,33 +665,42 @@
                         showOneDrugLevelNetworkStatistics(response.drug_id);
                         }
 
-                    var gene_based_burden_data = response.gene_based_burden_data;
-                    if (gene_based_burden_data.length>0)
+                    var pgx_clinical_data = response.pgx_clinical_data;
+                    if (pgx_clinical_data.length>0)
                     {
                         genebased_burden_distribution_area.style.display="block";
-                        var tableHtml = '<table class="display compact text-nowrap" id="genebased-burden-distribution-table"><thead id="headers" style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
+                        var tableHtml = '<table class="display compact text-nowrap" id="genebased-burden-distribution-table"><thead id="headers" style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Variant/Haplotypes &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th style="white-space: nowrap; text-align: center;">PMID &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th style="white-space: nowrap; text-align: center;">Phenotype category &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Significance &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Notes &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>Sentence&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>Alleles &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>P_Value &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>Biogeographical Groups &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;</th><th>Study_Type &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>Study_Cases &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>Study_Controls &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>Direction_of_effect &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>PD_PK_terms &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>Metabolizer_types &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
                         
-                        for (var k=0; k<gene_based_burden_data.length; k++){
-                            row = gene_based_burden_data[k];
-                            for (var l=0; l<row.burden_data.length; l++){
-                                value = row.burden_data[l];
+                        for (var k=0; k<pgx_clinical_data.length; k++){
+                            row = pgx_clinical_data[k];
+                            for (var l=0; l<row.clinical_data.length; l++){
+                                value = row.clinical_data[l];
                                 tableHtml+=`
                                 <tr>
                                     <td style="vertical-align: top;" >${row.drug_id}</td>
                                     <td style="vertical-align: top;" >${row.gene_name}</td>
                                     <td style="vertical-align: top;" >${row.moa}</td>
-                                    <td style="vertical-align: top;" >${value.annotation}</td>
-                                    <td style="vertical-align: top;" >${Number(value.n_cases).toFixed(0)}</td>
-                                    <td style="vertical-align: top;" >${Number(value.n_controls).toFixed(0)}</td>
-                                    <td style="vertical-align: top;" >${Number(value.Pvalue_Burden).toFixed(3)}</td>
-                                    <td style="vertical-align: top;" >${Number(value.BETA_Burden).toFixed(3)}</td>
+                                    <td style="vertical-align: top;" >${value.Variant_or_Haplotypes}</td>
+                                    <td style="vertical-align: top;" >PMID:${value.PMID}</td>
+                                    <td style="vertical-align: top;" >${value.Phenotype_Category}</td>
+                                    <td style="vertical-align: top;" >${value.Significance}</td>
+                                    <td style="vertical-align: top;" >${value.Notes}</td>
+                                    <td style="vertical-align: top;" >${value.Sentence}</td>
+                                    <td style="vertical-align: top;" >${value.Alleles}</td>
+                                    <td style="vertical-align: top;" >${value.P_Value}</td>
+                                    <td style="vertical-align: top;" >${value.Biogeographical_Groups}</td>
+                                    <td style="vertical-align: top;" >${value.Study_Type}</td>
+                                    <td style="vertical-align: top;" >${value.Study_Cases}</td>
+                                    <td style="vertical-align: top;" >${value.Study_Controls}</td>
+                                    <td style="vertical-align: top;" >${value.Direction_of_effect}</td>
+                                    <td style="vertical-align: top;" >${value.PD_PK_terms}</td>
+                                    <td style="vertical-align: top;" >${value.Metabolizer_types}</td>
                                 </tr>`;
                             }
                         }
                         tableHtml += '</tbody></table>';
                         var genebased_burden_distribution_div = document.getElementById("genebased-burden-distribution-div");
                         genebased_burden_distribution_div.innerHTML = tableHtml;
-
                         let structures_scrollable = $("#genebased-burden-distribution-table");
                         structures_scrollable.show();
                         let oTable1 = structures_scrollable.DataTable({
@@ -708,8 +717,8 @@
                             order: [[0, "asc"]],
                             pagingType: 'full_numbers',
                             lengthMenu: [
-                                [5, 10],
-                                [5, 10],
+                                [10, 20, 30],
+                                [10, 20, 30],
                             ],
                         });
 
@@ -721,16 +730,32 @@
                         column_filters = column_filters.concat(createYADCFfilters(1, 1, "select", null, "select", false, null, null, "60px"));
                         //MOA
                         column_filters = column_filters.concat(createYADCFfilters(2, 1, "select", null, "select", false, null, null, "60px"));
-                        //Annotation
+                        //Variant_or_Haplotypes
                         column_filters = column_filters.concat(createYADCFfilters(3, 1, "select", null, "select", false, null, null, "60px"));
-                        //n_cases
+                        //PMID
                         column_filters = column_filters.concat(createYADCFfilters(4, 1, "select", null, "select", false, null, null, "60px"));
-                        //n_controls
+                        //Phenotype_Category
                         column_filters = column_filters.concat(createYADCFfilters(5, 1, "select", null, "select", false, null, null, "60px"));
-                        //p_value burden
-                        column_filters = column_filters.concat(createYADCFfilters(6, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"));
-                        //BETA burden
-                        column_filters = column_filters.concat(createYADCFfilters(7, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"));
+                        //Significance
+                        column_filters = column_filters.concat(createYADCFfilters(6, 1, "select", null, "select", false, null, null, width="70px"));
+                        //Alleles
+                        column_filters = column_filters.concat(createYADCFfilters(9, 1, "select", null, "select", false, null, null, width="70px"));
+                        //P_Value
+                        column_filters = column_filters.concat(createYADCFfilters(10, 1, "select", null, "select", false, null, null, width="70px"));
+                        //Biogeographical_Groups
+                        column_filters = column_filters.concat(createYADCFfilters(11, 1, "select", null, "select", false, null, null, width="70px"));
+                        //Study_Type
+                        column_filters = column_filters.concat(createYADCFfilters(12, 1, "select", null, "select", false, null, null, width="70px"));
+                        //Study_Cases
+                        column_filters = column_filters.concat(createYADCFfilters(13, 1, "select", null, "select", false, null, null, width="70px"));
+                        //Study_Controls
+                        column_filters = column_filters.concat(createYADCFfilters(14, 1, "select", null, "select", false, null, null, width="70px"));
+                        //Direction_of_effect
+                        column_filters = column_filters.concat(createYADCFfilters(15, 1, "select", null, "select", false, null, null, width="70px"));
+                        //PD_PK_terms
+                        column_filters = column_filters.concat(createYADCFfilters(16, 1, "select", null, "select", false, null, null, width="70px"));
+                        //Metabolizer_types
+                        column_filters = column_filters.concat(createYADCFfilters(17, 1, "select", null, "select", false, null, null, width="70px"));
                         // update filters
                         yadcf.init(
                             oTable1,column_filters, {

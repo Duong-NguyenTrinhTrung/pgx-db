@@ -628,35 +628,6 @@
             }, 0);
         });
 
-        function draw_variant_plot_modal(response, variant_marker) {
-            $('#variantPlots_content').html('');  // clear data
-            var data = [{
-                type: 'violin',
-                // y: unpack(rows, 'total_bill'),
-                y: response.list_vep_scores,
-                points: 'none',
-                box: {
-                    visible: true
-                },
-                boxpoints: false,
-                line: {
-                    color: '#eb9d09'
-                },
-                fillcolor: '#FFE169' , //'#eb9d09',
-                opacity: 0.6,
-                meanline: {
-                    visible: true
-                },
-                x0: "Variant: "+variant_marker
-            },]
-            var layout = {
-                title: "Predicted variant effect scores of variant: "+variant_marker,
-                yaxis: {
-                    zeroline: false
-                }
-            }
-            Plotly.newPlot('variantPlots_content', data, layout);
-        }
         function draw_multiple_variant_plot(data) {
             $('#variantPlots_content').html('');  // clear data
             // Extract categories and values
@@ -809,15 +780,6 @@
             viewer.render();
         });
 
-        // let colorVariantPosition = function (atom, color1, color2) {
-        //     // Check if the current residue position is in the list
-        //     if (positionsToColor.includes(atom.resi)) {
-        //         return color1;
-        //     } else {
-        //         return color2;
-        //     }
-        // };
-
         const resiLabelSelect = document.getElementById('resiLabelSelect');
         let toremoveLabel = null;
         resiLabelSelect.addEventListener('change', (event) => {
@@ -875,9 +837,7 @@
             } else {
             }
         });
-        //adding something here
-
-        // Add a label for a specific residue at position "nth"
+        
         function addLabelForResidueNth(nth, labelText, labelOptions) {
             const labels = viewer.addResLabels({resi: nth}, labelOptions);
             return labels;
