@@ -652,6 +652,8 @@
                     atc_level_network_statistics_text.style.marginLeft = "10px";
                     atc_level_network_statistics_text.style.marginTop = "10px";
                     
+                    $("#genebased-burden-distribution-area").find('input[name="clinical-pgx-control"]').attr('data-atc-code', response.atc_code);
+
                     $("#genebased-burden-distribution-area").find('input[name="burden-control"]').attr('data-atc-code', response.atc_code);
                     $("#genebased-burden-distribution-area").find('button.exportBtn').attr('data-atc-code', response.atc_code);
                     var genebased_burden_distribution_area = document.getElementById("genebased-burden-distribution-area");
@@ -777,9 +779,139 @@
                     atc_level_network_statistics.style.display="none";
                 }
             }
+
+            $('input[name="clinical-pgx-control"]').change(function() {
+                $('#genebased-burden-control').prop('checked', false);
+                $('#variant-based-burden-control').prop('checked', false);
+                var inp = $('input[name="clinical-pgx-control"]');
+                var atc_code =inp.data('atc-code');
+                if (inp.is(':checked')){
+                    alert("it is chosen and atc_code "+atc_code);
+                    var url = "{% url 'get-clinical-pgx-data-by-atc' %}?atc_code="+atc_code;
+                        $.ajax(
+                        {
+                            url: url,
+                            type: "GET",
+                            success: function (response) {
+                                create_pgx_clinical_table(response);
+                            },
+                            error: function (xhr, status, error) {
+                                console.log(' clinical pgx - AJAX Error: ', error);
+                            }
+                        })
+                }
+            });
+
+            function create_pgx_clinical_table(response){
+                alert("create_pgx_clinical_table is called");
+                var genebased_burden_distribution_area = document.getElementById("genebased-burden-distribution-area");
+                var pgx_clinical_data = response;
+                    if (pgx_clinical_data.length>0)
+                    {
+                        genebased_burden_distribution_area.style.display="block";
+                        var tableHtml = '<table class="display compact text-nowrap" id="genebased-burden-distribution-table"><thead id="headers" style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Variant/Haplotypes &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th style="white-space: nowrap; text-align: center;">PMID &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th style="white-space: nowrap; text-align: center;">Phenotype category &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Significance &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Notes &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>Sentence&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>Alleles &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>P_Value &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>Biogeographical Groups &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;</th><th>Study_Type &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>Study_Cases &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>Study_Controls &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>Direction_of_effect &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>PD_PK_terms &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>Metabolizer_types &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
+                        
+                        for (var k=0; k<pgx_clinical_data.length; k++){
+                            row = pgx_clinical_data[k];
+                            for (var l=0; l<row.clinical_data.length; l++){
+                                value = row.clinical_data[l];
+                                tableHtml+=`
+                                <tr>
+                                    <td style="vertical-align: top;" >${row.drug_id}</td>
+                                    <td style="vertical-align: top;" >${row.gene_name}</td>
+                                    <td style="vertical-align: top;" >${row.moa}</td>
+                                    <td style="vertical-align: top;" >${value.Variant_or_Haplotypes}</td>
+                                    <td style="vertical-align: top;" >PMID:${value.PMID}</td>
+                                    <td style="vertical-align: top;" >${value.Phenotype_Category}</td>
+                                    <td style="vertical-align: top;" >${value.Significance}</td>
+                                    <td style="vertical-align: top;" >${value.Notes}</td>
+                                    <td style="vertical-align: top;" >${value.Sentence}</td>
+                                    <td style="vertical-align: top;" >${value.Alleles}</td>
+                                    <td style="vertical-align: top;" >${value.P_Value}</td>
+                                    <td style="vertical-align: top;" >${value.Biogeographical_Groups}</td>
+                                    <td style="vertical-align: top;" >${value.Study_Type}</td>
+                                    <td style="vertical-align: top;" >${value.Study_Cases}</td>
+                                    <td style="vertical-align: top;" >${value.Study_Controls}</td>
+                                    <td style="vertical-align: top;" >${value.Direction_of_effect}</td>
+                                    <td style="vertical-align: top;" >${value.PD_PK_terms}</td>
+                                    <td style="vertical-align: top;" >${value.Metabolizer_types}</td>
+                                </tr>`;
+                            }
+                        }
+                        tableHtml += '</tbody></table>';
+                        var genebased_burden_distribution_div = document.getElementById("genebased-burden-distribution-div");
+                        genebased_burden_distribution_div.innerHTML = tableHtml;
+                        let structures_scrollable = $("#genebased-burden-distribution-table");
+                        structures_scrollable.show();
+                        let oTable1 = structures_scrollable.DataTable({
+                            deferRender: true,
+                            scrollY: true,
+                            scrollX: true,
+                            scrollCollapse: true,
+                            scroller: true,
+                            paging: true,
+                            bSortCellsTop: false, //prevent sort arrows going on bottom row
+                            aaSorting: [],
+                            autoWidth: true,
+                            bInfo: true,
+                            order: [[0, "asc"]],
+                            pagingType: 'full_numbers',
+                            lengthMenu: [
+                                [10, 20, 30],
+                                [10, 20, 30],
+                            ],
+                        });
+
+                        let column_filters = [];
+                        // createYADCFfilters(start_column, num_cols, filter_type, select_type = null, filter_default_label = "", filter_reset_button_text = false, filter_match_mode = null, column_data_type = null, width = null)
+                        // Drug id
+                        column_filters = column_filters.concat(createYADCFfilters(0, 1, "select", null, "select", false, null, null, "60px"));
+                        //Gene
+                        column_filters = column_filters.concat(createYADCFfilters(1, 1, "select", null, "select", false, null, null, "60px"));
+                        //MOA
+                        column_filters = column_filters.concat(createYADCFfilters(2, 1, "select", null, "select", false, null, null, "60px"));
+                        //Variant_or_Haplotypes
+                        column_filters = column_filters.concat(createYADCFfilters(3, 1, "select", null, "select", false, null, null, "60px"));
+                        //PMID
+                        column_filters = column_filters.concat(createYADCFfilters(4, 1, "select", null, "select", false, null, null, "60px"));
+                        //Phenotype_Category
+                        column_filters = column_filters.concat(createYADCFfilters(5, 1, "select", null, "select", false, null, null, "60px"));
+                        //Significance
+                        column_filters = column_filters.concat(createYADCFfilters(6, 1, "select", null, "select", false, null, null, width="70px"));
+                        //Alleles
+                        column_filters = column_filters.concat(createYADCFfilters(9, 1, "select", null, "select", false, null, null, width="70px"));
+                        //P_Value
+                        column_filters = column_filters.concat(createYADCFfilters(10, 1, "select", null, "select", false, null, null, width="70px"));
+                        //Biogeographical_Groups
+                        column_filters = column_filters.concat(createYADCFfilters(11, 1, "select", null, "select", false, null, null, width="70px"));
+                        //Study_Type
+                        column_filters = column_filters.concat(createYADCFfilters(12, 1, "select", null, "select", false, null, null, width="70px"));
+                        //Study_Cases
+                        column_filters = column_filters.concat(createYADCFfilters(13, 1, "select", null, "select", false, null, null, width="70px"));
+                        //Study_Controls
+                        column_filters = column_filters.concat(createYADCFfilters(14, 1, "select", null, "select", false, null, null, width="70px"));
+                        //Direction_of_effect
+                        column_filters = column_filters.concat(createYADCFfilters(15, 1, "select", null, "select", false, null, null, width="70px"));
+                        //PD_PK_terms
+                        column_filters = column_filters.concat(createYADCFfilters(16, 1, "select", null, "select", false, null, null, width="70px"));
+                        //Metabolizer_types
+                        column_filters = column_filters.concat(createYADCFfilters(17, 1, "select", null, "select", false, null, null, width="70px"));
+                        // update filters
+                        yadcf.init(
+                            oTable1,column_filters, {
+                                cumulative_filtering: false,
+                                rowCallBack: function(row, data) {
+                                }
+                            }
+                        );
+                        $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').attr('size', '4');
+                        $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '10')
+                        $("#genebased-burden-distribution-table_filter").find("input").css("margin-left", "10px");
+                    }
+            };
             
             $('input[name="burden-control"]').change(function() {
-                
+                var inp = $('#variant-based-clinical-pgx-control').prop('checked', false);
                 var value_burden_control = $('input[name="burden-control"]').filter(":checked").val();
                 var atc_code = $('input[name="burden-control"]').filter(":checked").data('atc-code');
                 if (value_burden_control == "gene-based"){
@@ -822,7 +954,6 @@
             });
 
             function create_pgx_genebased_table(response){
-                console.log("in create_pgx_genebased_table, len response = "+ response.length);
                 var genebased_burden_distribution_area = document.getElementById("genebased-burden-distribution-area");
                 genebased_burden_distribution_area.style.display="block";
                 var gene_based_burden_data = response;
