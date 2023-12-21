@@ -50,10 +50,17 @@ function readDrugJSON() {
            // drug_xlsxData = jsonData.map(item => item.fields);
              if (typeof jsonData === 'string') {
                 try {
-                    drug_xlsxData = JSON.parse(jsonData);
-                    console.log("Data type is string, Parsing data",drug_xlsxData );
-                     var matchingRow = drug_xlsxData.find((row) => row.fields.name === "Sennosides").fields;
-                        console.log("matching row", matchingRow)
+                   var drug_xlsxData1 = JSON.parse(jsonData);
+                    //console.log("Data type is string, Parsing data",drug_xlsxData );
+                    // var matchingRow = drug_xlsxData.find((row) => row.fields.name === "Sennosides").fields;
+                     //   console.log("matching row", matchingRow)
+                    drug_xlsxData = drug_xlsxData1.map(item => {
+                        if (item && item.fields && item.pk) {
+                            item.fields.pk = item.pk;
+                        }
+                        return item.fields;
+                    });
+                    console.log("Final Drug Data", drug_xlsxData);
                 } catch (error) {
                     console.error("Error parsing JSON string:", error);
                     return;
@@ -743,11 +750,19 @@ function showDialog(title, parentNodeName) {
 
         // Your code to fetch the row where column name "name" = drugNameValue
         // Assuming you have the data in the global variable 'drug_xlsxData'
-    
-        var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
-       // var matchingRow = drug_xlsxData.find((row) => row.fields.name === drugNameValue).fields;
+       // var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
+
+        const findObjectByName = (array, targetName) => {
+            console.log("Array is ",array);
+            return (array.find(item => item.name === targetName));
+        };
+        console.log("data Drug Type of", typeof drug_xlsxData);
+      //  var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
+        const matchingRow = findObjectByName(drug_xlsxData, drugNameValue);
+         console.log("Matching Row Drug ImageTab", matchingRow);
+        
         if (matchingRow) {
-            var drugbank_id = matchingRow.drugbank_id;
+            var drugbank_id = matchingRow.pk;
 
             // Create an img element
             var image = document.createElement("img");
@@ -784,9 +799,14 @@ function showDialog(title, parentNodeName) {
 
         // Your code to fetch the row where column name "name" matches selectedDrugName1
         // Assuming you have the data in the global variable 'drug_xlsxData'
-       var matchingRow = drug_xlsxData.find((row) => row.name === selectedDrugName1);
-        //var matchingRow = drug_xlsxData.find((row) => row.fields.name === selectedDrugName1).fields;
-
+    
+       
+      // var matchingRow = drug_xlsxData.find((row) => row.name === selectedDrugName1);
+        const findObjectByName = (array, targetName) => {
+            return (array.find(item => item.name === targetName));
+        };
+        const matchingRow = findObjectByName(drug_xlsxData, selectedDrugName1);
+        console.log("Matching Row Description", matchingRow);
         if (matchingRow) {
             // Create a table to display the drug information
             var drugInfoTable = document.createElement("div");
@@ -794,10 +814,10 @@ function showDialog(title, parentNodeName) {
             getDrugStatusName(selectedDrugName1)
             // Create table rows and cells for each field
             var fields = [
-                { label: "Drug ID", key: "drugbank_id" },
+                { label: "Drug ID", key: "pk" },
                 { label: "Drug Name", key: "name" },
                 { label: "Drug Type", key: "drugtype", isConvert: true },
-                { label: "Drug Approval Status", key: "Drug_status", valueForDialog: drugStatusNameForDialog }, // Add Drug_status field with value for dialog
+                { label: "Drug Approval Status", key: "Clinical_status", valueForDialog: drugStatusNameForDialog }, // Add Drug_status field with value for dialog
                 { label: "Description", key: "description" }, // Move Description to the end
                 // Add more fields as needed
             ];
@@ -813,7 +833,7 @@ function showDialog(title, parentNodeName) {
 
                 var valueCell = document.createElement("div");
                 valueCell.classList.add("drug-info-cell");
-                if (field.key === "drugbank_id") {
+                if (field.key === "pk") {
                     var drugbankIdValue = matchingRow[field.key];
                     var drugbankIdLink = "https://go.drugbank.com/drugs/" + drugbankIdValue;
 
@@ -880,9 +900,14 @@ function showDialog(title, parentNodeName) {
         tabContent.innerHTML = ''; // Clear the existing content
 
         // Your code to fetch the row where column name "name" matches selectedDrugName1
-        // Assuming you have the data in the global variable 'drug_xlsxData'
-        var matchingRow = drug_xlsxData.find((row) => row.name === selectedDrugName1);
-       // var matchingRow = drug_xlsxData.find((row) => row.fields.name === selectedDrugName1).fields;
+        // Assuming you have the data in the global variable 'drug_xlsxData
+        
+        //var matchingRow = drug_xlsxData.find((row) => row.name === selectedDrugName1);
+     const findObjectByName = (array, targetName) => {
+            return (array.find(item => item.name === targetName));
+        };
+        const matchingRow = findObjectByName(drug_xlsxData, selectedDrugName1);
+        console.log("Matching Row Drug Structure", matchingRow);
 
         if (matchingRow) {
             // Create a table to display the drug structure information
@@ -1565,7 +1590,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-    console.log("Latest Edit CreateCHart_18_12_Tabi");
+    console.log("Latest Edit CreateCHart_18_12_Tabi_L");
     var container = d3.select("#chart");
     //debugger
      var containerWidth = [container.node().getBoundingClientRect().width] - 10;
