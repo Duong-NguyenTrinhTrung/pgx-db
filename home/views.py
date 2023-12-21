@@ -139,11 +139,11 @@ def drug_lookup(request):
                 Q(name__icontains=drug) 
             )
         else:
-            data = Drug.objects.all()[:10]
+            data = Drug.objects.all()[:30]
         drugs = []
         for item in data:
             atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True).first()
-            code = atc_code if atc_code is not None else "N/A"
+            code = atc_code if atc_code is not None else "Not assigned"
             drugs.append({
                 'drug_bankID': item.drug_bankID,
                 'name': item.name,
@@ -154,11 +154,11 @@ def drug_lookup(request):
 
         return JsonResponse({'drugs': drugs})
     else:
-        data = Drug.objects.all()[:10]
+        data = Drug.objects.all()[:30]
         drugs = []
         for item in data:
             atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True).first()
-            code = atc_code if atc_code is not None else "N/A"
+            code = atc_code if atc_code is not None else "Not assigned"
 
             drugs.append({
                 'drug_bankID': item.drug_bankID,

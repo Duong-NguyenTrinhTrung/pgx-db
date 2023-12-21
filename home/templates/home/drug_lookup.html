@@ -185,7 +185,7 @@
                     <td>{{ drug.drug_bankID }}</td>
                     <td>{{ drug.name }}</td>
                     <!-- <td><a href="#">{{ drug.atc_code }}</a></td> -->
-                    {% if drug.atc_code != 'N/A' %}
+                    {% if drug.atc_code != 'Not assigned' %}
                         <td><a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id={{ drug.atc_code.0 }}&detail={{ drug.atc_code }}">{{ drug.atc_code }}</a></td>
                     {% else %}
                         <td>{{ drug.atc_code }}</td>
