@@ -174,7 +174,7 @@
                 <th>Drugbank ID</th>
                 <th>Drug name</th>
                 <th>ATC code</th>
-                <th>Pharmacogenomics note</th>
+                <th>Drug type</th>
                 <th>Clinical status</th>
                 <th>Reference</th>
             </tr>
@@ -190,7 +190,7 @@
                     {% else %}
                         <td>{{ drug.atc_code }}</td>
                     {% endif %}
-                    <td>{{ drug.pharmacogenomics_note }}</td>
+                    <td>{{ drug.drug_type }}</td>
                     <td>{{ drug.Clinical_status }}</td>
                     <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ drug.drug_bankID }}"  target="_blank" rel="noopener noreferrer">Link</a></td>
                 </tr>
@@ -244,7 +244,7 @@
                                 <td>${item.drug_bankID}</td>
                                 <td>${item.name}</td>
                                 <td><a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id=${item.atc_code.charAt(0)}&detail=${item.atc_code}">${item.atc_code}</a></td>
-                                <td>${item.pharmacogenomics_note}</td>
+                                <td>${item.drug_type}</td>
                                 <td>${item.Clinical_status}</td>
                                 <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ item.drug_bankID }}"   target="_blank" rel="noopener noreferrer">Link</a></td>
                             </tr>`;
@@ -266,7 +266,7 @@
                                 <td>${item.drug_bankID}</td>
                                 <td>${item.name}</td>
                                 <td><a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id=${item.atc_code.charAt(0)}&detail=${item.atc_code}">${item.atc_code}</a></td>
-                                <td>${item.pharmacogenomics_note}</td>
+                                <td>${item.drug_type}</td>
                                 <td>${item.Clinical_status}</td>
                                 <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ item.drug_bankID }}"   target="_blank" rel="noopener noreferrer">Link</a></td>
                             </tr>`;
@@ -290,7 +290,7 @@
                                 <td>${item.drug_bankID}</td>
                                 <td>${item.name}</td>
                                 <td><a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id=${item.atc_code.charAt(0)}&detail=${item.atc_code}">${item.atc_code}</a></td>
-                                <td>${item.pharmacogenomics_note}</td>
+                                <td>${item.drug_type}</td>
                                 <td>${item.Clinical_status}</td>
                                 <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ item.drug_bankID }}"   target="_blank" rel="noopener noreferrer">Link</a></td>
                             </tr>`;

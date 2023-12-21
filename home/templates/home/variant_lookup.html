@@ -51,7 +51,7 @@
 
     /* Apply alternating row colors */
     #variant-result-table tr:nth-child(even) {
-        background-color: rgba(255, 143, 171, 0.4); /* Color 1 for even rows */
+        background-color: rgba(255, 143, 171, 0.2); /* Color 1 for even rows */
     }
 
     #variant-result-table tr:nth-child(odd) {
@@ -209,8 +209,7 @@
 
 {% block content %}
 <div id="variant">
-    <p>Enter a variant using <i><span style="color:#f8f9fa;">Ensembl</span></i> or <i><span
-                style="color:#f8f9fa;">RefSeq</span></i> format</p>
+    <p>Enter a variant using <i><span style="color:#f8f9fa;">Ensembl</span></i> format</p>
     <form method="get" action="">
         <table class="table table-bordered table-gray table-fulltext-two-rows">
             <tbody>
@@ -233,8 +232,7 @@
                 </tr>
                 <tr>
                     <td colspan="3" style="text-align: left; padding-left: 30px;">Examples: <a
-                            href="/gene/ENSG00000196396/" target='_blank' hreflang="en">20_50581449_C/G</a>; <a
-                            href="/gene/ENSG00000196396/" target='_blank' hreflang="en">some RefSeq </a>; ... </td>
+                            href="/gene/ENSG00000196396/" target='_blank' hreflang="en">20_50581449_C/G</a></td>
                 </tr>
             </tbody>
         </table>
@@ -247,8 +245,9 @@
             <tr>
                 <th>Variant ID</th>
                 <th>Gene ID</th>
-                <th>Genename</th>
-                <th>Link</th>
+                <th>Gene symbol</th>
+                <th>Primary transcript</th>
+                <th>Details</th>
             </tr>
         </thead>
         <tbody id="variant-result-tbody">
@@ -257,6 +256,7 @@
                     <td>{{variant.VariantMarker}}</td>
                     <td>{{variant.geneID}}</td>
                     <td>{{variant.genename}}</td>
+                    <td>{{variant.pt}}</td>
                     <td><a href="/gene/{{variant.geneID}}" target="_blank" rel="noopener noreferrer">Link</a></td>
                 </tr>
             {% endfor %}
@@ -283,7 +283,7 @@
                 });
             },
             autoFocus: true,
-            minLength: 6,
+            minLength: 7,
             select: function (event, ui) {
                 $('#search_variant').val(ui.item.value);
                 return false;
@@ -298,6 +298,7 @@
 
         // Hide autocomplete results when clicking outside of the input and results
         $("#search_variant").on('keyup', function () {
+            
             $.ajax({
                 url: "{% url 'variant_lookup' %}?variant="+ $(this).val().split("-")[0].trim(),
                 success: function(data){
@@ -308,6 +309,7 @@
                             <td>${item.VariantMarker}</td>
                             <td>${item.geneID}</td>
                             <td>${item.genename}</td>
+                            <td>${item.pt}</td>
                             <td><a href="/gene/${item.geneID}" target="_blank" rel="noopener noreferrer">Link</a></td>
                         </tr>`;
                     });
@@ -318,15 +320,17 @@
     
         var hasClearSearch = false;
         function variant_search(){
-            var variant_id = $("#search_variant").val().split("-")[0].trim();
+            var g = $("#search_variant").val().split(" ")[4];
+            var gene_id = g.trim().slice(1, g.length-1);
+            alert("gene_id = "+gene_id);
             var method = "GET";
-            var url= "/gene/" + variant_id + "/";
+            var url= "/gene/" + gene_id + "/";
 
             $.ajax({
                 url: url,
                 method: method,
                 data: {
-                    "variant_id": variant_id,
+                    "gene_id": gene_id,
                 },
                 success: function(data){
                     $("#search_variant").html("");
@@ -336,6 +340,7 @@
                             <td>${item.VariantMarker}</td>
                             <td>${item.geneID}</td>
                             <td>${item.genename}</td>
+                            <td>${item.pt}</td>
                             <td><a href="/gene/${item.geneID}" target="_blank" rel="noopener noreferrer">Link</a></td>
                         </tr>`;
                     });

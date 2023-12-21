@@ -103,13 +103,14 @@ def drug_target_network(request):
 
 def variant_lookup(request):
     context = {}
-    objects = Variant.objects.all()[:20]
+    objects = Variant.objects.all()[:30]
     variants = []
     for item in objects:
         variants.append({
             "VariantMarker": item.VariantMarker,
             'genename': item.Gene_ID.genename,
             'geneID': item.Gene_ID.gene_id,
+            'pt': item.Gene_ID.primary_transcript, # primary transcript
         })
     if request.GET.get('variant'):
         variant = request.GET.get('variant')
@@ -120,6 +121,7 @@ def variant_lookup(request):
                 "VariantMarker": item.VariantMarker,
                 'genename': item.Gene_ID.genename,
                 'geneID': item.Gene_ID.gene_id,
+                'pt': item.Gene_ID.primary_transcript, # primary transcript
             })
         return JsonResponse({'variants': variants})
     context["variants"] = variants
@@ -146,7 +148,7 @@ def drug_lookup(request):
                 'drug_bankID': item.drug_bankID,
                 'name': item.name,
                 'atc_code': code,
-                'pharmacogenomics_note': "coming soon",
+                'drug_type': item.drugtype.type_detail,
                 'Clinical_status': clinical_status_dict.get(item.Clinical_status)
             })
 
@@ -162,7 +164,7 @@ def drug_lookup(request):
                 'drug_bankID': item.drug_bankID,
                 'name': item.name,
                 'atc_code': code,
-                'pharmacogenomics_note': "coming soon",
+                'drug_type': item.drugtype.type_detail,
                 'Clinical_status': clinical_status_dict.get(item.Clinical_status)
             })
         context["drugs"] = drugs
