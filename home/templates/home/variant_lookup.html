@@ -257,7 +257,7 @@
                     <td>{{variant.VariantMarker}}</td>
                     <td>{{variant.geneID}}</td>
                     <td>{{variant.genename}}</td>
-                    <td>Link</td>
+                    <td><a href="/gene/{{variant.geneID}}" target="_blank" rel="noopener noreferrer">Link</a></td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -329,7 +329,17 @@
                     "variant_id": variant_id,
                 },
                 success: function(data){
-                    window.open(url, "_blank");
+                    $("#search_variant").html("");
+                    var html_data = "";
+                    data.variants.forEach(item => {
+                        html_data+=`<tr>
+                            <td>${item.VariantMarker}</td>
+                            <td>${item.geneID}</td>
+                            <td>${item.genename}</td>
+                            <td><a href="/gene/${item.geneID}" target="_blank" rel="noopener noreferrer">Link</a></td>
+                        </tr>`;
+                    });
+                    $("#search_variant").html(html_data);
                 },
                 error: function(error){
                     console.error("Error:", error);
