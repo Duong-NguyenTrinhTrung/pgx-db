@@ -197,18 +197,6 @@
                                     <option value="grey">Grey</option>
                                 </select>
                             </div>
-                            <div id="filter_3d_source">
-                                <p>2nd structure:</p>
-                                <select id="secondStructSelect" name="secondStructSelect">
-                                    <option value="all" selected="selected">All</option>
-                                    <option value="a">Alpha-helix</option>
-                                    <option value="b">Beta-strand</option>
-                                    <option value="c">Coil</option>
-                                    <option value="l">Loop</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div id="filter_3d_row3">
                             <div id="filter_3d_variant">
                                 <p>Variant:</p>
                                 <select id="variantVisibilitySelect" name="variant">
@@ -216,25 +204,11 @@
                                     <option value="show">Show</option>
                                 </select>
                             </div>
-                            <div id="filter_3d_resi_label">
-                                <p>Residue label:</p>
-                                <select id="resiLabelSelect" name="resiLabel">
-                                    <option value="hide">Hide</option>
-                                    <option value="show">Show</option>
-                                </select>
-                            </div>
-                            <div id="filter_3d_style">
-                                <p>Style:</p>
-                                <select id="styleSelect" name="styleSelect">
-                                    <option value="cartoon">Cartoon</option>
-                                    <option value="label">Label</option>
-                                    <option value="stick">Stick</option>
-                                    <option value="line">Line</option>
-                                </select>
-                            </div>
+                            
                         </div>
+                            
                         <div id="seqquence_filter_row">
-                            {% include '_sequence_viewer.html' %}
+                            
                         </div>
                     </div>
                 </div>
@@ -780,26 +754,26 @@
             viewer.render();
         });
 
-        const resiLabelSelect = document.getElementById('resiLabelSelect');
-        let toremoveLabel = null;
-        resiLabelSelect.addEventListener('change', (event) => {
-            const selectedResiVisibility = event.target.value;
-            if (selectedResiVisibility === 'hide') {
-                if (toremoveLabel != null) {
-                    viewer.removeLabel(toremoveLabel);
-                    toremoveLabel = null;
-                }
-            } else {
-                toremoveLabel = viewer.addResLabels({hetflag: false}, {
-                    font: 'Arial',
-                    fontSize: 6,
-                    fontColor: 'black',
-                    showBackground: false,
-                    screenOffset: {x: 0, y: 0}
-                });
-            }
-            viewer.render();
-        });
+        // const resiLabelSelect = document.getElementById('resiLabelSelect');
+        // let toremoveLabel = null;
+        // resiLabelSelect.addEventListener('change', (event) => {
+        //     const selectedResiVisibility = event.target.value;
+        //     if (selectedResiVisibility === 'hide') {
+        //         if (toremoveLabel != null) {
+        //             viewer.removeLabel(toremoveLabel);
+        //             toremoveLabel = null;
+        //         }
+        //     } else {
+        //         toremoveLabel = viewer.addResLabels({hetflag: false}, {
+        //             font: 'Arial',
+        //             fontSize: 6,
+        //             fontColor: 'black',
+        //             showBackground: false,
+        //             screenOffset: {x: 0, y: 0}
+        //         });
+        //     }
+        //     viewer.render();
+        // });
 
         const variantVisibilitySelect = document.getElementById('variantVisibilitySelect');
         variantVisibilitySelect.addEventListener('change', (event) => {
