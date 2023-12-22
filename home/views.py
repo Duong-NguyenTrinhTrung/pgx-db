@@ -101,31 +101,7 @@ def drug_target_network(request):
     return render(request, 'home/drug_and_target_network.html', context)
     # return render(request, 'home/drug_and_target_network copy.html', context)
 
-def variant_lookup(request):
-    context = {}
-    objects = Variant.objects.all()[:30]
-    variants = []
-    for item in objects:
-        variants.append({
-            "VariantMarker": item.VariantMarker,
-            'genename': item.Gene_ID.genename,
-            'geneID': item.Gene_ID.gene_id,
-            'pt': item.Gene_ID.primary_transcript, # primary transcript
-        })
-    if request.GET.get('variant'):
-        variant = request.GET.get('variant')
-        data = Variant.objects.filter(VariantMarker__icontains=variant)
-        variants = []
-        for item in data:
-            variants.append({
-                "VariantMarker": item.VariantMarker,
-                'genename': item.Gene_ID.genename,
-                'geneID': item.Gene_ID.gene_id,
-                'pt': item.Gene_ID.primary_transcript, # primary transcript
-            })
-        return JsonResponse({'variants': variants})
-    context["variants"] = variants
-    return render(request, 'home/variant_lookup.html', context)
+
 
 def drug_lookup(request):
     drug = request.GET.get('drug')
@@ -177,8 +153,36 @@ def get_atc_code(drug_bankID):
     except ObjectDoesNotExist:
         return None
 
+def variant_lookup(request):
+    context = {}
+    variant_id = request.GET.get('variant_id')
+    if variant_id:
+        if variant_id != 'default':
+            objects = Variant.objects.filter(VariantMarker__icontains=variant_id)
+        else:
+            objects = Variant.objects.all()[:30]
+        variants = []
+        for item in objects:
+            variants.append({
+                "VariantMarker": item.VariantMarker,
+                'genename': item.Gene_ID.genename,
+                'geneID': item.Gene_ID.gene_id,
+                'pt': item.Gene_ID.primary_transcript, # primary transcript
+            })
+        return JsonResponse({'variants': variants})
+    else:
+        objects = Variant.objects.all()[:30]
+        variants = []
+        for item in objects:
+            variants.append({
+                "VariantMarker": item.VariantMarker,
+                'genename': item.Gene_ID.genename,
+                'geneID': item.Gene_ID.gene_id,
+                'pt': item.Gene_ID.primary_transcript, # primary transcript
+            })
+        return render(request, 'home/variant_lookup.html', {'variants': variants})
+
 def target_lookup(request):
-    print("----------target lookup is called----------")
     target = request.GET.get('target')
     context = {}
     if target:
