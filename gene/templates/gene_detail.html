@@ -113,7 +113,10 @@
                                 <td class="align-left">{{ value.6|slice:"2:3" }}</td> <!-- Mutant  -->
                                 <td class="align-left">{{ value.7 }}</td> <!-- Codons  -->
                                 <td class="align-left">{{ value.2 }}</td> <!--Consequence   -->
-                                <td class="align-left">Coming soon</td> <!--  Mean VEP scores -->
+                                <td class="align-left"><a href="#" class="variant_associate_statistics"
+                                    data-remote-url="{% url 'variant:get-genebass-tables' %}"
+                                    data-variant-marker="{{ value.0 }}" data-toggle="modal"
+                                    data-target="#genebassModal">Link</a></td> <!--  AF -->
                                 <td class="align-left">{{ value|last }}</td> <!--  Mean VEP scores -->
                                 <td><a href="#" class="variant_associate_statistics"
                                        data-remote-url="{% url 'variant:get-genebass-tables' %}"
@@ -379,7 +382,7 @@
             //Consequence
             column_filters = column_filters.concat(createYADCFfilters(7, 1, "select", null, "Select", false, null, null, "80px"));
             //AF
-            column_filters = column_filters.concat(createYADCFfilters(8, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
+            // column_filters = column_filters.concat(createYADCFfilters(8, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
             //Score columns
             column_filters = column_filters.concat(createYADCFfilters(9, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"))
 
