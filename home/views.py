@@ -196,7 +196,7 @@ def target_lookup(request):
             )
             print("target is not default, get proteins filtered by target, length = ", len(proteins))
         else:
-            proteins = Protein.objects.all()[:6]
+            proteins = Protein.objects.all()[:10]
             print("target is default, get 6 records")
         items = []
         for item in proteins:
@@ -219,7 +219,7 @@ def target_lookup(request):
         return JsonResponse({'items': items})
     else:
         # If no target parameter provided, get 6 records
-        proteins = Protein.objects.all()[:6]
+        proteins = Protein.objects.all()[:10]
         items = []
         for item in proteins:
             interactions = Interaction.objects.filter(uniprot_ID=item.uniprot_ID)
@@ -244,3 +244,7 @@ def target_lookup(request):
 def target_statistics(request):
     context = {}
     return render(request, 'home/target_statistics.html', context)
+
+def about_pgx(request):
+    context = {}
+    return render(request, 'home/about_pgx.html', context)
