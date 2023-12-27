@@ -5,8 +5,8 @@
 /* styles.css */
 .grid-container {
     display: grid;
-    grid-template-columns: 30% 70%; /* Left column: 40%, Right column: 60% */
-    gap: 20px; /* Gap between columns */
+    grid-template-columns: 30% 70%; 
+    gap: 20px; 
 }
 
 .left {
