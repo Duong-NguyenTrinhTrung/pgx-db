@@ -28,12 +28,13 @@ urlpatterns = [
     path('get_clinical_pgx_data_by_drug/', views.get_clinical_pgx_data_by_drug, name='get-clinical-pgx-data-by-drug'),
     path('get_gene_based_burden_data_by_atc/', views.get_gene_based_burden_data_by_atc, name='get-gene-based-burden-data-by-atc'),
     path('get_variant_based_burden_data_by_atc/', views.get_variant_based_burden_data_by_atc, name='get-variant-based-burden-data-by-atc'),
+    path('get_variant_based_burden_data_by_drug/', views.get_variant_based_burden_data_by_drug, name='get-variant-based-burden-data-by-drug'),
     path('get_gene_based_burden_data_by_drug/', views.get_gene_based_burden_data_by_drug, name='get-gene-based-burden-data-by-drug'),
     path('get_drug_network/', views.get_drug_network, name='get-drug-network'),
     path('get-atc-sub-levels/', views.get_atc_sub_levels, name='get-atc-sub-levels'),
     path('drugbrowser', views.drugbrowser, name='drugbrowser'),  # load all the drugs - cached but still slow - might need to remove
     path('drugstatistic', (DrugStatistics.as_view()), name='drugstatistic'),  # okie but with dummy data
-    path('drugstatistic2', (DrugStatistics2.as_view()), name='drugstatistic2'),  # okie but with dummy data
+    path('drugstatistic2', (views.DrugStatistics2), name='drugstatistic2'),  # okie but with dummy data
     path('drug/autocomplete', (SelectionAutocomplete), name='autocomplete'),
     path('drug/<str:drugbank_id>/', views.drug_atc_expansion, name='drug_detail'),  # still ok but template does not have much info
 

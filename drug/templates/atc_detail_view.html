@@ -119,6 +119,21 @@
     #clinical-pgx-data-control-div {
         display: none;
     }
+
+
+    input[type=radio]:disabled {
+        color: red;
+    }
+
+    [type="radio"]:disabled {
+        color: red;
+    }
+
+    input[type="radio"]:disabled + .label:before{
+    box-shadow: inset 0 0 0 4px #f4f4f4;
+    border-color: #333;
+    background-color: red;
+    }
 </style>
 
 {% endblock %}
@@ -176,7 +191,7 @@
                                     style="font-size: 14px; margin-bottom:0; text-decoration: none; color: #337ab7;">
                                     Clinical PGx data</legend>
                                 <input id="variant-based-clinical-pgx-control" data-atc-code=""
-                                    name="clinical-pgx-control" type="radio" value="variant-based-clinical-pgx" checked>
+                                    name="clinical-pgx-control" type="radio" class="custom-radio" value="variant-based-clinical-pgx" checked>
                                 <label for="variant-based-clinical-pgx-control">Variant-based</label>
                             </fieldset>
                         </div>
@@ -185,11 +200,11 @@
                                 <legend
                                     style="font-size: 14px; margin-bottom:0; text-decoration: none; color: #337ab7;">
                                     Burden data</legend>
-                                <input id="genebased-burden-control" data-atc-code="" name="burden-control" type="radio"
+                                <input id="genebased-burden-control" data-atc-code="" name="burden-control" type="radio" class="custom-radio"
                                     value="gene-based"="">
                                 <label for="genebased-burden-control">Gene-based</label>
                                 <input id="variant-based-burden-control" data-atc-code="" name="burden-control"
-                                    type="radio" value="variant-based">
+                                    type="radio" class="custom-radio" value="variant-based">
                                 <label for="variant-based-burden-control">Variant-based</label>
                             </fieldset>
                         </div>
@@ -751,18 +766,19 @@
     }
 
     function render_variant_based_burden_data(variant_based_burden_data) {
-        var tableHtml = '<table class="display compact text-nowrap" id="pgx-data-table"><thead id="headers" style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">VariantID &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>AC </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>AF </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
+        var tableHtml = '<table class="display compact text-nowrap" id="pgx-data-table"><thead id="headers" style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">VariantID &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>AC </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>AF </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
 
         for (var k = 0; k < variant_based_burden_data.length; k++) {
             row = variant_based_burden_data[k];
+            var interactions = variant_based_burden_data[k].interactions;
             for (var l = 0; l < row.burden_data.length; l++) {
                 value = row.burden_data[l];
+                
                 tableHtml += `
                     <tr>
                         <td style="vertical-align: top;" >${row.drug_id}</td>
-                        <td style="vertical-align: top;" >${row.gene_name}</td>
-                        <td style="vertical-align: top;" >${row.MOA}</td>
-                        <td style="vertical-align: top;" >${row.variant_marker}</td>
+                        <td style="vertical-align: top;" >${value.genename}</td>
+                        <td style="vertical-align: top;" >${value.variant_marker__VariantMarker}</td>
                         <td style="vertical-align: top;" >${value.annotation}</td>
                         <td style="vertical-align: top;" >${Number(value.n_cases).toFixed(0)}</td>
                         <td style="vertical-align: top;" >${Number(value.n_controls).toFixed(0)}</td>
@@ -805,23 +821,23 @@
         //Gene
         column_filters = column_filters.concat(createYADCFfilters(1, 1, "select", null, "select", false, null, null, "60px"));
         //MOA
-        column_filters = column_filters.concat(createYADCFfilters(2, 1, "select", null, "select", false, null, null, "60px"));
+        // column_filters = column_filters.concat(createYADCFfilters(2, 1, "select", null, "select", false, null, null, "60px"));
         //Variant marker
-        column_filters = column_filters.concat(createYADCFfilters(3, 1, "select", null, "select", false, null, null, "60px"));
+        column_filters = column_filters.concat(createYADCFfilters(2, 1, "select", null, "select", false, null, null, "60px"));
         //annotation
-        column_filters = column_filters.concat(createYADCFfilters(4, 1, "select", null, "select", false, null, null, "60px"));
+        column_filters = column_filters.concat(createYADCFfilters(3, 1, "select", null, "select", false, null, null, "60px"));
         //n_cases 
-        column_filters = column_filters.concat(createYADCFfilters(5, 1, "select", null, "select", false, null, null, "60px"));
+        column_filters = column_filters.concat(createYADCFfilters(4, 1, "select", null, "select", false, null, null, "60px"));
         //n_controls  
-        column_filters = column_filters.concat(createYADCFfilters(6, 1, "select", null, "select", false, null, null, width = "70px"));
+        column_filters = column_filters.concat(createYADCFfilters(5, 1, "select", null, "select", false, null, null, width = "70px"));
         //p_value  
-        column_filters = column_filters.concat(createYADCFfilters(7, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "70px"));
+        column_filters = column_filters.concat(createYADCFfilters(6, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "70px"));
         //BETA 
-        column_filters = column_filters.concat(createYADCFfilters(8, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "70px"));
+        column_filters = column_filters.concat(createYADCFfilters(7, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "70px"));
         //AC
-        column_filters = column_filters.concat(createYADCFfilters(9, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "70px"));
+        column_filters = column_filters.concat(createYADCFfilters(8, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "70px"));
         //AF
-        column_filters = column_filters.concat(createYADCFfilters(10, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "70px"));
+        column_filters = column_filters.concat(createYADCFfilters(9, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "70px"));
 
         // update filters
         yadcf.init(

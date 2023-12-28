@@ -1,6 +1,254 @@
 {% extends "home/base.html" %}
 {% load static %}
 
+{% block addon_css %}
+<link rel="stylesheet" href="{% static 'home/css/nv.d3.min.css' %}" type="text/css" />
+<style>
+  
+    .nv-x text{
+    font-size: 10px;
+    }
+    body {
+      background-color:#fff;
+    }
+    #targetdistribution text {
+      fill: #000;
+      font: 16px Arial;
+    }
+    #targetdistribution {
+      background-color: #fff;
+    }
+
+</style>
+{% endblock %}
 {% block content %}
-    This page is coming soon!
+
+<h1 style="font-family: Arial">Interacting proteins</h1>
+<br>
+<br>
+<div>
+  <svg id="targetdistribution"></svg>
+</div>
+<br>
+
+<div class="row" style="position: relative; left: 90%; bottom:-5px;">
+  <div class="col-xs-12">
+    <select onchange="updateClasses(this.value, this.options[this.selectedIndex].text)" multiple class="form-control input-lg" size="9">
+      <option value="reset" selected="selected" >Clear all</option>
+      <option value="ion_class">Ion channel</option>
+      <option  value="enzyme_class">Enzyme</option>
+      <option value="epi_class">Epigenetic regulator</option>
+      <option value="kinase_class">Kinase</option>
+      <option value="nu_class">Nuclear receptor</option>
+      <option value="gpcr_class">GPCR</option>
+      <option value="trans_class">Transporter</option>
+      <option value="unknown_class">Unclassified</option>
+    </select>
+  </div>
+</div>
+<div>
+  <div id="pieChart1" style="width: 100%; height: 400px;">
+  </div>
+</div>
+
+
+{% endblock %}
+{% block addon_js %}
+<script src="{% static 'home/js/d3.min.js' %}"></script>
+<script src="{% static 'home/js/d3pie.js' %}"></script>
+<script src="{% static 'home/js/nv.d3.min.js' %}"></script>
+<script src="{% static 'home/js/d3pie.statistics.js' %}"></script>
+
+<script>
+
+var selected_moa = "";
+function updateClasses(element, text){
+    if (element === "reset") {
+        // Clear the content of the "pieChart1" div
+        document.getElementById("pieChart1").innerHTML = "";
+        return;
+    }
+    draw_piechart(element, text);
+}
+
+
+function draw_piechart(element, text){
+    var colors = color_set1;
+    var elementId = "pieChart1"; // The ID of the element to create the chart in
+    var text = text + " as "+ selected_moa.charAt(0).toLowerCase() + selected_moa.slice(1);
+    var data = []
+
+    if (element==="ion_class"){
+        if (selected_moa==="Enzyme"){data = {{ ion_class.enzyme |safe }}};
+        if (selected_moa==="Target"){data = {{ ion_class.target |safe }}};
+        if (selected_moa==="Transporter"){data = {{ ion_class.transporter |safe }}};
+        if (selected_moa==="Carrier"){data = {{ ion_class.carrier |safe }}};
+    }
+    else if (element === "enzyme_class") {
+        if (selected_moa==="Enzyme"){data = {{ enzyme_class.enzyme |safe }}};
+        if (selected_moa==="Target"){data = {{ enzyme_class.target |safe }}};
+        if (selected_moa==="Transporter"){data = {{ enzyme_class.transporter |safe }}};
+        if (selected_moa==="Carrier"){data = {{ enzyme_class.carrier |safe }}};
+    } 
+    else if (element === "epi_class") {
+        if (selected_moa==="Enzyme"){data = {{ epi_class.enzyme |safe }}};
+        if (selected_moa==="Target"){data = {{ epi_class.target |safe }}};
+        if (selected_moa==="Transporter"){data = {{ epi_class.transporter |safe }}};
+        if (selected_moa==="Carrier"){data = {{ epi_class.carrier |safe }}};
+    } 
+    else if (element === "kinase_class") {
+        if (selected_moa==="Enzyme"){data = {{ kinase_class.enzyme |safe }}};
+        if (selected_moa==="Target"){data = {{ kinase_class.target |safe }}};
+        if (selected_moa==="Transporter"){data = {{ kinase_class.transporter |safe }}};
+        if (selected_moa==="Carrier"){data = {{ kinase_class.carrier |safe }}};
+    } 
+    else if (element === "nu_class") {
+        if (selected_moa==="Enzyme"){data = {{ nu_class.enzyme |safe }}};
+        if (selected_moa==="Target"){data = {{ nu_class.target |safe }}};
+        if (selected_moa==="Transporter"){data = {{ nu_class.transporter |safe }}};
+        if (selected_moa==="Carrier"){data = {{ nu_class.carrier |safe }}};
+    } 
+    else if (element === "gpcr_class") {
+        if (selected_moa==="Enzyme"){data = {{ gpcr_class.enzyme |safe }}};
+        if (selected_moa==="Target"){data = {{ gpcr_class.target |safe }}};
+        if (selected_moa==="Transporter"){data = {{ gpcr_class.transporter |safe }}};
+        if (selected_moa==="Carrier"){data = {{ gpcr_class.carrier |safe }}};
+    } 
+    else if (element === "trans_class") {
+        if (selected_moa==="Enzyme"){data = {{ trans_class.enzyme |safe }}};
+        if (selected_moa==="Target"){data = {{ trans_class.target |safe }}};
+        if (selected_moa==="Transporter"){data = {{ trans_class.transporter |safe }}};
+        if (selected_moa==="Carrier"){data = {{ trans_class.carrier |safe }}};
+    } 
+    else{
+        if (selected_moa==="Enzyme"){data = {{ unknown_class.enzyme |safe }}};
+        if (selected_moa==="Target"){data = {{ unknown_class.target |safe }}};
+        if (selected_moa==="Transporter"){data = {{ unknown_class.transporter |safe }}};
+        if (selected_moa==="Carrier"){data = {{ unknown_class.carrier |safe }}};
+    }
+
+    var labels = [];
+    if (selected_moa==="Enzyme"){
+            labels = {{ enzyme_cate |safe }};
+    };
+    if (selected_moa==="Target"){
+        labels = {{ target_cate |safe }};
+    };
+    if (selected_moa==="Transporter"){
+        labels = {{ transporter_cate |safe }};
+    };
+    if (selected_moa==="Carrier"){
+        labels = {{ carrier_cate |safe }};
+    };
+    var drawdata = [];
+    for (var i=0; i<labels.length; i++) {
+        drawdata.push(
+            {
+                "label": labels[i],
+                "value": data[i],
+                "caption": labels[i],
+            }
+        )
+    }
+    console.log("drawdata "+drawdata);
+    var sum = data.reduce(function (accumulator, currentValue) {
+        return accumulator + currentValue;
+    }, 0);
+    if (sum==0){
+        alert(`There is no proteins in "${text}" category!`)
+    }else{
+        create_and_show_donut(drawdata, colors, elementId, text)
+    }
+
+}
+
+// Plotting the rectangle bar
+var dataset = [
+  { text: "Target", value: {{ no_of_target }} },
+  { text: "Transporter", value: {{ no_of_transporter }} },
+  { text: "Enzyme", value: {{ no_of_enzyme }} },
+  { text: "Carrier", value: {{ no_of_carrier }} },
+];
+
+var width = "95%",
+    height = 60,
+  perc_so_far = 0;
+
+var total_time = {{ total }};
+var chart = d3.select("#targetdistribution")
+  .attr("width", width)
+  .attr("height", height);
+var bar_x = 200;
+var chart_width = parseInt(d3.select("#targetdistribution").style("width"));
+
+var bar = chart.selectAll("g")
+  .data(dataset)
+  .enter().append("g");
+
+var color = d3.scale.ordinal()
+  .range(["#2a9d8f", "#f35b04", "#f7b801", "#7678ed"]);
+
+var tooltip = d3.select("body")
+  .append("div")
+  .style("position", "absolute")
+  .style("z-index", "10")
+  .style("visibility", "hidden")
+  .style("color", "white")
+  .style("padding", "8px")
+  .style("background-color", "rgba(0, 0, 0, 0.75)")
+  .style("border-radius", "6px")
+  .style("font", "12px sans-serif")
+  .text("tooltip");
+
+  bar.append("rect")
+  .attr("width", function(d) { return ((d.value/total_time)*100) + "%"; } )
+  .attr("rx", 10) // rounded corners
+  .attr("x", function(d) {
+    var prev_perc = perc_so_far;
+    var this_perc = 100*(d.value/total_time);
+    perc_so_far = perc_so_far + this_perc;
+    return prev_perc + "%";
+  })
+  .attr("height", height)
+  .attr("fill",  function(d) { return (color(d.value)) } )
+  .on("mouseover", function(d) {
+      tooltip.text(d.text + " drugs: "+ d.value + " (" + Math.round((d.value/total_time).toFixed(2)*100) + "%)")
+      tooltip.style("visibility", "visible")
+  })
+  .on("mousemove", function() {
+    return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");
+  })
+  .on("mouseout", function(){return tooltip.style("visibility", "hidden")})
+  .on("click", function(d) {
+
+    // Reset all rectangles to their original stroke color
+    bar.selectAll("rect").attr("stroke", "none");
+
+    // Change the stroke color of the clicked rectangle
+    d3.select(this)
+    .attr("stroke", "red") // Change "red" to your desired color
+    .attr("stroke-width", 6); // Adjust the stroke width as needed
+
+    selected_moa = d.text;
+    var selectElement = document.querySelector("select"); // Selects the first <select> element in the document
+    selectElement.options[0].selected = false;
+    selectElement.options[1].selected = true;
+    draw_piechart("ion_class", "Ion channel")
+  });
+
+  perc_so_far = 0;
+  bar.append("text")
+  .attr("x", function(d) {
+    var prev_perc = perc_so_far;
+    var this_perc = 100*(d.value/total_time);
+    perc_so_far = perc_so_far + this_perc;
+    return prev_perc + this_perc/8 + "%";
+  })
+  .attr("y", 11)
+  .attr("dy", "1.35em")
+  .data(dataset)
+  .text(function(d) { return d.text; });
+
+</script>
+
 {% endblock %}
