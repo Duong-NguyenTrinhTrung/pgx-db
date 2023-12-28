@@ -44,7 +44,7 @@ function create_and_show_donut(data, colors, elementId, text){
       "location": "center"
     },
     "size": {
-      "canvasWidth": 450,
+      "canvasWidth": 550,
       "canvasHeight": 405,
       "pieOuterRadius": "80%",
 			"pieInnerRadius": "50%"

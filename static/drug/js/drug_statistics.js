@@ -715,6 +715,6 @@ function createPieChart4() {
 
 
 createPieChart_Drug_Category();
-createPieChart_MOA();
+// createPieChart_MOA();
 createPieChart_Drug_Superclass()
 createPieChart4()

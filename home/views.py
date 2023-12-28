@@ -242,8 +242,505 @@ def target_lookup(request):
         return render(request, 'home/target_lookup.html', context)
     
 def target_statistics(request):
-    context = {}
-    return render(request, 'home/target_statistics.html', context)
+    enzyme_cate = ["substrate", "inhibitor", "substrate|inhibitor", "inducer", "substrate|inducer", "substrate|inhibitor|inducer", "inhibitor|inducer", "ligand", "cofactor", "other"]
+    target_cate = ["inhibitor", "antagonist", "agonist", "binder", "ligand", "cofactor", "activator", "potentiator", "inducer", "substrate", "partial agonist", "other"]
+    transporter_cate = ["inhibitor", "substrate", "substrate|inhibitor", "inducer", "substrate|inhibitor|inducer", "inhibitor|inducer", "substrate|inducer", "transporter", "other"] 
+    carrier_cate = ["binder", "substrate", "substrate|inhibitor", "inducer", "inhibitor", "ligand", "antagonist", "agonist", "carrier", "other"] 
+    
+
+    context = {
+        "no_of_target": Interaction.objects.filter(interaction_type="target").count(),
+        "no_of_enzyme": Interaction.objects.filter(interaction_type="enzyme").count(),
+        "no_of_transporter": Interaction.objects.filter(interaction_type="transporter").count(),
+        "no_of_carrier": Interaction.objects.filter(interaction_type="carrier").count(),
+        "total": Interaction.objects.filter(interaction_type="target").count()+ Interaction.objects.filter(interaction_type="enzyme").count()+Interaction.objects.filter(interaction_type="transporter").count()+Interaction.objects.filter(interaction_type="carrier").count(),
+        "enzyme_cate": enzyme_cate, 
+        "target_cate": target_cate, 
+        "transporter_cate": transporter_cate, 
+        "carrier_cate": carrier_cate, 
+
+        #protein class = ion channel
+        "ion_class":
+        {
+            "enzyme":
+            [
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inducer") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inhibitor|inducer") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inhibitor|inducer") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="cofactor") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & ~Q(actions__in=enzyme_cate[:-1]) & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+            ],
+
+            "target":
+                [
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="antagonist") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="agonist") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="binder") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="cofactor") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="activator") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="potentiator") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="partial agonist") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & ~Q(actions__in=target_cate[:-1]) & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                ],
+
+            "transporter":
+            [
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inhibitor|inducer") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inhibitor|inducer") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inducer") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="transporter") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & ~Q(actions__in=transporter_cate[:-1]) & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+            ],
+
+            "carrier":
+            [
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="binder") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="carrier") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="antagonist") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="agonist") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & ~Q(actions__in=carrier_cate[:-1]) & Q(uniprot_ID__Protein_class="Ion channel")).count(),
+            ]
+        },
+        #protein class = Enzyme
+        "enzyme_class":
+        {
+            "enzyme":
+            [
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inducer") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inhibitor|inducer") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inhibitor|inducer") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="cofactor") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & ~Q(actions__in=enzyme_cate[:-1]) & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+            ],
+
+            "target":
+            [
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="antagonist") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="agonist") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="binder") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="cofactor") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="activator") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="potentiator") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="partial agonist") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & ~Q(actions__in=target_cate[:-1]) & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+            ],
+
+            "transporter":
+            [
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inhibitor|inducer") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inhibitor|inducer") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inducer") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="transporter") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & ~Q(actions__in=transporter_cate[:-1]) & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+            ],
+
+            "carrier":
+            [
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="binder") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="carrier") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="antagonist") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="agonist") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & ~Q(actions__in=carrier_cate[:-1]) & Q(uniprot_ID__Protein_class="Enzyme")).count(),
+            ]
+        },
+
+        #protein class = Epigenetic regulator
+        "epi_class":
+        {
+            "enzyme":
+            [
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inducer") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inhibitor|inducer") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inhibitor|inducer") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="cofactor") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & ~Q(actions__in=enzyme_cate[:-1]) & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+            ],
+
+            "target":
+            [
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="antagonist") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="agonist") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="binder") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="cofactor") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="activator") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="potentiator") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="partial agonist") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & ~Q(actions__in=target_cate[:-1]) & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+            ],
+
+            "transporter":
+            [
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inhibitor|inducer") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inhibitor|inducer") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inducer") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="transporter") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & ~Q(actions__in=transporter_cate[:-1]) & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+            ],
+
+            "carrier":
+            [
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="binder") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="carrier") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="antagonist") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="agonist") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & ~Q(actions__in=carrier_cate[:-1]) & Q(uniprot_ID__Protein_class="Epigenetic regulator")).count(),
+            ]       
+        },
+
+        #protein class = Kinase
+        "kinase_class":
+        {
+            "enzyme":
+            [
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inducer") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inhibitor|inducer") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inhibitor|inducer") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="cofactor") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & ~Q(actions__in=enzyme_cate[:-1]) & Q(uniprot_ID__Protein_class="Kinase")).count(),
+            ],
+
+            "target":
+            [
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="antagonist") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="agonist") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="binder") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="cofactor") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="activator") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="potentiator") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="partial agonist") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & ~Q(actions__in=target_cate[:-1]) & Q(uniprot_ID__Protein_class="Kinase")).count(),
+            ],
+
+            "transporter":
+            [
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inhibitor|inducer") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inhibitor|inducer") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inducer") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="transporter") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & ~Q(actions__in=transporter_cate[:-1]) & Q(uniprot_ID__Protein_class="Kinase")).count(),
+            ],
+
+            "carrier":
+            [
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="binder") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="carrier") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="antagonist") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="agonist") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Kinase")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & ~Q(actions__in=carrier_cate[:-1]) & Q(uniprot_ID__Protein_class="Kinase")).count(),
+            ]   
+        },
+
+        #protein class = Nuclear receptor
+        "nu_class":
+        {
+            "enzyme":
+            [
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inducer") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inhibitor|inducer") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inhibitor|inducer") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="cofactor") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & ~Q(actions__in=enzyme_cate[:-1]) & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+            ],
+
+            "target":
+            [
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="antagonist") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="agonist") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="binder") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="cofactor") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="activator") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="potentiator") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="partial agonist") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & ~Q(actions__in=target_cate[:-1]) & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+            ],
+
+            "transporter":
+            [
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inhibitor|inducer") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inhibitor|inducer") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inducer") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="transporter") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & ~Q(actions__in=transporter_cate[:-1]) & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+            ],
+
+            "carrier":
+            [
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="binder") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="carrier") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="antagonist") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="agonist") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & ~Q(actions__in=carrier_cate[:-1]) & Q(uniprot_ID__Protein_class="Nuclear receptor")).count(),
+            ]
+        },
+
+        #protein class = GPCR
+        "gpcr_class":
+        {
+            "enzyme":
+            [
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inducer") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inhibitor|inducer") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inhibitor|inducer") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="cofactor") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & ~Q(actions__in=enzyme_cate[:-1]) & Q(uniprot_ID__Protein_class="GPCR")).count(),
+            ],
+
+            "target":
+            [
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="antagonist") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="agonist") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="binder") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="cofactor") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="activator") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="potentiator") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="partial agonist") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & ~Q(actions__in=target_cate[:-1]) & Q(uniprot_ID__Protein_class="GPCR")).count(),
+            ],
+            "transporter":
+            [
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inhibitor|inducer") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inhibitor|inducer") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inducer") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="transporter") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & ~Q(actions__in=transporter_cate[:-1]) & Q(uniprot_ID__Protein_class="GPCR")).count(),
+            ],
+            "carrier":
+            [
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="binder") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="carrier") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="antagonist") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="agonist") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="GPCR")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & ~Q(actions__in=carrier_cate[:-1]) & Q(uniprot_ID__Protein_class="GPCR")).count(),
+            ],
+        },
+
+        #protein class = Transporter
+        "trans_class":
+        {
+            "enzyme":
+            [
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inducer") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inhibitor|inducer") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inhibitor|inducer") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="cofactor") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & ~Q(actions__in=enzyme_cate[:-1]) & Q(uniprot_ID__Protein_class="Transporter")).count(),
+            ],
+            "target":
+            [
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="antagonist") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="agonist") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="binder") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="cofactor") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="activator") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="potentiator") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="partial agonist") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & ~Q(actions__in=target_cate[:-1]) & Q(uniprot_ID__Protein_class="Transporter")).count(),
+            ],
+            "transporter":
+            [
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inhibitor|inducer") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inhibitor|inducer") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inducer") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="transporter") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & ~Q(actions__in=transporter_cate[:-1]) & Q(uniprot_ID__Protein_class="Transporter")).count(),
+            ],
+            "carrier":
+            [
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="binder") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="carrier") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="antagonist") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="agonist") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Transporter")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & ~Q(actions__in=carrier_cate[:-1]) & Q(uniprot_ID__Protein_class="Transporter")).count(),
+            ]
+        },
+
+        #protein class = Unknown
+        "unknown_class":
+        {
+            "enzyme":
+            [
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inducer") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="substrate|inhibitor|inducer") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="inhibitor|inducer") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & Q(actions="cofactor") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="enzyme") & ~Q(actions__in=enzyme_cate[:-1]) & Q(uniprot_ID__Protein_class="Unknown")).count(),
+            ],
+            "target":
+            [
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="antagonist") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="agonist") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="binder") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="cofactor") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="activator") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="potentiator") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & Q(actions="partial agonist") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="target") & ~Q(actions__in=target_cate[:-1]) & Q(uniprot_ID__Protein_class="Unknown")).count(),
+            ],
+            "transporter":
+            [
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inhibitor|inducer") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="inhibitor|inducer") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="substrate|inducer") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & Q(actions="transporter") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="transporter") & ~Q(actions__in=transporter_cate[:-1]) & Q(uniprot_ID__Protein_class="Unknown")).count(),
+            ],
+            "carrier":
+            [
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="binder") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="substrate") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="carrier") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="inducer") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="inhibitor") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="ligand") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="antagonist") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="agonist") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & Q(actions="substrate|inhibitor") & Q(uniprot_ID__Protein_class="Unknown")).count(),
+                Interaction.objects.filter(Q(interaction_type="carrier") & ~Q(actions__in=carrier_cate[:-1]) & Q(uniprot_ID__Protein_class="Unknown")).count(),
+            ]
+        }
+    }
+
+    print("context = ", context)
+    return render(request,  'home/target_statistics.html', context)
 
 def about_pgx(request):
     context = {}

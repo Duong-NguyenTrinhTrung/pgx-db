@@ -531,13 +531,23 @@ def SelectionAutocomplete(request):
 
 
 # Create your views here.
-class DrugStatistics2(TemplateView):
-    template_name = 'drugstatistics-not use.html'
+def DrugStatistics2(request):
+    #0 -> Nutraceutical, 1 - Experimental, 2- Investigational, 3- Approved , 4 - Vet approved, 5 - Illicit
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+    no_of_others = len(list(set(Drug.objects.filter(Clinical_status__in=[0, 4, 5]).values_list("drug_bankID", flat=True))))
+    no_of_experimental = len(list(set(Drug.objects.filter(Clinical_status=1).values_list("drug_bankID", flat=True))))
+    no_of_investigational = len(list(set(Drug.objects.filter(Clinical_status=2).values_list("drug_bankID", flat=True))))
+    no_of_approved = len(list(set(Drug.objects.filter(Clinical_status=3).values_list("drug_bankID", flat=True))))
 
+    context = {
+        "no_of_investigational": no_of_investigational, 
+        "no_of_approved": no_of_approved, 
+        "no_of_experimental": no_of_experimental, 
+        "no_of_others": no_of_others, 
+        "total": no_of_others + no_of_experimental + no_of_investigational + no_of_approved,
+    }
+
+    return render(request, 'drugstatistics-not use.html', context)
 
 # Create your views here.
 class DrugStatistics(TemplateView):
@@ -547,6 +557,7 @@ class DrugStatistics(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
+    
 
 # Help from chatGPT.
 def drug_interaction_detail(request, drugbank_id):
@@ -618,7 +629,10 @@ def format_atc_name(s):
     s = s.replace('"', '')
     return s
 
+# Set timeout to a very high value (e.g., 10 years)
+LONG_TIMEOUT = 60 * 60 * 24 * 365
 
+@cache_page(LONG_TIMEOUT)
 def atc_detail_view(request):
     group_id = request.GET.get('group_id')  # Retrieve group_id from the query parameter
     anatomic_group = None
@@ -733,7 +747,14 @@ def get_drug_atc_association(request):
             "gene_based_burden_data": gene_based_burden_data,
             "pgx_clinical_data": pgx_clinical_data,
         }
-        cache.set("get_drug_atc_association_"+atc_code, response_data, 60*60)
+        # Check the length of atc_code and set the cache with an appropriate timeout
+        if len(atc_code) <= 5:
+            # Set cache expiration to one year (365 days * 24 hours * 60 minutes * 60 seconds)
+            cache_timeout = 365 * 24 * 60 * 60
+            cache.set("get_drug_atc_association_"+atc_code, response_data, timeout=cache_timeout)
+        else:
+            # Set cache expiration to the default value (e.g., 15 minutes)
+            cache.set("get_drug_atc_association_"+atc_code, response_data, timeout=60 * 15)
     return JsonResponse(response_data)
 
 
@@ -979,47 +1000,37 @@ def get_gene_based_burden_data_by_atc(request):
 
 def get_variant_based_burden_data_by_drug(request):
     drug_id = request.GET.get("drug_id")
-    print("drug_id = ", drug_id)
     if cache.get("get_variant_based_burden_data_by_drug_"+drug_id):
         response_data = cache.get("get_variant_based_burden_data_by_drug_"+drug_id)
     else:
         response_data=[]
-        interactions = Interaction.objects.filter(drug_bankID=drug_id)
-        for interaction in interactions:
-            gene_id = interaction.uniprot_ID.geneID
-            gene_name = interaction.uniprot_ID.genename
-            variant_markers = Variant.objects.filter(Gene_ID=gene_id)
-            for variant_marker in variant_markers:
-                data_genebass = GenebassVariantPGx.objects.filter(Q(variant_marker=variant_marker)&Q(drugbank_id=drug_id))
-                if len(data_genebass) != 0:
-                        response_data.append({
-                                "gene_name": gene_name,
-                                "drug_id": drug_id,
-                                "MOA": interaction.interaction_type.title(),
-                                "variant_marker": variant_marker.VariantMarker,
-                                "burden_data": [
-                                    {
-                                        "coding_description": genebass.coding_description,
-                                        "description": genebass.description,
-                                        "annotation": genebass.annotation.title(),
-                                        "n_cases": str(genebass.n_cases),
-                                        "n_controls": str(genebass.n_controls),
-                                        "Pvalue": str(genebass.Pvalue),
-                                        "BETA": str(genebass.BETA),
-                                        "AC": str(genebass.AC),
-                                        "AF": str(genebass.AF),
-                                    } 
-                                    for genebass in data_genebass
-                                    # if all(
-                                    #     value not in [float('inf'), float('-inf')] and value is not None
-                                    #     for value in [genebass.Pvalue, genebass.Pvalue, genebass.BETA, genebass.AC, genebass.AF]
-                                    # )
-                                ]
-                        })
-                    
+        drug_id = request.GET.get("drug_id")
+        gene_names = list(set(Interaction.objects.filter(drug_bankID=drug_id).values_list("uniprot_ID__genename", flat=True)))
+        genebass_data = GenebassVariantPGx.objects.filter(
+            drugbank_id=drug_id, genename__in=gene_names
+        ).all().values(
+            'genename', 
+            'variant_marker__VariantMarker',
+            'coding_description',
+            'description',
+            'annotation',
+            'n_cases',
+            'n_controls',
+            'Pvalue',
+            'BETA',
+            'AC',
+            'AF',
+        )
+        
+        print("genebass_data type: ", type(genebass_data))
+        if len(genebass_data) != 0:
+            response_data = [{"drug_id": drug_id,
+                "interactions": list(Interaction.objects.filter(drug_bankID=drug_id).values("drug_bankID", "uniprot_ID__genename", "interaction_type")),
+                "burden_data": list(genebass_data_portion),
+                # "burden_data_full": list(genebass_data),
+            }]
         if len(response_data)>0:
-            print("len response data = ", len(response_data))
-            print("sample response data = ", response_data[0])
+            print("len response data = ", len(response_data[0].get("burden_data")))
             cache.set("get_variant_based_burden_data_by_drug_"+drug_id, response_data, 60*60)
         else:
             print("no variant pgx data")
@@ -1037,44 +1048,36 @@ def get_variant_based_burden_data_by_atc(request):
         drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
         undup_drugs = list(set(drugs))
         drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+        gene_names = list(set(Interaction.objects.filter(drug_bankID__in=undup_drugs).values_list("uniprot_ID__genename", flat=True)))
         response_data=[]
         for drug in drug_objs:
-            interactions = Interaction.objects.filter(drug_bankID=drug)
-            for interaction in interactions:
-                gene_id = interaction.uniprot_ID.geneID
-                gene_name = interaction.uniprot_ID.genename
-                variant_markers = Variant.objects.filter(Gene_ID=gene_id)
-                for variant_marker in variant_markers:
-                    data_genebass = GenebassVariantPGx.objects.filter(Q(variant_marker=variant_marker)&Q(drugbank_id=drug.drug_bankID))
-                    if len(data_genebass) != 0:
-                            response_data.append({
-                                    "gene_name": gene_name,
-                                    "drug_id": drug.drug_bankID,
-                                    "MOA": interaction.interaction_type.title(),
-                                    "variant_marker": variant_marker.VariantMarker,
-                                    "burden_data": [
-                                        {
-                                            "coding_description": genebass.coding_description,
-                                            "description": genebass.description,
-                                            "annotation": genebass.annotation.title(),
-                                            "n_cases": str(genebass.n_cases),
-                                            "n_controls": str(genebass.n_controls),
-                                            "Pvalue": str(genebass.Pvalue),
-                                            "BETA": str(genebass.BETA),
-                                            "AC": str(genebass.AC),
-                                            "AF": str(genebass.AF),
-                                        } 
-                                        for genebass in data_genebass
-                                        if all(
-                                            value not in [float('inf'), float('-inf')] and value is not None
-                                            for value in [genebass.Pvalue, genebass.Pvalue, genebass.BETA, genebass.AC, genebass.AF]
-                                        )
-                                    ]
-                            })
-                    
+            genebass_data = GenebassVariantPGx.objects.filter(
+                drugbank_id=drug, genename__in=gene_names
+            ).all().values(
+                'genename', 
+                'variant_marker__VariantMarker',
+                'coding_description',
+                'description',
+                'annotation',
+                'n_cases',
+                'n_controls',
+                'Pvalue',
+                'BETA',
+                'AC',
+                'AF',
+            )
+            
+            if len(genebass_data) != 0:
+                response_data.append(
+                {
+                    "drug_id": drug.drug_bankID,
+                    "burden_data": list(genebass_data),
+                    # "burden_data_full": list(genebass_data),
+                })
+            
         if len(response_data)>0:
             print("len response data = ", len(response_data))
-            print("sample response data = ", response_data[0])
+            print("len response data item = ", len(response_data[0].get("burden_data")))
             cache.set("get_variant_based_data_by_atc_"+atc_code, response_data, 60*60)
         else:
             print("no variant pgx data")
