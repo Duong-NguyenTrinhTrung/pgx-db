@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 from django.views.decorators.cache import cache_page
-from .views import SelectionAutocomplete, DrugStatistics, DrugStatistics2
+from .views import SelectionAutocomplete, DrugStatistics
 from . import views
 from .views import search_drugs, drug_atc_expansion, atc_lookup, atc_detail_view, atc_search_view, get_drug_atc_association, get_drug_network, get_drugs_network, get_statistics_by_atc, get_gene_based_burden_data_by_atc, get_variant_based_burden_data_by_atc, get_clinical_pgx_data_by_atc, get_clinical_pgx_data_by_drug
 
@@ -33,8 +33,8 @@ urlpatterns = [
     path('get_drug_network/', views.get_drug_network, name='get-drug-network'),
     path('get-atc-sub-levels/', views.get_atc_sub_levels, name='get-atc-sub-levels'),
     path('drugbrowser', views.drugbrowser, name='drugbrowser'),  # load all the drugs - cached but still slow - might need to remove
-    path('drugstatistic', (DrugStatistics.as_view()), name='drugstatistic'),  # okie but with dummy data
-    path('drugstatistic2', (views.DrugStatistics2), name='drugstatistic2'),  # okie but with dummy data
+    # path('drugstatistic', (DrugStatistics.as_view()), name='drugstatistic'),  # okie but with dummy data
+    path('drugstatistic', (views.DrugStatistics), name='drugstatistic'),  # okie but with dummy data
     path('drug/autocomplete', (SelectionAutocomplete), name='autocomplete'),
     path('drug/<str:drugbank_id>/', views.drug_atc_expansion, name='drug_detail'),  # still ok but template does not have much info
 
