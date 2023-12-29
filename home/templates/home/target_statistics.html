@@ -23,7 +23,9 @@
 {% endblock %}
 {% block content %}
 
-<h1 style="font-family: Arial">Interacting proteins</h1>
+<br>
+<br>
+<h2 style="font-family: Arial">Actions of interacting proteins categozied by protein families</h2>
 <br>
 <br>
 <div>
@@ -141,6 +143,8 @@ function draw_piechart(element, text){
         labels = {{ carrier_cate |safe }};
     };
     var drawdata = [];
+    var canvasWidth = 550;
+    var canvasHeight = 450;
     for (var i=0; i<labels.length; i++) {
         drawdata.push(
             {
@@ -155,9 +159,9 @@ function draw_piechart(element, text){
         return accumulator + currentValue;
     }, 0);
     if (sum==0){
-        alert(`There is no proteins in "${text}" category!`)
+        alert(`Wow, there is no proteins in "${text}" category!`)
     }else{
-        create_and_show_donut(drawdata, colors, elementId, text)
+        create_and_show_donut(drawdata, colors, elementId, text, canvasWidth, canvasHeight)
     }
 
 }

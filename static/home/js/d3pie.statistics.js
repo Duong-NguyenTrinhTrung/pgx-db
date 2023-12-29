@@ -20,7 +20,7 @@ var color_set1 =  [
 
 
 // from http://d3pie.org/#generator
-function create_and_show_donut(data, colors, elementId, text){
+function create_and_show_donut(data, colors, elementId, text, canvasWidth, canvasHeight){
   var pie = new d3pie(elementId, {
     "header": {
       "title": {
@@ -44,9 +44,9 @@ function create_and_show_donut(data, colors, elementId, text){
       "location": "center"
     },
     "size": {
-      "canvasWidth": 550,
-      "canvasHeight": 405,
-      "pieOuterRadius": "80%",
+      "canvasWidth": canvasWidth,
+      "canvasHeight": canvasHeight,
+      "pieOuterRadius": "70%",
 			"pieInnerRadius": "50%"
     },
 		
@@ -63,21 +63,21 @@ function create_and_show_donut(data, colors, elementId, text){
     },
     "labels": {
       "outer": {
-        "pieDistance": 21
+        "pieDistance": 15
       },
       "inner": {
         "hideWhenLessThanPercentage": 2
       },
       "mainLabel": {
-        "fontSize": 17
+        "fontSize": 15
       },
       "percentage": {
         "color": "#ffffff",
-        "fontSize": 18
+        "fontSize": 15
       },
       "value": {
         "color": "#adadad",
-        "fontSize": 18
+        "fontSize": 15
       },
       "lines": {
         "enabled": true,

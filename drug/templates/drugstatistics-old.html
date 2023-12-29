@@ -1,0 +1,60 @@
+{% extends "home/base.html" %}
+{% load static %}
+{% block addon_css %}
+<link rel="stylesheet" href="{% static 'home/css/nv.d3.min.css' %}" type="text/css" />
+<style>
+  
+    
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="col-md-4 col-sm-12" >
+    <div class="card custom-card">
+        <div class="card-body text-center" style="margin-top: 200px;">
+            <h4 class="card-title ">Drug type</h4>
+            <!--PieChart Code here-->
+            <div id="chart-container4">
+                <svg id="pie-chart-drug-type"></svg>
+            </div>
+            <!--PieChart End here-->
+        </div>
+    </div>
+  </div> 
+
+
+  <div class="col-md-4 col-sm-12">
+    <div class="card custom-card">
+        <div class="card-body text-center">
+            <h4 class="card-title ">Drug superclass</h4>
+            <!--PieChart Code here-->
+            <div id="chart-container3">
+                <svg id="pie-chart-drug-superclass"></svg>
+            </div>
+            <!--PieChart End here-->
+        </div>
+    </div>
+  </div> 
+  
+  <div class="col-md-4 col-sm-12" style="margin-top: 200px;">
+    <div class="card custom-card">
+        <div class="card-body text-center">
+            <h4 class="card-title ">Drug categories</h4>
+            <!--PieChart Code here-->
+            <div id="chart-container1">
+                <svg id="pie-chart-drug-category"></svg>
+            </div>
+            <!--PieChart End here-->
+        </div>
+    </div>
+  </div> 
+
+
+{% endblock %}
+
+{% block addon_js %}
+<script src="{% static 'home/js/d3.v7.min.js' %}"></script> 
+<script src="{% static 'drug/js/drug_statistics.js' %}"></script>   
+<script>
+</script>
+{% endblock %}

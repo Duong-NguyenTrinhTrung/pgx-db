@@ -531,7 +531,7 @@ def SelectionAutocomplete(request):
 
 
 # Create your views here.
-def DrugStatistics2(request):
+def DrugStatistics(request):
     #0 -> Nutraceutical, 1 - Experimental, 2- Investigational, 3- Approved , 4 - Vet approved, 5 - Illicit
 
     no_of_others = len(list(set(Drug.objects.filter(Clinical_status__in=[0, 4, 5]).values_list("drug_bankID", flat=True))))
@@ -539,25 +539,36 @@ def DrugStatistics2(request):
     no_of_investigational = len(list(set(Drug.objects.filter(Clinical_status=2).values_list("drug_bankID", flat=True))))
     no_of_approved = len(list(set(Drug.objects.filter(Clinical_status=3).values_list("drug_bankID", flat=True))))
 
+    super_classes = ["Organoheterocyclic compounds", "Benzenoids", "Organic acids and derivatives", "None", "Lipids and lipid-like molecules", "Organic oxygen compounds", "Phenylpropanoids and polyketides", "Nucleosides, nucleotides, and analogues", "Organic nitrogen compounds", "Alkaloids and derivatives", "Mixed metal/non-metal compounds", "Organosulfur compounds", "Organic Polymers", "Homogeneous non-metal compounds", "Homogeneous metal compounds", "Organohalogen compounds", "Lignans, neolignans and related compounds", "Organophosphorus compounds", "Organometallic compounds", "Organic salts", "Hydrocarbon derivatives"]
+    super_classes_displayed = ["Organoheterocyclic compounds", "Benzenoids", "Organic acids and derivatives", "Unknown superclass", "Lipids and lipid-like molecules", "Organic oxygen compounds", "Phenylpropanoids and polyketides", "Nucleosides, nucleotides, and analogues", "Organic nitrogen compounds", "Alkaloids and derivatives", "Mixed metal/non-metal compounds", "Organosulfur compounds", "Organic Polymers", "Homogeneous non-metal compounds", "Homogeneous metal compounds", "Organohalogen compounds", "Lignans, neolignans and related compounds", "Organophosphorus compounds", "Organometallic compounds", "Organic salts", "Hydrocarbon derivatives"]
+
+    # context = {
     context = {
         "no_of_investigational": no_of_investigational, 
         "no_of_approved": no_of_approved, 
         "no_of_experimental": no_of_experimental, 
         "no_of_others": no_of_others, 
         "total": no_of_others + no_of_experimental + no_of_investigational + no_of_approved,
+        "super_classes": super_classes_displayed,
+        "biologic":
+        {
+            "experimental": [Drug.objects.filter(Q(drugtype__type_detail="Biotech") & Q(Clinical_status=1) & Q(superclass__superclass_detail=sc)).count() for sc in super_classes],
+            "approve": [Drug.objects.filter(Q(drugtype__type_detail="Biotech") & Q(Clinical_status=3) & Q(superclass__superclass_detail=sc)).count() for sc in super_classes],
+            "investigational": [Drug.objects.filter(Q(drugtype__type_detail="Biotech") & Q(Clinical_status=2) & Q(superclass__superclass_detail=sc)).count() for sc in super_classes],
+            "other": [Drug.objects.filter(Q(drugtype__type_detail="Biotech") & ~Q(Clinical_status__in=[0, 4, 5]) & Q(superclass__superclass_detail=sc)).count() for sc in super_classes],
+        },
+        "small_molecule":
+        {
+            "experimental": [Drug.objects.filter(Q(drugtype__type_detail="Small Molecule") & Q(Clinical_status=1) & Q(superclass__superclass_detail=sc)).count() for sc in super_classes],
+            "approve": [Drug.objects.filter(Q(drugtype__type_detail="Small Molecule") & Q(Clinical_status=3) & Q(superclass__superclass_detail=sc)).count() for sc in super_classes],
+            "investigational": [Drug.objects.filter(Q(drugtype__type_detail="Small Molecule") & Q(Clinical_status=2) & Q(superclass__superclass_detail=sc)).count() for sc in super_classes],
+            "other": [Drug.objects.filter(Q(drugtype__type_detail="Small Molecule") & ~Q(Clinical_status__in=[0, 4, 5]) & Q(superclass__superclass_detail=sc)).count() for sc in super_classes],
+        },
     }
+    print("context = ", context)
+    return render(request, 'drugstatistics.html', context)
 
-    return render(request, 'drugstatistics-not use.html', context)
 
-# Create your views here.
-class DrugStatistics(TemplateView):
-    template_name = 'drugstatistics.html'
-    # template_name = 'drugstatistics-not use.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
-    
 
 # Help from chatGPT.
 def drug_interaction_detail(request, drugbank_id):

@@ -745,3 +745,4 @@ def target_statistics(request):
 def about_pgx(request):
     context = {}
     return render(request, 'home/about_pgx.html', context)
+
