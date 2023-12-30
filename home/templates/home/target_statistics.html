@@ -26,6 +26,7 @@
 <br>
 <br>
 <h2 style="font-family: Arial">Actions of interacting proteins categozied by protein families</h2>
+<p style="color: #1982c4; font-size: 16px;"><i>Click on the mode of action (Target, Enzyme, Transporter or Carrier), then choose protein class(es) to see the statistics plots of actions</i></p>
 <br>
 <br>
 <div>
@@ -158,11 +159,16 @@ function draw_piechart(element, text){
     var sum = data.reduce(function (accumulator, currentValue) {
         return accumulator + currentValue;
     }, 0);
-    if (sum==0){
-        alert(`Wow, there is no proteins in "${text}" category!`)
-    }else{
-        create_and_show_donut(drawdata, colors, elementId, text, canvasWidth, canvasHeight)
+    if (selected_moa===""){
+      alert("Please choose a mode of action first");
     }
+    else{
+        if (sum==0){
+            alert(`Wow, there is no proteins in "${text}" category!`)
+        }else{
+            create_and_show_donut(drawdata, colors, elementId, text, canvasWidth, canvasHeight)
+        }
+      }
 
 }
 
