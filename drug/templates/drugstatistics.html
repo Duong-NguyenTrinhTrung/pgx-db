@@ -24,6 +24,8 @@
 <br>
 <br>
 <h2 style="font-family: Arial">Superclasses of drugs categorized by clinical statuses and types</h2>
+<p style="color: #1982c4; font-size: 16px;"><i>Click on a clinical status (Experimental, Approved, Investigational or Other), then choose drug type(s) to see the statistics plots of drug superclasses</i></p>
+
 <br>
 <br>
 <div>
@@ -102,10 +104,15 @@ function draw_piechart(element, text)
     var sum = data.reduce(function (accumulator, currentValue) {
         return accumulator + currentValue;
     }, 0);
-    if (sum==0){
-        alert(`Wow, there is no drugs in "${text}" category!`)
-    }else{
-        create_and_show_donut(drawdata, colors, elementId, text, canvasWidth, canvasHeight)
+    if (selected_status===""){
+      alert("Please choose a drug clinical status first");
+    }
+    else{
+      if (sum==0){
+          alert(`Wow, there is no drugs in "${text}" category!`)
+      }else{
+          create_and_show_donut(drawdata, colors, elementId, text, canvasWidth, canvasHeight)
+      }
     }
 
 }
