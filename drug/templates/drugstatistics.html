@@ -105,7 +105,7 @@ function draw_piechart(element, text)
         return accumulator + currentValue;
     }, 0);
     if (selected_status===""){
-      alert("Please choose a drug clinical status first");
+      alert("Please choose a drug clinical status first!");
     }
     else{
       if (sum==0){
@@ -185,9 +185,9 @@ var tooltip = d3.select("body")
 
     selected_status = d.text;
     var selectElement = document.querySelector("select"); // Selects the first <select> element in the document
-    selectElement.options[0].selected = false;
-    selectElement.options[1].selected = true;
-    draw_piechart("biologic", "Biologic")
+    selectElement.options[0].selected = true;
+    // selectElement.options[1].selected = true;
+    // draw_piechart("biologic", "Biologic")
   });
 
   perc_so_far = 0;

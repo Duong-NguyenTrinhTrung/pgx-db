@@ -160,7 +160,7 @@ function draw_piechart(element, text){
         return accumulator + currentValue;
     }, 0);
     if (selected_moa===""){
-      alert("Please choose a mode of action first");
+      alert("Please choose a mode of action first!");
     }
     else{
         if (sum==0){
@@ -241,9 +241,9 @@ var tooltip = d3.select("body")
 
     selected_moa = d.text;
     var selectElement = document.querySelector("select"); // Selects the first <select> element in the document
-    selectElement.options[0].selected = false;
-    selectElement.options[1].selected = true;
-    draw_piechart("ion_class", "Ion channel")
+    selectElement.options[0].selected = true;
+    // selectElement.options[1].selected = true;
+    // draw_piechart("ion_class", "Ion channel")
   });
 
   perc_so_far = 0;

@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     "sitesearch",
     "api",
     "restapi",
+    "chromosome",
 ]
 
 MIDDLEWARE = [

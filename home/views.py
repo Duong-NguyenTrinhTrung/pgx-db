@@ -22,11 +22,32 @@ from variant.models import Variant, VepVariant, GenebassPGx, GenebassVariantPGx,
 from interaction.models import Interaction
 from gene.models import Gene
 from drug.models import Drug, DrugAtcAssociation
+from chromosome.models import Chromosome
 from django.conf import settings
 from django.http import JsonResponse
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 
+def anno_from_autocomplete_view(request):
+    version = request.GET.get('version')
+    anno_from = request.GET.get('anno_from')
+    query = request.GET.get('query', "")
+    anno_from_examples=[]
+
+    if (anno_from=="ensembl"):
+        anno_from_examples = list(Chromosome.objects.filter(Q(genome_version=version)&Q(ensembl__icontains=query)).values_list("ensembl", flat=True))
+    if (anno_from=="ucsc"):
+        anno_from_examples = list(Chromosome.objects.filter(Q(genome_version=version)&Q(ucsc__icontains=query)).values_list("ucsc", flat=True))
+    if (anno_from=="refseq"):
+        anno_from_examples = list(Chromosome.objects.filter(Q(genome_version=version)&Q(refseq__icontains=query)).values_list("refseq", flat=True))
+    if (anno_from=="gencode"):
+        anno_from_examples = list(Chromosome.objects.filter(Q(genome_version=version)&Q(gencode__icontains=query)).values_list("gencode", flat=True))
+    if (anno_from=="ncbi"):
+        anno_from_examples = list(Chromosome.objects.filter(Q(genome_version=version)&Q(ncbi__icontains=query)).values_list("ncbi", flat=True))
+
+    anno_from_examples = list(set(anno_from_examples))
+    anno_from_examples = [d for d in anno_from_examples if not d==""]
+    return JsonResponse({'suggestions': anno_from_examples})
 
 def protein_autocomplete_view(request):
     query = request.GET.get('query', '')
@@ -90,11 +111,89 @@ def common_menu(request):
     }
     return render(request, 'home/common_menu.html', context)
 
-
-def variant_statistics(request):
+# http://localhost:8000/get_chromosome_mapping/?version=GRCh38&anno1=ensembl&input=22&anno2=ucsc
+def get_chromosome_mapping(request):
+    version = request.GET.get("version")
+    anno_from = request.GET.get("anno_from")
+    anno_to = request.GET.get("anno_to")
+    input = request.GET.get("input")
+    # ensembl, gencode, genome_version, id, ncbi, refseg, ucsc
+    if (anno_from=="ensembl"):
+        data = list(Chromosome.objects.filter(Q(genome_version=version)&Q(ensembl=input)).values_list(anno_to, flat=True))
+    if (anno_from=="gencode"):
+        data = list(Chromosome.objects.filter(Q(genome_version=version)&Q(gencode=input)).values_list(anno_to, flat=True))
+    if (anno_from=="ncbi"):
+        data = list(Chromosome.objects.filter(Q(genome_version=version)&Q(ncbi=input)).values_list(anno_to, flat=True))
+    if (anno_from=="refseg"):
+        data = list(Chromosome.objects.filter(Q(genome_version=version)&Q(refseg=input)).values_list(anno_to, flat=True))
+    if (anno_from=="ucsc"):
+        data = list(Chromosome.objects.filter(Q(genome_version=version)&Q(ucsc=input)).values_list(anno_to, flat=True))
+    data = list(set(data))
+    data = [d for d in data if not d==""]
+    if len(data)==0:
+        data="None"
     context = {
+        "result": data
     }
-    return render(request, 'home/variant_statistics.html', context)
+    print("---get_chromosome_mapping ->context ", context)
+    return JsonResponse(context)
+
+
+def get_chromosome_mapping_example(request):
+    version = request.GET.get("version")
+    anno_from = request.GET.get("anno_from")
+    anno_to = request.GET.get("anno_to")
+    anno_from_example=[]
+    anno_to_example=[]
+
+    print("paras: ",version, " ", anno_from, " ", anno_to)
+
+    if (anno_from=="ensembl"):
+        anno_from_example = list(Chromosome.objects.filter(genome_version=version).values_list("ensembl", flat=True))
+    if (anno_from=="gencode"):
+        anno_from_example = list(Chromosome.objects.filter(genome_version=version).values_list("gencode", flat=True))
+    if (anno_from=="ncbi"):
+        anno_from_example = list(Chromosome.objects.filter(genome_version=version).values_list("ncbi", flat=True))
+    if (anno_from=="refseg"):
+        anno_from_example = list(Chromosome.objects.filter(genome_version=version).values_list("refseg", flat=True))
+    if (anno_from=="ucsc"):
+        anno_from_example = list(Chromosome.objects.filter(genome_version=version).values_list("ucsc", flat=True))
+    anno_from_example = list(set(anno_from_example))
+    anno_from_example = [d for d in anno_from_example if not d==""]
+
+    if (anno_to=="ensembl"):
+        anno_to_example = list(Chromosome.objects.filter(genome_version=version).values_list("ensembl", flat=True))
+    if (anno_to=="gencode"):
+        anno_to_example = list(Chromosome.objects.filter(genome_version=version).values_list("gencode", flat=True))
+    if (anno_to=="ncbi"):
+        anno_to_example = list(Chromosome.objects.filter(genome_version=version).values_list("ncbi", flat=True))
+    if (anno_to=="refseg"):
+        anno_to_example = list(Chromosome.objects.filter(genome_version=version).values_list("refseg", flat=True))
+    if (anno_to=="ucsc"):
+        anno_to_example = list(Chromosome.objects.filter(genome_version=version).values_list("ucsc", flat=True))
+    anno_to_example = list(set(anno_to_example))
+    anno_to_example = [d for d in anno_to_example if not d==""]
+
+    if len(anno_from_example)>0:
+        anno_from_example=anno_from_example[0]
+    else:
+        anno_from_example="None"
+
+    if len(anno_to_example)>0:
+        anno_to_example=anno_to_example[0]
+    else:
+        anno_to_example="None"
+
+    context = {
+        "anno_from_example": anno_from_example,
+        "anno_to_example": anno_to_example
+    }
+    print("context = ", context)
+    return JsonResponse(context)
+
+def variant_annotation_converter(request):
+    context = {}
+    return render(request, 'home/variant_annotation_converter.html', context)
 
 def drug_target_network(request):
     context = {}
