@@ -218,4 +218,8 @@ class Pharmgkb(models.Model):
         null=True,
     )
 
+class VariantStatistics(models.Model):
+    # 'GeneID', 'TranscriptID', 'Chromosome', 'Total SNP', 'No_of__synonymous', 
+    pass
+
 

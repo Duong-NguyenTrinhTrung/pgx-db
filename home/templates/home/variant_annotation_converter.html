@@ -1,0 +1,359 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+
+{% block addon_css %}
+<link rel="stylesheet" href="{% static '/home/css/font.awesome.all.min.css' %}">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<style>
+    #variant,
+    #variant-result {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 80px;
+    }
+
+    #variant-result {
+        margin-top: 20px;
+        width: 70%;
+        margin: 20px auto;
+    }
+
+    #variant-result-table {
+        border-radius: 5px;
+        width: 100%;
+
+    }
+
+    #variant-result-table th:first-child {
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+    }
+
+    #variant-result-table th:last-child {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+
+    #variant-result-table th {
+        height: 40px;
+
+        background-color: rgb(255, 143, 171);
+        font-weight: normal;
+        color: white;
+        font-size: 14px;
+    }
+
+    #variant-result-table th,
+    td {
+        padding: 0 7px;
+        text-align: left;
+    }
+
+    /* Apply alternating row colors */
+    #variant-result-table tr:nth-child(even) {
+        background-color: rgba(255, 143, 171, 0.2);
+        /* Color 1 for even rows */
+    }
+
+    #variant-result-table tr:nth-child(odd) {
+        /* background-color: rgba(241, 124, 14, 0.2); */
+        background-color: white;
+        /* Color 2 for odd rows */
+    }
+
+
+    #variant form {
+        background-color: #F2F5F6;
+        /* Use a different pastel background color for the form if desired */
+        padding: 3px;
+        /* Add some padding to the form */
+        border-radius: 5px;
+        /* Optional: Add rounded corners to the form */
+        width: 70%;
+        height: 210px;
+    }
+
+    /* Style the input elements and buttons */
+    #variant input {
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    /* Add some spacing between buttons */
+    #variant_search,
+    #variant_reset {
+        margin-right: 10px;
+    }
+
+    input.form-control {
+        width: 650px;
+    }
+
+    td {
+        /* text-align: center;  */
+        vertical-align: middle;
+        /* Vertically center the content within the td */
+    }
+
+    .autocomplete-outer {
+        display: none;
+        width: 650px;
+        max-height: 400px;
+        background-color: white;
+        border: 1px solid #ccc;
+        padding: 5px;
+        position: absolute;
+        top: 100%;
+        left: 0;
+    }
+
+    #variant {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 40px
+            /* height: 100vh; Make sure the divs take the full viewport height */
+    }
+
+    #variant {
+        margin-top: 80px;
+    }
+
+    /* Style the input elements and buttons */
+    #variant input {
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    /* Add some spacing between buttons */
+    #variant_search,
+    #variant_reset {
+        margin-right: 10px;
+    }
+
+    input.form-control {
+        width: 650px;
+    }
+
+    .autocomplete-outer {
+        display: none;
+        width: 650px;
+        max-height: 400px;
+        background-color: white;
+        border: 1px solid #ccc;
+        padding: 5px;
+        position: absolute;
+        top: 100%;
+        left: 0;
+    }
+
+    #variant-autocomplete-results {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    #converter {
+        display: flex;
+        flex-direction: row;
+        gap: 15px;
+        width: 100%;
+    }
+
+    #ensembl,
+    #refseg {
+        width: 45%;
+        margin-left: 15px;
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    #refseg {
+        margin-left: -10px;
+    }
+
+    #switch {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    #switch button{
+        border: none;
+        background-color: transparent;
+    }
+
+    div.select-version {
+        text-align: left; 
+        width: 70%;
+        display: flex; 
+        flex-direction: row; 
+        gap: 15px; 
+        margin-bottom: 15px;
+        font-size: 16px;
+    }
+
+    #genome_select option[selected="selected"] {
+        /* color: #337ab7; */
+        /* background-color: #a9d6e5; */
+    }
+</style>
+{% endblock %}
+
+
+
+{% block content %}
+<div id="variant">
+    <h2>Chromosome/contig name mappings between <a href=""><i><span>UCSC</span></i></a>, <a href=""><i><span>Ensembl</span></i></a>, <a href=""><i><span>Gencode</span></i></a>, <a href=""><i><span>RefSeq</span></i></a> and <a href=""><i><span>NCBI</span></i></a></h2>
+    <br>
+    <div class="select-version" >
+        <p>Select a genome version</p>
+        <select id="genome_select" onchange="updateExample()" multiple class="form-control input-sm" style="width: 100px; font-size: 14px;" size="2">
+            <option value="grch38" selected="selected" >GRCh38</option>
+            <option value="grch37" >GRCh37</option>
+        </select>
+    </div>
+    <form method="get" action="">
+        <div id="converter">
+            <div id="ensembl">
+                    <div class="select-version">
+                        <p>Select a namming system</p>
+                        <select id="anno-from-select" onchange="updateExample()" multiple class="form-control input-sm" style="width: 100px; font-size: 14px;" size="5">
+                            <option value="ucsc" selected="selected" >UCSC</option>
+                            <option value="ensembl">Ensembl</option>
+                            <option  value="gencode">Gencode</option>
+                            <option  value="ncbi">NCBI</option>
+                            <option  value="refseq">RefSeg</option>
+                        </select>
+                    </div>
+                    <input id="search-anno-from"
+                        class="form-text form-type-textfield form-control optional ui-autocomplete-input"
+                        style="width:100%;" size="70%" autocomplete="on" />
+                    <div class="autocomplete-outer" style="width: 50px;">
+                        <div id="anno-from-autocomplete-results">
+                        </div>
+                    </div>
+                    <div id="anno_from_example" style="text-align: left;"><span >Examples: <i style="color:#0077b6;">GL000208.1</i></span></div>
+            </div>
+            <div id="switch">
+                <!-- <input id="submit_variant" type="submit" value="<i class='fa fa-exchange' aria-hidden='true'></i>" style="border: none;"> -->
+                    <button type="button" onclick="showResult()" style="margin-top: 7px;">
+                        <span><i class="fa fa-2x fa-exchange" aria-hidden="true"></i></span>
+                    </button>
+            </div>
+            <div id="refseg">
+                    <div class="select-version">
+                        <p>Select a namming system</p>
+                        <select id="anno-to-select" onchange="updateExample()" multiple class="form-control input-sm" style="width: 100px; font-size: 14px;"  size="5">
+                            <option value="ucsc">UCSC</option>
+                            <option value="ensembl" selected="selected">Ensembl</option>
+                            <option  value="gencode">Gencode</option>
+                            <option  value="ncbi">NCBI</option>
+                            <option  value="refseq">RefSeg</option>
+                        </select>
+                    </div>
+                    <input id="search-anno-to"
+                        class="form-text form-type-textfield form-control optional ui-autocomplete-input"
+                        style="width:100%;" size="70%" autocomplete="on" disabled/>
+                    <div class="autocomplete-outer" style="width: 50px;">
+                        <div id="anno-to-autocomplete-results">
+                        </div>
+                    </div>
+                    <div id="anno_to_example" style="text-align: left;"><span>Examples: <i style="color:#0077b6;">chr5_GL000208v1_random</i></span></div>
+            </div>
+        </div>
+
+        </tbody>
+        </table>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block addon_js %}
+
+<script>
+    $(document).ready(function () {
+        var autocompleteResults = $('#anno-from-autocomplete-results');
+        var version = $("#genome_select option:selected").text();
+        var anno_from = $("#anno-from-select").val();
+        $('#search-anno-from').autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: `{% url 'anno-from-autocomplete-view' %}?version=${version}&anno_from=${anno_from}`,
+                    data: {
+                        query: request.term
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        response(data.suggestions);
+                    }
+                });
+            },
+            autoFocus: true,
+            minLength: 3,
+            select: function (event, ui) {
+                $('#search-anno-from').val(ui.item.value);
+                return false;
+            },
+            open: function (event, ui) {
+                autocompleteResults.show(); 
+            },
+            close: function (event, ui) {
+                autocompleteResults.hide(); 
+            }
+        });
+    });
+
+    function updateExample(){
+        var version = $("#genome_select option:selected").text();
+        var anno_from = $("#anno-from-select").val(); 
+        var anno_to = $("#anno-to-select").val();
+        var ex_from = $("#anno_from_example span");
+        var ex_to = $("#anno_to_example span");
+        var anno_from_inp = $('#search-anno-to');
+        anno_from_inp.val("")
+        var anno_to_inp = $('#search-from-to');
+        anno_to_inp.val("");
+
+        $.ajax({
+                    url: `{% url 'get_chromosome_mapping_example' %}?version=${version}&anno_from=${anno_from}&anno_to=${anno_to}`,
+                    
+                    success: function (response) {
+                        ex_from.html(`Examples: <i style="color:#0077b6;">${response.anno_from_example}</i>`);
+                        ex_to.html(`Examples: <i style="color:#0077b6;">${response.anno_to_example}</i>`);
+                    }
+                });
+    }
+
+    function showResult(){
+        var version = $("#genome_select option:selected").text();
+        var anno_from = $("#anno-from-select").val(); 
+        var anno_to = $("#anno-to-select").val();
+        var query = $('#search-anno-from').val();
+        alert("query = "+query);
+        $.ajax({
+                    url: `{% url 'get_chromosome_mapping' %}?version=${version}&input=${query}&anno_from=${anno_from}&anno_to=${anno_to}`,
+                    
+                    success: function (response) {
+                        alert("success, rs = "+response.result);
+                        $('#search-anno-to').val(response.result);
+                    }
+                });
+
+    }
+
+</script>
+
+{% endblock %}
