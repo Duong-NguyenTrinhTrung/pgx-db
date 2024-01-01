@@ -168,7 +168,7 @@
     }
 
     #ensembl,
-    #refseg {
+    #refseq {
         width: 45%;
         margin-left: 15px;
         margin-top: 10px;
@@ -178,18 +178,22 @@
         gap: 10px;
     }
 
-    #refseg {
+    #refseq {
         margin-left: -10px;
     }
 
     #switch {
+        
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 20px;
+        padding: 78px 26px 20px 14px;
+        flex-direction: column;
     }
 
     #switch button{
+        /* border: solid 1px grey; */
+        /* border-radius: 3px; */
         border: none;
         background-color: transparent;
     }
@@ -219,7 +223,7 @@
     <br>
     <div class="select-version" >
         <p>Select a genome version</p>
-        <select id="genome_select" onchange="updateExample()" multiple class="form-control input-sm" style="width: 100px; font-size: 14px;" size="2">
+        <select id="genome_select" onchange="updateExample(this)" multiple class="form-control input-sm" style="width: 100px; font-size: 14px;" size="2">
             <option value="grch38" selected="selected" >GRCh38</option>
             <option value="grch37" >GRCh37</option>
         </select>
@@ -229,12 +233,12 @@
             <div id="ensembl">
                     <div class="select-version">
                         <p>Select a namming system</p>
-                        <select id="anno-from-select" onchange="updateExample()" multiple class="form-control input-sm" style="width: 100px; font-size: 14px;" size="5">
+                        <select id="anno-from-select" onchange="updateExample(this)" multiple class="form-control input-sm" style="width: 100px; font-size: 14px;" size="5">
                             <option value="ucsc" selected="selected" >UCSC</option>
                             <option value="ensembl">Ensembl</option>
                             <option  value="gencode">Gencode</option>
                             <option  value="ncbi">NCBI</option>
-                            <option  value="refseq">RefSeg</option>
+                            <option  value="refseq">RefSeq</option>
                         </select>
                     </div>
                     <input id="search-anno-from"
@@ -247,20 +251,22 @@
                     <div id="anno_from_example" style="text-align: left;"><span >Examples: <i style="color:#0077b6;">GL000208.1</i></span></div>
             </div>
             <div id="switch">
-                <!-- <input id="submit_variant" type="submit" value="<i class='fa fa-exchange' aria-hidden='true'></i>" style="border: none;"> -->
+                    <button type="button" onclick="reset()" style="margin-top: 7px;">
+                        <span style="color: green;"><i class="fa fa-2x fa-refresh" aria-hidden="true"></i></span>
+                    </button>
                     <button type="button" onclick="showResult()" style="margin-top: 7px;">
                         <span><i class="fa fa-2x fa-exchange" aria-hidden="true"></i></span>
                     </button>
             </div>
-            <div id="refseg">
+            <div id="refseq">
                     <div class="select-version">
                         <p>Select a namming system</p>
-                        <select id="anno-to-select" onchange="updateExample()" multiple class="form-control input-sm" style="width: 100px; font-size: 14px;"  size="5">
+                        <select id="anno-to-select" onchange="updateExample(this)" multiple class="form-control input-sm" style="width: 100px; font-size: 14px;"  size="5">
                             <option value="ucsc">UCSC</option>
                             <option value="ensembl" selected="selected">Ensembl</option>
                             <option  value="gencode">Gencode</option>
                             <option  value="ncbi">NCBI</option>
-                            <option  value="refseq">RefSeg</option>
+                            <option  value="refseq">RefSeq</option>
                         </select>
                     </div>
                     <input id="search-anno-to"
@@ -316,16 +322,30 @@
         });
     });
 
-    function updateExample(){
+    function reset(){
+        $("#search-anno-from").val("");
+        $("#search-anno-to").val("");
+    }
+
+    function updateExample(selectElement){
+        var elementID = selectElement.id;
+        if (elementID==="genome_select"){
+            $("#search-anno-from").val("");
+            $("#search-anno-to").val("");
+        }
+        else if(elementID==="anno-from-select"){
+            $("#search-anno-from").val("");
+            $("#search-anno-to").val("");
+        }
+        else {
+            $("#search-anno-to").val("");
+        }
+
         var version = $("#genome_select option:selected").text();
         var anno_from = $("#anno-from-select").val(); 
         var anno_to = $("#anno-to-select").val();
         var ex_from = $("#anno_from_example span");
         var ex_to = $("#anno_to_example span");
-        var anno_from_inp = $('#search-anno-to');
-        anno_from_inp.val("")
-        var anno_to_inp = $('#search-from-to');
-        anno_to_inp.val("");
 
         $.ajax({
                     url: `{% url 'get_chromosome_mapping_example' %}?version=${version}&anno_from=${anno_from}&anno_to=${anno_to}`,
@@ -342,16 +362,12 @@
         var anno_from = $("#anno-from-select").val(); 
         var anno_to = $("#anno-to-select").val();
         var query = $('#search-anno-from').val();
-        alert("query = "+query);
         $.ajax({
                     url: `{% url 'get_chromosome_mapping' %}?version=${version}&input=${query}&anno_from=${anno_from}&anno_to=${anno_to}`,
-                    
                     success: function (response) {
-                        alert("success, rs = "+response.result);
                         $('#search-anno-to').val(response.result);
                     }
                 });
-
     }
 
 </script>

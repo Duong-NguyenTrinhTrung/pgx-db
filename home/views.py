@@ -117,15 +117,15 @@ def get_chromosome_mapping(request):
     anno_from = request.GET.get("anno_from")
     anno_to = request.GET.get("anno_to")
     input = request.GET.get("input")
-    # ensembl, gencode, genome_version, id, ncbi, refseg, ucsc
+    # ensembl, gencode, genome_version, id, ncbi, refseq, ucsc
     if (anno_from=="ensembl"):
         data = list(Chromosome.objects.filter(Q(genome_version=version)&Q(ensembl=input)).values_list(anno_to, flat=True))
     if (anno_from=="gencode"):
         data = list(Chromosome.objects.filter(Q(genome_version=version)&Q(gencode=input)).values_list(anno_to, flat=True))
     if (anno_from=="ncbi"):
         data = list(Chromosome.objects.filter(Q(genome_version=version)&Q(ncbi=input)).values_list(anno_to, flat=True))
-    if (anno_from=="refseg"):
-        data = list(Chromosome.objects.filter(Q(genome_version=version)&Q(refseg=input)).values_list(anno_to, flat=True))
+    if (anno_from=="refseq"):
+        data = list(Chromosome.objects.filter(Q(genome_version=version)&Q(refseq=input)).values_list(anno_to, flat=True))
     if (anno_from=="ucsc"):
         data = list(Chromosome.objects.filter(Q(genome_version=version)&Q(ucsc=input)).values_list(anno_to, flat=True))
     data = list(set(data))
@@ -154,8 +154,8 @@ def get_chromosome_mapping_example(request):
         anno_from_example = list(Chromosome.objects.filter(genome_version=version).values_list("gencode", flat=True))
     if (anno_from=="ncbi"):
         anno_from_example = list(Chromosome.objects.filter(genome_version=version).values_list("ncbi", flat=True))
-    if (anno_from=="refseg"):
-        anno_from_example = list(Chromosome.objects.filter(genome_version=version).values_list("refseg", flat=True))
+    if (anno_from=="refseq"):
+        anno_from_example = list(Chromosome.objects.filter(genome_version=version).values_list("refseq", flat=True))
     if (anno_from=="ucsc"):
         anno_from_example = list(Chromosome.objects.filter(genome_version=version).values_list("ucsc", flat=True))
     anno_from_example = list(set(anno_from_example))
@@ -167,8 +167,8 @@ def get_chromosome_mapping_example(request):
         anno_to_example = list(Chromosome.objects.filter(genome_version=version).values_list("gencode", flat=True))
     if (anno_to=="ncbi"):
         anno_to_example = list(Chromosome.objects.filter(genome_version=version).values_list("ncbi", flat=True))
-    if (anno_to=="refseg"):
-        anno_to_example = list(Chromosome.objects.filter(genome_version=version).values_list("refseg", flat=True))
+    if (anno_to=="refseq"):
+        anno_to_example = list(Chromosome.objects.filter(genome_version=version).values_list("refseq", flat=True))
     if (anno_to=="ucsc"):
         anno_to_example = list(Chromosome.objects.filter(genome_version=version).values_list("ucsc", flat=True))
     anno_to_example = list(set(anno_to_example))
@@ -191,9 +191,9 @@ def get_chromosome_mapping_example(request):
     print("context = ", context)
     return JsonResponse(context)
 
-def variant_annotation_converter(request):
+def chromosome_mapper(request):
     context = {}
-    return render(request, 'home/variant_annotation_converter.html', context)
+    return render(request, 'home/chromosome_mapper.html', context)
 
 def drug_target_network(request):
     context = {}

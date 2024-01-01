@@ -6,5 +6,5 @@ class Chromosome(models.Model):
     ensembl = models.CharField(max_length=50)  # string values
     ucsc = models.CharField(max_length=50)  # string values
     ncbi = models.CharField(max_length=50)  # string values
-    refseg = models.CharField(max_length=50)  # string values
+    refseq = models.CharField(max_length=50)  # string values
     gencode = models.CharField(max_length=50)  # string values
