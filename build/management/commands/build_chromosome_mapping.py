@@ -67,6 +67,7 @@ class Command(BaseCommand):
             filepath = os.sep.join([self.chromosomedata_data_dir, filename])
             with open(filepath, "r") as f:
                 lines = f.readlines()
+                #;version;NCBI;UCSC;ensembl;gencode;RefSeq
                 for i,line in enumerate(lines[1:]):
                         values=line[:-1].split(";")
                         version = values[1]
@@ -74,7 +75,7 @@ class Command(BaseCommand):
                         UCSC = values[3]
                         ensembl = values[4]
                         gencode = values[5]
-                        RefSeg  = values[6]
+                        RefSeq  = values[6]
 
                         type, created = Chromosome.objects.get_or_create(
                             genome_version = version,
@@ -82,7 +83,7 @@ class Command(BaseCommand):
                             ucsc = UCSC,
                             ensembl = ensembl,
                             gencode = gencode,
-                            refseg  = RefSeg,
+                            refseq  = RefSeq,
                             )
                         type.save()
                         print(i, " a record is saved")
