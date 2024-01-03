@@ -64,6 +64,7 @@ INSTALLED_APPS = [
     "api",
     "restapi",
     "chromosome",
+    "disease",
 ]
 
 MIDDLEWARE = [

@@ -39,6 +39,8 @@ from .models import (
     DrugAtcAssociation,
 )
 from .services import DrugNetworkGetDataService, DrugsNetworkGetDataService
+from time import perf_counter
+
 
 app_name = 'drug'
 
@@ -641,10 +643,11 @@ def format_atc_name(s):
     return s
 
 # Set timeout to a very high value (e.g., 10 years)
-LONG_TIMEOUT = 60 * 60 * 24 * 365
+LONG_TIMEOUT = 60 * 60 * 24 * 30
 
 @cache_page(LONG_TIMEOUT)
 def atc_detail_view(request):
+    start_time = perf_counter()
     group_id = request.GET.get('group_id')  # Retrieve group_id from the query parameter
     anatomic_group = None
     try:
@@ -668,8 +671,11 @@ def atc_detail_view(request):
         group.name = format_atc_name(group.name)
     context = {'group2s': group2s, 'group3s': group3s, 'group4s': group4s, 'group5s': group5s, "group_id": group_id,
                "group_name": group_name}
-    
-    return render(request, 'atc_detail_view.html', context)
+    end_time = perf_counter()
+    print("duration = ", (end_time - start_time))
+    response = render(request, 'atc_detail_view.html', context)
+    response['atc_detail_view-Duration'] = end_time - start_time
+    return response
 
 
 @csrf_exempt  # Use this decorator for simplicity, but consider using a proper csrf token in production.
