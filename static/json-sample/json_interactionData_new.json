@@ -1,0 +1,56 @@
+[
+  {
+    "interaction_id": 52124,
+    "actions": null,
+    "known_action": "Unknown",
+    "interaction_type": "Target",
+    "pubmed_ids": "19270242",
+    "drugbank_id": "DB00898",
+    "uniprot_ID_id": "A5X5Y0"
+  },
+  {
+    "interaction_id": 55491,
+    "actions": "potentiator",
+    "known_action": "yes",
+    "interaction_type": "Target",
+    "pubmed_ids": "2857046",
+    "drugbank_id": "DB01567",
+    "uniprot_ID_id": "A8MPY1"
+  },
+  {
+    "interaction_id": 57318,
+    "actions": null,
+    "known_action": "Unknown",
+    "interaction_type": "Target",
+    "pubmed_ids": "10592235",
+    "drugbank_id": "DB03247",
+    "uniprot_ID_id": "O00141"
+  },
+  {
+    "interaction_id": 62019,
+    "actions": null,
+    "known_action": "Unknown",
+    "interaction_type": "Target",
+    "pubmed_ids": "10592235",
+    "drugbank_id": "DB07837",
+    "uniprot_ID_id": "O00141"
+  },
+  {
+    "interaction_id": 62356,
+    "actions": null,
+    "known_action": "Unknown",
+    "interaction_type": "Target",
+    "pubmed_ids": "10592235",
+    "drugbank_id": "DB08191",
+    "uniprot_ID_id": "O00141"
+  },
+  {
+    "interaction_id": 63913,
+    "actions": null,
+    "known_action": "Unknown",
+    "interaction_type": "Target",
+    "pubmed_ids": "16824036|16831968|16990274|17257012|19236027|19697239|22791135",
+    "drugbank_id": "DB09130",
+    "uniprot_ID_id": "F7VJQ1"
+  }
+]

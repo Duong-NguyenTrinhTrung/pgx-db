@@ -645,7 +645,7 @@ def format_atc_name(s):
 # Set timeout to a very high value (e.g., 10 years)
 LONG_TIMEOUT = 60 * 60 * 24 * 30
 
-@cache_page(LONG_TIMEOUT)
+# @cache_page(LONG_TIMEOUT)
 def atc_detail_view(request):
     start_time = perf_counter()
     group_id = request.GET.get('group_id')  # Retrieve group_id from the query parameter

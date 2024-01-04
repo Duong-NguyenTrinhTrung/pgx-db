@@ -17,8 +17,10 @@ function createPieChartForTargetType(data) {
         .innerRadius(radius - 60)
         .outerRadius(radius - 10);
 
-    const colors = d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length);
+    // const colors = d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length);
+    const colors = ["#ff99c8", "#43bccd", "#f9c80e", "#662e9b"];
     const color = d3.scaleOrdinal(colors);
+   
 
     const g = svg.append("g")
         .attr("transform", `translate(${size / 2},${size / 2})`); // Center the chart
@@ -91,7 +93,8 @@ function createPieChartForDrugStatus(data) {
         .innerRadius(radius - 60)
         .outerRadius(radius - 10);
 
-    const colors = d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length);
+    // const colors = d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length);
+    const colors = ["#ee6055", "#60d394", "#aaf683", "#ffd97d", "#ff9b85", "#e4c1f9"];
     const color = d3.scaleOrdinal(colors);
 
     const g = svg.append("g")
@@ -165,7 +168,8 @@ function createPieChartForDrugType(data) {
         .innerRadius(radius - 60)
         .outerRadius(radius - 10);
 
-    const colors = d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length);
+    // const colors = d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length);
+    const colors = ["#d62828", "#003049"];
     const color = d3.scaleOrdinal(colors);
 
     const g = svg.append("g")
