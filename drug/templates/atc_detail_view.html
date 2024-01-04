@@ -130,10 +130,29 @@
     }
 
     input[type="radio"]:disabled + .label:before{
-    box-shadow: inset 0 0 0 4px #f4f4f4;
-    border-color: #333;
-    background-color: red;
+        box-shadow: inset 0 0 0 4px #f4f4f4;
+        border-color: #333;
+        background-color: red;
     }
+
+    .legend {
+            list-style: none;
+            padding: 0;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 2px;
+    }
+
+    .legend-color {
+        width: 10px;
+        height: 10px;
+        margin-right: 8px;
+        border: 1px solid #000;  /* You can adjust the border color */
+    }
+
 </style>
 
 {% endblock %}
@@ -146,13 +165,49 @@
         <!-- block for showing the drug table -->
         <div id='drug-table'>
         </div>
+
+        <!-- block for showing network -->
+        <div class="forcenetworkgraph" id="graphvisibility"
+            style="display: none; width: 100%; margin: 10px 0; height: 90%; ">
+            <p> <span style="color: red;" id="network_overview"></span> </p>
+            <iframe id="myIframe" style="
+                                                display: none;
+                                                width: 98%;
+                                                height: 100%;
+                                                border: #b4b1b1 1px solid;
+                                                margin-right: 5px;">
+            </iframe>
+        </div>
+
         <!-- block for showing the atc level network statistics -->
         <div id='atc_level_network_statistics' style="border: #b4b1b1 1px solid">
             <p>
                 <span id="atc_level_network_statistics_text"> </span>
             </p>
             <div class="row">
-                <div class="col-md-2 col-sm-12">
+                <div class="col-md-2 col-sm-12" style="margin-right: -80px;">
+                    <div id="moa_legend">
+                        <ul class="legend">
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #ff99c8;"></div>
+                                Target
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #43bccd;"></div>
+                                Enzyme
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #662e9b;"></div>
+                                Transporter
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #f9c80e;"></div>
+                                Carrier
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-12" style="margin-right: 60px">
                     <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
                         <p style="font-style: italic; text-align: left;">Mode of action</p>
                         <div id="chart-container-ATC-interaction-type" style="width: 150px; height: 150px;">
@@ -160,7 +215,21 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2 col-sm-12">
+                <div class="col-md-2 col-sm-12" style="margin-right: -80px;">
+                    <div id="dtype_legend">
+                        <ul class="legend">
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #d62828;"></div>
+                                Small Molecule
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #003049;"></div>
+                                Biotech
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-12" style="margin-right: 60px">
                     <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
                         <p style="font-style: italic; text-align: left;">Drug type</p>
                         <div id="chart-container-ATC-drug-type" style="width: 150px; height: 150px;">
@@ -168,10 +237,39 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-2 col-sm-12" style="margin-right: -80px;">
+                    <div id="dstatus_legend">
+                        <ul class="legend">
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #ee6055;"></div>
+                                Nutraceutical
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #60d394;"></div>
+                                Experimental
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #aaf683;"></div>
+                                Investigational
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #ffd97d;"></div>
+                                Approved
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #ff9b85;"></div>
+                                VetApproved
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #e4c1f9;"></div>
+                                Illicit
+                            </li>
+                        </ul>
+                    </div>
+                </div>
                 <div class="col-md-2 col-sm-12">
-                    <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
+                    <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px; ">
                         <p style="font-style: italic; text-align: left;">Drug clinical status</p>
-                        <!--PieChart Code here-->
                         <div id="chart-container-ATC-drug-status" style="width: 150px; height: 150px;">
                             <svg id="pie-chart-ATC-drug-status"></svg>
                         </div>
@@ -221,18 +319,7 @@
             </div>
 
         </div>
-        <!-- block for showing network -->
-        <div class="forcenetworkgraph" id="graphvisibility"
-            style="display: none; width: 100%; margin: 10px 0; height: 90%; ">
-            <p> <span style="color: red;" id="network_overview"></span> </p>
-            <iframe id="myIframe" style="
-                                                display: none;
-                                                width: 98%;
-                                                height: 100%;
-                                                border: #b4b1b1 1px solid;
-                                                margin-right: 5px;">
-            </iframe>
-        </div>
+        
         <!-- block for showing the target table -->
         <div id="target-table" style="display: none;">
             <span style="font-style: italic; margin-bottom: 10px;" id="info-target-table"></span>
@@ -360,11 +447,13 @@
                         { category: "Transporter", value: response.response_data.NoOfTransporterTypes },
                     ];
                     createPieChartForTargetType(target_type_data);
+
                     const drug_type_data = [
                         { category: "Small Molecule", value: response.response_data.NoOfSmallMolecule },
                         { category: "Biotech", value: response.response_data.NoOfBiotech },
                     ];
                     createPieChartForDrugType(drug_type_data);
+
                     const drug_status_data = [
                         { category: "Nutraceutical", value: response.response_data.NoOfNutraceuticalDrug },
                         { category: "Experimental", value: response.response_data.NoOfExperimentalDrug },
