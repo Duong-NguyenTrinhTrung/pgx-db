@@ -168,7 +168,7 @@
 
         <!-- block for showing network -->
         <div class="forcenetworkgraph" id="graphvisibility"
-            style="display: none; width: 100%; margin: 10px 0; height: 90%; ">
+            style="display: none; width: 100%; margin: 10px 0; height: 1300px; ">
             <p> <span style="color: red;" id="network_overview"></span> </p>
             <iframe id="myIframe" style="
                                                 display: none;
@@ -223,7 +223,7 @@
                                 Small Molecule
                             </li>
                             <li class="legend-item">
-                                <div class="legend-color" style="background-color: #003049;"></div>
+                                <div class="legend-color" style="background-color: #004e98;"></div>
                                 Biotech
                             </li>
                         </ul>
@@ -677,7 +677,26 @@
 
     //datatable render function
     function render_clinical_pgx_data(pgx_clinical_data) {
-        var tableHtml = '<table class="display compact text-nowrap" id="pgx-data-table"><thead id="headers" style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Variant/Haplotypes &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th style="white-space: nowrap; text-align: center;">PMID &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th style="white-space: nowrap; text-align: center;">Phenotype category &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Significance &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Notes &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>Sentence&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>Alleles &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>P_Value &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>Biogeographical Groups &nbsp; &nbsp; &nbsp; &nbsp;&nbsp;&nbsp;</th><th>Study_Type &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>Study_Cases &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>Study_Controls &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>Direction_of_effect &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>PD_PK_terms &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>Metabolizer_types &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
+        var tableHtml = '<table class="display compact text-nowrap" id="pgx-data-table"><thead id="headers" style="text-align: left;"><tr>'+
+            '<th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th>'+
+            '<th style="white-space: nowrap;">Gene name &nbsp; &nbsp; &nbsp; &nbsp; </th>'+
+            '<th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp; &nbsp; &nbsp;</th>'+
+            '<th style="white-space: nowrap; text-align: center;">Variant/Haplotypes&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;</th>'+
+            '<th style="white-space: nowrap; text-align: center;">PMID &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;</th>'+
+            '<th style="white-space: nowrap; text-align: left;">Phenotype<br>category &nbsp; &nbsp; &nbsp; &nbsp; </th>'+
+            '<th >Significance &nbsp; &nbsp; &nbsp; &nbsp; </th>'+
+            '<th>Alleles &nbsp; &nbsp; &nbsp; &nbsp; </th>'+
+            '<th>P_Value &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th>'+
+            '<th style="white-space: normal; text-align: left; margin-right: 20px;">Biogeographical<br>Groups &nbsp; &nbsp; &nbsp; &nbsp;</th>'+
+            '<th style="text-align: right;">Study_Type &nbsp; &nbsp; &nbsp; &nbsp; </th>'+
+            '<th>Study_Cases &nbsp; &nbsp; &nbsp; &nbsp;</th>'+
+            '<th>Study_Controls &nbsp; &nbsp; &nbsp; &nbsp; </th>'+
+            '<th>Direction_of_effect &nbsp; &nbsp; &nbsp; &nbsp; </th>'+
+            '<th>PD_PK_terms &nbsp; &nbsp; &nbsp; &nbsp; </th>'+
+            '<th >Metabolizer_types &nbsp; &nbsp; &nbsp; &nbsp;</th>'+
+            '<th style="text-align: center;">Association &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;</th>'+
+            '<th style="text-align: center;">MORE DETAILS &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;</th>'+
+            '</tr></thead><tbody>';
         for (var k = 0; k < pgx_clinical_data.length; k++) {
             row = pgx_clinical_data[k];
             for (var l = 0; l < row.clinical_data.length; l++) {
@@ -687,21 +706,21 @@
                         <td style="vertical-align: top;" >${row.drug_id}</td>
                         <td style="vertical-align: top;" >${row.gene_name}</td>
                         <td style="vertical-align: top;" >${row.moa}</td>
-                        <td style="vertical-align: top;" >${value.Variant_or_Haplotypes}</td>
-                        <td style="vertical-align: top;" >PMID:${value.PMID}</td>
+                        <td style="vertical-align: top; white-space: normal;" >${value.Variant_or_Haplotypes}</td>
+                        <td style="vertical-align: top;" >PMID:<a href="https://pubmed.ncbi.nlm.nih.gov/${value.PMID}" target="_blank">${value.PMID}</a></td>
                         <td style="vertical-align: top;" >${value.Phenotype_Category}</td>
-                        <td style="vertical-align: top;" >${value.Significance}</td>
-                        <td style="vertical-align: top;" >${value.Notes}</td>
-                        <td style="vertical-align: top;" >${value.Sentence}</td>
+                        <td style="vertical-align: top; white-space: normal;" >${value.Significance}</td>
                         <td style="vertical-align: top;" >${value.Alleles}</td>
-                        <td style="vertical-align: top;" >${value.P_Value}</td>
-                        <td style="vertical-align: top;" >${value.Biogeographical_Groups}</td>
-                        <td style="vertical-align: top;" >${value.Study_Type}</td>
-                        <td style="vertical-align: top;" >${value.Study_Cases}</td>
+                        <td style="vertical-align: top;" >${value.P_Value}&nbsp; &nbsp; &nbsp;&nbsp;</td>
+                        <td style="vertical-align: top; white-space: normal;" >${value.Biogeographical_Groups}</td>
+                        <td style="vertical-align: top; text-align: center;" >${value.Study_Type}</td>
+                        <td style="vertical-align: top; " >${value.Study_Cases}</td>
                         <td style="vertical-align: top;" >${value.Study_Controls}</td>
                         <td style="vertical-align: top;" >${value.Direction_of_effect}</td>
                         <td style="vertical-align: top;" >${value.PD_PK_terms}</td>
                         <td style="vertical-align: top;" >${value.Metabolizer_types}</td>
+                        <td style="vertical-align: top; white-space: normal;" >${value.Sentence}</td>
+                        <td style="vertical-align: top; white-space: normal;" >${value.Notes}</td>
                     </tr>`;
             }
         }
@@ -724,8 +743,8 @@
             order: [[0, "asc"]],
             pagingType: 'full_numbers',
             lengthMenu: [
-                [10, 20, 30],
-                [10, 20, 30],
+                [3, 5, 10, 20, 30],
+                [3, 5, 10, 20, 30],
             ],
         });
 
@@ -738,32 +757,36 @@
         //MOA
         column_filters = column_filters.concat(createYADCFfilters(2, 1, "select", null, "select", false, null, null, "60px"));
         //Variant_or_Haplotypes
-        column_filters = column_filters.concat(createYADCFfilters(3, 1, "select", null, "select", false, null, null, "60px"));
+        // column_filters = column_filters.concat(createYADCFfilters(3, 1, "select", null, "select", false, null, null, "60px"));
         //PMID
-        column_filters = column_filters.concat(createYADCFfilters(4, 1, "select", null, "select", false, null, null, "60px"));
+        // column_filters = column_filters.concat(createYADCFfilters(4, 1, "select", null, "select", false, null, null, "60px"));
         //Phenotype_Category
         column_filters = column_filters.concat(createYADCFfilters(5, 1, "select", null, "select", false, null, null, "60px"));
         //Significance
-        column_filters = column_filters.concat(createYADCFfilters(6, 1, "select", null, "select", false, null, null, width = "70px"));
+        column_filters = column_filters.concat(createYADCFfilters(6, 1, "select", null, "select", false, null, null, "60px"));
         //Alleles
-        column_filters = column_filters.concat(createYADCFfilters(9, 1, "select", null, "select", false, null, null, width = "70px"));
+        // column_filters = column_filters.concat(createYADCFfilters(7, 1, "select", null, "select", false, null, null, width = "70px"));
         //P_Value
-        column_filters = column_filters.concat(createYADCFfilters(10, 1, "select", null, "select", false, null, null, width = "70px"));
+        // column_filters = column_filters.concat(createYADCFfilters(8, 1, "select", null, "select", false, null, null, width = "70px"));
         //Biogeographical_Groups
-        column_filters = column_filters.concat(createYADCFfilters(11, 1, "select", null, "select", false, null, null, width = "70px"));
+        column_filters = column_filters.concat(createYADCFfilters(9, 1, "auto_complete", null, "", false, null, null, width = "70px"));
         //Study_Type
-        column_filters = column_filters.concat(createYADCFfilters(12, 1, "select", null, "select", false, null, null, width = "70px"));
+        column_filters = column_filters.concat(createYADCFfilters(10, 1, "select", null, "select", false, null, null, width = "70px"));
         //Study_Cases
-        column_filters = column_filters.concat(createYADCFfilters(13, 1, "select", null, "select", false, null, null, width = "70px"));
+        column_filters = column_filters.concat(createYADCFfilters(11, 1, "select", null, "select", false, null, null, width = "70px"));
         //Study_Controls
-        column_filters = column_filters.concat(createYADCFfilters(14, 1, "select", null, "select", false, null, null, width = "70px"));
+        column_filters = column_filters.concat(createYADCFfilters(12, 1, "select", null, "select", false, null, null, width = "70px"));
         //Direction_of_effect
-        column_filters = column_filters.concat(createYADCFfilters(15, 1, "select", null, "select", false, null, null, width = "70px"));
+        column_filters = column_filters.concat(createYADCFfilters(13, 1, "select", null, "select", false, null, null, width = "70px"));
         //PD_PK_terms
-        column_filters = column_filters.concat(createYADCFfilters(16, 1, "select", null, "select", false, null, null, width = "70px"));
+        column_filters = column_filters.concat(createYADCFfilters(14, 1, "select", null, "select", false, null, null, width = "70px"));
         //Metabolizer_types
-        column_filters = column_filters.concat(createYADCFfilters(17, 1, "select", null, "select", false, null, null, width = "70px"));
+        // column_filters = column_filters.concat(createYADCFfilters(15, 1, "select", null, "select", false, null, null, width = "70px"));
         // update filters
+        //Association (Sentence)
+        // column_filters = column_filters.concat(createYADCFfilters(16, 1, "select", null, "select", false, null, null, width = "70px"));
+        //MORE DETAILS (Notes)
+        // column_filters = column_filters.concat(createYADCFfilters(17, 1, "select", null, "select", false, null, null, width = "70px"));
         yadcf.init(
             oTable1, column_filters, {
             cumulative_filtering: false,
