@@ -6,9 +6,9 @@ from .views import search_drugs, drug_atc_expansion, atc_lookup, atc_detail_view
 
 urlpatterns = [
     path('search_drugs', views.search_drugs, name='search_drugs'),
-    path('atc-lookup', views.atc_lookup, name='atc-lookup'),
+    path('atc-lookup', cache_page(3600*24*7)(views.atc_lookup), name='atc-lookup'),
     path('atc-anatomical-groups', views.AtcAnatomicalGroupListView.as_view(), name='atc-anatomical-groups'),
-    path('atc_search_view', views.atc_search_view, name='atc_search_view'),
+    path('atc_search_view', cache_page(3600*24*7)(views.atc_search_view), name='atc_search_view'),
     path('drug_network', views.get_drug_network, name='drug_network'), #'viz_index1_v3.html'
     path('drug_network/<str:drug_bank_id>/general_data', views.get_drug_general_data, name='drug_network_general_data'),
     path('drug_network/<str:drug_bank_id>/drug_data', views.get_drug_data, name='drug_network_drug_data'),

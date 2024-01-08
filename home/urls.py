@@ -5,12 +5,12 @@ from .views import Home, drug_target_network, drug_lookup, target_lookup, drug_a
 
 
 urlpatterns = [
-    path("", Home.as_view(), name='home'),
+    path("", cache_page(3600*24*7)(Home.as_view()), name='home'),
     path("drug_target_network/", drug_target_network, name='drug_target_network'),
-    path("drug_lookup/", drug_lookup, name='drug_lookup'),
+    path("drug_lookup/", cache_page(3600*24*7)(drug_lookup), name='drug_lookup'),
     path("about_pgx/", about_pgx, name='about-pgx'),
-    path("target_lookup/", target_lookup, name='target_lookup'),
-    path("variant_lookup/", variant_lookup, name='variant_lookup'),
+    path("target_lookup/", cache_page(3600*24*7)(target_lookup), name='target_lookup'),
+    path("variant_lookup/", cache_page(3600*24*7)(variant_lookup), name='variant_lookup'),
     path("chromosome_mapper/", chromosome_mapper, name='chromosome_mapper'),
     path("get_chromosome_mapping/", get_chromosome_mapping, name='get_chromosome_mapping'),
     path("get_chromosome_mapping_example/", get_chromosome_mapping_example, name='get_chromosome_mapping_example'),

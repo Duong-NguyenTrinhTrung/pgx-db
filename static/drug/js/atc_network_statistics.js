@@ -169,7 +169,7 @@ function createPieChartForATCDrugType(data) {
         .outerRadius(radius - 10);
 
     // const colors = d3.quantize(t => d3.interpolateSpectral(t * 0.8 + 0.1), data.length);
-    const colors = ["#d62828", "#003049"];
+    const colors = ["#d62828", "#004e98"];
     const color = d3.scaleOrdinal(colors);
 
     const g = svg.append("g")
