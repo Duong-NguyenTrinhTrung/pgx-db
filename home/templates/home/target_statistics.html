@@ -241,9 +241,9 @@ var tooltip = d3.select("body")
 
     selected_moa = d.text;
     var selectElement = document.querySelector("select"); // Selects the first <select> element in the document
-    selectElement.options[0].selected = true;
-    // selectElement.options[1].selected = true;
-    // draw_piechart("ion_class", "Ion channel")
+    for (var i = 0; i < selectElement.options.length; i++) {
+      selectElement.options[i].selected = false;
+    }
   });
 
   perc_so_far = 0;

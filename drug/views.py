@@ -567,7 +567,7 @@ def DrugStatistics(request):
             "other": [Drug.objects.filter(Q(drugtype__type_detail="Small Molecule") & ~Q(Clinical_status__in=[0, 4, 5]) & Q(superclass__superclass_detail=sc)).count() for sc in super_classes],
         },
     }
-    print("context = ", context)
+    # print("context = ", context)
     return render(request, 'drugstatistics.html', context)
 
 

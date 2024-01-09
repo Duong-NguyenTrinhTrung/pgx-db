@@ -89,7 +89,7 @@ function draw_piechart(element, text)
     
     var labels = {{ super_classes |safe }};
     var drawdata = [];
-    var canvasWidth = 900;
+    var canvasWidth = 850;
     var canvasHeight = 600;
     for (var i=0; i<labels.length; i++) {
         drawdata.push(
@@ -185,9 +185,9 @@ var tooltip = d3.select("body")
 
     selected_status = d.text;
     var selectElement = document.querySelector("select"); // Selects the first <select> element in the document
-    selectElement.options[0].selected = true;
-    // selectElement.options[1].selected = true;
-    // draw_piechart("biologic", "Biologic")
+    for (var i = 0; i < selectElement.options.length; i++) {
+      selectElement.options[i].selected = false;
+    }
   });
 
   perc_so_far = 0;
