@@ -838,7 +838,7 @@ def target_statistics(request):
         }
     }
 
-    print("context = ", context)
+    # print("context = ", context)
     return render(request,  'home/target_statistics.html', context)
 
 def about_pgx(request):
