@@ -181,16 +181,82 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        
-                        
                     </div>
                 </div>
             </div>
             <!-- pieChart HTML End Here Code -->
 
-            <!-- Stats -->
+            
+
+            <!-- Introduction video -->
+            <div class="col-md-4" >
+                <div class="panel panel-primary" id='intro-video'>
+                    <div class="panel-body">
+                        <h3>Introduction video</h3>
+                        <a href="https://www.youtube.com/watch?v=RXmrUhSSSlo" target="_blank"><img style="width: 100%;align:center;" src="{% static '/home/images/youtube_intro_image2.png' %}". ></img></a>
+                        <!-- <h3><a href="https://files.gpcrdb.org/video/GPCRdb-David_Gloriam.mp4">Videos</a></h3> -->
+                    </div>
+                </div>
+                
+            </div>
+
+            <!-- Related resources -->
             <div class="col-md-4">
+                
+                <div class="panel panel-primary">
+                    <div class="panel-body">
+                        <h3>Related resources</h3>
+                        <a href='https://go.drugbank.com/' target='_blank'>Drugbank</a>, <a href='https://app.genebass.org/' target='_blank'>Genebass</a>,
+                        <a href='https://www.pharmgkb.org/' target='_blank'>PharmKB</a>, <a href='https://www.ensembl.org/' target='_blank'>Ensembl</a>  and <a href='https://gnomad.broadinstitute.org/' target='_blank'>Gnomad</a>
+                        cover related aspects of how genetic variants affect drug metabolism and drug response.
+                        {% if users %}
+                        {{ users|safe }}
+                        {% endif %}
+                        <br />
+                        <br />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Release Notes -->
+            <div class="col-md-4" >
+                <div class="panel panel-primary" id='releases'>
+                    <div class="panel-body">
+                        <h3>Release & Accessibility </a></h3>
+                        <br />
+                        <strong>First release: </strong><span>to be in Dec-2023</span>
+                        <br /> 
+                        <strong>Accessibility: </strong><span>This website is freely accessible to all users</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Why pharmacogenomics? -->
+        <div class="col-md-3">
+            <div class="panel panel-primary">
+                <div class="panel-body">
+                    <h3>Why pharmacogenomics?</h3>
+                    <div style='max-height: 470px; overflow-y: scroll;'>
+                        <p>
+                          <strong style="color: grey;">Trends in GPCR drug discovery: new agents, targets and indications. </strong><br />
+                          Hauser, A. S., Attwood, M. M., Rask-Andersen, M., Schiöth, H. B., & Gloriam, D. E. (2017). <br />
+                          <a href ='https://www.nature.com/articles/nrd.2017.178' target='_blank'><i>Nature reviews Drug discovery</i>, 2017, 16(12), 829-842.</a><br />
+                        </p>
+                        <p>
+                          <strong style="color: grey;">Pharmacogenomics of GPCR drug targets.  </strong><br />
+                          Hauser, A. S., Chavali, S., Masuho, I., Jahn, L. J., Martemyanov, K. A., Gloriam, D. E., & Babu, M. M. (2018). <br />
+                          <a href ='https://www.cell.com/cell/pdf/S0092-8674(17)31384-3.pdf' target='_blank'><i>Cell</i> 2018, 172(1), 41-54.</a><br />
+                        </p>
+                    </div>
+                    <div style='height: 30px; margin-top: 10px; position: relative;'>
+                      <span style="position: absolute; bottom 0;"><strong><a role="button" id='cite_gpcrdb_pubs'>Citing PGx</a></strong></span>
+                    </div>
+                </div>
+            </div>
+            
+
+            <!-- Stats -->
                 <div class="panel panel-primary">
                     <div class="panel-body">
                         <h3>Data</h3>
@@ -231,7 +297,7 @@
                                 <div class="text">Gene-based association statistics burden test scores</div>
                               </div>
                             </li>
-                            <li style="--cardColor:#8e7dbe">
+                            <li style="--cardColor:rgb(88, 44, 77)">
                               <div class="content">
                                 <div class="title">221,484,210</div>
                                 <div class="text">Variant-based association statistics burden test scores</div>
@@ -241,75 +307,6 @@
 
                     </div>
                 </div>
-            </div>
-
-            
-            <!-- Introduction video -->
-            <div class="col-md-4" >
-                <div class="panel panel-primary" id='intro-video'>
-                    <div class="panel-body">
-                        <h3>Introduction video</h3>
-                        <a href="https://www.youtube.com/watch?v=RXmrUhSSSlo" target="_blank"><img style="width: 100%;align:center;" src="{% static '/home/images/youtube_intro_image2.png' %}". ></img></a>
-                        <!-- <h3><a href="https://files.gpcrdb.org/video/GPCRdb-David_Gloriam.mp4">Videos</a></h3> -->
-                    </div>
-                </div>
-                
-            </div>
-            
-            <!-- Related resources -->
-            <div class="col-md-4">
-                
-                <div class="panel panel-primary">
-                    <div class="panel-body">
-                        <h3>Related resources</h3>
-                        <a href='https://go.drugbank.com/' target='_blank'>Drugbank</a>, <a href='https://app.genebass.org/' target='_blank'>Genebass</a>,
-                        <a href='https://www.pharmgkb.org/' target='_blank'>PharmKB</a>, <a href='https://www.ensembl.org/' target='_blank'>Ensembl</a>  and <a href='https://gnomad.broadinstitute.org/' target='_blank'>Gnomad</a>
-                        cover related aspects of how genetic variants affect drug metabolism and drug response.
-                        {% if users %}
-                        {{ users|safe }}
-                        {% endif %}
-                        <br />
-                        <br />
-                        <h4>External PGx <a href="{{ documentation_url }}external_sites.html">sites</a></h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Why pharmacogenomics? -->
-        <div class="col-md-3">
-            <div class="panel panel-primary">
-                <div class="panel-body">
-                    <h3>Why pharmacogenomics?</h3>
-                    <div style='max-height: 470px; overflow-y: scroll;'>
-                        <p>
-                          <strong style="color: grey;">Trends in GPCR drug discovery: new agents, targets and indications. </strong><br />
-                          Hauser, A. S., Attwood, M. M., Rask-Andersen, M., Schiöth, H. B., & Gloriam, D. E. (2017). <br />
-                          <a href ='https://www.nature.com/articles/nrd.2017.178' target='_blank'><i>Nature reviews Drug discovery</i>, 2017, 16(12), 829-842.</a><br />
-                        </p>
-                        <p>
-                          <strong style="color: grey;">Pharmacogenomics of GPCR drug targets.  </strong><br />
-                          Hauser, A. S., Chavali, S., Masuho, I., Jahn, L. J., Martemyanov, K. A., Gloriam, D. E., & Babu, M. M. (2018). <br />
-                          <a href ='https://www.cell.com/cell/pdf/S0092-8674(17)31384-3.pdf' target='_blank'><i>Cell</i> 2018, 172(1), 41-54.</a><br />
-                        </p>
-                    </div>
-                    <div style='height: 30px; margin-top: 10px; position: relative;'>
-                      <span style="position: absolute; bottom 0;"><strong><a role="button" id='cite_gpcrdb_pubs'>Citing PGx</a></strong></span>
-                    </div>
-                </div>
-            </div>
-            <!-- Release Notes -->
-                <!-- <div class="col-md-3" > -->
-                    <div class="panel panel-primary" id='releases'>
-                        <div class="panel-body">
-                            <h3>Release & Accessibility </a></h3>
-                            <br />
-                            <strong>First release: </strong><span>to be in Dec-2023</span>
-                            <br /> 
-                            <strong>Accessibility: </strong><span>This website is freely accessible to all users</span>
-                        </div>
-                    </div>
-                <!-- </div> -->
         </div>
     </div>
 
