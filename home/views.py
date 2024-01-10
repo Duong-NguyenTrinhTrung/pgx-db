@@ -21,6 +21,7 @@ from protein.models import Protein
 from variant.models import Variant, VepVariant, GenebassPGx, GenebassVariantPGx, Pharmgkb
 from interaction.models import Interaction
 from gene.models import Gene
+from disease.models import Disease, DrugDiseaseStudy
 from drug.models import Drug, DrugAtcAssociation
 from chromosome.models import Chromosome
 from django.conf import settings
@@ -845,3 +846,92 @@ def about_pgx(request):
     context = {}
     return render(request, 'home/about_pgx.html', context)
 
+def disease_lookup(request):
+    disease = request.GET.get('disease')
+    context = {}
+    if disease:
+        if disease != 'default':
+            diseases = Disease.objects.filter(disease_name__icontains=disease)
+        else:
+            diseases = Disease.objects.all()[:8]
+        response_data = []
+        for d in diseases:
+            drugs = DrugDiseaseStudy.objects.filter(disease_name__disease_name=d.disease_name).values_list('drug_bankID', 'clinical_trial', 'link')
+            for item in drugs:
+                response_data.append(
+                    {
+                    'disease_name':d.disease_name,
+                    'drug_bankID': item[0],
+                    'drugname': Drug.objects.get(drug_bankID=item[0]).name,
+                    'clinical_trial': item[1],
+                    'link': item[2],
+                    'atc_code': DrugAtcAssociation.objects.filter(drug_id=item[0]).values_list('atc_id', flat=True).first(),
+                    'disease_class': d.disease_class,
+                    'disease_UML_CUI': d.disease_UML_CUI
+                    })
+        print("length = ",len(response_data))
+        return JsonResponse({'response_data': response_data})
+    else:
+        diseases = Disease.objects.all()[:8]
+        response_data = []
+        for d in diseases:
+            drugs = DrugDiseaseStudy.objects.filter(disease_name__disease_name=d.disease_name).values_list('drug_bankID', 'clinical_trial', 'link')
+            for item in drugs:
+                response_data.append(
+                    {
+                    'disease_name':d.disease_name,
+                    'drug_bankID': item[0],
+                    'drugname': Drug.objects.get(drug_bankID=item[0]).name,
+                    'clinical_trial': item[1],
+                    'link': item[2],
+                    'atc_code': DrugAtcAssociation.objects.filter(drug_id=item[0]).values_list('atc_id', flat=True).first(),
+                    'disease_class': d.disease_class,
+                    'disease_UML_CUI': d.disease_UML_CUI
+                    })
+        context["response_data"] = response_data
+        print("length = ",len(response_data))
+        return render(request, 'home/disease_lookup.html', context)
+
+def disease_statistics(request):
+    no_of_phase1 = len(list(set(DrugDiseaseStudy.objects.filter(clinical_trial="1").values_list("drug_bankID", "disease_name"))))
+    no_of_phase2 = len(list(set(DrugDiseaseStudy.objects.filter(clinical_trial="2").values_list("drug_bankID", "disease_name"))))
+    no_of_phase3 = len(list(set(DrugDiseaseStudy.objects.filter(clinical_trial="3").values_list("drug_bankID", "disease_name"))))
+    no_of_phase4 = len(list(set(DrugDiseaseStudy.objects.filter(clinical_trial="4").values_list("drug_bankID", "disease_name"))))
+    disease_classes = list(Disease.objects.values_list('disease_class', flat=True).distinct())
+
+    
+    context = {
+        "no_of_phase1": no_of_phase1,
+        "no_of_phase2": no_of_phase2,
+        "no_of_phase3": no_of_phase3,
+        "no_of_phase4": no_of_phase4,
+        "total": no_of_phase1 + no_of_phase2 + no_of_phase3 + no_of_phase4,
+        "disease_classes": disease_classes,
+
+        "biologic":
+        {
+            "phase1": [DrugDiseaseStudy.objects.filter(Q(clinical_trial="1")&Q(drug_bankID__drugtype__type_detail="Biotech") & Q(disease_name__disease_class=dc)).count() for dc in disease_classes],
+            "phase2": [DrugDiseaseStudy.objects.filter(Q(clinical_trial="2")&Q(drug_bankID__drugtype__type_detail="Biotech") & Q(disease_name__disease_class=dc)).count() for dc in disease_classes],
+            "phase3": [DrugDiseaseStudy.objects.filter(Q(clinical_trial="3")&Q(drug_bankID__drugtype__type_detail="Biotech") & Q(disease_name__disease_class=dc)).count() for dc in disease_classes],
+            "phase4": [DrugDiseaseStudy.objects.filter(Q(clinical_trial="4")&Q(drug_bankID__drugtype__type_detail="Biotech") & Q(disease_name__disease_class=dc)).count() for dc in disease_classes],
+        },
+        "small_molecule":
+        {
+            "phase1": [DrugDiseaseStudy.objects.filter(Q(clinical_trial="1")&Q(drug_bankID__drugtype__type_detail="Small Molecule") & Q(disease_name__disease_class=dc)).count() for dc in disease_classes],
+            "phase2": [DrugDiseaseStudy.objects.filter(Q(clinical_trial="2")&Q(drug_bankID__drugtype__type_detail="Small Molecule") & Q(disease_name__disease_class=dc)).count() for dc in disease_classes],
+            "phase3": [DrugDiseaseStudy.objects.filter(Q(clinical_trial="3")&Q(drug_bankID__drugtype__type_detail="Small Molecule") & Q(disease_name__disease_class=dc)).count() for dc in disease_classes],
+            "phase4": [DrugDiseaseStudy.objects.filter(Q(clinical_trial="4")&Q(drug_bankID__drugtype__type_detail="Small Molecule") & Q(disease_name__disease_class=dc)).count() for dc in disease_classes],
+        },
+    }
+
+    print("context ======== ", context)
+
+    return render(request, 'home/disease_statistics.html', context)
+
+
+def disease_autocomplete_view(request):
+    query = request.GET.get('query', '')
+    diseases = Disease.objects.filter(Q(disease_name__icontains=query))
+    if len(diseases) > 0:
+        results = [disease.disease_name  for disease in diseases]
+    return JsonResponse({'suggestions': results})

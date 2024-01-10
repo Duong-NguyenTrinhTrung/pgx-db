@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from drug.models import Drug
-from disease.models import Disease
+from disease.models import Disease, DrugDiseaseStudy
 from optparse import make_option
 import logging
 import csv
@@ -36,17 +36,17 @@ class Command(BaseCommand):
         print("checkpoint 1.1, filenames = ", filenames)
 
         try:
-            self.purge_diseases()
+            self.purge_drug_disease_study()
             self.create_disease_data(filenames)
         except Exception as msg:
             print(msg)
             self.logger.error(msg)
 
-    def purge_diseases(self):
+    def purge_drug_disease_study(self):
         print("checkpoint 1.2 inside purge_diseases function ")
         try:
-            Disease.objects.all().delete()
-        except Disease.DoesNotExist:
+            DrugDiseaseStudy.objects.all().delete()
+        except DrugDiseaseStudy.DoesNotExist:
             self.logger.warning(
                 "Disease mod not found: nothing to delete.")
 
@@ -61,7 +61,7 @@ class Command(BaseCommand):
             filenames = [
                 fn
                 for fn in os.listdir(self.diseasedata_data_dir)
-                if fn.endswith("disease_only_data.csv")
+                if fn.endswith("disease_drug_study_data.csv")
             ]
             print("checkpoint2")
             print(filenames)
@@ -75,33 +75,49 @@ class Command(BaseCommand):
 
             print("data column = ", data.columns)
             for index, row in enumerate(data.iterrows()):
+                Disease_name = data[index: index + 1]["Disease_name"].values[0]
+                Phase = data[index: index + 1]["Phase"].values[0]
+                Standard_inchiKey = data[index: index + 1]["Standard_inchiKey"].values[0]
+                Link = data[index: index + 1]["Link"].values[0]
+                drug_bankID = data[index: index + 1]["DrugBank_ID"].values[0]
 
-                disease_name = data[index: index + 1]["Disease_name"].values[0]
-                disease_class = data[index: index + 1]["Disease_class"].values[0]
-                disease_UML_CUI = data[index: index + 1]["Disease_UML_CUI"].values[0]
+                # fetch disease
+                try:
+                    # print(Disease_name, " is got")
+                    di = Disease.objects.get(disease_name=Disease_name)
+                except Disease.DoesNotExist:
 
-                # # fetch drug
+                    self.logger.error(
+                        "Disease not found for entry with Disease name {}".format(
+                            Disease_name)
+                    )
+                    print("Disease not found for entry with Disease_name {}".format(
+                            Disease_name))
+                    continue
 
-                # try:
-                #     d = Drug.objects.get(drug_bankID=drug_bankID)
-                # except Drug.DoesNotExist:
+                # fetch drug
+                try:
+                    d = Drug.objects.get(drug_bankID=drug_bankID)
+                except Drug.DoesNotExist:
 
-                #     self.logger.error(
-                #         "Drug not found for entry with drugbank ID {}".format(
-                #             drug_bankID)
-                #     )
-                #     print("Drug not found for entry with drugbank ID {}".format(
-                            # drug_bankID))
-                    # continue
+                    self.logger.error(
+                        "Drug not found for entry with drugbank ID {}".format(
+                            drug_bankID)
+                    )
+                    print("Drug not found for entry with drugbank ID {}".format(
+                            drug_bankID))
+                    continue
 
                 # print("checkpoint 2.1 - start to fetch data to interaction table")
-                disease, created = Disease.objects.get_or_create(
+                disease, created = DrugDiseaseStudy.objects.get_or_create(
                     
-                    disease_name = disease_name,
-                    disease_class = disease_class,
-                    disease_UML_CUI = disease_UML_CUI,
+                    disease_name = di,
+                    clinical_trial = Phase,
+                    standard_inchiKey = Standard_inchiKey,
+                    link = Link,
+                    drug_bankID = d,
                 )
                 disease.save()
-                print("a record is saved")
+                # print("a record is saved")
 
-        self.logger.info("COMPLETED CREATING DISEASEDATA")
+        self.logger.info("COMPLETED CREATING DRUG DISEASE STUDY DATA")

@@ -1,0 +1,302 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+
+{% block addon_css %}
+
+<style>
+    #disease, #disease-result{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 80px;
+    }
+
+    #disease-result{
+        margin-top: 20px;
+        width: 70%;
+        margin: 20px auto;
+    }
+
+    #disease-result-table {
+        border-radius: 5px;
+        min-width: 100%;
+    }
+
+    #disease-result-table th:first-child{
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+    }
+
+    #disease-result-table th:last-child {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+
+
+
+    #disease-result-table th{
+        height: 40px;
+        text-align: left;
+        background-color: #dee2e6; 
+        font-weight: bold;
+        font-size: 14px;
+    }
+
+    #disease-result-table th, td {
+        padding: 0 7px;
+    }
+
+    #disease-result-table tr:nth-child(even) {
+        background-color: #dee2e6 /* Color 1 for even rows */
+    }
+
+    #disease-result-table tr:nth-child(odd) {
+        /* background-color: rgba(241, 124, 14, 0.2); */
+        background-color: white; /* Color 2 for odd rows */
+    }
+
+    /* Add background colors to the form and the paragraph */
+    #disease p
+   {
+        display: block;
+        width: 70%;
+        background-color: #dee2e6;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    #disease form
+    {
+        background-color: #F2F5F6;
+        padding: 3px;
+        border-radius: 5px;
+        width: 70%;
+        height: 95px
+    }
+
+    /* Style the input elements and buttons */
+    #disease input
+    {
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    /* Add some spacing between buttons */
+    #disease_search,
+    #disease_reset
+     {
+        margin-right: 10px;
+    }
+
+    input.form-control {
+        width: 650px;
+    }
+
+    td {
+        /* text-align: center;  */
+        vertical-align: middle;
+        /* Vertically center the content within the td */
+    }
+
+    .autocomplete-outer{
+        display: none;
+        width: 650px;
+        max-height: 400px;
+        background-color: white;
+        border: 1px solid #ccc;
+        padding: 5px;
+        position: absolute;
+        top: 100%;
+        left: 0;
+    }
+
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div id="disease">
+    <p>Search by <i><span style="color:#3f88c5;">Disease name</span></i></p>
+    <form method="get" action="">
+        <table class="table table-bordered table-gray table-fulltext-two-rows">
+            <tbody>
+                <tr>
+                    <td>
+                        <div style="position: relative;">
+                            <input id="search_disease"
+                                class="form-text form-type-textfield form-control optional ui-autocomplete-input" style="width:100%;" size="70%"
+                                autocomplete="on" />
+                            <div class="autocomplete-outer">
+                                <div id="disease-autocomplete-results">
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="h-center"><input id="submit_disease" type="submit" value="Search"
+                            class="button js-form-submit form-submit form-type-submit btn btn-default btn-block"></td>
+                    <td class="h-center"><input id="reset_disease" type="reset" value="Reset"
+                            class="button js-form-submit form-submit form-type-submit btn btn-default btn-block"></td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: left; padding-left: 30px;">Examples: <a
+                            href="#"  hreflang="en">Radiation Pneumonitis</a>; 
+                            </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<div id="disease-result">
+
+    <table id="disease-result-table">
+        <thead>
+            <tr>
+                <th>Disease name</th>
+                <th>Disease class</th>
+                <th>Disease_UML_CUI</th>
+                <th>Associated drug name</th>
+                <th>ATC code</th>
+                <th style="text-align: center;">Phase of clinical study</th>
+                <th>Study</th>
+                <th style="text-align: center;">Drug-disease network</th>
+            </tr>
+        </thead>
+        <tbody id="disease-result-tbody">
+            {% for item in response_data %}
+                <tr>
+                    <td>{{ item.disease_name }}</td>
+                    <td>{{ item.disease_class }}</td>
+                    <td style="text-align: center;">{{ item.disease_UML_CUI }}</td>
+                    <td>{{ item.drugname }} (<i>id: {{item.drug_bankID}}</i>)</td>
+                    <td>{{ item.atc_code }}</td>
+                    <td style="text-align: center;">{{ item.clinical_trial }}</td>
+                    <td><a href="{{ item.link }}" target="_blank">Ref</a></td>
+                    <td style="text-align: center;"><a href="#">Go to network</a></td>
+                </tr>
+            {% endfor %}
+
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}
+{% block addon_js %}
+
+<script>
+    $(document).ready(function () {
+        // autocomplete 
+        var autocompleteResults = $('#disease-autocomplete-results');
+        $('#search_disease').autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "{% url 'disease_autocomplete_view' %}",
+                    data: {
+                        query: request.term
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        response(data.suggestions);
+                    }
+                });
+            },
+            autoFocus: true,
+            minLength: 3,
+            select: function (event, ui) {
+                $('#search_disease').val(ui.item.value);
+                return false;
+            },
+            open: function (event, ui) {
+                autocompleteResults.show(); 
+            },
+            close: function (event, ui) {
+                autocompleteResults.hide(); 
+            }
+        });
+
+        // Hide autocomplete results when clicking outside of the input and results
+        $("#search_disease").on('keyup', function() {
+            $.ajax({
+                    url: "{% url 'disease_lookup' %}?disease="+ $(this).val(),
+                    success: function (data) {
+                        $("#disease-result-tbody").html('');
+                        var html_data = '';
+                        data.response_data.forEach(item => {
+                            html_data += `<tr>
+                                <td>${item.disease_name}</td>
+                                <td>${item.disease_class}</td>
+                                <td style="text-align: center;">${item.disease_UML_CUI}</td>
+                                <td>${item.drugname} (<i>id: ${item.drug_bankID}</i>)</td>
+                                <td>${item.atc_code}</td>
+                                <td style="text-align: center;">${item.clinical_trial}</td>
+                                <td><a href="${item.link }" target="_blank">Ref</a></td>
+                                <td style="text-align: center;"><a href="#">Go to network</a></td>
+                            </tr>`;
+                        });
+                        $("#disease-result-tbody").html(html_data);
+                    }
+                });
+        });
+
+        // submit
+        $("#submit_disease").click(function() {
+            $.ajax({
+                    url: "{% url 'disease_lookup' %}?disease="+ $("#search_disease").val(),
+                    success: function (data) {
+                        $("#disease-result-tbody").html('');
+                        var html_data = '';
+                        data.response_data.forEach(item => {
+                            html_data += `<tr>
+                                <td>${item.disease_name}</td>
+                                <td>${item.disease_class}</td>
+                                <td style="text-align: center;">${item.disease_UML_CUI}</td>
+                                <td>${item.drugname} (<i>id: ${item.drug_bankID}</i>)</td>
+                                <td>${item.atc_code}</td>
+                                <td style="text-align: center;">${item.clinical_trial}</td>
+                                <td><a href="${item.link }" target="_blank">Ref</a></td>
+                                <td style="text-align: center;"><a href="#">Go to network</a></td>
+                            </tr>`;
+                        });
+                        $("#disease-result-tbody").html(html_data);
+                    }
+                });
+        });
+
+        // Handle the form submission when the form is submitted
+        $("form").submit(function (event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+        });
+
+        // reset
+        $("#reset_disease").click(function() {
+            $.ajax({
+                    url: "{% url 'disease_lookup' %}?disease=default",
+                    success: function (data) {
+                        $("#disease-result-tbody").html('');
+                        var html_data = '';
+                        data.response_data.forEach(item => {
+                            html_data += `<tr>
+                                <td>${item.disease_name}</td>
+                                <td>${item.disease_class}</td>
+                                <td style="text-align: center;">${item.disease_UML_CUI}</td>
+                                <td>${item.drugname} (<i>id: ${item.drug_bankID}</i>)</td>
+                                <td>${item.atc_code}</td>
+                                <td style="text-align: center;">${item.clinical_trial}</td>
+                                <td><a href="${item.link }" target="_blank">Ref</a></td>
+                                <td style="text-align: center;"><a href="#">Go to network</a></td>
+                            </tr>`;
+                        });
+                        $("#disease-result-tbody").html(html_data);
+                    }
+                });
+        });
+
+
+    });
+</script>
+{% endblock %}

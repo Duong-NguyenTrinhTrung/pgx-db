@@ -106,6 +106,7 @@ nav.navbar li.dropdown:hover > ul.dropdown-menu {
 
 li#pgx_menu,
 li#drug_menu,
+li#disease_menu,
 li#target_menu,
 li#variant_menu,
 li#about_menu {
@@ -127,6 +128,12 @@ li#drug_menu {
   background-image: url("/static/home/logo/drug/drug2.png");
 }
 
+li#disease_menu {
+  background-position: -4px 1px;
+  background-image: url("/static/home/logo/disease/rx3.png");
+  background-size: 49px;
+  padding-left: 28px;
+}
 li#target_menu {
   background-position: 5px -3px;
   background-size: 40px;
