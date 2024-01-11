@@ -94,6 +94,12 @@ class VepVariant(models.Model):
     PhyloP30way_mammalian_rankscore = models.FloatField()
     LINSIGHT_rankscore = models.FloatField()
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['Transcript_ID']),
+            models.Index(fields=['Variant_marker']),
+        ]
+
 #definition for pgx data from gene-based burden from Genebass
 class GenebassPGx(models.Model):
     gene_id = models.ForeignKey(
@@ -120,6 +126,10 @@ class GenebassPGx(models.Model):
         on_delete=models.CASCADE,
         null=True,
     )
+    # class Meta:
+    #     indexes = [
+    #         models.Index(fields=['gene_id']),
+    #     ]
 
 
 #definition for pgx data from variant-based burden from Genebass
@@ -148,11 +158,17 @@ class GenebassVariantPGx(models.Model):
         null=True,
     )
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['drugbank_id']),
+            models.Index(fields=['genename']),
+        ]
+
 class GenebassCategory(models.Model):
     category_code = models.IntegerField(primary_key=True)
     category_description = models.TextField(null=True)
 
-
+#genebass original data
 class GenebassVariant(models.Model):
     gb_id = models.AutoField(auto_created=True, primary_key=True)
     markerID = models.ForeignKey(
@@ -188,6 +204,11 @@ class GenebassVariant(models.Model):
     AF_Cases = models.FloatField()
     AF_Controls = models.FloatField()
     Pvalue = models.FloatField()
+
+    # class Meta:
+    #     indexes = [
+    #         models.Index(fields=['gene_id']),
+    #     ]
 
 
 class Pharmgkb(models.Model):

@@ -19,6 +19,9 @@ class Interaction(models.Model):
 
     class Meta:
         ordering = ["drug_bankID__name"]
+        indexes = [
+                    models.Index(fields=['uniprot_ID']),
+                ]
 
     def __str__(self):
         return self.uniprot_ID.uniprot_ID + " acts as a " + self.interaction_type + " for drug " + self.drug_bankID.drug_bankID

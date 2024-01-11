@@ -58,6 +58,10 @@ class DrugAtcAssociation(models.Model):
     drug_id = models.ForeignKey("drug.drug", on_delete=models.CASCADE)
     class Meta():
         db_table = 'drug_atc_association'
+        indexes = [
+                    models.Index(fields=['atc_id']),
+                    models.Index(fields=['drug_id']),
+                ]
 
 class DrugType(models.Model):
     drugtype = models.IntegerField(primary_key=True)  
@@ -174,3 +178,6 @@ class Drug(models.Model):
 
     class Meta():
         ordering = ('drug_bankID',)
+        indexes = [
+                    models.Index(fields=['drug_bankID']),
+                ]
