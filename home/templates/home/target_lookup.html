@@ -246,6 +246,7 @@
             }
         });
         // Hide autocomplete results when clicking outside of the input and results
+        
         $("#search_protein").on('keyup', function() {
             $.ajax({
                     url: "{% url 'target_lookup' %}?target="+ $(this).val(),
@@ -278,7 +279,7 @@
                         $("#target-result-tbody").html(html_data);
                     }
                 });
-        });
+        }); 
         $("#submit_protein").click(function() {
             $.ajax({
                     url: "{% url 'target_lookup' %}?target="+ $("#search_protein").val(),

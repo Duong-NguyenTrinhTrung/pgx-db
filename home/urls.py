@@ -1,12 +1,13 @@
 # from django.conf.urls import url
 from django.urls import path
 from django.views.decorators.cache import cache_page
-from .views import Home, drug_target_network, drug_lookup, target_lookup, drug_autocomplete_view, protein_autocomplete_view, variant_autocomplete_view, variant_lookup, chromosome_mapper, target_statistics, about_pgx, get_chromosome_mapping, get_chromosome_mapping_example, anno_from_autocomplete_view, disease_lookup, disease_statistics, disease_autocomplete_view
+from .views import Home, drug_target_network, drug_lookup, target_lookup, drug_autocomplete_view, protein_autocomplete_view, variant_autocomplete_view, variant_lookup, chromosome_mapper, target_statistics, about_pgx, get_chromosome_mapping, get_chromosome_mapping_example, anno_from_autocomplete_view, disease_lookup, disease_statistics, disease_autocomplete_view, contribute_to_pgx
 
 
 urlpatterns = [
     path("", cache_page(3600*24*7)(Home.as_view()), name='home'),
     path("about_pgx/", about_pgx, name='about-pgx'),
+    path("contribute_to_pgx/", contribute_to_pgx, name='contribute-pgx'),
 
     path("drug_lookup/", cache_page(3600*24*7)(drug_lookup), name='drug_lookup'),
     path('drug-autocomplete/', drug_autocomplete_view, name='drug_autocomplete_view'),

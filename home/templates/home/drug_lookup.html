@@ -234,7 +234,7 @@
             }
         });
         // Hide autocomplete results when clicking outside of the input and results
-        $("#search_drug").on('keyup', function() {
+        /* $("#search_drug").on('keyup', function() {
             $.ajax({
                     url: "{% url 'drug_lookup' %}?drug="+ $(this).val(),
                     success: function (data) {
@@ -254,7 +254,7 @@
                         $("#drug-result-tbody").html(html_data);
                     }
                 });
-        });
+        }); */
         $("#submit_drug").click(function() {
             $.ajax({
                     url: "{% url 'drug_lookup' %}?drug="+ $("#search_drug").val(),

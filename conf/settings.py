@@ -20,6 +20,9 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = os.path.join(BASE_DIR, 'data')
 
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
@@ -65,6 +68,7 @@ INSTALLED_APPS = [
     "restapi",
     "chromosome",
     "disease",
+    "feedback",
 ]
 
 MIDDLEWARE = [
