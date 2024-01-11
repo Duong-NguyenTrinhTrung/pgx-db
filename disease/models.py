@@ -21,3 +21,9 @@ class DrugDiseaseStudy(models.Model):
     clinical_trial = models.CharField(max_length=10)
     drug_bankID = models.ForeignKey(
         "drug.drug", on_delete=models.CASCADE) 
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=['drug_bankID']),
+            models.Index(fields=['disease_name']),
+        ]
