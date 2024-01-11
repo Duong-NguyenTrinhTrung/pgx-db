@@ -797,6 +797,8 @@
         $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').attr('size', '4');
         $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '10')
         $("#pgx-data-table_filter").find("input").css("margin-left", "10px");
+        var selectElement = $('select[name="pgx-data-table_length"]');
+        //selectElement[0][1].selected = true; //still not make the datatable align well
     }
 
     function render_gene_based_burden_data(gene_based_burden_data) {
@@ -872,6 +874,7 @@
         $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').attr('size', '4');
         $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '10')
         $("#pgx-data-table_filter").find("input").css("margin-left", "10px");
+        
         // $(".yadcf-filter-wrapper").find('span.yadcf-filter-range-number-seperator').each(function () {
         //     $(this).html('<br>');
         // })

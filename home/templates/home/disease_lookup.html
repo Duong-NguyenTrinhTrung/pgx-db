@@ -206,7 +206,7 @@
                 });
             },
             autoFocus: true,
-            minLength: 3,
+            minLength: 4,
             select: function (event, ui) {
                 $('#search_disease').val(ui.item.value);
                 return false;
@@ -219,29 +219,7 @@
             }
         });
 
-        // Hide autocomplete results when clicking outside of the input and results
-        $("#search_disease").on('keyup', function() {
-            $.ajax({
-                    url: "{% url 'disease_lookup' %}?disease="+ $(this).val(),
-                    success: function (data) {
-                        $("#disease-result-tbody").html('');
-                        var html_data = '';
-                        data.response_data.forEach(item => {
-                            html_data += `<tr>
-                                <td>${item.disease_name}</td>
-                                <td>${item.disease_class}</td>
-                                <td style="text-align: center;">${item.disease_UML_CUI}</td>
-                                <td>${item.drugname} (<i>id: ${item.drug_bankID}</i>)</td>
-                                <td>${item.atc_code}</td>
-                                <td style="text-align: center;">${item.clinical_trial}</td>
-                                <td><a href="${item.link }" target="_blank">Ref</a></td>
-                                <td style="text-align: center;"><a href="#">Go to network</a></td>
-                            </tr>`;
-                        });
-                        $("#disease-result-tbody").html(html_data);
-                    }
-                });
-        });
+        
 
         // submit
         $("#submit_disease").click(function() {

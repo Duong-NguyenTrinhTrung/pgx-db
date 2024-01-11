@@ -846,6 +846,14 @@ def about_pgx(request):
     context = {}
     return render(request, 'home/about_pgx.html', context)
 
+def questions_to_pgx(request):
+    context = {}
+    return render(request, 'home/questions_to_pgx.html', context)
+
+def contribute_to_pgx(request):
+    context = {}
+    return render(request, 'home/contribute_to_pgx.html', context)
+
 def disease_lookup(request):
     disease = request.GET.get('disease')
     context = {}

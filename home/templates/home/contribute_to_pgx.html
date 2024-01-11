@@ -1,0 +1,46 @@
+{% extends "home/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="modal fade" id="about-modal" tabindex="-1" role="dialog" aria-labelledby="about-modal-label"
+    aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered" role="document" style="width: 60%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="about-modal-label">Contribute to PGx/ Scientific collaboration</h2>
+                <button id="closeToHome" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body" >
+                <p style="text-align: justify; font-size: large; ">
+                    If you have an experimental dataset that you would like to make available in PGx or would like assistance with computational analyses, please send a short description of the suggested collaboration to the head of PGx, Alexander S. Hausser (<a href="mailto:alexander.hauser@sund.ku.dk">alexander.hauser@sund.ku.dk</a>).
+                </p>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block addon_js %}
+<script>
+    var csrf_token = "{{ csrf_token }}";
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('#about-modal').modal('show');
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var closeBtn = document.getElementById("closeToHome");
+        
+        closeBtn.addEventListener("click", function () {
+            var urlOpen = "/";
+            window.location.href = urlOpen;
+        });
+    });
+</script>
+{% endblock %}
