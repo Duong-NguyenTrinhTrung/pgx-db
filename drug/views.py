@@ -85,7 +85,23 @@ def get_drug_general_data(request, drug_bank_id):
         raise Http404("Drug does not exist")
     # import pdb
     # pdb.set_trace()
-    data = DrugNetworkGetDataService(drug=drug).get_general_data()
+    data = DrugNetworkGetDataService(drug=drug).get_general_data() # without s
+
+    return JsonResponse(data, safe=False)
+
+# Retrieve data for many general sets
+def get_drugs_general_data(request):
+    """
+    Get the general data for a list of drugs
+    """
+
+    drug_bank_ids = request.GET.get('drug_bank_ids')
+    drug_bank_ids = drug_bank_ids.split(',')
+    if cache.get("drugs_general_data_" + "_".join(drug_bank_ids)) is not None:
+        data = cache.get("drugs_general_data_" + "_".join(drug_bank_ids))
+    else:
+        data = DrugsNetworkGetDataService(drug_bank_ids=drug_bank_ids).get_general_data() # with s
+        cache.set("drugs_general_data_" + "_".join(drug_bank_ids), data, 60 * 60)
 
     return JsonResponse(data, safe=False)
 
@@ -132,21 +148,7 @@ def get_drug_protein_data(request, drug_bank_id):
 
 
 
-# Retrieve data for many general sets
-def get_drugs_general_data(request):
-    """
-    Get the general data for a list of drugs
-    """
 
-    drug_bank_ids = request.GET.get('drug_bank_ids')
-    drug_bank_ids = drug_bank_ids.split(',')
-    if cache.get("drugs_general_data_" + "_".join(drug_bank_ids)) is not None:
-        data = cache.get("drugs_general_data_" + "_".join(drug_bank_ids))
-    else:
-        data = DrugsNetworkGetDataService(drug_bank_ids=drug_bank_ids).get_general_data()
-        cache.set("drugs_general_data_" + "_".join(drug_bank_ids), data, 60 * 60)
-
-    return JsonResponse(data, safe=False)
 
 # Retrieve data for many drugs
 def get_drugs_data(request):
@@ -567,7 +569,6 @@ def DrugStatistics(request):
             "other": [Drug.objects.filter(Q(drugtype__type_detail="Small Molecule") & ~Q(Clinical_status__in=[0, 4, 5]) & Q(superclass__superclass_detail=sc)).count() for sc in super_classes],
         },
     }
-    # print("context = ", context)
     return render(request, 'drugstatistics.html', context)
 
 
@@ -672,7 +673,6 @@ def atc_detail_view(request):
     context = {'group2s': group2s, 'group3s': group3s, 'group4s': group4s, 'group5s': group5s, "group_id": group_id,
                "group_name": group_name}
     end_time = perf_counter()
-    print("duration = ", (end_time - start_time))
     response = render(request, 'atc_detail_view.html', context)
     response['atc_detail_view-Duration'] = end_time - start_time
     return response
@@ -728,7 +728,6 @@ def atc_search_view(request):
             rs["name"] = format_atc_name(rs["name"])
         context = {"query_option": query_option, "search_result": results, "input": inp}
         return render(request, 'atc_search_result.html', context)
-    print("atc_search_View = ", results)
     return render(request, 'atc_search_result.html', {"results": results})
 
 
@@ -827,7 +826,6 @@ def _get_clinical_pgx_data_by_drug(drug_id):
                     })
         if len(response_data)>0:
             cache.set(cache_str, response_data, 60*60)
-    print("_get_clinical_pgx_data_by_atc --> Response data", response_data)          
     return response_data
 
 def get_clinical_pgx_data_by_drug(request):
@@ -890,7 +888,6 @@ def _get_clinical_pgx_data_by_atc(atc_code):
                                     # )
                                 ]
                         })
-        print("_get_clinical_pgx_data_by_atc --> Response data", response_data)          
         if len(response_data)>0:
             cache.set(cache_str, response_data, 60*60)
     return response_data
@@ -951,10 +948,8 @@ def get_genebased_data_from_genebass(atc_code):
                                     # )
                                 ]
                         })
-        print("Response data", response_data)          
         if len(response_data)>0:
             cache.set(cache_str, response_data, 60*60)
-    # print("finish helper function, response_data = ", response_data)
     return response_data
 
 # a helper function
@@ -1002,7 +997,6 @@ def get_genebased_data_from_genebass_by_drug(drug_id):
                         })
     if len(response_data)>0:
         cache.set(cache_str, response_data, 60*60)
-    print("finish helper function, response_data = ", response_data)
     return response_data
 
 def get_gene_based_burden_data_by_drug(request):
@@ -1039,7 +1033,6 @@ def get_variant_based_burden_data_by_drug(request):
             'AF',
         )
         
-        print("genebass_data type: ", type(genebass_data))
         if len(genebass_data) != 0:
             response_data = [{"drug_id": drug_id,
                 "interactions": list(Interaction.objects.filter(drug_bankID=drug_id).values("drug_bankID", "uniprot_ID__genename", "interaction_type")),
@@ -1047,7 +1040,6 @@ def get_variant_based_burden_data_by_drug(request):
                 # "burden_data_full": list(genebass_data),
             }]
         if len(response_data)>0:
-            print("len response data = ", len(response_data[0].get("burden_data")))
             cache.set("get_variant_based_burden_data_by_drug_"+drug_id, response_data, 60*60)
         else:
             print("no variant pgx data")
@@ -1056,7 +1048,6 @@ def get_variant_based_burden_data_by_drug(request):
 
 def get_variant_based_burden_data_by_atc(request):
     atc_code = request.GET.get("atc_code")
-    print("atc_code = ", atc_code)
     if cache.get("get_variant_based_data_by_atc_"+atc_code):
         response_data = cache.get("get_variant_based_data_by_atc_"+atc_code)
     else:
@@ -1093,8 +1084,6 @@ def get_variant_based_burden_data_by_atc(request):
                 })
             
         if len(response_data)>0:
-            print("len response data = ", len(response_data))
-            print("len response data item = ", len(response_data[0].get("burden_data")))
             cache.set("get_variant_based_data_by_atc_"+atc_code, response_data, 60*60)
         else:
             print("no variant pgx data")
@@ -1149,7 +1138,6 @@ def get_statistics_by_atc(request):
             "NoOfSmallMolecule":noOfSmallMolecule,
             "NoOfBiotech":noOfBiotech,
             }
-        # print("------get_statistics_by_atc: response_data: ", response_data)
         cache.set("get_statistics_by_atc_"+atc_code, response_data, 60*60)
     return JsonResponse(response_data)
 
@@ -1201,7 +1189,6 @@ def get_drug_association(request):
         {"drug_bankID": drug_id, "name": drug.name, "description": drug.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=drug_id)]}
         ]
     data = get_network_statistics_by_drug(drug_id)
-    print("----- inside get_drug_association, data = ", data)
     total_interaction = 0
     interacted_protein = []
     for association in associations_list:
@@ -1233,7 +1220,6 @@ def get_drug_association(request):
         "pgx_clinical_data": pgx_clinical_data,
     }
 
-    # print("response_data: ", response_data)
     return JsonResponse(response_data)
 
 
@@ -1276,7 +1262,6 @@ def get_drug_list_by_uniprotID(request):
         "NoOfBiotech":noOfBiotech,
 
     }
-    # print(" get_drug_list_by_uniprotID - returned data = ", temp)
     return JsonResponse({ "response_data" : temp})
    
 
@@ -1349,15 +1334,12 @@ def get_atc_sub_levels(request):
 
 class TargetByAtcBaseView:
     def get_target_by_atc_code(self, slug):
-        # print("checkpoint 1 in get_target_by_atc_code func of TargetByAtcBaseView, self = ", self, " slug = ", slug)
 
         context = {}
         if slug is not None:
-            # print("checkpoint 2 when slug is not None in get_target_by_atc_code func of TargetByAtcBaseView")
             if cache.get("target_by_atc_data_" + slug) is not None:
                 table = cache.get("target_by_atc_data_" + slug)
             else:
-                # print("checkpoint 3 when not cached in get_target_by_atc_code func of TargetByAtcBaseView")
                 table = pd.DataFrame()
                 data = {"chemical_substance": retrieving_chemical_substance(slug)}
                 for value in data.get('chemical_substance'):
@@ -1401,7 +1383,6 @@ class DescriptionByAtcBaseView:
                 context = dict()
                 cache.set("description_by_atc_data_" + slug, description, 60 * 60)
             context['description'] = description
-            # print("context : ", context)
         return context
 
 
@@ -1431,7 +1412,6 @@ class AtcCodesByLevelBaseView:
                 context = dict()
                 cache.set("atc_codes_by_level_" + slug, list_of_codes, 60 * 60)
             context['list_of_codes'] = list_of_codes
-            # print("context : ", context)
         return context
     
 class TargetsByDrugBaseView:
@@ -1446,7 +1426,6 @@ class TargetsByDrugBaseView:
                 context = dict()
                 cache.set("targets_by_drug_" + slug, list_of_targets, 60 * 60)
             context['list_of_targets'] = list_of_targets
-            # print("context : ", context)
         return context
     
 class AtcCodesByDrugView:
@@ -1466,7 +1445,6 @@ class AtcCodesByDrugView:
                 context = dict()
                 cache.set("atc_codes_by_drug_" + slug, returned_data, 60 * 60)
             context['list_of_atc_codes'] = returned_data
-            # print("context : ", context)
         return context
     
 
@@ -1486,7 +1464,6 @@ class PGxByAtcCodeView:
                 context = dict()
                 cache.set("pgx_by_atc_codes_" + slug, returned_data, 60 * 60)
             context['pgx'] = returned_data
-            # print("context : ", context)
         return context
     
 class DrugTargetInteractionByAtcBaseView:
@@ -1500,9 +1477,7 @@ class DrugTargetInteractionByAtcBaseView:
                 returned_data = []
                 for drug_id in drug_ids:
                     interactions = Interaction.objects.filter(drug_bankID=drug_id).values_list("uniprot_ID", "actions", "known_action", "interaction_type")
-                    # print("interactions: ", interactions)
                     for interaction in interactions:
-                        # print("--- interaction: ", interaction)
                         temp={
                             "drug_bankID":drug_id,
                             "uniprot_ID":interaction[0],
@@ -1514,6 +1489,5 @@ class DrugTargetInteractionByAtcBaseView:
                 context = dict()
                 cache.set("interactions_by_atc_code_" + slug, returned_data, 60 * 60)
             context['interactions_by_atc_code'] = returned_data
-            # print("context: ", context)
         return context
     
