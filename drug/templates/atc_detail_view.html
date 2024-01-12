@@ -986,7 +986,7 @@
         var drug_bank_ids = [];
         // Check if the 'associations' key exists in the JSON response
         if (associations.length > 0) {
-            var tableHtml = '<table id="associated_drug_tbl" ><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID</th><th style="white-space: nowrap;">Drug name</th><th style="white-space: nowrap; text-align: center;">No. of </br>interacting proteins</th><th style="white-space: nowrap;">List of interacting proteins</br><i>(Show in gene names)</i> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th><th>Short description</th></tr></thead><tbody>';
+            var tableHtml = '<table id="associated_drug_tbl" ><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID</th><th style="white-space: nowrap;">Drug name</th><th style="white-space: nowrap; text-align: center;">No. of </br>interacting proteins</th><th style="white-space: nowrap;">List of interacting proteins</br><i>(Show in gene names)</i> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th><th>Short description of drug</th></tr></thead><tbody>';
 
             for (var i = 0; i < associations.length; i++) {
                 var row = associations[i];
