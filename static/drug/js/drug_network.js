@@ -1383,6 +1383,7 @@ var selectedProteinName1 = "";
 var selectedInteractionName1 = "";
 var hiddenDrugStatuses = {};
 var hiddenProteinClasses = {};
+var hiddenDiseaseClasses = {};
 var hiddenDrugTypes = {}
 var hiddenInteractionTypes = {}
 var nodeImages = {};
@@ -1506,13 +1507,15 @@ function processData() {
                 var drugID = row.drugbank_id;
                 var protein = row.protein;
                 var genename = row.gene_name;
-                var interaction = row.interaction;
+                var interaction = row.interaction_type;
+                console.log("row.interaction = " + row.interaction_type);
                 //var drugStatus = row.Drug_status; // Get the "Drug_status" value
                 var drugStatus = clinicalStatusMap[row.Drug_status];
                 var drugType = row.drugtype; // Get the "Drug_status" value
                 var proteinClass = row.Protein_Class;
 
                 var disease_interaction = "phase" + row.Phase;
+                console.log("row.Phase = " + row.Phase +" disease_interaction "+ disease_interaction);
                 var disease = row.Disease_name; // getting the new disease
                 var Disease_class = row.Disease_class
                 var disease_phase = row.Phase;
@@ -1595,7 +1598,8 @@ function processData() {
                     type: disease_interaction,
                     // disease_type: disease_interaction // You can customize the type for disease links
                 });
-                console.log(links.type, "here are the type")
+
+                console.log(links, "here are the type")
             });
             console.log("here are the links", links);
             var childNodeMap = {};
@@ -1631,6 +1635,7 @@ function processData() {
             createLegend_status();
             createLegend_drugType();
             createProteinsLegend();
+            createDiseaseLegend();
 
             // Add an event listener to detect changes in the threshold slider value
             thresholdSlider.addEventListener('input', function () {
@@ -2048,28 +2053,40 @@ function redrawChart(originalLinks) {
 }
 
 // Get color based on interaction type
+// Get color based on interaction type
 function getColor(type) {
-    if (type.toLowerCase() === "Target".toLowerCase()) {
-        return "green";
-    } else if (type.toLowerCase() === "Enzyme".toLowerCase()) {
-        return "blue";
-    } else if (type.toLowerCase() === "Transporter".toLowerCase()) {
-        return "red";
-    } else if (type.toLowerCase() === "Carrier".toLowerCase()) {
-        return "orange";
-    } else {
-        return "black";
-    }
-}
+    var lowercaseType = type.toLowerCase();
 
-var colorMap = {
-    "target": "green",
-    "enzyme": "blue",
-    "transporter": "red",
-    "carrier": "orange",
-    "unknown": "black"
-};
-var hiddenInteractions = {
+    // Check if the type is in the colorMap, if yes, return the corresponding color
+    if (colorMap.hasOwnProperty(lowercaseType)) {
+      return colorMap[lowercaseType];
+    } else {
+      // If the type is not in the colorMap, default to black
+      return "black";
+    }
+  }
+
+
+  var colorMap = {
+    target: "green",
+    enzyme: "blue",
+    transporter: "red",
+    carrier: "orange",
+    unknown: "black",
+    phase1: "steelblue",  // Choose a different color
+    phase2: "purple",  // Choose a different color
+    phase3: "cyan",    // Choose a different color
+    phase4: "magenta"  // Choose a different color
+  };
+
+
+  // var Disease_colorMap_legend= {
+  //   Phase1: "green",
+  //   Phase2: "blue",
+  //   Phase3: "red",
+  //   Phase4: "orange"
+  // };
+  var hiddenInteractions = {
     target: false,
     enzyme: false,
     transporter: false,
@@ -2081,6 +2098,25 @@ var hiddenInteractions = {
     Phase4: false,
   };
 
+  //Legends Dragable code below
+  // Assuming you've imported D3 as d3
+  // Draggable functionality for the legend box
+
+  //Legends Dragable end code
+
+  // Create the legend for interactions
+  var interactions = [
+    "Target",
+    "Enzyme",
+    "Transporter",
+    "Carrier",
+    "unknown",
+    "Phase1",
+    "Phase2",
+    "Phase3",
+    "Phase4",
+
+  ];
   //Legends Dragable code below
   // Assuming you've imported D3 as d3
   // Draggable functionality for the legend box
@@ -2266,15 +2302,6 @@ function createLegend() {
       d3.selectAll(".selected-legend1").classed("selected-legend1", false);
     });
   }
-
-
-
-
-
-
-
-
-
 
 function drawLinks() {
     svg.selectAll(".link")

@@ -239,7 +239,8 @@ class GeneDetailBaseView(object):
         if vep_variant[1] in self.name_dic.keys():
             data_subset["Consequence"] = self.name_dic.get(vep_variant[1]).title()
         else:
-            data_subset["Consequence"] = "Re-check"
+            terms = vep_variant[1].split(",")
+            data_subset["Consequence"] = ", ".join([self.name_dic.get(term).title() for term in terms])
 
         data_subset["cDNA_position"] = vep_variant[2]
         data_subset["CDS_position"] = vep_variant[3]

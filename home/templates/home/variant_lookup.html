@@ -231,7 +231,7 @@
                             class="button js-form-submit form-submit form-type-submit btn btn-default btn-block"></td>
                 </tr>
                 <tr>
-                    <td colspan="3" style="text-align: left; padding-left: 30px;">Examples: <a
+                    <td colspan="3" style="text-align: left; padding-left: 30px;">Input format: <span style="color: #0582ca"><i>Chromosome_Coordinate_Reference/Alternative allele</i></span>. <br>Examples: <a
                             href="/gene/ENSG00000196396/" target='_blank' hreflang="en">20_50581449_C/G</a></td>
                 </tr>
             </tbody>
@@ -283,7 +283,7 @@
                 });
             },
             autoFocus: true,
-            minLength: 7,
+            minLength: 5,
             select: function (event, ui) {
                 $('#search_variant').val(ui.item.value);
                 return false;
