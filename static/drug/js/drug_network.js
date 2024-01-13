@@ -2148,7 +2148,8 @@ function createLegend() {
     var legendContent = d3.select("#legend-content");
 
     var legendContent2 = d3.select("#legend-content_disease");
-
+    console.log("interaction legend",legendContent);
+    console.log("disease legend",legendContent2);
     var uniqueInteractions = new Set();
 
     links.forEach(function (link) {
@@ -2167,7 +2168,10 @@ function createLegend() {
         uniqueInteractions.add(interaction);
       }
     });
+    console.log("unique Interactions", uniqueInteractions);
     function createLegendItem(interaction, color, container) {
+        console.log("CreateLegendItem", interaction +"\n"+color);
+            console.log("CreateLegendItem COntainer", container);
       var legendItem = container
         .append("div")
         .style("display", "flex")
@@ -2176,7 +2180,7 @@ function createLegend() {
         .on("click", function () {
           d3.select(this).classed("selected-legend1", true);
         });
-
+        console.log("legendItem", legendItem);
       var phases = ["phase1", "phase2", "phase3", "phase4"];
       var dropdown = legendItem
         .append("div")
