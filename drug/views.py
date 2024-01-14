@@ -752,16 +752,12 @@ def get_drug_atc_association(request):
                 interacted_protein.append(target.get("uniProt_ID"))
         interacted_protein = list(set(interacted_protein))
 
-        gene_based_burden_data = get_genebased_data_from_genebass(atc_code)
-        pgx_clinical_data = _get_clinical_pgx_data_by_atc(atc_code)
         # Create a JSON response with the data
         response_data = {
             "associations": associations_list,
             "atc_code": atc_code,
             "total_interaction": total_interaction,
             "no_of_interacted_protein":len(interacted_protein),
-            "gene_based_burden_data": gene_based_burden_data,
-            "pgx_clinical_data": pgx_clinical_data,
         }
         # Check the length of atc_code and set the cache with an appropriate timeout
         if len(atc_code) <= 5:

@@ -36,7 +36,7 @@
         font-weight: bold;
     }
 
-    #genebased-burden-distribution-area {
+    #pgx_data_display_area {
         display: none;
     }
 
@@ -276,8 +276,8 @@
                     </div>
                 </div>
             </div>
-            <div class="row" id="genebased-burden-distribution-area">
-                <div id="genebased-burden-distribution" class="col-md-12 col-sm-12">
+            <div class="row" id="pgx_data_display_area">
+                <div id="pgx_data_display_area_inner" class="col-md-12 col-sm-12">
                     <button onclick="tableToExcel($(this))" type="button" class="btn btn-primary exportBtn"
                         style="width: 120px; float: left; margin-right: 20px; ">
                         Export to Excel
@@ -1054,57 +1054,8 @@
             // Adding the atc_level_network_statistics if there is drug associated with this ATC code
             var atc_level_network_statistics = document.getElementById("atc_level_network_statistics");
             atc_level_network_statistics.style.display = "block";
-
-            var atc_level_network_burden = document.getElementById("genebased-burden-distribution");
-            atc_level_network_burden.style.display = "block";
-
-            var atc_level_network_statistics_text = document.getElementById("atc_level_network_statistics_text");
-            atc_level_network_statistics_text.style.marginLeft = "10px";
-            atc_level_network_statistics_text.style.marginTop = "10px";
-
-            $("#genebased-burden-distribution-area").find('input[name="clinical-pgx-control"]').attr('data-atc-code', response.atc_code);
-
-            $("#genebased-burden-distribution-area").find('input[name="burden-control"]').attr('data-atc-code', response.atc_code);
-            $("#genebased-burden-distribution-area").find('button.exportBtn').attr('data-atc-code', response.atc_code);
-            var genebased_burden_distribution_area = document.getElementById("genebased-burden-distribution-area");
-            var clinical_pgx_data_control_area = document.getElementById("clinical-pgx-data-control-div");
-            var burden_data_control_area = document.getElementById("burden-data-control-div");
-
-            if (response.atc_code != "no ATC code") {
-                atc_level_network_statistics_text.innerHTML = "Network statistics for " + response.atc_code;
-                showAtcLevelNetworkStatistics(response.atc_code);
-            } else {
-                atc_level_network_statistics_text.innerHTML = "Network statistics";
-                showOneDrugLevelNetworkStatistics(response.drug_id);
-            }
-
-            var pgx_clinical_data = response.pgx_clinical_data;
-            var gene_based_burden_data = response.gene_based_burden_data;
-            if (pgx_clinical_data.length > 0) {
-                genebased_burden_distribution_area.style.display = "block";
-                clinical_pgx_data_control_area.style.display = "block";
-                render_clinical_pgx_data(pgx_clinical_data);
-
-                if (gene_based_burden_data.length == 0) {
-                    burden_data_control_area.style.display = "block";
-                    $('#burden-data-control-div input').prop('disabled', true);
-                }
-                else {
-                    burden_data_control_area.style.display = "block";
-                }
-            }
-            else {
-                if (gene_based_burden_data.length > 0) {
-                    genebased_burden_distribution_area.style.display = "block";
-                    $('#variant-based-clinical-pgx-control').prop('checked', false);
-                    $('#variant-based-clinical-pgx-control').prop('disabled', true);
-                    clinical_pgx_data_control_area.style.display = "block";
-                    burden_data_control_area.style.display = "block";
-                    $('#genebased-burden-control').prop('checked', true);
-                    render_gene_based_burden_data(gene_based_burden_data);
-                }
-            }
         }
+
         else { //if not (associations.length > 0) 
             right_panel_text.innerHTML = "There is no targeting drugs associated with " + response.atc_code;
             right_panel.appendChild(right_panel_text);
@@ -1114,7 +1065,137 @@
         }
     };
 
-    //
+    function showAtcLevelNetworkStatistics2(atc_code) {
+        // Adding the atc_level_network_statistics if there is drug associated with this ATC code
+        var atc_level_network_statistics = document.getElementById("atc_level_network_statistics");
+        atc_level_network_statistics.style.display = "block";
+
+        var atc_level_network_statistics_text = document.getElementById("atc_level_network_statistics_text");
+        atc_level_network_statistics_text.style.marginLeft = "10px";
+        atc_level_network_statistics_text.style.marginTop = "10px";
+
+        if (atc_code != "no ATC code") {
+            atc_level_network_statistics_text.innerHTML = "Network statistics for " + atc_code;
+            showAtcLevelNetworkStatistics(atc_code);
+        } else {
+            atc_level_network_statistics_text.innerHTML = "Network statistics";
+            showOneDrugLevelNetworkStatistics(drug_id);
+        }
+    }
+
+    function showPGxTable(atc_code){
+        var pgx_data_display_area = document.getElementById("pgx_data_display_area");
+        var pgx_data_display_area_inner = document.getElementById("pgx_data_display_area_inner");
+        var clinical_pgx_data_control_area = document.getElementById("clinical-pgx-data-control-div");
+        var burden_data_control_area = document.getElementById("burden-data-control-div");
+
+        $("#pgx_data_display_area").find('input[name="clinical-pgx-control"]').attr('data-atc-code', atc_code);
+        $("#pgx_data_display_area").find('input[name="burden-control"]').attr('data-atc-code', atc_code);
+        $("#pgx_data_display_area").find('button.exportBtn').attr('data-atc-code', atc_code);
+
+        // Get the radio buttons by their IDs
+        const geneBasedRadio = document.getElementById('genebased-burden-control');
+        const variantBasedRadio = document.getElementById('variant-based-burden-control');
+        // Check the variant-based radio button and uncheck the gene-based radio button
+
+        $.ajax(
+            {
+                url: "{% url 'get-clinical-pgx-data-by-atc' %}?atc_code=" + atc_code,
+                type: "GET",
+                success: function (clinical_response) {
+                    if (clinical_response.length > 0 ){
+                        //alert("yes, there are clinical_response data "+ clinical_response.length);
+                        pgx_data_display_area.style.display = "block";
+                        pgx_data_display_area_inner.style.display = "block";
+                        clinical_pgx_data_control_area.style.display = "block";
+                        render_clinical_pgx_data(clinical_response);
+                        $.ajax(
+                        {
+                            url: "{% url 'get-gene-based-burden-data-by-atc' %}?atc_code=" + atc_code,
+                            type: "GET",
+                            success: function (burden_response) {
+                                if (burden_response.length > 0 ){
+                                    //alert("yes, there are GENE burden_response data");
+                                    pgx_data_display_area.style.display = "block";
+                                    pgx_data_display_area_inner.style.display = "block";
+                                    burden_data_control_area.style.display = "block";
+                                    //render_gene_based_burden_data(burden_response);
+                                }else{
+                                    $.ajax(
+                                    {
+                                        url: "{% url 'get-variant-based-burden-data-by-atc' %}?atc_code=" + atc_code,
+                                        type: "GET",
+                                        success: function (burden_response) {
+                                            if (burden_response.length > 0 ){
+                                                //alert("yes, there are VARIANT burden_response data");
+                                                pgx_data_display_area.style.display = "block";
+                                                pgx_data_display_area_inner.style.display = "block";
+                                                burden_data_control_area.style.display = "block";
+                                                //variantBasedRadio.checked = true;
+                                                //render_gene_based_burden_data(burden_response);
+                                            }
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.log('AJAX Error:', error);
+                                        }
+                                    });
+                                }
+
+                            },
+                            error: function (xhr, status, error) {
+                                console.log('AJAX Error:', error);
+                            }
+                        });
+                    }else{
+                        //alert("no, there are no clinical_response data");
+                        $.ajax(
+                        {
+                            url: "{% url 'get-gene-based-burden-data-by-atc' %}?atc_code=" + atc_code,
+                            type: "GET",
+                            success: function (burden_response) {
+                                //alert("burden_response "+burden_response.length);
+                                if (burden_response.length > 0 ){
+                                    //alert("yes, there are burden_response data");
+                                    pgx_data_display_area.style.display = "block";
+                                    pgx_data_display_area_inner.style.display = "block";
+                                    burden_data_control_area.style.display = "block";
+                                    geneBasedRadio.checked = true;
+                                    render_gene_based_burden_data(burden_response);
+                                }else{
+                                    $.ajax(
+                                    {
+                                        url: "{% url 'get-variant-based-burden-data-by-atc' %}?atc_code=" + atc_code,
+                                        type: "GET",
+                                        success: function (burden_response) {
+                                            if (burden_response.length > 0 ){
+                                                //alert("yes, there are VARIANT burden_response data");
+                                                pgx_data_display_area.style.display = "block";
+                                                pgx_data_display_area_inner.style.display = "block";
+                                                burden_data_control_area.style.display = "block";
+                                                variantBasedRadio.checked = true;
+                                                geneBasedRadio.checked = false;
+                                                geneBasedRadio.disabled = true;
+                                                render_variant_based_burden_data(burden_response);
+                                            }
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.log('AJAX Error:', error);
+                                        }
+                                    });
+                                    }
+                            },
+                            error: function (xhr, status, error) {
+                                console.log('AJAX Error:', error);
+                            }
+                        });
+                        }
+                },
+                error: function (xhr, status, error) {
+                    console.log('AJAX Error:', error);
+                }
+            });
+    }
+
     $('input[name="clinical-pgx-control"]').change(function () 
     {   
         $('input[name="burden-control"]').prop('checked', false);
@@ -1136,8 +1217,8 @@
 
     });
     function create_pgx_clinical_data_table(response) {
-        var genebased_burden_distribution_area = document.getElementById("genebased-burden-distribution-area");
-        genebased_burden_distribution_area.style.display = "block";
+        var pgx_data_display_area = document.getElementById("pgx_data_display_area");
+        pgx_data_display_area.style.display = "block";
         if (response.length > 0) {
             render_clinical_pgx_data(response);
 
@@ -1189,8 +1270,8 @@
 
 
     function create_pgx_genebased_table(response) {
-        var genebased_burden_distribution_area = document.getElementById("genebased-burden-distribution-area");
-        genebased_burden_distribution_area.style.display = "block";
+        var pgx_data_display_area = document.getElementById("pgx_data_display_area");
+        pgx_data_display_area.style.display = "block";
         if (response.length > 0) {
             render_gene_based_burden_data(response);
 
@@ -1198,8 +1279,8 @@
     };
 
     function create_pgx_variant_based_table(response) {
-        var genebased_burden_distribution_area = document.getElementById("genebased-burden-distribution-area");
-        genebased_burden_distribution_area.style.display = "block";
+        var pgx_data_display_area = document.getElementById("pgx_data_display_area");
+        pgx_data_display_area.style.display = "block";
         if (response.length > 0) {
             render_variant_based_burden_data(response);
         }
@@ -1228,6 +1309,8 @@
             const atcCode = button.getAttribute("data-atc-code");
 
             const url = button.getAttribute('data-remote-url'); //"{% url 'get-drug-atc-association' %}"
+            showAtcLevelNetworkStatistics2(atcCode);
+            showPGxTable(atcCode);
             $.ajax(
                 {
                     url: url,
@@ -1237,6 +1320,8 @@
                     },
                     success: function (response) {
                         list_associated_drugs_in_table(response);
+                        //showAtcLevelNetworkStatistics2(response.atc_code);
+                        //showPGxTable(response.atc_code);
                         draw_atc_level_network(button, response);
                     },
                     error: function (xhr, status, error) {
