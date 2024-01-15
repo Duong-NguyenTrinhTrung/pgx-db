@@ -20,13 +20,47 @@ class DrugNetworkGetDataService(object):
         drug_protein_interactions = Interaction.objects.filter(drug_bankID=self.drug.drug_bankID)
         drug_disease_interactions = DrugDiseaseStudy.objects.filter(drug_bankID=self.drug.drug_bankID)
         general_data = []
+        # print("drug_protein_interactions: ", len(drug_protein_interactions))
+        # print("drug_disease_interactions: ", len(drug_disease_interactions))
         for t1 in drug_protein_interactions:
-            for t2 in drug_disease_interactions:
+            if len(drug_disease_interactions) != 0:
+                for t2 in drug_disease_interactions:
+                    interaction_info = {
+                        "interaction_id": t1.interaction_id,
+                        "interaction_type": t1.interaction_type,
+                        "pubmed_ids": t1.pubmed_ids,
+                    }
+                    drug_info = {
+                        "drugbank_id": t1.drug_bankID.drug_bankID,
+                        "drug_name": t1.drug_bankID.name,
+                        "drugtype": t1.drug_bankID.drugtype.type_detail,
+                        "Drug_status": t1.drug_bankID.Clinical_status,
+                    }
+                    protein_info = {
+                        "protein": t1.uniprot_ID.uniprot_ID,
+                        "protein_name": t1.uniprot_ID.protein_name,
+                        "Protein_Class": t1.uniprot_ID.Protein_class,
+                        "gene_name": t1.uniprot_ID.genename,
+                    }
+                    disease_info = {
+                        "Phase": t2.clinical_trial,
+                        "Disease_name": t2.disease_name.disease_name,
+                        "Disease_class": t2.disease_name.disease_class,
+                    }
+                    
+                    interaction_data = {
+                        **interaction_info,
+                        **drug_info,
+                        **protein_info,
+                        **disease_info,
+                    }
+                    general_data.append(interaction_data)
+            else:
                 interaction_info = {
-                    "interaction_id": t1.interaction_id,
-                    "interaction_type": t1.interaction_type,
-                    "pubmed_ids": t1.pubmed_ids,
-                }
+                        "interaction_id": t1.interaction_id,
+                        "interaction_type": t1.interaction_type,
+                        "pubmed_ids": t1.pubmed_ids,
+                    }
                 drug_info = {
                     "drugbank_id": t1.drug_bankID.drug_bankID,
                     "drug_name": t1.drug_bankID.name,
@@ -40,9 +74,9 @@ class DrugNetworkGetDataService(object):
                     "gene_name": t1.uniprot_ID.genename,
                 }
                 disease_info = {
-                    "Phase": t2.clinical_trial,
-                    "Disease_name": t2.disease_name.disease_name,
-                    "Disease_class": t2.disease_name.disease_class,
+                    "Phase": "",
+                    "Disease_name": "",
+                    "Disease_class": "",
                 }
                 
                 interaction_data = {
@@ -131,13 +165,47 @@ class DrugsNetworkGetDataService:
         drug_protein_interactions = Interaction.objects.filter(drug_bankID__in=self.drug_bank_ids).distinct()
         drug_disease_interactions = DrugDiseaseStudy.objects.filter(drug_bankID__in=self.drug_bank_ids).distinct()
         general_data = []
+        # print("drug_protein_interactions: ", len(drug_protein_interactions))
+        # print("drug_disease_interactions: ", len(drug_disease_interactions))
         for t1 in drug_protein_interactions:
-            for t2 in drug_disease_interactions:
+            if len(drug_disease_interactions) != 0:
+                for t2 in drug_disease_interactions:
+                    interaction_info = {
+                        "interaction_id": t1.interaction_id,
+                        "interaction_type": t1.interaction_type,
+                        "pubmed_ids": t1.pubmed_ids,
+                    }
+                    drug_info = {
+                        "drugbank_id": t1.drug_bankID.drug_bankID,
+                        "drug_name": t1.drug_bankID.name,
+                        "drugtype": t1.drug_bankID.drugtype.type_detail,
+                        "Drug_status": t1.drug_bankID.Clinical_status,
+                    }
+                    protein_info = {
+                        "protein": t1.uniprot_ID.uniprot_ID,
+                        "protein_name": t1.uniprot_ID.protein_name,
+                        "Protein_Class": t1.uniprot_ID.Protein_class,
+                        "gene_name": t1.uniprot_ID.genename,
+                    }
+                    disease_info = {
+                        "Phase": t2.clinical_trial,
+                        "Disease_name": t2.disease_name.disease_name,
+                        "Disease_class": t2.disease_name.disease_class,
+                    }
+                    
+                    interaction_data = {
+                        **interaction_info,
+                        **drug_info,
+                        **protein_info,
+                        **disease_info,
+                    }
+                    general_data.append(interaction_data)
+            else:
                 interaction_info = {
-                    "interaction_id": t1.interaction_id,
-                    "interaction_type": t1.interaction_type,
-                    "pubmed_ids": t1.pubmed_ids,
-                }
+                        "interaction_id": t1.interaction_id,
+                        "interaction_type": t1.interaction_type,
+                        "pubmed_ids": t1.pubmed_ids,
+                    }
                 drug_info = {
                     "drugbank_id": t1.drug_bankID.drug_bankID,
                     "drug_name": t1.drug_bankID.name,
@@ -151,10 +219,11 @@ class DrugsNetworkGetDataService:
                     "gene_name": t1.uniprot_ID.genename,
                 }
                 disease_info = {
-                    "Phase": t2.clinical_trial,
-                    "Disease_name": t2.disease_name.disease_name,
-                    "Disease_class": t2.disease_name.disease_class,
+                    "Phase": "",
+                    "Disease_name": "",
+                    "Disease_class": "",
                 }
+                
                 interaction_data = {
                     **interaction_info,
                     **drug_info,
@@ -162,7 +231,7 @@ class DrugsNetworkGetDataService:
                     **disease_info,
                 }
                 general_data.append(interaction_data)
-        # print("general data for many drugs :", general_data)
+        # print("general data for one drug :", general_data)
         return general_data
 
     def get_drug_data(self) -> list[dict]:

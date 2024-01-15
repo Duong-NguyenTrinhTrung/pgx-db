@@ -86,6 +86,7 @@ def get_drug_general_data(request, drug_bank_id):
     # import pdb
     # pdb.set_trace()
     data = DrugNetworkGetDataService(drug=drug).get_general_data() # without s
+    # print("get_drug_general_data: ", data, drug_bank_id)
 
     return JsonResponse(data, safe=False)
 
@@ -658,16 +659,16 @@ def atc_detail_view(request):
 
     group_name = anatomic_group.name if anatomic_group else ''
 
-    group2s = AtcTherapeuticGroup.objects.all()
+    group2s = AtcTherapeuticGroup.objects.filter(id__icontains=group_id)
     for group in group2s:
         group.name = format_atc_name(group.name)
-    group3s = AtcPharmacologicalGroup.objects.all()
+    group3s = AtcPharmacologicalGroup.objects.filter(id__icontains=group_id)
     for group in group3s:
         group.name = format_atc_name(group.name)
-    group4s = AtcChemicalGroup.objects.all()
+    group4s = AtcChemicalGroup.objects.filter(id__icontains=group_id)
     for group in group4s:
         group.name = format_atc_name(group.name)
-    group5s = AtcChemicalSubstance.objects.all()
+    group5s = AtcChemicalSubstance.objects.filter(id__icontains=group_id)
     for group in group5s:
         group.name = format_atc_name(group.name)
     context = {'group2s': group2s, 'group3s': group3s, 'group4s': group4s, 'group5s': group5s, "group_id": group_id,
@@ -675,6 +676,8 @@ def atc_detail_view(request):
     end_time = perf_counter()
     response = render(request, 'atc_detail_view.html', context)
     response['atc_detail_view-Duration'] = end_time - start_time
+    # print("atc_detail_view: group_id: "+group_id+" ", len(context.get("group2s")), " ", len(context.get("group3s")), " ", len(context.get("group4s")), " ", len(context.get("group5s")))
+    
     return response
 
 
