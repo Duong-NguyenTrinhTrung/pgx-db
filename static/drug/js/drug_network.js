@@ -1631,7 +1631,7 @@ function processData() {
 
             // Create the chart using D3.js
             createChart(links);
-            // createLegend();
+            createLegend();
             createLegend_status();
             createLegend_drugType();
             createProteinsLegend();
