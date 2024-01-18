@@ -33,6 +33,7 @@ from gene.models import Gene
 from interaction.models import Interaction
 from protein.models import Protein
 from variant.models import GenebassVariant, GenebassPGx, GenebassVariantPGx, Variant, Pharmgkb
+from disease.models import DrugDiseaseStudy, Disease
 
 from .models import (
     Drug,
@@ -677,8 +678,11 @@ def atc_detail_view(request):
     response = render(request, 'atc_detail_view.html', context)
     response['atc_detail_view-Duration'] = end_time - start_time
     # print("atc_detail_view: group_id: "+group_id+" ", len(context.get("group2s")), " ", len(context.get("group3s")), " ", len(context.get("group4s")), " ", len(context.get("group5s")))
-    
     return response
+
+
+
+
 
 
 @csrf_exempt  # Use this decorator for simplicity, but consider using a proper csrf token in production.
@@ -1089,6 +1093,105 @@ def get_variant_based_burden_data_by_atc(request):
     return JsonResponse(response_data, safe=False)
 
 
+def get_data_for_comparing_network_degree_distribution(request):
+    atc_code = request.GET.get("atc_code")
+    if cache.get("get_data_for_comparing_network_degree_distribution_"+atc_code):
+        response_data = cache.get("get_data_for_comparing_network_degree_distribution_"+atc_code)
+    else:
+        allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+        chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+        drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+        undup_drugs = list(set(drugs))
+        drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+        degree_distribution = []
+        for drug in drug_objs:
+            interactions = Interaction.objects.filter(drug_bankID=drug).values_list("uniprot_ID", flat=True)
+            associations = DrugDiseaseStudy.objects.filter(drug_bankID=drug).values_list("disease_name", flat=True)
+            degree_distribution.append({"drug":drug.drug_bankID, "interaction_degree":len(list(interactions)), "association_degree":len(list(associations))})
+        response_data = {
+            "degree_distribution":degree_distribution, 
+        }
+        cache.set("get_data_for_comparing_network_degree_distribution_"+atc_code, response_data, 60*60)
+    return JsonResponse(response_data)
+
+
+def get_data_for_comparing_common_and_unique_network_element(request):
+    atc_code = request.GET.get("atc_code")
+    if cache.get("get_data_for_comparing_common_and_unique_network_element_"+atc_code):
+        response_data = cache.get("get_data_for_comparing_common_and_unique_network_element_"+atc_code)
+    else:
+        allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+        chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+        drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+        undup_drugs = list(set(drugs))
+        drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+        protein_objs = []
+        disease_objs = []
+        for drug in drug_objs:
+            #drug-protein interaction
+            interactions = Interaction.objects.filter(drug_bankID=drug)
+            protein_objs += list(interactions.values_list('uniprot_ID', flat=True))
+            #drug-disease association
+            association = DrugDiseaseStudy.objects.filter(drug_bankID=drug)
+            disease_objs += list(association.values_list('disease_name', flat=True))
+
+        protein_objs = list(set(protein_objs))
+        disease_objs = list(set(disease_objs))
+        response_data = {
+            "drug_objs": list(drug_objs.values_list("drug_bankID", flat=True)),
+            "protein_objs": protein_objs,
+            "disease_objs": list(set(DrugDiseaseStudy.objects.filter(disease_name__in=disease_objs).values_list("disease_name__disease_name", flat=True))),
+        }
+        print("response_data : ", response_data)
+        cache.set("get_data_for_comparing_common_and_unique_network_element_"+atc_code, response_data, 60*60)
+    return JsonResponse(response_data)
+
+def get_statistics_by_atc_for_network_size_comparison(request):
+    atc_code = request.GET.get("atc_code") # main
+    atc_comparison = request.GET.get("atc_comparison") #compare
+    response_data ={
+        "atc_code": get_statistics_by_ONE_atc_for_network_size_comparison(atc_code),
+        "atc_comparison": get_statistics_by_ONE_atc_for_network_size_comparison(atc_comparison)
+    }
+    return JsonResponse(response_data)
+
+# helper
+def get_statistics_by_ONE_atc_for_network_size_comparison(atc_code):
+    print("atc_code:", atc_code)
+    if cache.get("get_statistics_by_ONE_atc_for_network_size_comparison_"+atc_code):
+        response_data = cache.get("get_statistics_by_ONE_atc_for_network_size_comparison_"+atc_code)
+    else:
+        allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+        chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+        drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+        undup_drugs = list(set(drugs))
+        drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+        interaction_all = []
+        association_all = []
+        protein_objs = []
+        disease_objs = []
+        for drug in drug_objs:
+            #drug-protein interaction
+            interactions = Interaction.objects.filter(drug_bankID=drug)
+            interaction_all+=interactions
+            protein_objs += list(interactions.values_list('uniprot_ID', flat=True))
+            #drug-disease association
+            association = DrugDiseaseStudy.objects.filter(drug_bankID=drug)
+            association_all+=association
+            disease_objs += list(association.values_list('disease_name', flat=True))
+        protein_count = len(list(set(protein_objs)))
+        disease_count = len(list(set(disease_objs)))
+        response_data = {
+            "name_atc_code": atc_code,
+            "no of drugs": len(drug_objs),
+            "no of diseases": disease_count,
+            "no of proteins": protein_count,
+            "NoOfDrugPoteinInteractions": len(interaction_all),
+            "NoOfDrugDiseaseAssociationStudy": len(association_all),
+        }
+        cache.set("get_statistics_by_ONE_atc_for_network_size_comparison_"+atc_code, response_data, 60*60)
+    return response_data
+
 def get_statistics_by_atc(request):
     atc_code = request.GET.get("atc_code")
     if cache.get("get_statistics_by_atc_"+atc_code):
@@ -1100,10 +1203,17 @@ def get_statistics_by_atc(request):
         undup_drugs = list(set(drugs))
         drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
         interaction_all = []
+        association_all = []
         for drug in drug_objs:
+            #drug-protein interaction
             interactions = Interaction.objects.filter(drug_bankID=drug)
             interaction_all+=interactions
+            #drug-disease association
+            association = DrugDiseaseStudy.objects.filter(drug_bankID=drug)
+            association_all+=association
         interaction_all = list(set(interaction_all))
+        association_all = list(set(association_all))
+
         noOfTargetTypes = len([interaction for interaction in interaction_all if interaction.interaction_type=="target" ])
         noOfTransporterTypes = len([interaction for interaction in interaction_all if interaction.interaction_type=="transporter" ])
         noOfCarrierTypes = len([interaction for interaction in interaction_all if interaction.interaction_type=="carrier" ])
@@ -1120,6 +1230,14 @@ def get_statistics_by_atc(request):
         noOfSmallMolecule = len([drug for drug in drug_objs if drug.drugtype.type_detail=="Small Molecule"])
         noOfBiotech = len([drug for drug in drug_objs if drug.drugtype.type_detail=="Biotech"])
 
+        noOfPhase1 = len([s for s in association_all if s.clinical_trial=="1"])
+        noOfPhase2 = len([s for s in association_all if s.clinical_trial=="2"])
+        noOfPhase3 = len([s for s in association_all if s.clinical_trial=="3"])
+        noOfPhase4 = len([s for s in association_all if s.clinical_trial=="4"])
+
+        disease_classes = list(Disease.objects.values_list('disease_class', flat=True).distinct())
+        new_disease_classes = []
+        disease_class_count = []
         response_data = {
             "no of drugs": len(drug_objs),
             "atc_code": atc_code,
@@ -1136,7 +1254,20 @@ def get_statistics_by_atc(request):
             "NoOfIllicitDrug":noOfIllicitDrug,
             "NoOfSmallMolecule":noOfSmallMolecule,
             "NoOfBiotech":noOfBiotech,
+            "noOfPhase1": noOfPhase1,
+            "noOfPhase2": noOfPhase2,
+            "noOfPhase3": noOfPhase3,
+            "noOfPhase4": noOfPhase4,
+            "totalNoOfDisease": noOfPhase1 + noOfPhase2 + noOfPhase3 + noOfPhase4,
             }
+        for dc in disease_classes:
+            c = DrugDiseaseStudy.objects.filter(Q(drug_bankID__in=undup_drugs) & Q(disease_name__disease_class=dc)).distinct().count()
+            if c>0:
+                disease_class_count.append(c)
+                new_disease_classes.append(dc)
+        response_data["disease_classes"]=new_disease_classes
+        response_data["disease_class_count"]=disease_class_count
+
         cache.set("get_statistics_by_atc_"+atc_code, response_data, 60*60)
     return JsonResponse(response_data)
 
@@ -1285,50 +1416,80 @@ def retrieving_chemical_substance(atc_code):
     return list(AtcChemicalSubstance.objects.filter(id__startswith=atc_code).values('id', 'name'))
 
 
+# def get_atc_sub_levels(request):
+#     atc_code = request.GET.get("atc_code");
+#     data = {'atc_code': atc_code}
+#     if len(atc_code) == 1:
+#         data = {"anatomical_group": retrieving_anatomical_group(atc_code),
+#                 "therapeutic_group": retrieving_therapeutic_group(atc_code),
+#                 "pharmacological_group": retrieving_pharmacological_group(atc_code),
+#                 "chemical_group": retrieving_chemical_group(atc_code),
+#                 "chemical_substance": retrieving_chemical_substance(atc_code)}
+#     if len(atc_code) == 3:
+#         data = {"therapeutic_group": retrieving_therapeutic_group(atc_code),
+#                 "pharmacological_group": retrieving_pharmacological_group(atc_code),
+#                 "chemical_group": retrieving_chemical_group(atc_code),
+#                 "chemical_substance": retrieving_chemical_substance(atc_code)}
+#     if len(atc_code) == 4:
+#         data = {"pharmacological_group": retrieving_pharmacological_group(atc_code),
+#                 "chemical_group": retrieving_chemical_group(atc_code),
+#                 "chemical_substance": retrieving_chemical_substance(atc_code)}
+#     if len(atc_code) == 5:
+#         data = {"chemical_group": retrieving_chemical_group(atc_code),
+#                 "chemical_substance": retrieving_chemical_substance(atc_code)}
+#     if len(atc_code) == 7:
+#         data = {"chemical_substance": retrieving_chemical_substance(atc_code)}
+
+#     # re-organize the data
+#     reorganized_data = {}
+
+#     # Loop through each element in the original data
+#     for group_type, group_list in data.items():
+#         # Create a dictionary to hold the grouped elements
+#         grouped_elements = {}
+
+#         # Loop through the elements in the group_list
+#         for element in group_list:
+#             # Extract the element ID
+#             element_id = element['id']
+
+#             # Add the element to the grouped_elements dictionary
+#             grouped_elements[element_id] = element
+
+#         # Add the grouped_elements to the reorganized_data using the group_type as the key
+#         reorganized_data[group_type] = grouped_elements
+#     reorganized_data["atc_code"] = atc_code
+#     reorganized_data["data"] = data
+#     return JsonResponse(reorganized_data, safe=False)
+
 def get_atc_sub_levels(request):
     atc_code = request.GET.get("atc_code");
     data = {'atc_code': atc_code}
     if len(atc_code) == 1:
-        data = {"anatomical_group": retrieving_anatomical_group(atc_code),
-                "therapeutic_group": retrieving_therapeutic_group(atc_code),
-                "pharmacological_group": retrieving_pharmacological_group(atc_code),
-                "chemical_group": retrieving_chemical_group(atc_code),
-                "chemical_substance": retrieving_chemical_substance(atc_code)}
+        data = {
+                "therapeutic_group": list(AtcTherapeuticGroup.objects.filter(id__startswith=atc_code).values('id')),
+                "pharmacological_group": list(AtcPharmacologicalGroup.objects.filter(id__startswith=atc_code).values('id')),
+                "chemical_group": list(AtcChemicalGroup.objects.filter(id__startswith=atc_code).values('id')),
+                "chemical_substance": list(AtcChemicalSubstance.objects.filter(id__startswith=atc_code).values('id'))}
     if len(atc_code) == 3:
-        data = {"therapeutic_group": retrieving_therapeutic_group(atc_code),
-                "pharmacological_group": retrieving_pharmacological_group(atc_code),
-                "chemical_group": retrieving_chemical_group(atc_code),
-                "chemical_substance": retrieving_chemical_substance(atc_code)}
+        data = {
+                "pharmacological_group": list(AtcPharmacologicalGroup.objects.filter(id__startswith=atc_code).values('id')),
+                "chemical_group": list(AtcChemicalGroup.objects.filter(id__startswith=atc_code).values('id')),
+                "chemical_substance": list(AtcChemicalSubstance.objects.filter(id__startswith=atc_code).values('id'))}
     if len(atc_code) == 4:
-        data = {"pharmacological_group": retrieving_pharmacological_group(atc_code),
-                "chemical_group": retrieving_chemical_group(atc_code),
-                "chemical_substance": retrieving_chemical_substance(atc_code)}
+        data = {
+                "chemical_group": list(AtcChemicalGroup.objects.filter(id__startswith=atc_code).values('id')),
+                "chemical_substance": list(AtcChemicalSubstance.objects.filter(id__startswith=atc_code).values('id'))}
     if len(atc_code) == 5:
-        data = {"chemical_group": retrieving_chemical_group(atc_code),
-                "chemical_substance": retrieving_chemical_substance(atc_code)}
+        data = {
+                "chemical_substance": list(AtcChemicalSubstance.objects.filter(id__startswith=atc_code).values('id'))}
     if len(atc_code) == 7:
-        data = {"chemical_substance": retrieving_chemical_substance(atc_code)}
-
-    # re-organize the data
-    reorganized_data = {}
-
-    # Loop through each element in the original data
-    for group_type, group_list in data.items():
-        # Create a dictionary to hold the grouped elements
-        grouped_elements = {}
-
-        # Loop through the elements in the group_list
-        for element in group_list:
-            # Extract the element ID
-            element_id = element['id']
-
-            # Add the element to the grouped_elements dictionary
-            grouped_elements[element_id] = element
-
-        # Add the grouped_elements to the reorganized_data using the group_type as the key
-        reorganized_data[group_type] = grouped_elements
-    reorganized_data["atc_code"] = atc_code
-    return JsonResponse(reorganized_data, safe=False)
+        data = {"chemical_substance": list(AtcChemicalSubstance.objects.filter(id__iexact=atc_code).values('id'))}
+    
+    temp=[]
+    for key in data.keys():
+        temp+=[item.get("id") for item in data.get(key)]
+    return JsonResponse({"atc_code": atc_code, "sub_atc_codes": temp}, safe=False)
 
 
 class TargetByAtcBaseView:

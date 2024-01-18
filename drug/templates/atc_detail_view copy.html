@@ -176,238 +176,206 @@
           
             <!-- Tab panes -->
             <div class="tab-content">
-              <div role="tabpanel" class="tab-pane active" id="tab_network_visualization">
-                <!-- block for showing network -->
-                    <div class="forcenetworkgraph" id="graphvisibility"
-                    style="display: none; width: 100%; margin: 10px 0; height: 1300px; ">
-                        <p> <span style="color: red;" id="network_overview"></span> </p>
-                        <iframe id="myIframe" style="
-                                                            display: none;
-                                                            width: 98%;
-                                                            height: 100%;
-                                                            border: #b4b1b1 1px solid;
-                                                            margin-right: 5px;">
-                        </iframe>
-                    </div>
-              </div>
-              <div role="tabpanel" class="tab-pane" id="tab_network_statistics">
-                <!-- block for showing the atc level network statistics -->
-                <div id='atc_level_network_statistics' style="border: #b4b1b1 1px solid">
-                    <p>
-                        <span id="atc_level_network_statistics_text"> </span>
-                    </p>
-                    <div class="row" id="atc_level_network_statistics_with_protein">
-                        <div class="col-md-2 col-sm-12" style="margin-right: -80px;">
-                            <div id="moa_legend">
-                                <ul class="legend">
-                                    <li class="legend-item">
-                                        <div class="legend-color" style="background-color: #ff99c8;"></div>
-                                        Target
-                                    </li>
-                                    <li class="legend-item">
-                                        <div class="legend-color" style="background-color: #43bccd;"></div>
-                                        Enzyme
-                                    </li>
-                                    <li class="legend-item">
-                                        <div class="legend-color" style="background-color: #662e9b;"></div>
-                                        Transporter
-                                    </li>
-                                    <li class="legend-item">
-                                        <div class="legend-color" style="background-color: #f9c80e;"></div>
-                                        Carrier
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-sm-12" style="margin-right: 60px">
-                            <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
-                                <p style="font-style: italic; text-align: left;">Mode of action</p>
-                                <div id="chart-container-ATC-interaction-type" style="width: 150px; height: 150px;">
-                                    <svg id="pie-chart-ATC-interaction-type"></svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-sm-12" style="margin-right: -80px;">
-                            <div id="dtype_legend">
-                                <ul class="legend">
-                                    <li class="legend-item">
-                                        <div class="legend-color" style="background-color: #d62828;"></div>
-                                        Small Molecule
-                                    </li>
-                                    <li class="legend-item">
-                                        <div class="legend-color" style="background-color: #004e98;"></div>
-                                        Biotech
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-sm-12" style="margin-right: 60px">
-                            <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
-                                <p style="font-style: italic; text-align: left;">Drug type</p>
-                                <div id="chart-container-ATC-drug-type" style="width: 150px; height: 150px;">
-                                    <svg id="pie-chart-ATC-drug-type"></svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-sm-12" style="margin-right: -80px;">
-                            <div id="dstatus_legend">
-                                <ul class="legend">
-                                    <li class="legend-item">
-                                        <div class="legend-color" style="background-color: #ee6055;"></div>
-                                        Nutraceutical
-                                    </li>
-                                    <li class="legend-item">
-                                        <div class="legend-color" style="background-color: #60d394;"></div>
-                                        Experimental
-                                    </li>
-                                    <li class="legend-item">
-                                        <div class="legend-color" style="background-color: #aaf683;"></div>
-                                        Investigational
-                                    </li>
-                                    <li class="legend-item">
-                                        <div class="legend-color" style="background-color: #ffd97d;"></div>
-                                        Approved
-                                    </li>
-                                    <li class="legend-item">
-                                        <div class="legend-color" style="background-color: #ff9b85;"></div>
-                                        VetApproved
-                                    </li>
-                                    <li class="legend-item">
-                                        <div class="legend-color" style="background-color: #e4c1f9;"></div>
-                                        Illicit
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-md-2 col-sm-12">
-                            <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px; ">
-                                <p style="font-style: italic; text-align: left;">Drug clinical status</p>
-                                <div id="chart-container-ATC-drug-status" style="width: 150px; height: 150px;">
-                                    <svg id="pie-chart-ATC-drug-status"></svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row" id="atc_level_network_statistics_with_disease" style="display: none; margin-bottom: 120px;">
-                        <div class="col-md-2 col-sm-12" style="margin-right: -80px;">
-                            <div id="moa_legend">
-                                <ul class="legend">
-                                    <li class="legend-item">
-                                        <div class="legend-color" style="background-color: steelblue;"></div>
-                                        Phase 1
-                                    </li>
-                                    <li class="legend-item">
-                                        <div class="legend-color" style="background-color: purple;"></div>
-                                        Phase 2
-                                    </li>
-                                    <li class="legend-item">
-                                        <div class="legend-color" style="background-color: cyan;"></div>
-                                        Phase 3
-                                    </li>
-                                    <li class="legend-item">
-                                        <div class="legend-color" style="background-color: magenta;"></div>
-                                        Phase 4
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-12" style="margin-right: 60px">
-                            <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
-                                <p style="font-style: italic; text-align: left;">Drug-disease clinical trial phase</p>
-                                <div id="chart-container-ATC-clinical-trial-phase" style="width: 150px; height: 150px;">
-                                    <svg id="pie-chart-ATC-clinical-trial-phase"></svg>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-7 col-sm-12" style="margin-right: 60px">
-                            <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
-                                <p style="font-style: italic; text-align: left; display: inline-block;">Disease class</p>
-                                <div id="chart-container-ATC-disease-class">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row" id="pgx_data_display_area">
-                        <div id="pgx_data_display_area_inner" class="col-md-12 col-sm-12">
-                            <button onclick="tableToExcel($(this))" type="button" class="btn btn-primary exportBtn"
-                                style="width: 120px; float: left; margin-right: 20px; ">
-                                Export to Excel
-                            </button>
-                            <div style="display: flex; gap: 10px; flex-direction: row;">
-                                <div id="clinical-pgx-data-control-div">
-                                    <fieldset style="width:250px; border-radius: 5px;">
-                                        <legend
-                                            style="font-size: 14px; margin-bottom:0; text-decoration: none; color: #337ab7;">
-                                            Clinical PGx data</legend>
-                                        <input id="variant-based-clinical-pgx-control" data-atc-code=""
-                                            name="clinical-pgx-control" type="radio" class="custom-radio" value="variant-based-clinical-pgx" checked>
-                                        <label for="variant-based-clinical-pgx-control">Variant-based</label>
-                                        
-                                    </fieldset>
-                                </div>
-                                <div id="burden-data-control-div" >
-                                    <div style="display: flex; flex-direction: row; gap: 10px;">
-                                        <fieldset style="width:250px; border-radius: 5px;">
-                                            <legend
-                                                style="font-size: 14px; margin-bottom:0; text-decoration: none; color: #337ab7;">
-                                                Burden data</legend>
-                                            <input id="genebased-burden-control" data-atc-code="" name="burden-control" type="radio" class="custom-radio"
-                                                value="gene-based"="">
-                                            <label for="genebased-burden-control">Gene-based</label>
-                                            <input id="variant-based-burden-control" data-atc-code="" name="burden-control"
-                                                type="radio" class="custom-radio" value="variant-based">
-                                            <label for="variant-based-burden-control">Variant-based</label>
-                                        </fieldset>
-                                        <select id="atc-sublevel-select" multiple class="form-control input-lg" size="4" style="display: none; margin-top: 20px;">
-                                            <option value="no-selection" selected="selected">Select a sub-level ATC code</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <p id="waiting-prompt" style="text-align: center; display: none"><i> <mark>Please kindly wait when
-                                        the data is being loaded! </i></mark> </p>
-                            <div class="spinner" style="display: none; margin: auto;">
-                            </div>
-                            <!-- A datatable here  -->
-                            <div id="pgx-data-table-div" style="margin-top: 20px;">
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-              </div>
-              <div role="tabpanel" class="tab-pane" id="tab_network_comparison" >
-                <div style="display: flex; flex-direction: row; gap: 20px; margin-top: 15px;">
-                    <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
-                        <label for="atc_comparison" style="font-size: 16px; color: rgb(51, 122, 183); font-weight: bold;">Input an ATC code for network comparison</label>
-                        <input type="text" id="atc_comparison" placeholder="ATC code" style="width: 100%;">
-                        <button id="btn-network-compare" type="button" style="width: 200px; border-radius: 5px;" class="btn-primary">Compare</button>
-                    </div>
-                    <div >
-                        <select id="compare-type" multiple class="form-control input-lg" size="7">
-                            <option value="no-selection" selected="selected">Select an option</option>
-                            <option value="compare_network_size">Compare network size</option>
-                            <option value="compare_degree_distritution">Compare degree distritution</option>
-                            <option value="see_common_and_unique_elements">See common and unique elements</option>
-                            <option value="measure_centralization">Measure the degree of centralization</option>
-                            <option value="calculate_path_length">Calculate average path length</option>
-                            <option value="see_clinical_trial_phase_distribution">See clinical trial phase distribution</option>
-                        </select>
-                    </div>
-                </div>
-                 
-                 <table id="result-compare" >
-                 </table>
-              </div>
+              <div role="tabpanel" class="tab-pane active" id="tab_network_visualization">Network visualization</div>
+              <div role="tabpanel" class="tab-pane" id="tab_network_statistics">Network statistics</div>
+              <div role="tabpanel" class="tab-pane" id="tab_network_comparison">Network comparison</div>
             </div>
           
           </div>
-        
+        <!-- block for showing network -->
+        <div class="forcenetworkgraph" id="graphvisibility"
+            style="display: none; width: 100%; margin: 10px 0; height: 1300px; ">
+            <p> <span style="color: red;" id="network_overview"></span> </p>
+            <iframe id="myIframe" style="
+                                                display: none;
+                                                width: 98%;
+                                                height: 100%;
+                                                border: #b4b1b1 1px solid;
+                                                margin-right: 5px;">
+            </iframe>
+        </div>
 
-        
+        <!-- block for showing the atc level network statistics -->
+        <div id='atc_level_network_statistics' style="border: #b4b1b1 1px solid">
+            <p>
+                <span id="atc_level_network_statistics_text"> </span>
+            </p>
+            <div class="row" id="atc_level_network_statistics_with_protein">
+                <div class="col-md-2 col-sm-12" style="margin-right: -80px;">
+                    <div id="moa_legend">
+                        <ul class="legend">
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #ff99c8;"></div>
+                                Target
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #43bccd;"></div>
+                                Enzyme
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #662e9b;"></div>
+                                Transporter
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #f9c80e;"></div>
+                                Carrier
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-12" style="margin-right: 60px">
+                    <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
+                        <p style="font-style: italic; text-align: left;">Mode of action</p>
+                        <div id="chart-container-ATC-interaction-type" style="width: 150px; height: 150px;">
+                            <svg id="pie-chart-ATC-interaction-type"></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-12" style="margin-right: -80px;">
+                    <div id="dtype_legend">
+                        <ul class="legend">
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #d62828;"></div>
+                                Small Molecule
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #004e98;"></div>
+                                Biotech
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-12" style="margin-right: 60px">
+                    <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
+                        <p style="font-style: italic; text-align: left;">Drug type</p>
+                        <div id="chart-container-ATC-drug-type" style="width: 150px; height: 150px;">
+                            <svg id="pie-chart-ATC-drug-type"></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-12" style="margin-right: -80px;">
+                    <div id="dstatus_legend">
+                        <ul class="legend">
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #ee6055;"></div>
+                                Nutraceutical
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #60d394;"></div>
+                                Experimental
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #aaf683;"></div>
+                                Investigational
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #ffd97d;"></div>
+                                Approved
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #ff9b85;"></div>
+                                VetApproved
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: #e4c1f9;"></div>
+                                Illicit
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                    <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px; ">
+                        <p style="font-style: italic; text-align: left;">Drug clinical status</p>
+                        <div id="chart-container-ATC-drug-status" style="width: 150px; height: 150px;">
+                            <svg id="pie-chart-ATC-drug-status"></svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" id="atc_level_network_statistics_with_disease" style="margin-bottom: 120px;">
+                <div class="col-md-2 col-sm-12" style="margin-right: -80px;">
+                    <div id="moa_legend">
+                        <ul class="legend">
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: steelblue;"></div>
+                                Phase 1
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: purple;"></div>
+                                Phase 2
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: cyan;"></div>
+                                Phase 3
+                            </li>
+                            <li class="legend-item">
+                                <div class="legend-color" style="background-color: magenta;"></div>
+                                Phase 4
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-12" style="margin-right: 60px">
+                    <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
+                        <p style="font-style: italic; text-align: left;">Clinical trial phase</p>
+                        <div id="chart-container-ATC-clinical-trial-phase" style="width: 150px; height: 150px;">
+                            <svg id="pie-chart-ATC-clinical-trial-phase"></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-7 col-sm-12" style="margin-right: 60px">
+                    <div class="card-body text-center" style="margin-left: 5px; margin-top: 20px;">
+                        <p style="font-style: italic; text-align: left; display: inline-block;">Disease class</p>
+                        <div id="chart-container-ATC-disease-class">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="pgx_data_display_area">
+                <div id="pgx_data_display_area_inner" class="col-md-12 col-sm-12">
+                    <button onclick="tableToExcel($(this))" type="button" class="btn btn-primary exportBtn"
+                        style="width: 120px; float: left; margin-right: 20px; ">
+                        Export to Excel
+                    </button>
+                    <div style="display: flex; gap: 10px; flex-direction: row;">
+                        <div id="clinical-pgx-data-control-div">
+                            <fieldset style="width:250px; border-radius: 5px;">
+                                <legend
+                                    style="font-size: 14px; margin-bottom:0; text-decoration: none; color: #337ab7;">
+                                    Clinical PGx data</legend>
+                                <input id="variant-based-clinical-pgx-control" data-atc-code=""
+                                    name="clinical-pgx-control" type="radio" class="custom-radio" value="variant-based-clinical-pgx" checked>
+                                <label for="variant-based-clinical-pgx-control">Variant-based</label>
+                            </fieldset>
+                        </div>
+                        <div id="burden-data-control-div">
+                            <fieldset style="width:250px; border-radius: 5px;">
+                                <legend
+                                    style="font-size: 14px; margin-bottom:0; text-decoration: none; color: #337ab7;">
+                                    Burden data</legend>
+                                <input id="genebased-burden-control" data-atc-code="" name="burden-control" type="radio" class="custom-radio"
+                                    value="gene-based"="">
+                                <label for="genebased-burden-control">Gene-based</label>
+                                <input id="variant-based-burden-control" data-atc-code="" name="burden-control"
+                                    type="radio" class="custom-radio" value="variant-based">
+                                <label for="variant-based-burden-control">Variant-based</label>
+                            </fieldset>
+                        </div>
+                    </div>
+
+                    <p id="waiting-prompt" style="text-align: center; display: none"><i> <mark>Please kindly wait when
+                                the data is being loaded! </i></mark> </p>
+                    <div class="spinner" style="display: none; margin: auto;">
+                    </div>
+                    <!-- A datatable here  -->
+                    <div id="pgx-data-table-div" style="margin-top: 20px;">
+                    </div>
+                </div>
+            </div>
+
+        </div>
         
         <!-- block for showing the target table -->
         <div id="target-table" style="display: none;">
@@ -622,17 +590,14 @@
                         { category: "Illicit", value: response.NoOfIllicitDrug },
                     ];
                     createPieChartForATCDrugStatus(drug_status_data);
-                    if (response.totalNoOfDisease>0){
-                        $("#atc_level_network_statistics_with_disease").show();
-                        const clinical_trial_phase = [
-                            { category: "Phase 1", value: response.noOfPhase1 },
-                            { category: "Phase 2", value: response.noOfPhase2 },
-                            { category: "Phase 3", value: response.noOfPhase3 },
-                            { category: "Phase 4", value: response.noOfPhase4 },
-                        ];
-                        createPieChartForATCClinicalTrialPhase(clinical_trial_phase);
-                        createBarChartForATCDiseaseClass(response.disease_classes, response.disease_class_count);
-                    }
+                    const clinical_trial_phase = [
+                        { category: "Phase 1", value: response.noOfPhase1 },
+                        { category: "Phase 2", value: response.noOfPhase2 },
+                        { category: "Phase 3", value: response.noOfPhase3 },
+                        { category: "Phase 4", value: response.noOfPhase4 },
+                    ];
+                    createPieChartForATCClinicalTrialPhase(clinical_trial_phase);
+                    createBarChartForATCDiseaseClass(response.disease_classes, response.disease_class_count);
                 },
                 error: function (xhr, status, error) {
                     console.log('AJAX Error:', error);
@@ -1154,7 +1119,6 @@
             // Adding the atc_level_network_statistics if there is drug associated with this ATC code
             var atc_level_network_statistics = document.getElementById("atc_level_network_statistics");
             atc_level_network_statistics.style.display = "block";
-            $("#tabs_network").show();
         }
 
         else { //if not (associations.length > 0) 
@@ -1163,7 +1127,6 @@
             clean_drug_network()
             var atc_level_network_statistics = document.getElementById("atc_level_network_statistics");
             atc_level_network_statistics.style.display = "none";
-            $("#tabs_network").hide();
         }
     };
 
@@ -1347,45 +1310,29 @@
                 })
         }
         if (value_burden_control == "variant-based") {
-            // $("#waiting-prompt").show();
-            // $(".spinner").show();
-            // $("#pgx-data-table-div").hide();
-            var select = $("#atc-sublevel-select");
-            select.show();
-            var url = "{% url 'get-atc-sub-levels' %}?atc_code=" + atc_code;
+            $("#waiting-prompt").show();
+            $(".spinner").show();
+            $("#pgx-data-table-div").hide();
+            var url = "{% url 'get-variant-based-burden-data-by-atc' %}?atc_code=" + atc_code;
+
             $.ajax(
                 {
                     url: url,
                     type: "GET",
                     success: function (response) {
-                        var optionSelect;
-                        response.sub_atc_codes.forEach(function(item) 
-                        {
-                            //console.log("atc sub item "+item);
-                            optionSelect += `<option value=${item}>${item}</option>`;
-                        });
-                        select.append(optionSelect);
+                        create_pgx_variant_based_table(response);
+                        $(".spinner").hide();
+                        $("#waiting-prompt").hide();
+                        $("#pgx-data-table-div").show();
                     },
                     error: function (xhr, status, error) {
-                        console.log('variant based pgx- AJAX Error:', error);
+                        console.log('AJAX Error:', error);
                     }
                 })
-            // $.ajax(
-            //     {
-            //         url: url,
-            //         type: "GET",
-            //         success: function (response) {
-            //             create_pgx_variant_based_table(response);
-            //             $(".spinner").hide();
-            //             $("#waiting-prompt").hide();
-            //             $("#pgx-data-table-div").show();
-            //         },
-            //         error: function (xhr, status, error) {
-            //             console.log('AJAX Error:', error);
-            //         }
-            //     })
         }
     });
+
+
 
     function create_pgx_genebased_table(response) {
         var pgx_data_display_area = document.getElementById("pgx_data_display_area");
@@ -1436,8 +1383,6 @@
                     },
                     success: function (response) {
                         list_associated_drugs_in_table(response);
-                        // show tabs
-                        $("#tabs_network").attr("data-atc-code", atcCode);
                         if (response.associations.length>0)
                         {
                             showAtcLevelNetworkStatistics2(response.atc_code);
@@ -1450,7 +1395,8 @@
                     }
                 })
 
-            
+            // show tabs
+            $("#tabs_network").show();
         }
 
         // a newwork where there is at least one drug
@@ -1498,56 +1444,8 @@
         }
     });    
 
-    function isValidATC(atc_comparison){
-        return true;
-    }
 
 
-    $("#btn-network-compare").click(function() {
-        var atc_code = $("#tabs_network").data("atc-code");
-        var atc_comparison = $("#atc_comparison").val();
-        var compare_type = $("#compare-type").val();
-        var urlCompare;
-        if (atc_comparison!="" & isValidATC(atc_comparison)){
-                if(compare_type == "no-selection") {
-                    alert("Please select a comparison type!");
-                }
-                else if(compare_type == "compare_network_size") {
-                    urlCompare = "{% url 'get_statistics_by_atc_for_network_size_comparison' %}";
-                }
-                else if(compare_type == "compare_degree_distritution") {
-                    urlCompare = "{% url 'get_statistics_by_atc_for_network_size_comparison' %}";
-                }
-                else if(compare_type == "see_common_and_unique_elements") {
-                    urlCompare = "{% url 'get_statistics_by_atc_for_network_size_comparison' %}";
-                }
-        }else{
-            alert("Please enter a valid ATC code!");
-        }
-        $.ajax( {
-            url: `${urlCompare}?atc_code=${atc_code}&atc_comparison=${atc_comparison}`,
-            type: "GET",
-            success: function (response) {
-                console.log(response);
-                var dataAtcCode = response.atc_code;
-                var htmlData = "<tr>" ;
-                for (const [key, value] of Object.entries(dataAtcCode)) {
-                    htmlData += `<th>${key}<th><td>${value}</td>`;
-                }
-                htmlData += "</tr>";
-                dataAtcCode = response.atc_comparison;
-                htmlData += "<tr>" ;
-                for (const [key, value] of Object.entries(dataAtcCode)) {
-                    htmlData += `<th>${key}<th><td>${value}</td>`;
-                }
-                htmlData += "</tr>";
-                $("#result-compare").html(htmlData);
-            },
-            error: function (xhr, status, error) {
-                console.log('AJAX Error:', error);
-            }
-        });
-    })
     
     
 
