@@ -2,7 +2,7 @@ from django.urls import path, re_path
 from django.views.decorators.cache import cache_page
 from .views import SelectionAutocomplete, DrugStatistics
 from . import views
-from .views import search_drugs, drug_atc_expansion, atc_lookup, atc_detail_view, atc_search_view, get_drug_atc_association, get_drug_network, get_drugs_network, get_statistics_by_atc, get_gene_based_burden_data_by_atc, get_variant_based_burden_data_by_atc, get_clinical_pgx_data_by_atc, get_clinical_pgx_data_by_drug
+from .views import search_drugs, drug_atc_expansion, atc_lookup, atc_detail_view, atc_search_view, get_drug_atc_association, get_drug_network, get_drugs_network, get_statistics_by_atc, get_gene_based_burden_data_by_atc, get_variant_based_burden_data_by_atc, get_clinical_pgx_data_by_atc, get_clinical_pgx_data_by_drug, get_data_for_comparing_network_degree_distribution, get_data_for_comparing_common_and_unique_network_element, get_statistics_by_atc_for_network_size_comparison
 
 urlpatterns = [
     path('search_drugs', views.search_drugs, name='search_drugs'),
@@ -42,4 +42,9 @@ urlpatterns = [
     path('drugs-network/drug-data', views.get_drugs_data, name='drugs_network_drug_data'),
     path('drugs-network/protein-data', views.get_drugs_protein_data, name='drugs_network_protein_data'),
     path('drugs-network/interaction-data',views.get_drugs_interaction_data,name='drugs_network_interaction_data',),
+
+    #network comparison
+    path('get_data_for_comparing_network_degree_distribution/', views.get_data_for_comparing_network_degree_distribution, name='get_data_for_comparing_network_degree_distribution'),
+    path('get_data_for_comparing_common_and_unique_network_element/', views.get_data_for_comparing_common_and_unique_network_element, name='get_data_for_comparing_common_and_unique_network_element'),
+    path('get_statistics_by_atc_for_network_size_comparison/', views.get_statistics_by_atc_for_network_size_comparison, name='get_statistics_by_atc_for_network_size_comparison'),
 ]
