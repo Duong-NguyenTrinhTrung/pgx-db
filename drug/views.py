@@ -1,3 +1,4 @@
+from collections import Counter
 import json
 import numpy as np
 from django.core import serializers
@@ -41,6 +42,8 @@ from .models import (
 )
 from .services import DrugNetworkGetDataService, DrugsNetworkGetDataService
 from time import perf_counter
+import networkx as nx
+from community import community_louvain
 
 
 app_name = 'drug'
@@ -1092,59 +1095,398 @@ def get_variant_based_burden_data_by_atc(request):
             print("no variant pgx data")
     return JsonResponse(response_data, safe=False)
 
+def get_statistics_by_atc_for_ONE_atc_code_for_clinical_trial_phase_comparison(atc_code):
+    allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+    chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+    drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+    undup_drugs = list(set(drugs))
+    drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+    phases = []
+    for drug in drug_objs:
+        associations = DrugDiseaseStudy.objects.filter(drug_bankID=drug)
+        for association in associations:
+            phases.append("Phase "+association.clinical_trial)
+    return {"classes": list(Counter(phases).keys()), "class_count": list(Counter(phases).values())}
+
+def get_statistics_by_atc_for_clinical_trial_phase_comparison(request):
+    atc_code = request.GET.get("atc_code")
+    atc_comparison = request.GET.get("atc_comparison")
+    if cache.get("get_data_for_comparing_clinical_trial_phase_distribution_"+atc_code+"_"+atc_comparison):
+        response_data = cache.get("get_data_for_comparing_clinical_trial_phase_distribution_"+atc_code+"_"+atc_comparison)
+    else:
+        #max_value = max(my_dict, key=my_dict.get)
+        data1 = get_statistics_by_atc_for_ONE_atc_code_for_clinical_trial_phase_comparison(atc_code)
+        data2 = get_statistics_by_atc_for_ONE_atc_code_for_clinical_trial_phase_comparison(atc_comparison)
+        print("data1 = ", data1)
+        print("data2 = ", data2)
+        if len(list(data1.get("class_count"))):
+             max1 = max(list(data1.get("class_count")))
+        else:
+            max1 = 0
+        if len(list(data2.get("class_count"))):
+            max2 = max(list(data2.get("class_count")))
+        else:
+            max2 = 0
+        response_data = {
+            "atc_code": data1, 
+            "atc_comparison": data2,
+            "max_count": max(max1, max2) 
+        }
+        cache.set("get_data_for_comparing_clinical_trial_phase_distribution_"+atc_code+"_"+atc_comparison, response_data, 60*60)
+    return JsonResponse(response_data)
+
+def get_statistics_by_atc_for_ONE_atc_code_for_MOA_comparison(atc_code):
+    allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+    chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+    drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+    undup_drugs = list(set(drugs))
+    drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+    moas = []
+    for drug in drug_objs:
+        interactions = Interaction.objects.filter(drug_bankID=drug)
+        for interaction in interactions:
+            moas.append(interaction.interaction_type)
+    return {"classes": list(Counter(moas).keys()), "class_count": list(Counter(moas).values())}
+
+def get_statistics_by_atc_code_for_MOA_comparison(request):
+    atc_code = request.GET.get("atc_code")
+    atc_comparison = request.GET.get("atc_comparison")
+    if cache.get("get_data_for_comparing_moa_distribution_"+atc_code+"_"+atc_comparison):
+        response_data = cache.get("get_data_for_comparing_moa_distribution_"+atc_code+"_"+atc_comparison)
+    else:
+        data1 = get_statistics_by_atc_for_ONE_atc_code_for_MOA_comparison(atc_code)
+        data2 = get_statistics_by_atc_for_ONE_atc_code_for_MOA_comparison(atc_comparison)
+        max1 = max(list(data1.get("class_count")))
+        max2 = max(list(data2.get("class_count")))
+        response_data = {
+            "atc_code": data1, 
+            "atc_comparison": data2,
+            "max_count": max(max1, max2) 
+        }
+        cache.set("get_data_for_comparing_moa_distribution_"+atc_code+"_"+atc_comparison, response_data, 60*60)
+    return JsonResponse(response_data)
+
+def get_statistics_by_atc_for_detecting_community_drug_protein(request):
+    atc_code = request.GET.get("atc_code")
+    atc_comparison = request.GET.get("atc_comparison")
+    if cache.get("get_statistics_by_ONE_atc_for_detecting_community_drug_protein_"+atc_code+"_"+atc_comparison):
+        response_data = cache.get("get_statistics_by_ONE_atc_for_detecting_community_drug_protein_"+atc_code+"_"+atc_comparison)
+    else:
+        response_data = {
+            "atc_code":get_statistics_by_ONE_atc_for_detecting_community_drug_protein(atc_code), 
+            "atc_comparison":get_statistics_by_ONE_atc_for_detecting_community_drug_protein(atc_comparison), 
+        }
+        cache.set("get_statistics_by_ONE_atc_for_detecting_community_drug_protein_"+atc_code+"_"+atc_comparison, response_data, 60*60)
+    return JsonResponse(response_data)
+
+def get_statistics_by_ONE_atc_for_detecting_community_drug_protein(atc_code):
+    allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+    chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+    drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+    undup_drugs = list(set(drugs))
+    unique_drug_list = list(Drug.objects.filter(drug_bankID__in=undup_drugs).values_list("name", flat=True))
+    unique_drug_list2 = ["*"+ d for d in unique_drug_list]
+    G = nx.Graph()
+    #adding nodes
+    G.add_nodes_from(unique_drug_list2)
+    interactions = list(Interaction.objects.filter(drug_bankID__name__in=unique_drug_list).values_list("uniprot_ID__genename", flat=True))
+    interactions2 = ["@"+ g for g in list(set(interactions))]
+    G.add_nodes_from(interactions2)
+
+    #adding edges
+    for drug in unique_drug_list:
+        genenames = list(Interaction.objects.filter(drug_bankID__name=drug).values_list("uniprot_ID__genename", flat=True))
+        for genename in genenames:
+            G.add_edge("*"+drug, "@"+genename)
+
+    #detect community
+    partition = community_louvain.best_partition(G)
+    partition_drug = [{node:community_id} for node, community_id in partition.items() if node[0]=="*"]
+    partition_gene = [{node:community_id} for node, community_id in partition.items() if node[0]=="@"]
+    return {"partition_drug":partition_drug, "partition_gene":partition_gene}
+
+def get_statistics_by_atc_for_calculating_average_path_length(request):
+    atc_code = request.GET.get("atc_code")
+    atc_comparison = request.GET.get("atc_comparison")
+    if cache.get("get_statistics_by_ONE_atc_for_calculating_average_path_length_"+atc_code+"_"+atc_comparison):
+        response_data = cache.get("get_statistics_by_ONE_atc_for_calculating_average_path_length_"+atc_code+"_"+atc_comparison)
+    else:
+        response_data = {
+            "atc_code":get_statistics_by_ONE_atc_for_calculating_average_path_length(atc_code), 
+            "atc_comparison":get_statistics_by_ONE_atc_for_calculating_average_path_length(atc_comparison), 
+        }
+        cache.set("get_statistics_by_ONE_atc_for_calculating_average_path_length_"+atc_code+"_"+atc_comparison, response_data, 60*60)
+    return JsonResponse(response_data)
+
+def get_statistics_by_ONE_atc_for_calculating_average_path_length(atc_code):
+    allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+    chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+    drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+    undup_drugs = list(set(drugs))
+    unique_drug_list = list(Drug.objects.filter(drug_bankID__in=undup_drugs).values_list("name", flat=True))
+    G = nx.Graph()
+    #adding nodes
+    G.add_nodes_from(unique_drug_list)
+    associations = list(DrugDiseaseStudy.objects.filter(drug_bankID__name__in=unique_drug_list).values_list("disease_name__disease_name", flat=True))
+    G.add_nodes_from(associations)
+
+    #adding edges
+    for drug in unique_drug_list:
+        disease_names = list(DrugDiseaseStudy.objects.filter(drug_bankID__name=drug).values_list("disease_name__disease_name", flat=True))
+        for disease_name in disease_names:
+            G.add_edge(drug, disease_name)
+
+    response = []
+    is_connected = nx.is_connected(G)
+    if not is_connected:
+        connected_components = list(nx.connected_components(G))
+        for component in connected_components:
+            component_graph = G.subgraph(component)
+            shortest_paths = nx.shortest_path_length(component_graph)
+
+            average_shortest_path_length = nx.average_shortest_path_length(component_graph)
+            shortest_paths_dict = {}
+
+            for source_node, paths in shortest_paths:
+                shortest_paths_dict[source_node] = dict(paths)
+            response.append({"Number of components":len(connected_components), "nodes":list(component_graph.nodes), "shortest_paths_dict": shortest_paths_dict, "average_shortest_path_length":average_shortest_path_length})
+    else:
+        shortest_paths = nx.shortest_path_length(G)
+        average_shortest_path_length = nx.average_shortest_path_length(G)
+        shortest_paths_dict = {}
+        for source_node, paths in shortest_paths:
+            shortest_paths_dict[source_node] = dict(paths)
+        response.append({"Number of components":1, "nodes":list(G.nodes), "shortest_paths_dict": shortest_paths_dict, "average_shortest_path_length":average_shortest_path_length})
+    return response
+    
+
+def get_statistics_by_atc_for_detecting_community_drug_disease(request):
+    atc_code = request.GET.get("atc_code")
+    atc_comparison = request.GET.get("atc_comparison")
+    if cache.get("get_statistics_by_ONE_atc_for_detecting_community_drug_disease_"+atc_code+"_"+atc_comparison):
+        response_data = cache.get("get_statistics_by_ONE_atc_for_detecting_community_drug_disease_"+atc_code+"_"+atc_comparison)
+    else:
+        response_data = {
+            "atc_code":get_statistics_by_ONE_atc_for_detecting_community_drug_disease(atc_code), 
+            "atc_comparison":get_statistics_by_ONE_atc_for_detecting_community_drug_disease(atc_comparison), 
+        }
+        cache.set("get_statistics_by_ONE_atc_for_detecting_community_drug_disease_"+atc_code+"_"+atc_comparison, response_data, 60*60)
+    return JsonResponse(response_data)
+
+def get_statistics_by_ONE_atc_for_detecting_community_drug_disease(atc_code):
+    allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+    chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+    drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+    undup_drugs = list(set(drugs))
+    unique_drug_list = list(Drug.objects.filter(drug_bankID__in=undup_drugs).values_list("name", flat=True))
+    unique_drug_list2 = ["*"+ d for d in unique_drug_list]
+    G = nx.Graph()
+    #adding nodes
+    G.add_nodes_from(unique_drug_list2)
+    associations = list(DrugDiseaseStudy.objects.filter(drug_bankID__name__in=unique_drug_list).values_list("disease_name__disease_name", flat=True))
+    associations2 = ["#"+ d for d in list(set(associations))]
+    G.add_nodes_from(associations2)
+
+    #adding edges
+    for drug in unique_drug_list:
+        disease_names = list(DrugDiseaseStudy.objects.filter(drug_bankID__name=drug).values_list("disease_name__disease_name", flat=True))
+        for disease_name in disease_names:
+            G.add_edge("*"+drug, "#"+disease_name)
+
+    #detect community
+    partition = community_louvain.best_partition(G)
+    partition_drug = [{node:community_id} for node, community_id in partition.items() if node[0]=="*"]
+    partition_disease = [{node:community_id} for node, community_id in partition.items() if node[0]=="#"]
+    return {"partition_drug":partition_drug, "partition_disease":partition_disease}
+
+    
+def get_statistics_by_atc_for_measure_centralization_drug_protein(request):
+    atc_code = request.GET.get("atc_code")
+    atc_comparison = request.GET.get("atc_comparison")
+    if cache.get("get_statistics_by_atc_for_measure_centralization_drug_protein_"+atc_code+"_"+atc_comparison):
+        response_data = cache.get("get_statistics_by_atc_for_measure_centralization_drug_protein_"+atc_code+"_"+atc_comparison)
+    else:
+        response_data = {
+            "atc_code":get_statistics_by_ONE_atc_for_measure_centralization_drug_protein(atc_code), 
+            "atc_comparison":get_statistics_by_ONE_atc_for_measure_centralization_drug_protein(atc_comparison), 
+        }
+        cache.set("get_statistics_by_atc_for_measure_centralization_drug_protein_"+atc_code+"_"+atc_comparison, response_data, 60*60)
+    return JsonResponse(response_data)
+
+def get_statistics_by_ONE_atc_for_measure_centralization_drug_protein(atc_code):
+    allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+    chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+    drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+    undup_drugs = list(set(drugs))
+    unique_drug_list = list(Drug.objects.filter(drug_bankID__in=undup_drugs).values_list("name", flat=True))
+    unique_drug_list2 = ["*"+ d for d in unique_drug_list]
+    G = nx.Graph()
+    #adding nodes
+    G.add_nodes_from(unique_drug_list2)
+    interactions = list(Interaction.objects.filter(drug_bankID__name__in=unique_drug_list).values_list("uniprot_ID__genename", flat=True))
+    interactions2 = ["@"+ g for g in list(set(interactions))]
+    G.add_nodes_from(interactions2)
+
+    #adding edges
+    for drug in unique_drug_list:
+        genenames = list(Interaction.objects.filter(drug_bankID__name=drug).values_list("uniprot_ID__genename", flat=True))
+        for genename in genenames:
+            G.add_edge("*"+drug, "@"+genename)
+    
+    #calculate centrality
+    betweenness_centrality = nx.betweenness_centrality(G)
+    degree_centrality = nx.degree_centrality(G)
+    degree_centrality_drug = [{node:centrality} for node, centrality in degree_centrality.items() if node[0]=="*"]
+    degree_centrality_gene = [{node:centrality} for node, centrality in degree_centrality.items() if node[0]=="@"]
+    betweenness_centrality_drug = [{node:centrality} for node, centrality in betweenness_centrality.items() if node[0]=="*"]
+    betweenness_centrality_gene = [{node:centrality} for node, centrality in betweenness_centrality.items() if node[0]=="@"]
+    return {"degree_centrality_drug":degree_centrality_drug, "degree_centrality_gene":degree_centrality_gene, "betweenness_centrality_drug": betweenness_centrality_drug, "betweenness_centrality_gene": betweenness_centrality_gene}
+
+
+
+def get_statistics_by_ONE_atc_for_measure_centralization_drug_disease(atc_code):
+    allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+    chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+    drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+    undup_drugs = list(set(drugs))
+    unique_drug_list = list(Drug.objects.filter(drug_bankID__in=undup_drugs).values_list("name", flat=True))
+    unique_drug_list2 = ["*"+ d for d in unique_drug_list]
+    G = nx.Graph()
+    #adding nodes
+    G.add_nodes_from(unique_drug_list2)
+    associations = list(DrugDiseaseStudy.objects.filter(drug_bankID__name__in=unique_drug_list).values_list("disease_name__disease_name", flat=True))
+    associations2 = ["#"+ d for d in list(set(associations))]
+    G.add_nodes_from(associations2)
+
+    #adding edges
+    for drug in unique_drug_list:
+        disease_names = list(DrugDiseaseStudy.objects.filter(drug_bankID__name=drug).values_list("disease_name__disease_name", flat=True))
+        for disease_name in disease_names:
+            G.add_edge("*"+drug, "#"+disease_name)
+    
+    #calculate centrality
+    betweenness_centrality = nx.betweenness_centrality(G)
+    degree_centrality = nx.degree_centrality(G)
+    degree_centrality_drug = [{node:centrality} for node, centrality in degree_centrality.items() if node[0]=="*"]
+    degree_centrality_disease = [{node:centrality} for node, centrality in degree_centrality.items() if node[0]=="#"]
+    betweenness_centrality_drug = [{node:centrality} for node, centrality in betweenness_centrality.items() if node[0]=="*"]
+    betweenness_centrality_disease = [{node:centrality} for node, centrality in betweenness_centrality.items() if node[0]=="#"]
+    return {"degree_centrality_drug":degree_centrality_drug, "degree_centrality_disease":degree_centrality_disease, "betweenness_centrality_drug": betweenness_centrality_drug, "betweenness_centrality_disease": betweenness_centrality_disease}
+
+def get_statistics_by_atc_for_measure_centralization_drug_disease(request):
+    atc_code = request.GET.get("atc_code")
+    atc_comparison = request.GET.get("atc_comparison")
+    if cache.get("get_statistics_by_atc_for_measure_centralization_drug_disease_"+atc_code+"_"+atc_comparison):
+        response_data = cache.get("get_statistics_by_atc_for_measure_centralization_drug_disease_"+atc_code+"_"+atc_comparison)
+    else:
+        response_data = {
+            "atc_code":get_statistics_by_ONE_atc_for_measure_centralization_drug_disease(atc_code), 
+            "atc_comparison":get_statistics_by_ONE_atc_for_measure_centralization_drug_disease(atc_comparison), 
+            
+        }
+        cache.set("get_statistics_by_atc_for_measure_centralization_drug_disease_"+atc_code+"_"+atc_comparison, response_data, 60*60)
+    return JsonResponse(response_data)
+
+
+def get_data_for_comparing_network_associate_distribution(request):
+    atc_code = request.GET.get("atc_code")
+    atc_comparison = request.GET.get("atc_comparison")
+    if cache.get("get_data_for_comparing_network_association_distribution_"+atc_code+"_"+atc_comparison):
+        response_data = cache.get("get_data_for_comparing_network_association_distribution_"+atc_code+"_"+atc_comparison)
+    else:
+        response_data = {
+            "atc_code":get_data_for_ONE_atc_code_for_comparing_network_association_distribution(atc_code), 
+            "atc_comparison":get_data_for_ONE_atc_code_for_comparing_network_association_distribution(atc_comparison), 
+            "both": {
+                "distribution": get_data_for_ONE_atc_code_for_comparing_network_association_distribution(atc_code).get("distribution") + get_data_for_ONE_atc_code_for_comparing_network_association_distribution(atc_comparison).get("distribution"), 
+            }
+        }
+        cache.set("get_data_for_comparing_network_association_distribution_"+atc_code+"_"+atc_comparison, response_data, 60*60)
+    return JsonResponse(response_data)
+
+def get_data_for_ONE_atc_code_for_comparing_network_association_distribution(atc_code):
+    allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+    chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+    drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+    undup_drugs = list(set(drugs))
+    drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+    distribution = []
+    for drug in drug_objs:
+        associations = DrugDiseaseStudy.objects.filter(drug_bankID=drug).values_list("disease_name", flat=True)
+        distribution.append(len(list(associations)))
+    response_data = {
+        "distribution": distribution, 
+    }
+    return response_data
 
 def get_data_for_comparing_network_degree_distribution(request):
     atc_code = request.GET.get("atc_code")
-    if cache.get("get_data_for_comparing_network_degree_distribution_"+atc_code):
-        response_data = cache.get("get_data_for_comparing_network_degree_distribution_"+atc_code)
+    atc_comparison = request.GET.get("atc_comparison")
+    if cache.get("get_data_for_comparing_network_degree_distribution_"+atc_code+"_"+atc_comparison):
+        response_data = cache.get("get_data_for_comparing_network_degree_distribution_"+atc_code+"_"+atc_comparison)
     else:
-        allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
-        chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
-        drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
-        undup_drugs = list(set(drugs))
-        drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
-        degree_distribution = []
-        for drug in drug_objs:
-            interactions = Interaction.objects.filter(drug_bankID=drug).values_list("uniprot_ID", flat=True)
-            associations = DrugDiseaseStudy.objects.filter(drug_bankID=drug).values_list("disease_name", flat=True)
-            degree_distribution.append({"drug":drug.drug_bankID, "interaction_degree":len(list(interactions)), "association_degree":len(list(associations))})
         response_data = {
-            "degree_distribution":degree_distribution, 
+            "atc_code":get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_code), 
+            "atc_comparison":get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_comparison), 
+            "both": {
+                "distribution": get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_code).get("distribution") + get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_comparison).get("distribution"), 
+            }
         }
-        cache.set("get_data_for_comparing_network_degree_distribution_"+atc_code, response_data, 60*60)
+        cache.set("get_data_for_comparing_network_degree_distribution_"+atc_code+"_"+atc_comparison, response_data, 60*60)
     return JsonResponse(response_data)
 
+def get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_code):
+    allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+    chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+    drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+    undup_drugs = list(set(drugs))
+    drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+    distribution = []
+    for drug in drug_objs:
+        interactions = Interaction.objects.filter(drug_bankID=drug).values_list("uniprot_ID", flat=True)
+        distribution.append(len(list(interactions)))
+    response_data = {
+        "distribution": distribution, 
+    }
+    return response_data
 
 def get_data_for_comparing_common_and_unique_network_element(request):
     atc_code = request.GET.get("atc_code")
-    if cache.get("get_data_for_comparing_common_and_unique_network_element_"+atc_code):
-        response_data = cache.get("get_data_for_comparing_common_and_unique_network_element_"+atc_code)
+    atc_comparison = request.GET.get("atc_comparison") #compare
+    if cache.get("get_data_for_comparing_common_and_unique_network_element_"+atc_code+"_"+atc_comparison):
+        response_data = cache.get("get_data_for_comparing_common_and_unique_network_element_"+atc_code+"_"+atc_comparison)
     else:
-        allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
-        chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
-        drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
-        undup_drugs = list(set(drugs))
-        drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
-        protein_objs = []
-        disease_objs = []
-        for drug in drug_objs:
-            #drug-protein interaction
-            interactions = Interaction.objects.filter(drug_bankID=drug)
-            protein_objs += list(interactions.values_list('uniprot_ID', flat=True))
-            #drug-disease association
-            association = DrugDiseaseStudy.objects.filter(drug_bankID=drug)
-            disease_objs += list(association.values_list('disease_name', flat=True))
-
-        protein_objs = list(set(protein_objs))
-        disease_objs = list(set(disease_objs))
-        response_data = {
-            "drug_objs": list(drug_objs.values_list("drug_bankID", flat=True)),
-            "protein_objs": protein_objs,
-            "disease_objs": list(set(DrugDiseaseStudy.objects.filter(disease_name__in=disease_objs).values_list("disease_name__disease_name", flat=True))),
+        response_data ={
+        "atc_code": get_data_ONE_atc_code_for_comparing_common_and_unique_network_element(atc_code),
+        "atc_comparison": get_data_ONE_atc_code_for_comparing_common_and_unique_network_element(atc_comparison)
         }
-        print("response_data : ", response_data)
-        cache.set("get_data_for_comparing_common_and_unique_network_element_"+atc_code, response_data, 60*60)
+        cache.set("get_data_for_comparing_common_and_unique_network_element_"+atc_code+"_"+atc_comparison, response_data, 60*60)
     return JsonResponse(response_data)
+
+def get_data_ONE_atc_code_for_comparing_common_and_unique_network_element(atc_code):
+    allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+    chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+    drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+    undup_drugs = list(set(drugs))
+    drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+    protein_objs = []
+    disease_objs = []
+    for drug in drug_objs:
+        #drug-protein interaction
+        interactions = Interaction.objects.filter(drug_bankID=drug)
+        protein_objs += list(interactions.values_list('uniprot_ID', flat=True))
+        #drug-disease association
+        association = DrugDiseaseStudy.objects.filter(drug_bankID=drug)
+        disease_objs += list(association.values_list('disease_name', flat=True))
+
+    protein_objs = list(set(protein_objs))
+    disease_objs = list(set(disease_objs))
+    response_data = {
+        "drug_objs": list(drug_objs.values_list("drug_bankID", flat=True)),
+        "protein_objs": protein_objs,
+        "disease_objs": list(set(DrugDiseaseStudy.objects.filter(disease_name__in=disease_objs).values_list("disease_name__disease_name", flat=True))),
+    }
+    return response_data
 
 def get_statistics_by_atc_for_network_size_comparison(request):
     atc_code = request.GET.get("atc_code") # main
@@ -1183,9 +1525,9 @@ def get_statistics_by_ONE_atc_for_network_size_comparison(atc_code):
         disease_count = len(list(set(disease_objs)))
         response_data = {
             "name_atc_code": atc_code,
-            "no of drugs": len(drug_objs),
-            "no of diseases": disease_count,
-            "no of proteins": protein_count,
+            "no_of_drugs": len(drug_objs),
+            "no_of_diseases": disease_count,
+            "no_of_proteins": protein_count,
             "NoOfDrugPoteinInteractions": len(interaction_all),
             "NoOfDrugDiseaseAssociationStudy": len(association_all),
         }
@@ -1467,28 +1809,28 @@ def get_atc_sub_levels(request):
     data = {'atc_code': atc_code}
     if len(atc_code) == 1:
         data = {
-                "therapeutic_group": list(AtcTherapeuticGroup.objects.filter(id__startswith=atc_code).values('id')),
+                "therapeutic_group": list(AtcTherapeuticGroup.objects.filter(id__startswith=atc_code).values('id', "name")),
                 "pharmacological_group": list(AtcPharmacologicalGroup.objects.filter(id__startswith=atc_code).values('id')),
-                "chemical_group": list(AtcChemicalGroup.objects.filter(id__startswith=atc_code).values('id')),
-                "chemical_substance": list(AtcChemicalSubstance.objects.filter(id__startswith=atc_code).values('id'))}
+                "chemical_group": list(AtcChemicalGroup.objects.filter(id__startswith=atc_code).values('id', "name")),
+                "chemical_substance": list(AtcChemicalSubstance.objects.filter(id__startswith=atc_code).values('id', "name"))}
     if len(atc_code) == 3:
         data = {
-                "pharmacological_group": list(AtcPharmacologicalGroup.objects.filter(id__startswith=atc_code).values('id')),
-                "chemical_group": list(AtcChemicalGroup.objects.filter(id__startswith=atc_code).values('id')),
-                "chemical_substance": list(AtcChemicalSubstance.objects.filter(id__startswith=atc_code).values('id'))}
+                "pharmacological_group": list(AtcPharmacologicalGroup.objects.filter(id__startswith=atc_code).values('id', "name")),
+                "chemical_group": list(AtcChemicalGroup.objects.filter(id__startswith=atc_code).values('id', "name")),
+                "chemical_substance": list(AtcChemicalSubstance.objects.filter(id__startswith=atc_code).values('id', "name"))}
     if len(atc_code) == 4:
         data = {
-                "chemical_group": list(AtcChemicalGroup.objects.filter(id__startswith=atc_code).values('id')),
-                "chemical_substance": list(AtcChemicalSubstance.objects.filter(id__startswith=atc_code).values('id'))}
+                "chemical_group": list(AtcChemicalGroup.objects.filter(id__startswith=atc_code).values('id', "name")),
+                "chemical_substance": list(AtcChemicalSubstance.objects.filter(id__startswith=atc_code).values('id', "name"))}
     if len(atc_code) == 5:
         data = {
-                "chemical_substance": list(AtcChemicalSubstance.objects.filter(id__startswith=atc_code).values('id'))}
+                "chemical_substance": list(AtcChemicalSubstance.objects.filter(id__startswith=atc_code).values('id', "name"))}
     if len(atc_code) == 7:
-        data = {"chemical_substance": list(AtcChemicalSubstance.objects.filter(id__iexact=atc_code).values('id'))}
+        data = {"chemical_substance": list(AtcChemicalSubstance.objects.filter(id__iexact=atc_code).values('id', "name"))}
     
     temp=[]
     for key in data.keys():
-        temp+=[item.get("id") for item in data.get(key)]
+        temp+=[item for item in data.get(key)]
     return JsonResponse({"atc_code": atc_code, "sub_atc_codes": temp}, safe=False)
 
 

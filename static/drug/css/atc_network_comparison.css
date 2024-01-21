@@ -1,0 +1,58 @@
+@import url("https://fonts.googleapis.com/css?family=Lato|Noto+Serif+SC:700&display=swap");
+
+
+.network-distribution {
+  margin: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, 400px);
+  grid-gap: 1rem;
+  justify-content: top;
+}
+/* have the header and footer span both columns of the respective row */
+.network-distribution header,
+.network-distribution footer {
+  grid-column: span 2;
+  line-height: 2;
+}
+.network-distribution header h1 {
+  font-family: "Noto Serif SC", serif;
+}
+/* separate the svg from the surrounding header and footer */
+.network-distribution svg {
+  margin: 1.5rem 0;
+  width: 100%;
+  height: auto;
+}
+/* with a pseudo element include a P.S. label highlighting the purpose of the footer */
+.network-distribution footer {
+  margin-top: 4rem;
+  position: relative;
+  font-size: 0.9rem;
+}
+.network-distribution footer:before {
+  position: absolute;
+  top: 100%;
+  right: 0%;
+  transform: translate(0, -50%);
+  content: "P.S.";
+  font-size: 4rem;
+  opacity: 0.1;
+  font-family: "Noto Serif SC", serif;
+}
+.network-distribution footer a {
+  color: inherit;
+}
+
+/* on smaller viewports display the items in a single column */
+@media (max-width: 800px) {
+  .network-distribution {
+    grid-template-columns: 400px;
+  }
+  .network-distribution header,
+  .network-distribution footer {
+    grid-column: initial;
+  }
+  .network-distribution footer {
+    margin-top: 2rem;
+  }
+}
