@@ -1,6 +1,5 @@
 function createBarChartForATCDiseaseClass(disease_classes, disease_class_count)
 {
-    alert("yang yang yang yang yang");
     const data = [];
     for (var i=0; i<disease_classes.length; i++){
         temp = {

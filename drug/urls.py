@@ -2,7 +2,7 @@ from django.urls import path, re_path
 from django.views.decorators.cache import cache_page
 from .views import SelectionAutocomplete, DrugStatistics
 from . import views
-from .views import search_drugs, drug_atc_expansion, atc_lookup, atc_detail_view, atc_search_view, get_drug_atc_association, get_drug_network, get_drugs_network, get_statistics_by_atc, get_gene_based_burden_data_by_atc, get_variant_based_burden_data_by_atc, get_clinical_pgx_data_by_atc, get_clinical_pgx_data_by_drug, get_data_for_comparing_network_degree_distribution, get_data_for_comparing_common_and_unique_network_element, get_statistics_by_atc_for_network_size_comparison
+from .views import search_drugs, drug_atc_expansion, atc_lookup, atc_detail_view, atc_search_view, get_drug_atc_association, get_drug_network, get_drugs_network, get_statistics_by_atc, get_gene_based_burden_data_by_atc, get_variant_based_burden_data_by_atc, get_clinical_pgx_data_by_atc, get_clinical_pgx_data_by_drug, get_data_for_comparing_network_degree_distribution, get_data_for_comparing_common_and_unique_network_element, get_statistics_by_atc_for_network_size_comparison, get_statistics_by_atc_for_clinical_trial_phase_comparison, get_statistics_by_atc_code_for_MOA_comparison, get_data_for_comparing_network_associate_distribution, get_statistics_by_atc_for_measure_centralization_drug_disease, get_statistics_by_atc_for_measure_centralization_drug_protein, get_statistics_by_atc_for_detecting_community_drug_protein, get_statistics_by_atc_for_detecting_community_drug_disease
 
 urlpatterns = [
     path('search_drugs', views.search_drugs, name='search_drugs'),
@@ -45,6 +45,15 @@ urlpatterns = [
 
     #network comparison
     path('get_data_for_comparing_network_degree_distribution/', views.get_data_for_comparing_network_degree_distribution, name='get_data_for_comparing_network_degree_distribution'),
-    path('get_data_for_comparing_common_and_unique_network_element/', views.get_data_for_comparing_common_and_unique_network_element, name='get_data_for_comparing_common_and_unique_network_element'),
+    path('get_data_for_comparing_network_associate_distribution/', views.get_data_for_comparing_network_associate_distribution, name='get_data_for_comparing_network_associate_distribution'),
     path('get_statistics_by_atc_for_network_size_comparison/', views.get_statistics_by_atc_for_network_size_comparison, name='get_statistics_by_atc_for_network_size_comparison'),
+    path('get_statistics_by_atc_for_clinical_trial_phase_comparison/', views.get_statistics_by_atc_for_clinical_trial_phase_comparison, name='get_statistics_by_atc_for_clinical_trial_phase_comparison'),
+    path('get_statistics_by_atc_code_for_MOA_comparison/', views.get_statistics_by_atc_code_for_MOA_comparison, name='get_statistics_by_atc_code_for_MOA_comparison'),
+    path('get_statistics_by_atc_for_measure_centralization_drug_disease/', views.get_statistics_by_atc_for_measure_centralization_drug_disease, name='get_statistics_by_atc_for_measure_centralization_drug_disease'),
+    path('get_statistics_by_atc_for_measure_centralization_drug_protein/', views.get_statistics_by_atc_for_measure_centralization_drug_protein, name='get_statistics_by_atc_for_measure_centralization_drug_protein'),
+    path('get_statistics_by_atc_for_detecting_community_drug_protein/', views.get_statistics_by_atc_for_detecting_community_drug_protein, name='get_statistics_by_atc_for_detecting_community_drug_protein'),
+    path('get_statistics_by_atc_for_detecting_community_drug_disease/', views.get_statistics_by_atc_for_detecting_community_drug_disease, name='get_statistics_by_atc_for_detecting_community_drug_disease'),
+    
+    path('get_statistics_by_atc_for_calculating_average_path_length/', views.get_statistics_by_atc_for_calculating_average_path_length, name='get_statistics_by_atc_for_calculating_average_path_length'),
+    path('get_data_for_comparing_common_and_unique_network_element/', views.get_data_for_comparing_common_and_unique_network_element, name='get_data_for_comparing_common_and_unique_network_element'),
 ]
