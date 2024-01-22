@@ -374,7 +374,6 @@ function detectingCommunityDrugProtein(data, elementID, text)
     var partitionDrugData = data["partition_drug"];
     var partitionGeneData = data["partition_gene"];
 
-
     var e = $("#"+elementID);
     e.html("");
     e.append(`<h4>${text}</h4><br>`);
@@ -398,5 +397,71 @@ function detectingCommunityDrugProtein(data, elementID, text)
     }
     htmlTable += `</tbody></table>`;
     e.append(htmlTable);
+}
+
+
+function calculatePathLength(data, elementID, text){
+    $("#result-compare-table").html("");
+    $("#result-compare-area-text").html("");
+
+    var no_of_components = data["no_of_components"];
+    var component_detail = data["component_detail"];
+
+    var e = $("#"+elementID);
+    e.html("");
+    e.append(`<h4>${text}</h4><br>`);
+    e.append(`<p>Number of component: <span style="color:#d90429;font-weight: bold;">${no_of_components}</span></p><br>`);
+
+    var htmlTable=`<table><tbody><tr style="color: #3498db;font-weight: bold;"><td>Component</td><td>&nbsp;&nbsp;&nbsp;&nbsp;List of node(s)</td><td>&nbsp;&nbsp;&nbsp;&nbsp;Average path length</td></tr>`;
+
+    // Iterate through the data and build table rows
+    for(var i=0; i<component_detail.length; i++){
+        var nodes = component_detail[i]["nodes"];
+        var average_shortest_path_length = component_detail[i]["average_shortest_path_length"];
+        htmlTable += `<tr><td>${i+1}</td><td>&nbsp;&nbsp;&nbsp;&nbsp;${nodes.join('<br>')}</td><td>&nbsp;&nbsp;&nbsp;&nbsp;${average_shortest_path_length.toFixed(2)}</td></tr>`;
+    }
+    htmlTable += `</tbody></table>`;
+    e.append(htmlTable);
+}
+
+
+function convert(objects){
+    if (objects==[]){
+        objects = "None";
+    }else{
+        objects = objects.join(", ");
+    }
+}
+function commonAndUniqueNodes(data, text)
+{
+    $("#atc_code_box").html("");
+    $("#atc_comparison_box").html("");
+    $("#result-compare-table").css("width", "40%");
+    $("#result-compare-area-text").html(`<h4>${text}</h4>`);
+    $("#result-compare-area-text").css("color", "#3498db");
+    console.log("data ", data.common_proteins);
+    var common_drugs = convert(data.common_drugs);
+    // alert("data.common_drugs: "+data.common_drugs);
+    // alert("common_drugs: "+common_drugs);
+    var common_proteins = convert(data.common_proteins); 
+    // alert("data.common_proteins: "+data.common_proteins);
+    // alert("common_proteins: "+common_proteins);
+    var common_diseases = convert(data.common_diseases); 
+    var unique_drug_atc_code = convert(data.unique_drug_atc_code); 
+    var unique_protein_atc_code = convert(data.unique_protein_atc_code);
+    var unique_disease_atc_code = convert(data.unique_disease_atc_code);
+    var unique_drug_atc_comparison = convert(data.unique_drug_atc_comparison);
+    var unique_protein_atc_comparison = convert(data.unique_protein_atc_comparison);
+    var unique_disease_atc_comparison = convert(data.unique_disease_atc_comparison);
+
+    $("#result-compare-area-text").append(`</h5>Common drugs: <span style="color: #d90429">${common_drugs}</span></h5><br>`);
+    $("#result-compare-area-text").append(`</h5>Common proteins: <span style="color: #d90429">${common_proteins}</span></h5><br>`);
+    $("#result-compare-area-text").append(`</h5>Common disease: <span style="color: #d90429">${common_diseases}</span></h5><br><br>`);
+
+    var htmlData = `<table><thead><tr style="color: #d90429"><th>Atc code</th><th>${data.atc_code}</th><th>${data.atc_comparison}</th></tr></thead><tbody>`;
+    htmlData += `<tr><td>Unique drugs</td><td>${unique_drug_atc_code}</td><td>${unique_drug_atc_comparison}</td></tr>`;
+    htmlData += `<tr><td>Unique proteins</td><td>${unique_protein_atc_code}</td><td>${unique_protein_atc_comparison}</td></tr>`;
+    htmlData += `<tr><td>Unique disease</td><td>${unique_disease_atc_code}</td><td>${unique_disease_atc_comparison}</td></tr>`;
+    $("#result-compare-table").html(htmlData);
 }
 

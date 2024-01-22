@@ -1205,20 +1205,78 @@ def get_statistics_by_ONE_atc_for_detecting_community_drug_protein(atc_code):
     partition_gene = [{node:community_id} for node, community_id in partition.items() if node[0]=="@"]
     return {"partition_drug":partition_drug, "partition_gene":partition_gene}
 
-def get_statistics_by_atc_for_calculating_average_path_length(request):
+def get_statistics_by_atc_for_calculating_average_path_length_drug_protein(request):
+    pass
     atc_code = request.GET.get("atc_code")
     atc_comparison = request.GET.get("atc_comparison")
-    if cache.get("get_statistics_by_ONE_atc_for_calculating_average_path_length_"+atc_code+"_"+atc_comparison):
-        response_data = cache.get("get_statistics_by_ONE_atc_for_calculating_average_path_length_"+atc_code+"_"+atc_comparison)
+    if cache.get("get_statistics_by_ONE_atc_for_calculating_average_path_length_drug_protein_"+atc_code+"_"+atc_comparison):
+        response_data = cache.get("get_statistics_by_ONE_atc_for_calculating_average_path_length_drug_protein_"+atc_code+"_"+atc_comparison)
     else:
         response_data = {
-            "atc_code":get_statistics_by_ONE_atc_for_calculating_average_path_length(atc_code), 
-            "atc_comparison":get_statistics_by_ONE_atc_for_calculating_average_path_length(atc_comparison), 
+            "atc_code":get_statistics_by_ONE_atc_for_calculating_average_path_length_drug_protein(atc_code), 
+            "atc_comparison":get_statistics_by_ONE_atc_for_calculating_average_path_length_drug_protein(atc_comparison), 
         }
-        cache.set("get_statistics_by_ONE_atc_for_calculating_average_path_length_"+atc_code+"_"+atc_comparison, response_data, 60*60)
+        cache.set("get_statistics_by_ONE_atc_for_calculating_average_path_length_drug_disease_"+atc_code+"_"+atc_comparison, response_data, 60*60)
     return JsonResponse(response_data)
 
-def get_statistics_by_ONE_atc_for_calculating_average_path_length(atc_code):
+def get_statistics_by_ONE_atc_for_calculating_average_path_length_drug_protein(atc_code):
+    allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
+    chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
+    drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
+    undup_drugs = list(set(drugs))
+    unique_drug_list = list(Drug.objects.filter(drug_bankID__in=undup_drugs).values_list("name", flat=True))
+    G = nx.Graph()
+    #adding nodes
+    G.add_nodes_from(unique_drug_list)
+    interactions = list(Interaction.objects.filter(drug_bankID__name__in=unique_drug_list).values_list("uniprot_ID__genename", flat=True))
+    G.add_nodes_from(interactions)
+
+    #adding edges
+    for drug in unique_drug_list:
+        gene_names = list(Interaction.objects.filter(drug_bankID__name=unique_drug_list).values_list("uniprot_ID__genename", flat=True))
+        for gene_name in gene_names:
+            G.add_edge(drug, gene_name)
+
+    response = {}
+    is_connected = nx.is_connected(G)
+    if not is_connected:
+        connected_components = list(nx.connected_components(G))
+        response["no_of_components"]=len(connected_components)
+        temp=[]
+        for component in connected_components:
+            component_graph = G.subgraph(component)
+            shortest_paths = nx.shortest_path_length(component_graph)
+
+            average_shortest_path_length = nx.average_shortest_path_length(component_graph)
+            # shortest_paths_dict = {}
+
+            # for source_node, paths in shortest_paths:
+            #     shortest_paths_dict[source_node] = dict(paths)
+            temp.append({ "nodes":list(component_graph.nodes), "average_shortest_path_length":average_shortest_path_length})
+        response["component_detail"] = temp
+    else:
+        shortest_paths = nx.shortest_path_length(G)
+        average_shortest_path_length = nx.average_shortest_path_length(G)
+        # shortest_paths_dict = {}
+        # for source_node, paths in shortest_paths:
+        #     shortest_paths_dict[source_node] = dict(paths)
+        response = {"no_of_components":1, "component_detail":[{"nodes":list(G.nodes), "average_shortest_path_length":average_shortest_path_length}]}
+    return response
+
+def get_statistics_by_atc_for_calculating_average_path_length_drug_disease(request):
+    atc_code = request.GET.get("atc_code")
+    atc_comparison = request.GET.get("atc_comparison")
+    if cache.get("get_statistics_by_ONE_atc_for_calculating_average_path_length_drug_disease_"+atc_code+"_"+atc_comparison):
+        response_data = cache.get("get_statistics_by_ONE_atc_for_calculating_average_path_length_drug_disease_"+atc_code+"_"+atc_comparison)
+    else:
+        response_data = {
+            "atc_code":get_statistics_by_ONE_atc_for_calculating_average_path_length_drug_disease(atc_code), 
+            "atc_comparison":get_statistics_by_ONE_atc_for_calculating_average_path_length_drug_disease(atc_comparison), 
+        }
+        cache.set("get_statistics_by_ONE_atc_for_calculating_average_path_length_drug_disease_"+atc_code+"_"+atc_comparison, response_data, 60*60)
+    return JsonResponse(response_data)
+
+def get_statistics_by_ONE_atc_for_calculating_average_path_length_drug_disease(atc_code):
     allChemicalSubstanceCodes = list(DrugAtcAssociation.objects.all().values_list("atc_id", flat=True))
     chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
     drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
@@ -1236,27 +1294,30 @@ def get_statistics_by_ONE_atc_for_calculating_average_path_length(atc_code):
         for disease_name in disease_names:
             G.add_edge(drug, disease_name)
 
-    response = []
+    response = {}
     is_connected = nx.is_connected(G)
     if not is_connected:
         connected_components = list(nx.connected_components(G))
+        response["no_of_components"]=len(connected_components)
+        temp=[]
         for component in connected_components:
             component_graph = G.subgraph(component)
             shortest_paths = nx.shortest_path_length(component_graph)
 
             average_shortest_path_length = nx.average_shortest_path_length(component_graph)
-            shortest_paths_dict = {}
+            # shortest_paths_dict = {}
 
-            for source_node, paths in shortest_paths:
-                shortest_paths_dict[source_node] = dict(paths)
-            response.append({"Number of components":len(connected_components), "nodes":list(component_graph.nodes), "shortest_paths_dict": shortest_paths_dict, "average_shortest_path_length":average_shortest_path_length})
+            # for source_node, paths in shortest_paths:
+            #     shortest_paths_dict[source_node] = dict(paths)
+            temp.append({ "nodes":list(component_graph.nodes), "average_shortest_path_length":average_shortest_path_length})
+        response["component_detail"] = temp
     else:
         shortest_paths = nx.shortest_path_length(G)
         average_shortest_path_length = nx.average_shortest_path_length(G)
-        shortest_paths_dict = {}
-        for source_node, paths in shortest_paths:
-            shortest_paths_dict[source_node] = dict(paths)
-        response.append({"Number of components":1, "nodes":list(G.nodes), "shortest_paths_dict": shortest_paths_dict, "average_shortest_path_length":average_shortest_path_length})
+        # shortest_paths_dict = {}
+        # for source_node, paths in shortest_paths:
+        #     shortest_paths_dict[source_node] = dict(paths)
+        response = {"no_of_components":1, "component_detail":[{"nodes":list(G.nodes), "average_shortest_path_length":average_shortest_path_length}]}
     return response
     
 
@@ -1456,9 +1517,20 @@ def get_data_for_comparing_common_and_unique_network_element(request):
     if cache.get("get_data_for_comparing_common_and_unique_network_element_"+atc_code+"_"+atc_comparison):
         response_data = cache.get("get_data_for_comparing_common_and_unique_network_element_"+atc_code+"_"+atc_comparison)
     else:
+        atc_code_data = get_data_ONE_atc_code_for_comparing_common_and_unique_network_element(atc_code)
+        atc_comparison_data = get_data_ONE_atc_code_for_comparing_common_and_unique_network_element(atc_comparison)
         response_data ={
-        "atc_code": get_data_ONE_atc_code_for_comparing_common_and_unique_network_element(atc_code),
-        "atc_comparison": get_data_ONE_atc_code_for_comparing_common_and_unique_network_element(atc_comparison)
+        "atc_code": atc_code,
+        "atc_comparison": atc_comparison,
+        "common_drugs": [d for d in atc_code_data.get("drug_objs") if d in atc_comparison_data.get("drug_objs")],
+        "common_proteins": [d for d in atc_code_data.get("protein_objs") if d in atc_comparison_data.get("protein_objs")],
+        "common_diseases": [d for d in atc_code_data.get("disease_objs") if d in atc_comparison_data.get("disease_objs")],
+        "unique_drug_atc_code": [d for d in atc_code_data.get("drug_objs") if not d in atc_comparison_data.get("drug_objs")],
+        "unique_protein_atc_code": [d for d in atc_code_data.get("protein_objs") if not d in atc_comparison_data.get("protein_objs")],
+        "unique_disease_atc_code": [d for d in atc_code_data.get("disease_objs") if not d in atc_comparison_data.get("disease_objs")],
+        "unique_drug_atc_comparison": [d for d in atc_comparison_data.get("drug_objs") if not d in atc_code_data.get("drug_objs")],
+        "unique_protein_atc_comparison": [d for d in atc_comparison_data.get("protein_objs") if not d in atc_code_data.get("protein_objs")],
+        "unique_disease_atc_comparison": [d for d in atc_comparison_data.get("disease_objs") if not d in atc_code_data.get("disease_objs")],
         }
         cache.set("get_data_for_comparing_common_and_unique_network_element_"+atc_code+"_"+atc_comparison, response_data, 60*60)
     return JsonResponse(response_data)
