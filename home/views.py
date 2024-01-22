@@ -864,38 +864,45 @@ def disease_lookup(request):
             diseases = Disease.objects.all()[:8]
         response_data = []
         for d in diseases:
-            drugs = DrugDiseaseStudy.objects.filter(disease_name__disease_name=d.disease_name).values_list('drug_bankID', 'clinical_trial', 'link')
-            for item in drugs:
-                response_data.append(
-                    {
+                temp=[]
+                drugs = DrugDiseaseStudy.objects.filter(disease_name__disease_name=d.disease_name).values_list('drug_bankID', 'clinical_trial', 'link')
+                for item in drugs:
+                    temp.append({
+                        'drug_bankID': item[0],
+                        'drugname': Drug.objects.get(drug_bankID=item[0]).name,
+                        'clinical_trial': item[1],
+                        'link': item[2],
+                        'atc_code': DrugAtcAssociation.objects.filter(drug_id=item[0]).values_list('atc_id', flat=True).first(),
+                        })
+                response_data.append({
                     'disease_name':d.disease_name,
-                    'drug_bankID': item[0],
-                    'drugname': Drug.objects.get(drug_bankID=item[0]).name,
-                    'clinical_trial': item[1],
-                    'link': item[2],
-                    'atc_code': DrugAtcAssociation.objects.filter(drug_id=item[0]).values_list('atc_id', flat=True).first(),
                     'disease_class': d.disease_class,
-                    'disease_UML_CUI': d.disease_UML_CUI
-                    })
+                    'disease_UML_CUI': d.disease_UML_CUI,
+                    "drugs": temp,
+                })
+            
         print("length = ",len(response_data))
         return JsonResponse({'response_data': response_data})
     else:
         diseases = Disease.objects.all()[:8]
         response_data = []
         for d in diseases:
-            drugs = DrugDiseaseStudy.objects.filter(disease_name__disease_name=d.disease_name).values_list('drug_bankID', 'clinical_trial', 'link')
-            for item in drugs:
-                response_data.append(
-                    {
+                temp=[]
+                drugs = DrugDiseaseStudy.objects.filter(disease_name__disease_name=d.disease_name).values_list('drug_bankID', 'clinical_trial', 'link')
+                for item in drugs:
+                    temp.append({
+                        'drug_bankID': item[0],
+                        'drugname': Drug.objects.get(drug_bankID=item[0]).name,
+                        'clinical_trial': item[1],
+                        'link': item[2],
+                        'atc_code': DrugAtcAssociation.objects.filter(drug_id=item[0]).values_list('atc_id', flat=True).first(),
+                        })
+                response_data.append({
                     'disease_name':d.disease_name,
-                    'drug_bankID': item[0],
-                    'drugname': Drug.objects.get(drug_bankID=item[0]).name,
-                    'clinical_trial': item[1],
-                    'link': item[2],
-                    'atc_code': DrugAtcAssociation.objects.filter(drug_id=item[0]).values_list('atc_id', flat=True).first(),
                     'disease_class': d.disease_class,
-                    'disease_UML_CUI': d.disease_UML_CUI
-                    })
+                    'disease_UML_CUI': d.disease_UML_CUI,
+                    "drugs": temp,
+                })
         context["response_data"] = response_data
         print("length = ",len(response_data))
         return render(request, 'home/disease_lookup.html', context)
