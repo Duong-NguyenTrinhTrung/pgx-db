@@ -44,9 +44,31 @@ from .services import DrugNetworkGetDataService, DrugsNetworkGetDataService
 from time import perf_counter
 import networkx as nx
 from community import community_louvain
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 app_name = 'drug'
+
+def drawNetworkAndSaveInAPlot(G, pat, name, title):
+    # Create a simple graph
+    # G = nx.Graph()
+    # G.add_edges_from([(1, 2), (1, 3), (2, 3), (2, 4), (3, 4), (4, 5)])
+
+    # Visualize the graph
+    pos = nx.spring_layout(G, seed=42)  # Set seed for reproducibility
+    nx.draw(G, pos, with_labels=True, font_weight='bold', node_color='skyblue', node_size=1000, font_size=10)
+
+    # Assign colors to nodes based on community
+    # colors = [partition[node] for node in G.nodes]
+
+    # Draw the graph with nodes colored by community
+    # nx.draw(G, pos, node_color=colors, cmap=plt.cm.get_cmap('viridis'), with_labels=True, font_weight='bold', node_size=1000, font_size=10)
+
+    # plt.title("Simple Graph with Fake Data")
+    plt.title(title)
+    plt.show()
+    plt.savefig(path+"/"+name+".png")
 
 
 def get_drug_network(request):

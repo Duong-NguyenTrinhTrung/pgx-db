@@ -39,7 +39,7 @@
             let atc_code = $(this).data('atc-code');
             let url = $(this).data('remote-url');
             // Construct the URL with the atc_code parameter
-            let fullUrl = url + `?group_id=${atc_code[0]}&detail=${atc_code}`;
+            let fullUrl = url + `?group_id=${atc_code[0]}&atc_search=${atc_code}`;
 
             // Redirect the browser to the constructed URL
             window.location.href = fullUrl;

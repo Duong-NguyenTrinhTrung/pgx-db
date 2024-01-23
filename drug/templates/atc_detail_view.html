@@ -220,20 +220,21 @@
 
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
-              <li role="presentation" class="active"><a href="#tab_network_visualization" aria-controls="tab_network_visualization" role="tab" data-toggle="tab">Network visualization</a></li>
-              <li role="presentation"><a href="#tab_network_statistics" aria-controls="tab_network_statistics" role="tab" data-toggle="tab">Network statistics</a></li>
+              <li role="presentation" class="active"><a href="#tab_network_statistics" aria-controls="tab_network_statistics" role="tab" data-toggle="tab">Network statistics</a></li>
+              <li role="presentation"><a href="#tab_network_visualization" aria-controls="tab_network_visualization" role="tab" data-toggle="tab">Network visualization</a></li>
               <li role="presentation"><a href="#tab_network_comparison" aria-controls="tab_network_comparison" role="tab" data-toggle="tab">Network comparison</a></li>
               <li role="presentation"><a href="#tab_network_pgx" aria-controls="tab_network_pgx" role="tab" data-toggle="tab">Network pharmacogenomics</a></li>
             </ul>
           
             <!-- Tab panes -->
             <div class="tab-content">
-              <div role="tabpanel" class="tab-pane active" id="tab_network_visualization">
-                <!-- block for showing network -->
+                {% include "network_statistics_tab.html" %}
+                <div role="tabpanel" class="tab-pane" id="tab_network_visualization">
+                    <!-- block for showing network -->
                     <div class="forcenetworkgraph" id="graphvisibility"
                     style="display: none; width: 100%; margin: 10px 0; height: 1300px; ">
-                        <p> <span style="color: red;" id="network_overview"></span> </p>
-                        <iframe id="myIframe" style="
+                    <p> <span style="color: red;" id="network_overview"></span> </p>
+                    <iframe id="myIframe" style="
                                                             display: none;
                                                             width: 98%;
                                                             height: 100%;
@@ -241,9 +242,9 @@
                                                             margin-right: 5px;">
                         </iframe>
                     </div>
-              </div>
+                </div>
+                
               
-              {% include "network_statistics_tab.html" %}
               {% include "network_comparison_tab.html" %}
               {% include "network_pgx_tab.html" %}
             </div>
@@ -643,6 +644,7 @@
             const button = networkButtons[index];
             //button.style.borderColor = "red"
             button.classList.add("active");
+            $("#tabs_network > ul.nav.nav-tabs a:first").tab('show');
             const atcCode = button.getAttribute("data-atc-code");
 
             const url = button.getAttribute('data-remote-url'); //"{% url 'get-drug-atc-association' %}"

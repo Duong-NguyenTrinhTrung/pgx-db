@@ -1,7 +1,7 @@
 {% load static %}
 {% csrf_token %}
 
-<div role="tabpanel" class="tab-pane" id="tab_network_statistics">
+<div role="tabpanel" class="tab-pane active" id="tab_network_statistics">
     <!-- block for showing the atc level network statistics -->
     <div id='atc_level_network_statistics' style="border: #b4b1b1 1px solid">
         <p>
@@ -165,7 +165,7 @@
             showOneDrugLevelNetworkStatistics(drug_id);
         }
     }
-    
+
     function showAtcLevelNetworkStatistics(atc_code) {
         $.ajax(
             {
