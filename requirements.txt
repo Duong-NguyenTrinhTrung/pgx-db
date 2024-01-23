@@ -32,3 +32,4 @@ django-jsonapi
 psycopg2-binary==2.9.3
 networkx==3.2.1
 python-louvain==0.16
+seaborn==0.13.1

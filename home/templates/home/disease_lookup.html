@@ -175,9 +175,9 @@
                     <tr style="background-color: {% if forloop.parentloop.counter0|divisibleby:2 %}#f2f2f2{% else %}#ffffff{% endif %}">
                         {% if forloop.first %}
                             <!-- Apply rowspan only for the first row -->
-                            <td rowspan="{{ item.drugs|length }}">{{ item.disease_name }}</td>
-                            <td rowspan="{{ item.drugs|length }}">{{ item.disease_class }}</td>
-                            <td style="text-align: center;" rowspan="{{ item.drugs|length }}">{{ item.disease_UML_CUI }}</td>
+                            <td style="vertical-align: top;" rowspan="{{ item.drugs|length }}">{{ item.disease_name }}</td>
+                            <td style="vertical-align: top;" rowspan="{{ item.drugs|length }}">{{ item.disease_class }}</td>
+                            <td style="text-align: center; vertical-align: top;" rowspan="{{ item.drugs|length }}">{{ item.disease_UML_CUI }}</td>
                         {% endif %}
                         <td>{{ drug.drugname }} (<i>id: {{ drug.drug_bankID }}</i>)</td>
                         <td>{{ drug.atc_code }}</td>
@@ -241,9 +241,9 @@
                         for (var j = 0; j < data.response_data[i].drugs.length; j++) {
                             if (j==0){
                                 html_data += `<tr style="background-color:${bgColor};">
-                                            <td rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_name}</td>
-                                            <td rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_class}</td>
-                                            <td style="text-align: center;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_UML_CUI}</td>
+                                            <td style="vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_name}</td>
+                                            <td style="vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_class}</td>
+                                            <td style="text-align: center; vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_UML_CUI}</td>
                                             <td>${data.response_data[i].drugs[j].drugname} (<i>id: ${data.response_data[i].drugs[j].drug_bankID}</i>)</td>
                                             <td>${data.response_data[i].drugs[j].atc_code}</td>
                                             <td style="text-align: center;">${data.response_data[i].drugs[j].clinical_trial}</td>
@@ -285,9 +285,9 @@
                             for (var j = 0; j < data.response_data[i].drugs.length; j++) {
                                 if (j==0){
                                     html_data += `<tr style="background-color:${bgColor};">
-                                                <td rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_name}</td>
-                                                <td rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_class}</td>
-                                                <td style="text-align: center;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_UML_CUI}</td>
+                                                <td style="vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_name}</td>
+                                                <td  style="vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_class}</td>
+                                                <td style="text-align: center; vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_UML_CUI}</td>
                                                 <td>${data.response_data[i].drugs[j].drugname} (<i>id: ${data.response_data[i].drugs[j].drug_bankID}</i>)</td>
                                                 <td>${data.response_data[i].drugs[j].atc_code}</td>
                                                 <td style="text-align: center;">${data.response_data[i].drugs[j].clinical_trial}</td>
