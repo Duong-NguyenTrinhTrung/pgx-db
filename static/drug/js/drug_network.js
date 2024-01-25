@@ -1490,12 +1490,13 @@ function xlsxToJson(file, callback) {
 
 function processData() {
     const jsonFilePath = json_GeneralFile; // JSON file path
-    //console.log("Inside Process Data Function11");
+    console.log("Inside Process Data Function11");
+    console.log("jsonGeneral: ", jsonFilePath)
     fetch(jsonFilePath)
         .then((response) => response.json())
         .then((data) => {
             // Extract nodes and links from the JSON data
-            // console.log("inside processData: ", data);
+             console.log("inside processData: ", data);
             chartDataJ = data;
             data.forEach(function (row) {
                 //  console.log("ProcessData");
@@ -1672,7 +1673,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-    //console.log("Latest Edit CreateCHart_13_jan_2024_A");
+    console.log("Latest Edit CreateCHart_25_jan_2024_A");
     var container = d3.select("#chart");
     //debugger
     var containerWidth = [container.node().getBoundingClientRect().width] - 10;
