@@ -35,55 +35,33 @@
                     {{ g2.id }} - <a href="#" class="desc">{{ g2.name }} </a><button data-atc-code={{g2.id}} data-remote-url="{% url 'get-drug-atc-association' %}" title="Click to show network" class="network-button"></button>
                     <!-- show data in level 3 -->
                     <ul>
-                        {% for g3 in group3s %}
-                            {% if g3.parent_id == g2.id %}
-                                <li>
-                                    {{ g3.id }} -<a href="#" class="desc"> {{ g3.name }} </a><button data-atc-code={{g3.id}} data-remote-url="{% url 'get-drug-atc-association' %}" title="Click to show network" class="network-button"></button>
-                                    <!-- show data in level 4 -->
-                                    <ul>
-                                        {% for g4 in group4s %}
-                                            {% if g4.parent_id == g3.id %}
-                                                <li>
-                                                    {{ g4.id }} -<a href="#"
-                                                                    class="desc"> {{ g4.name }} </a><button data-atc-code={{g4.id}} data-remote-url="{% url 'get-drug-atc-association' %}" title="Click to show network" class="network-button"></button>
-                                                    <!-- show data in level 5 -->
-                                                    <ul>
-                                                        {% for g5 in group5s %}
-                                                            {% if g5.parent_id == g4.id %}
-                                                                <li>
-                                                                    {{ g5.id }} -<a href="#"
-                                                                                    class="desc"> {{ g5.name }} </a>
-                                                                                <button data-atc-code={{g5.id}} data-remote-url="{% url 'get-drug-atc-association' %}" title="Click to show network" class="network-button"></button>
-
-                                                                </li>
-                                                            {% endif %}
-                                                        {% empty %}
-                                                            <li>
-                                                                No data available
-                                                            </li>
-                                                        {% endfor %}
-                                                    </ul>
-                                                </li>
-                                            {% endif %}
-                                        {% empty %}
-                                            <li>
-                                                No data available
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                </li>
-                            {% endif %}
-                        {% empty %}
+                        {% for g3 in g2.atcpharmacologicalgroup_set.all %}
                             <li>
-                                No data available
+                                {{ g3.id }} -<a href="#" class="desc"> {{ g3.name }} </a><button data-atc-code={{g3.id}} data-remote-url="{% url 'get-drug-atc-association' %}" title="Click to show network" class="network-button"></button>
+                                <!-- show data in level 4 -->
+                                <ul>
+                                    {% for g4 in g3.atcchemicalgroup_set.all %}
+                                        <li>
+                                        {{ g4.id }} -<a href="#"
+                                                        class="desc"> {{ g4.name }} </a><button data-atc-code={{g4.id}} data-remote-url="{% url 'get-drug-atc-association' %}" title="Click to show network" class="network-button"></button>
+                                        <!-- show data in level 5 -->
+                                        <ul>
+                                            {% for g5 in g4.atcchemicalsubstance_set.all %}
+                                                <li>
+                                                    {{ g5.id }} -<a href="#"
+                                                                    class="desc"> {{ g5.name }} </a>
+                                                                <button data-atc-code={{g5.id}} data-remote-url="{% url 'get-drug-atc-association' %}" title="Click to show network" class="network-button"></button>
+
+                                                </li>
+                                            {% endfor %}
+                                            </ul>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
                             </li>
                         {% endfor %}
                     </ul>
                 </li>
-                {% empty %}
-                    <li>
-                        No data available
-                    </li>
                 {% endfor %}
             </ul>
         </li>

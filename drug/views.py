@@ -24,10 +24,10 @@ from django.views.generic import TemplateView, ListView
 from django_filters.views import FilterView
 from drug.filters import AtcAnatomicalGroupFilter
 from drug.models import (AtcAnatomicalGroup,
+    AtcTherapeuticGroup,
+    AtcPharmacologicalGroup,
     AtcChemicalGroup,
     AtcChemicalSubstance,
-    AtcPharmacologicalGroup,
-    AtcTherapeuticGroup,
     DrugAtcAssociation,
 )
 from gene.models import Gene
@@ -70,6 +70,62 @@ def drawNetworkAndSaveInAPlot(G, pat, name, title):
     plt.show()
     plt.savefig(path+"/"+name+".png")
 
+# from drug.models import (AtcAnatomicalGroup,
+#     AtcChemicalGroup,
+#     AtcChemicalSubstance,
+#     AtcPharmacologicalGroup,
+#     AtcTherapeuticGroup,
+#     DrugAtcAssociation,
+# )
+
+def atc_comparison_autocomplete_view(request):
+    query = request.GET.get('query', '')
+    print("query = ", query)
+    results = []
+    if len(query)==3:
+        try:
+            code = AtcTherapeuticGroup.objects.get(id=query)
+            results.append(code.id+ " ("+code.name+")")
+        except AtcTherapeuticGroup.DoesNotExist:
+            pass
+        codes = AtcPharmacologicalGroup.objects.filter(id__icontains=query)
+        results+=[code.id+ " ("+code.name+")" for code in codes]
+        codes = AtcChemicalGroup.objects.filter(id__icontains=query)
+        results+=[code.id+ " ("+code.name+")" for code in codes]
+        codes = AtcChemicalSubstance.objects.filter(id__icontains=query)
+        results+=[code.id+ " ("+code.name+")" for code in codes]
+    else:
+        if len(query)==4:
+            try:
+                code = AtcPharmacologicalGroup.objects.get(id=query)
+                results.append(code.id+ " ("+code.name+")")
+            except AtcPharmacologicalGroup.DoesNotExist:
+                pass
+            codes = AtcChemicalGroup.objects.filter(id__icontains=query)
+            results+=[code.id+ " ("+code.name+")" for code in codes]
+            codes = AtcChemicalSubstance.objects.filter(id__icontains=query)
+            results+=[code.id+ " ("+code.name+")" for code in codes]
+        else:
+            if len(query)==5:
+                try:
+                    code = AtcChemicalGroup.objects.get(id=query)
+                    results.append(code.id+ " ("+code.name+")")
+                except AtcChemicalGroup.DoesNotExist:
+                    pass
+                codes = AtcChemicalSubstance.objects.filter(id__icontains=query)
+                results+=[code.id+ " ("+code.name+")" for code in codes]
+            else:
+                if len(query)==7:
+                    try:
+                        code = AtcChemicalSubstance.objects.get(id=query)
+                        results.append(code.id+ " ("+code.name+")")
+                    except AtcChemicalSubstance.DoesNotExist:
+                        pass
+                    
+    results = list(set(results))
+    results = sorted(results, key=lambda x: x.split()[0])
+    print("atc_comparison_autocomplete_view suggestion: ", results)
+    return JsonResponse({'suggestions': results})
 
 def get_drug_network(request):
 
@@ -688,26 +744,22 @@ def atc_detail_view(request):
     group2s = AtcTherapeuticGroup.objects.filter(id__icontains=group_id)
     for group in group2s:
         group.name = format_atc_name(group.name)
-    group3s = AtcPharmacologicalGroup.objects.filter(id__icontains=group_id)
-    for group in group3s:
-        group.name = format_atc_name(group.name)
-    group4s = AtcChemicalGroup.objects.filter(id__icontains=group_id)
-    for group in group4s:
-        group.name = format_atc_name(group.name)
-    group5s = AtcChemicalSubstance.objects.filter(id__icontains=group_id)
-    for group in group5s:
-        group.name = format_atc_name(group.name)
-    context = {'group2s': group2s, 'group3s': group3s, 'group4s': group4s, 'group5s': group5s, "group_id": group_id,
+    # group3s = AtcPharmacologicalGroup.objects.filter(id__icontains=group_id)
+    # for group in group3s:
+    #     group.name = format_atc_name(group.name)
+    # group4s = AtcChemicalGroup.objects.filter(id__icontains=group_id)
+    # for group in group4s:
+    #     group.name = format_atc_name(group.name)
+    # group5s = AtcChemicalSubstance.objects.filter(id__icontains=group_id)
+    # for group in group5s:
+    #     group.name = format_atc_name(group.name)
+    context = {'group2s': group2s, "group_id": group_id,
                "group_name": group_name}
     end_time = perf_counter()
     response = render(request, 'atc_detail_view.html', context)
     response['atc_detail_view-Duration'] = end_time - start_time
     # print("atc_detail_view: group_id: "+group_id+" ", len(context.get("group2s")), " ", len(context.get("group3s")), " ", len(context.get("group4s")), " ", len(context.get("group5s")))
     return response
-
-
-
-
 
 
 @csrf_exempt  # Use this decorator for simplicity, but consider using a proper csrf token in production.
