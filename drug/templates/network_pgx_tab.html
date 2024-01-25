@@ -624,6 +624,8 @@
     {
         //alert("value="+value+" text="+text);
         //retrieve data for an atc code selected
+        $("#waiting-prompt").show();
+        $(".spinner").show();
         var atc_code = value;
         var url2 = "{% url 'get-variant-based-burden-data-by-atc' %}?atc_code=" + atc_code;
         $.ajax(
@@ -634,9 +636,13 @@
                     
                     if (response.length>0){
                         $("#pgx-data-table-div").show();
+                        $(".spinner").hide();
+                        $("#waiting-prompt").hide();
                         create_pgx_variant_based_table(response);
                     }else{
                         $("#pgx-data-table-div").hide();
+                        $(".spinner").hide();
+                        $("#waiting-prompt").hide();
                         //alert("No variant-based burden data associated with drugs in this ATC code!");
                     }
                 },

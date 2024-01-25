@@ -7,7 +7,11 @@
         <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
             <label for="atc_comparison" style="font-size: 16px; color: rgb(51, 122, 183); font-weight: bold;">Input an
                 ATC code for network comparison</label>
-            <input type="text" id="atc_comparison" placeholder="ATC code" style="width: 100%;">
+            <input type="text" id="atc_comparison" class="form-text form-type-textfield form-control optional ui-autocomplete-input" autocomplete="on" placeholder="ATC code" style="width: 100%;">
+            <div class="autocomplete-outer">
+                <div id="atc-comparison-autocomplete-results" >
+                </div>
+            </div>
             <button id="btn-network-compare" type="button" style="width: 200px; border-radius: 5px;"
                 class="btn-primary">Compare</button>
         </div>
@@ -62,6 +66,54 @@
 </div>
 
 {% block addon_js %}
+<script src="{% static 'home/js/selection-autocomplete.js' %}"></script>
+
+<script>
+    //$(document).ready(function () {
+        //alert("We are sure to be here");
+        // autocomplete 
+        var autocompleteResults = $('#atc-comparison-autocomplete-results');
+        $('#atc_comparison').autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "{% url 'atc_comparison_autocomplete_view' %}",
+                    data: {
+                        query: request.term
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        //alert(data.suggestions);
+                        if (data.suggestions.length==0){
+                            alert("Please enter a valid ATC code!");
+                            $("#btn-network-compare").attr("disabled", "true");
+                            $("#btn-network-compare").addClass("btn-disabled");
+                        }
+                        else {
+                            $("#btn-network-compare").removeAttr("disabled");
+                            $("#btn-network-compare").removeClass("btn-disabled");
+                            response(data.suggestions);
+                        }
+                        
+                    }
+                });
+            },
+            autoFocus: true,
+            minLength: 3,
+            select: function (event, ui) {
+                $('#atc_comparison').val(ui.item.value);
+                return false;
+            },
+            open: function (event, ui) {
+                autocompleteResults.show(); 
+            },
+            close: function (event, ui) {
+                autocompleteResults.hide(); 
+            }
+        });
+    //});
+
+</script>
+
 <script>
     function isValidATC(atc_comparison){
         return true;
@@ -101,6 +153,7 @@
 
     $("#btn-network-compare").click(function() {
         var compare_type = $("#compare-type").val();
+        var atc_comparison = $("#atc_comparison").val().split(" ")[0];
         var urlCompare;
         var compareTask;
         var compareText;
@@ -179,8 +232,7 @@
             alert("Please enter a valid ATC code!");
         }
         var atc_code = $("#tabs_network").attr("data-atc-code");
-        var atc_comparison = $("#atc_comparison").val();
-        
+            
         if (compareTask == "distributionPlot")
         {
             $.ajax( {

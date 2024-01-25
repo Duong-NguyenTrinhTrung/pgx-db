@@ -19,7 +19,8 @@ from .views import (
     get_statistics_by_atc_for_detecting_community_drug_protein, 
     get_statistics_by_atc_for_detecting_community_drug_disease, 
     get_statistics_by_atc_for_calculating_average_path_length_drug_disease,
-    get_statistics_by_atc_for_calculating_average_path_length_drug_protein
+    get_statistics_by_atc_for_calculating_average_path_length_drug_protein,
+    atc_comparison_autocomplete_view
 )
 
 urlpatterns = [
@@ -75,4 +76,5 @@ urlpatterns = [
     path('get_statistics_by_atc_for_calculating_average_path_length_drug_protein/', views.get_statistics_by_atc_for_calculating_average_path_length_drug_protein, name='get_statistics_by_atc_for_calculating_average_path_length_drug_protein'),
     
     path('get_data_for_comparing_common_and_unique_network_element/', views.get_data_for_comparing_common_and_unique_network_element, name='get_data_for_comparing_common_and_unique_network_element'),
+    path('atc_comparison_autocomplete_view/', views.atc_comparison_autocomplete_view, name='atc_comparison_autocomplete_view'),
 ]
