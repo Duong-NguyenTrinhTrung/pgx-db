@@ -4,17 +4,12 @@ $(function () {
     });
 });
 //Pass jsonFiles Here
-// var json_GeneralFile = "/static/json-sample/json_GeneralFile.json";
-// var json_drugData = "/static/json-sample/json_drugData.json";
-// var json_proteinData = "/static/json-sample/json_proteinData.json";
-// var json_interactionData = "/static/json-sample/json_interactionData.json"
+var json_GeneralFile = "/static/json-sample/json_GeneralFile.json";
+var json_drugData = "/static/json-sample/json_drugData.json";
+var json_proteinData = "/static/json-sample/json_proteinData.json";
+var json_interactionData = "/static/json-sample/json_interactionData.json"
 
-// alert("is this new code????");
 
-var json_GeneralFile = "";
-var json_drugData = "";
-var json_proteinData = "";
-var json_interactionData = "";
 
 if (drug_bank_ids) {
     json_GeneralFile = "/drugs-network/general-data?drug_bank_ids=" + drug_bank_ids.join(',');
@@ -116,6 +111,7 @@ function readInteractionJSON() {
 
 window.onload = function () {
     readDrugJSON();
+    // processData();
     //getDrugJsonData(drugBankId);
 };
 
@@ -1510,13 +1506,17 @@ function processData() {
                 var protein = row.protein;
                 var genename = row.gene_name;
                 var interaction = row.interaction_type;
+                // var interaction = row.interaction;
+                
                 var disease_interaction;
                 if (row.Phase !== 1) {
                   disease_interaction = "phase" + row.Phase;
                 }
                 else {
-                  disease_interaction = "temp"
+                  disease_interaction = "temp";
                 }
+
+
                 //console.log("row.interaction = " + row.interaction_type);
                 //var drugStatus = row.Drug_status; // Get the "Drug_status" value
                 var drugStatus = clinicalStatusMap[row.Drug_status];
@@ -1842,13 +1842,13 @@ function createChart(links) {
             var uniqueSources = new Set();
             link.filter(function (templink) {
               if (templink.target.id === d.id) {
-                //console.log(templink.target.id, ' target');
+                console.log(templink.target.id, ' target');
                 uniqueSources.add(templink.source.id);
 
               }
             });
             var child_size = Array.from(uniqueSources).length;
-            //console.log('Unique Sources:', Array.from(uniqueSources), child_size);
+            console.log('Unique Sources:', Array.from(uniqueSources), child_size);
             if (child_size > 25) {
               return 30
             }
@@ -2198,9 +2198,15 @@ function createLegend() {
     var legendContent = d3.select("#legend-content");
 
     var legendContent2 = d3.select("#legend-content_disease");
+
+    // change4 copy this line 
+    var legendContent3 = d3.select("#trial_to_hide");
     //console.log("interaction legend",legendContent);
     //console.log("disease legend",legendContent2);
-    var uniqueInteractions = new Set();
+
+    // change1 
+
+    var uniqueInteractions = [];
 
     links.forEach(function (link) {
       var interaction = link.type; // No need to convert to lowercase
@@ -2208,14 +2214,16 @@ function createLegend() {
         interactions.includes(
           interaction.charAt(0).toUpperCase() + interaction.slice(1)
         ) &&
-        !uniqueInteractions.has(interaction)
+        // change2 has to includes  
+        !uniqueInteractions.includes(interaction)
       ) {
         if (["phase1", "phase2", "phase3", "phase4"].includes(interaction)) {
           createLegendItem(interaction, getColor(interaction), legendContent2);
         } else {
           createLegendItem(interaction, getColor(interaction), legendContent);
         }
-        uniqueInteractions.add(interaction);
+        // change3 add to includes 
+        uniqueInteractions.push(interaction);
       }
     });
     //console.log("unique Interactions", uniqueInteractions);
@@ -2328,8 +2336,8 @@ function createLegend() {
         uniqueInteractions.includes("phase4")
         ) {
 
-        //console.log(uniqueInteractions, ' here are unique interaction ')
-        //console.log("check")
+        console.log(uniqueInteractions, ' here are unique interaction ')
+        console.log("check")
         legendContent3.style("display", "block");
         }
         else {
@@ -2711,8 +2719,8 @@ let DiseaseColorMap = {
 
 
         if (diseases.some(disease => uniqueDisease.has(disease))) {
-          //console.log(uniqueDisease, ' here are unique interactions');
-          //console.log("check");
+          console.log(uniqueDisease, ' here are unique interactions');
+          console.log("check");
           legendContent4.style("display", "block");
         } else {
           legendContent4.style("display", "none");
@@ -2720,17 +2728,17 @@ let DiseaseColorMap = {
         }
   }
 
-var legendContent4 = d3.select("#Disease_to_hide");
+// var legendContent4 = d3.select("#Disease_to_hide");
 
 
-        if (diseases.some(disease => uniqueDisease.has(disease))) {
-          //console.log(uniqueDisease, ' here are unique interactions');
-          //console.log("check");
-          legendContent4.style("display", "block");
-        } else {
-          legendContent4.style("display", "none");
-          // Set display to "block" or any other desired value
-        }
+//         if (diseases.some(disease => uniqueDisease.has(disease))) {
+//           console.log(uniqueDisease, ' here are unique interactions');
+//           console.log("check");
+//           legendContent4.style("display", "block");
+//         } else {
+//           legendContent4.style("display", "none");
+//           // Set display to "block" or any other desired value
+//         }
 
 // Call the function to create the legend
 function createLegend_status() {
