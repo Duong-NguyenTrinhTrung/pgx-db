@@ -1673,7 +1673,7 @@ var simulation = null
 // Create the Forced Directed Network Chart
 function createChart(links) {
     d3.select("#chart").selectAll("*").remove();
-    //console.log("Latest Edit CreateCHart_25_jan_2024_A");
+    console.log("Latest Edit CreateCHart_25_jan_2024_A");
     var container = d3.select("#chart");
     //debugger
     var containerWidth = [container.node().getBoundingClientRect().width] - 10;
