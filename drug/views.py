@@ -1427,12 +1427,26 @@ def get_statistics_by_ONE_atc_for_detecting_community_drug_disease(atc_code):
         disease_names = list(DrugDiseaseStudy.objects.filter(drug_bankID__name=drug).values_list("disease_name__disease_name", flat=True))
         for disease_name in disease_names:
             G.add_edge("*"+drug, "#"+disease_name)
+    
 
     #detect community
     partition = community_louvain.best_partition(G)
     partition_drug = [{node:community_id} for node, community_id in partition.items() if node[0]=="*"]
     partition_disease = [{node:community_id} for node, community_id in partition.items() if node[0]=="#"]
-    return {"partition_drug":partition_drug, "partition_disease":partition_disease}
+
+    # # Assign colors to nodes based on community
+    # colors = [partition[node] for node in G.nodes]
+
+    # pos = nx.spring_layout(G, seed=42)  # Set seed for reproducibility
+    # # Draw the graph with nodes colored by community
+    # nx.draw(G, pos, node_color=colors, cmap=plt.cm.get_cmap('viridis'), with_labels=True,
+    #         font_weight='bold', node_size=1000, font_size=10)
+
+    # # Display the graph
+    # plt.title("Communities Detected by Louvain Algorithm")
+    # # plt.show()
+    # plt.savefig("../static/community_"+atc_code+".png")
+    return {"nodes": list(G.nodes), "edges": list(G.edges), "partition_drug":partition_drug, "partition_disease":partition_disease}
 
     
 def get_statistics_by_atc_for_measure_centralization_drug_protein(request):

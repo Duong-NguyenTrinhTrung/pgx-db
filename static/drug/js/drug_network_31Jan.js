@@ -4,6 +4,17 @@ $(function () {
     });
 });
 //Pass jsonFiles Here
+
+
+// var json_GeneralFile = "json/json_GeneralFile.json";
+// var json_GeneralFile = "json/json3.json";
+// var json_drugData = "json/json_drugData.json";
+// var json_proteinData = "json/json_proteinData.json";
+// var json_interactionData = "json/json_interactionData.json";
+
+
+
+
 var json_GeneralFile = "/static/json-sample/json_GeneralFile.json";
 var json_drugData = "/static/json-sample/json_drugData.json";
 var json_proteinData = "/static/json-sample/json_proteinData.json";
@@ -25,12 +36,37 @@ if (drug_bank_id) {
     json_interactionData = "/drug_network/" + drug_bank_id + "/interaction_data";
 }
 
+
+// code to get the li of the network visualization 
+document.addEventListener("DOMContentLoaded", function () {
+    // Get all <li> elements within the <ul>
+    var listItems = document.querySelectorAll('.nav-tabs li');
+
+    // Loop through the <li> elements
+    listItems.forEach(function (li) {
+        // Check if the text content of the <a> element within the <li> matches "Network visualization"
+        if (li.textContent.trim() === 'Network visualization') {
+            // Add a click event listener to the <li>
+            li.addEventListener('click', function () {
+
+                console.log('Network visualization tab clicked!');
+                if(!flag_tabclicked ){
+                    flag_tabclicked = true ; 
+                     if(flag_processData ){
+                        
+                console.log('chart is created on clicked ');
+                      createChart(links);
+                     }
+                  }
+
+            });
+        }
+    });
+});
+
 $("#loading").show();
-//console.log("json_GeneralFile ", json_GeneralFile);
-//***console.log("json_drugData "+json_drugData);
-//***console.log("json_proteinData "+json_proteinData);
-//***console.log("json_interactionData "+json_interactionData);
-//***console.log("Saad");
+
+
 let drug_xlsxData;
 let protein_xlsxData;
 let interaction_xlsxData;
@@ -1391,14 +1427,25 @@ var currentFilters;
 var interaction_source = "";
 var interaction_target = "";
 
+// var imagePaths11 = {
+//     Nutraceutical: "/static/d3/images/capsules/left0.png",
+//     Experimental: "/static/d3/images/capsules/left1.png",
+//     Investigational: "/static/d3/images/capsules/left2.png",
+//     Approved: "/static/d3/images/capsules/left3.png",
+//     'Vet-approved': "/static/d3/images/capsules/left4.png",
+//     Illicit: "/static/d3/images/capsules/left5.png"
+// };
+
+
 var imagePaths11 = {
-    Nutraceutical: "/static/d3/images/capsules/left0.png",
-    Experimental: "/static/d3/images/capsules/left1.png",
-    Investigational: "/static/d3/images/capsules/left2.png",
-    Approved: "/static/d3/images/capsules/left3.png",
-    'Vet-approved': "/static/d3/images/capsules/left4.png",
-    Illicit: "/static/d3/images/capsules/left5.png"
-};
+    Nutraceutical: "images/left0.png",
+    Experimental: "images/left1.png",
+    Investigational: "images/left2.png",
+    Approved: "images/left3.png",
+    "Vet-approved": "images/left4.png",
+    Illicit: "images/left5.png",
+  };
+
 
 var colorOptions = ["#e71f73", "#d5a100", "#0a5517", "#061755", "#941a4c", "#3d3d3d"];
 
@@ -1488,6 +1535,10 @@ function xlsxToJson(file, callback) {
         });
 }
 
+
+let flag_tabclicked = false;
+let flag_processData  = false;
+
 function processData() {
     const jsonFilePath = json_GeneralFile; // JSON file path
     //console.log("Inside Process Data Function11");
@@ -1505,12 +1556,12 @@ function processData() {
                 var drugID = row.drugbank_id;
                 var protein = row.protein;
                 var genename = row.gene_name;
-                var interaction = row.interaction_type;
+                var interaction = row.interaction_type.charAt(0).toUpperCase() + row.interaction_type.slice(1);;
                 // var interaction = row.interaction;
                 
                 var disease_interaction;
                 if (row.Phase !== 1) {
-                  disease_interaction = "phase" + row.Phase;
+                  disease_interaction = "Phase" + row.Phase;
                 }
                 else {
                   disease_interaction = "temp";
@@ -1557,6 +1608,7 @@ function processData() {
                         id: protein,
                         isParent: false,
                         radius: 5,
+                        genename :genename ,
                         Protein_Class: proteinClass,
                         child_type: "protein_type",
                     }); // Include the "Protein_Class" value in the node object
@@ -1638,13 +1690,14 @@ function processData() {
             thresholdSlider.value = 50;
             thresholdValueLabel.textContent = thresholdSlider.value;
 
-            // Create the chart using D3.js
-            createChart(links);
-            createLegend();
-            createLegend_status();
-            createLegend_drugType();
-            createProteinsLegend();
-            createDiseaseLegend();
+            if(flag_tabclicked){
+         
+                createChart(links);
+                
+            }
+            flag_processData = true ; 
+
+
 
             // Add an event listener to detect changes in the threshold slider value
             thresholdSlider.addEventListener('input', function () {
@@ -1675,8 +1728,8 @@ function createChart(links) {
     //console.log("Latest Edit CreateCHart_13_jan_2024_A");
     var container = d3.select("#chart");
     //debugger
-    var containerWidth = [container.node().getBoundingClientRect().width] - 10;
-    var containerHeight = [container.node().getBoundingClientRect().height] - 10;
+    var svgWidth = [container.node().getBoundingClientRect().width] - 100;
+    var svgHeight = [container.node().getBoundingClientRect().height] - 100;
     //var containerWidth = 500;
     //var containerHeight = 500;
     //console.log("Width : "+containerWidth+"  ----  Height : "+containerHeight);
@@ -1691,8 +1744,9 @@ function createChart(links) {
 
     // SVG creation with zoom behavior
     svg = container.append("svg")
-        .attr("width", containerWidth)
-        .attr("height", containerHeight)
+        .attr("width",  svgWidth)
+        .attr("height", svgHeight)
+        // .style("background-color" , "red")
         .call(zoom)
         .append("g"); // Append group element to SVG
 
@@ -1703,50 +1757,51 @@ function createChart(links) {
     var distanceBetweenNodes = 60;
     var noOfTotalNodes11 = links.length;
 
-    // console.log("HHHHHHHH" + noOfTotalNodes11);
-
-    // if (noOfTotalNodes11 < 100) {
-    //     chargeStrength = -100
-    //     var distanceBetweenNodes = 60;
-    // } else if (noOfTotalNodes11 > 99 && noOfTotalNodes11 < 200) {
-    //     chargeStrength = -100
-    //     var distanceBetweenNodes = 60;
-    // } else if (noOfTotalNodes11 > 199 && noOfTotalNodes11 < 250) {
-    //     chargeStrength = -100
-    //     var distanceBetweenNodes = 60;
-    // } else if (noOfTotalNodes11 > 249 && noOfTotalNodes11 < 300) {
-    //     chargeStrength = -100
-    //     var distanceBetweenNodes = 60;
-    // } else if (noOfTotalNodes11 > 299 && noOfTotalNodes11 < 350) {
-    //     chargeStrength = -100
-    //     var distanceBetweenNodes = 60;
-    // } else if (noOfTotalNodes11 > 349 && noOfTotalNodes11 < 400) {
-    //     chargeStrength = -100
-    //     var distanceBetweenNodes = 60;
-    // } else if (noOfTotalNodes11 > 399) {
-    //     chargeStrength = -100
-    //     var distanceBetweenNodes = 60;
-    // }
 
     if (noOfTotalNodes11 < 100) {
         chargeStrength = -650;
+      
         var distanceBetweenNodes = 200;
       } else if (noOfTotalNodes11 > 99 && noOfTotalNodes11 < 200) {
+        
         chargeStrength = -150;
         var distanceBetweenNodes = 100;
       } else if (noOfTotalNodes11 > 199 && noOfTotalNodes11 < 250) {
+        
+       
         chargeStrength = -150;
         var distanceBetweenNodes = 100;
       } else if (noOfTotalNodes11 > 249 && noOfTotalNodes11 < 300) {
+        
+      
         chargeStrength = -100;
         var distanceBetweenNodes = 80;
       } else if (noOfTotalNodes11 > 299 && noOfTotalNodes11 < 350) {
+        
+       
         chargeStrength = -100;
         var distanceBetweenNodes = 80;
+        // change2 
       } else if (noOfTotalNodes11 > 349 && noOfTotalNodes11 < 400) {
+        
+        console.log("check6")
         chargeStrength = -100;
         var distanceBetweenNodes = 60;
-      } else if (noOfTotalNodes11 > 399) {
+      } else if (noOfTotalNodes11 > 399 && noOfTotalNodes11 < 999 ) {
+        
+        console.log("check8" , noOfTotalNodes11)
+        chargeStrength = -550;
+        var distanceBetweenNodes = 100;
+      }else if (noOfTotalNodes11 > 1000 && noOfTotalNodes11 < 2999 ) {
+        
+        console.log("check9" , noOfTotalNodes11)
+        chargeStrength = -600;
+        var distanceBetweenNodes = 100;
+      }
+       else if (noOfTotalNodes11 > 3000) {
+        
+        console.log("check10" , noOfTotalNodes11)
+        chargeStrength = -300;
         var distanceBetweenNodes = 60;
       }
 
@@ -1766,8 +1821,8 @@ function createChart(links) {
         )
         .force("charge", d3.forceManyBody().strength(chargeStrength))
         // Adding centering forces for X and Y coordinates
-        .force("x", d3.forceX(containerWidth / 2).strength(0.1))
-        .force("y", d3.forceY(containerHeight / 2).strength(0.1))
+        .force("x", d3.forceX(svgWidth / 2).strength(0.1))
+        .force("y", d3.forceY(svgHeight / 2).strength(0.1))
 
         .on("end", function () {
             nodes.forEach(function (node) {
@@ -1776,7 +1831,6 @@ function createChart(links) {
             });
         });
 
-    //console.log("Creating nodes and links...");
     link = svg
         .selectAll(".link")
         .data(links)
@@ -1784,8 +1838,7 @@ function createChart(links) {
         .append("line")
         .attr("class", "link")
         .style("stroke", function (d) {
-
-            return colorMap[d.type];
+            return colorMap[(d.type).toLowerCase()]; 
 
 
         })
@@ -1799,9 +1852,7 @@ function createChart(links) {
         .on("click", function (event, d) {
             interaction_source = d.source.Drug_ID;
             interaction_target = d.target.id;
-            // console.log(interaction_source);
-            // console.log(interaction_target);
-            //console.log(d.type);
+       
             showDialog_Links(d.type, d.type);
             //showDialog_Interaction(d.id, d.id);
         });
@@ -1842,13 +1893,11 @@ function createChart(links) {
             var uniqueSources = new Set();
             link.filter(function (templink) {
               if (templink.target.id === d.id) {
-                console.log(templink.target.id, ' target');
                 uniqueSources.add(templink.source.id);
 
               }
             });
             var child_size = Array.from(uniqueSources).length;
-            console.log('Unique Sources:', Array.from(uniqueSources), child_size);
             if (child_size > 25) {
               return 30
             }
@@ -1860,12 +1909,12 @@ function createChart(links) {
             return proteinColorMap[d.Protein_Class] || "steelblue";
         })
         .on("click", function (event, d) {
-            //console.log(d.id);
             showDialog_Child(d.id, d.id);
         });
 
     node.filter(function (d) {
-        return d.child_type === 'disease_type' && !d.isParent && d.disease_phase !== 1;
+        // change1
+        return d.child_type === 'disease_type' && !d.isParent && d.disease_phase !== 1 && d.DiseaseClass;
     })
         .append("path")
         .attr("d", "M 0 0 L 8 16 L -8 16 Z") // Path data for a triangle
@@ -1896,7 +1945,7 @@ function createChart(links) {
         .attr("width", 30)
         .attr("height", 30)
         .on("click", function (event, d) {
-            //console.log(d.id);
+       
             showDialog(d.id, d.id);
         });
 
@@ -1926,39 +1975,37 @@ function createChart(links) {
         .attr("dx", 10)
         .attr("dy", ".25em")
         .text(function (d) {
-            return d.id;
+            return d.genename;
         })
         .attr("class", "node-label");
     // tag4
+
     simulation.on("tick", function () {
         link
             .attr("x1", function (d) {
-                return d.source.x;
+                return Math.max(0, Math.min(svgWidth, d.source.x));
             })
             .attr("y1", function (d) {
-                return d.source.y;
+                return Math.max(0, Math.min(svgHeight, d.source.y));
             })
             .attr("x2", function (d) {
-                return d.target.x;
+                return Math.max(0, Math.min(svgWidth, d.target.x));
             })
             .attr("y2", function (d) {
                 if (d.target.child_type === "disease_type") {
-                    return d.target.y + 8;
-
+                    return Math.max(0, Math.min(svgHeight, d.target.y)) + 8;
                 } else {
-
-                    return d.target.y
+                    return Math.max(0, Math.min(svgHeight, d.target.y));
                 }
             });
-
+    
         node.attr("transform", function (d) {
-            return "translate(" + d.x + "," + d.y + ")";
+            return `translate(${Math.max(0, Math.min(svgWidth, d.x))},${Math.max(0, Math.min(svgHeight, d.y))})`;
         });
     });
 
     // Enable drag behavior for nodes
     function drag(simulation) {
-        // console.log("Setting up drag behavior..."); 
         function dragStarted(event, d) {
             if (!event.active) simulation.alphaTarget(0.3).restart();
             d.fx = d.x;
@@ -1983,7 +2030,6 @@ function createChart(links) {
 
     // Button click handlers
     d3.select(".zoom-in-btn").on("click", function () {
-        //console.log("Zoom in called");
         zoom.scaleBy(svg.transition().duration(750), 1.1);  // scale up by 10%
     });
 
@@ -1997,6 +2043,12 @@ function createChart(links) {
     $("#loading").hide();
     //$("#loading").hide();
     updateChartVisibility();
+    createLegend();
+    createLegend_status();
+    createLegend_drugType();
+    createProteinsLegend();
+    createDiseaseLegend();
+
 }
 
 // Update the chart visibility based on the threshold value
@@ -2199,12 +2251,11 @@ function createLegend() {
 
     var legendContent2 = d3.select("#legend-content_disease");
 
-    // change4 copy this line 
     var legendContent3 = d3.select("#trial_to_hide");
     //console.log("interaction legend",legendContent);
     //console.log("disease legend",legendContent2);
 
-    // change1 
+    
 
     var uniqueInteractions = [];
 
@@ -2214,15 +2265,13 @@ function createLegend() {
         interactions.includes(
           interaction.charAt(0).toUpperCase() + interaction.slice(1)
         ) &&
-        // change2 has to includes  
         !uniqueInteractions.includes(interaction)
       ) {
-        if (["phase1", "phase2", "phase3", "phase4"].includes(interaction)) {
+        if (["Phase1", "Phase2", "Phase3", "Phase4"].includes(interaction)) {
           createLegendItem(interaction, getColor(interaction), legendContent2);
         } else {
           createLegendItem(interaction, getColor(interaction), legendContent);
         }
-        // change3 add to includes 
         uniqueInteractions.push(interaction);
       }
     });
@@ -2239,7 +2288,7 @@ function createLegend() {
           d3.select(this).classed("selected-legend1", true);
         });
         //console.log("legendItem", legendItem);
-      var phases = ["phase1", "phase2", "phase3", "phase4"];
+      var phases = ["Phase1", "Phase2", "Phase3", "Phase4"];
       var dropdown = legendItem
         .append("div")
         .attr("class", "dropdown1")
@@ -2297,7 +2346,7 @@ function createLegend() {
                 var selectedColor = getColor(selectedInteraction);
                 var selectedLegendItem = d3.select(".selected-legend1");
                 //console.log(selectedLegendItem, "selectedLegendItem");
-                colorMap[interaction.toLowerCase()] = selectedColor;
+                colorMap[interaction] = selectedColor;
 
                 if(phases.includes(interaction)){
 
@@ -2330,14 +2379,13 @@ function createLegend() {
         .text(interaction);
 
     if (
-        uniqueInteractions.includes("phase1") ||
-        uniqueInteractions.includes("phase2") ||
-        uniqueInteractions.includes("phase3") ||
-        uniqueInteractions.includes("phase4")
+        uniqueInteractions.includes("Phase1") ||
+        uniqueInteractions.includes("Phase2") ||
+        uniqueInteractions.includes("Phase3") ||
+        uniqueInteractions.includes("Phase4")
         ) {
 
-        console.log(uniqueInteractions, ' here are unique interaction ')
-        console.log("check")
+    
         legendContent3.style("display", "block");
         }
         else {
@@ -2350,7 +2398,7 @@ function createLegend() {
       // and the "hiddenInteractions" object to track the visibility of interactions.
       legendText.on("click", function () {
         var clickedText = d3.select(this);
-        var interaction = clickedText.text().toLowerCase();
+        var interaction = clickedText.text();
 
         if (clickedText.classed("text-through")) {
           clickedText.classed("text-through", false);
@@ -2719,8 +2767,7 @@ let DiseaseColorMap = {
 
 
         if (diseases.some(disease => uniqueDisease.has(disease))) {
-          console.log(uniqueDisease, ' here are unique interactions');
-          console.log("check");
+      
           legendContent4.style("display", "block");
         } else {
           legendContent4.style("display", "none");
