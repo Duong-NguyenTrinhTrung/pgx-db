@@ -4,17 +4,21 @@ $(function () {
     });
 });
 //Pass jsonFiles Here
-// var json_GeneralFile = "/static/json-sample/json_GeneralFile.json";
-// var json_drugData = "/static/json-sample/json_drugData.json";
-// var json_proteinData = "/static/json-sample/json_proteinData.json";
-// var json_interactionData = "/static/json-sample/json_interactionData.json"
 
-// alert("is this new code????");
 
-var json_GeneralFile = "";
-var json_drugData = "";
-var json_proteinData = "";
-var json_interactionData = "";
+// var json_GeneralFile = "json/json_GeneralFile.json";
+// var json_GeneralFile = "json/json3.json";
+// var json_drugData = "json/json_drugData.json";
+// var json_proteinData = "json/json_proteinData.json";
+// var json_interactionData = "json/json_interactionData.json";
+
+
+var json_GeneralFile = "/static/json-sample/json_GeneralFile.json";
+var json_drugData = "/static/json-sample/json_drugData.json";
+var json_proteinData = "/static/json-sample/json_proteinData.json";
+var json_interactionData = "/static/json-sample/json_interactionData.json"
+
+
 
 if (drug_bank_ids) {
     json_GeneralFile = "/drugs-network/general-data?drug_bank_ids=" + drug_bank_ids.join(',');
@@ -31,11 +35,7 @@ if (drug_bank_id) {
 }
 
 $("#loading").show();
-//console.log("json_GeneralFile ", json_GeneralFile);
-//***console.log("json_drugData "+json_drugData);
-//***console.log("json_proteinData "+json_proteinData);
-//***console.log("json_interactionData "+json_interactionData);
-//***console.log("Saad");
+
 let drug_xlsxData;
 let protein_xlsxData;
 let interaction_xlsxData;
@@ -116,6 +116,7 @@ function readInteractionJSON() {
 
 window.onload = function () {
     readDrugJSON();
+    // processData();
     //getDrugJsonData(drugBankId);
 };
 
@@ -1395,14 +1396,25 @@ var currentFilters;
 var interaction_source = "";
 var interaction_target = "";
 
+// var imagePaths11 = {
+//     Nutraceutical: "/static/d3/images/capsules/left0.png",
+//     Experimental: "/static/d3/images/capsules/left1.png",
+//     Investigational: "/static/d3/images/capsules/left2.png",
+//     Approved: "/static/d3/images/capsules/left3.png",
+//     'Vet-approved': "/static/d3/images/capsules/left4.png",
+//     Illicit: "/static/d3/images/capsules/left5.png"
+// };
+
+
 var imagePaths11 = {
-    Nutraceutical: "/static/d3/images/capsules/left0.png",
-    Experimental: "/static/d3/images/capsules/left1.png",
-    Investigational: "/static/d3/images/capsules/left2.png",
-    Approved: "/static/d3/images/capsules/left3.png",
-    'Vet-approved': "/static/d3/images/capsules/left4.png",
-    Illicit: "/static/d3/images/capsules/left5.png"
-};
+    Nutraceutical: "images/left0.png",
+    Experimental: "images/left1.png",
+    Investigational: "images/left2.png",
+    Approved: "images/left3.png",
+    "Vet-approved": "images/left4.png",
+    Illicit: "images/left5.png",
+  };
+
 
 var colorOptions = ["#e71f73", "#d5a100", "#0a5517", "#061755", "#941a4c", "#3d3d3d"];
 
@@ -1510,13 +1522,17 @@ function processData() {
                 var protein = row.protein;
                 var genename = row.gene_name;
                 var interaction = row.interaction_type;
+                // var interaction = row.interaction;
+                
                 var disease_interaction;
                 if (row.Phase !== 1) {
                   disease_interaction = "phase" + row.Phase;
                 }
                 else {
-                  disease_interaction = "temp"
+                  disease_interaction = "temp";
                 }
+
+
                 //console.log("row.interaction = " + row.interaction_type);
                 //var drugStatus = row.Drug_status; // Get the "Drug_status" value
                 var drugStatus = clinicalStatusMap[row.Drug_status];
@@ -1703,50 +1719,51 @@ function createChart(links) {
     var distanceBetweenNodes = 60;
     var noOfTotalNodes11 = links.length;
 
-    // console.log("HHHHHHHH" + noOfTotalNodes11);
-
-    // if (noOfTotalNodes11 < 100) {
-    //     chargeStrength = -100
-    //     var distanceBetweenNodes = 60;
-    // } else if (noOfTotalNodes11 > 99 && noOfTotalNodes11 < 200) {
-    //     chargeStrength = -100
-    //     var distanceBetweenNodes = 60;
-    // } else if (noOfTotalNodes11 > 199 && noOfTotalNodes11 < 250) {
-    //     chargeStrength = -100
-    //     var distanceBetweenNodes = 60;
-    // } else if (noOfTotalNodes11 > 249 && noOfTotalNodes11 < 300) {
-    //     chargeStrength = -100
-    //     var distanceBetweenNodes = 60;
-    // } else if (noOfTotalNodes11 > 299 && noOfTotalNodes11 < 350) {
-    //     chargeStrength = -100
-    //     var distanceBetweenNodes = 60;
-    // } else if (noOfTotalNodes11 > 349 && noOfTotalNodes11 < 400) {
-    //     chargeStrength = -100
-    //     var distanceBetweenNodes = 60;
-    // } else if (noOfTotalNodes11 > 399) {
-    //     chargeStrength = -100
-    //     var distanceBetweenNodes = 60;
-    // }
 
     if (noOfTotalNodes11 < 100) {
         chargeStrength = -650;
+      
         var distanceBetweenNodes = 200;
       } else if (noOfTotalNodes11 > 99 && noOfTotalNodes11 < 200) {
+        
         chargeStrength = -150;
         var distanceBetweenNodes = 100;
       } else if (noOfTotalNodes11 > 199 && noOfTotalNodes11 < 250) {
+        
+       
         chargeStrength = -150;
         var distanceBetweenNodes = 100;
       } else if (noOfTotalNodes11 > 249 && noOfTotalNodes11 < 300) {
+        
+      
         chargeStrength = -100;
         var distanceBetweenNodes = 80;
       } else if (noOfTotalNodes11 > 299 && noOfTotalNodes11 < 350) {
+        
+       
         chargeStrength = -100;
         var distanceBetweenNodes = 80;
+        // change2 
       } else if (noOfTotalNodes11 > 349 && noOfTotalNodes11 < 400) {
+        
+        console.log("check6")
         chargeStrength = -100;
         var distanceBetweenNodes = 60;
-      } else if (noOfTotalNodes11 > 399) {
+      } else if (noOfTotalNodes11 > 399 && noOfTotalNodes11 < 999 ) {
+        
+        console.log("check8" , noOfTotalNodes11)
+        chargeStrength = -550;
+        var distanceBetweenNodes = 100;
+      }else if (noOfTotalNodes11 > 1000 && noOfTotalNodes11 < 2999 ) {
+        
+        console.log("check9" , noOfTotalNodes11)
+        chargeStrength = -600;
+        var distanceBetweenNodes = 100;
+      }
+       else if (noOfTotalNodes11 > 3000) {
+        
+        console.log("check10" , noOfTotalNodes11)
+        chargeStrength = -300;
         var distanceBetweenNodes = 60;
       }
 
@@ -1776,7 +1793,6 @@ function createChart(links) {
             });
         });
 
-    //console.log("Creating nodes and links...");
     link = svg
         .selectAll(".link")
         .data(links)
@@ -1799,9 +1815,7 @@ function createChart(links) {
         .on("click", function (event, d) {
             interaction_source = d.source.Drug_ID;
             interaction_target = d.target.id;
-            // console.log(interaction_source);
-            // console.log(interaction_target);
-            //console.log(d.type);
+       
             showDialog_Links(d.type, d.type);
             //showDialog_Interaction(d.id, d.id);
         });
@@ -1842,13 +1856,11 @@ function createChart(links) {
             var uniqueSources = new Set();
             link.filter(function (templink) {
               if (templink.target.id === d.id) {
-                //console.log(templink.target.id, ' target');
                 uniqueSources.add(templink.source.id);
 
               }
             });
             var child_size = Array.from(uniqueSources).length;
-            //console.log('Unique Sources:', Array.from(uniqueSources), child_size);
             if (child_size > 25) {
               return 30
             }
@@ -1860,12 +1872,12 @@ function createChart(links) {
             return proteinColorMap[d.Protein_Class] || "steelblue";
         })
         .on("click", function (event, d) {
-            //console.log(d.id);
             showDialog_Child(d.id, d.id);
         });
 
     node.filter(function (d) {
-        return d.child_type === 'disease_type' && !d.isParent && d.disease_phase !== 1;
+        // change1
+        return d.child_type === 'disease_type' && !d.isParent && d.disease_phase !== 1 && d.DiseaseClass;
     })
         .append("path")
         .attr("d", "M 0 0 L 8 16 L -8 16 Z") // Path data for a triangle
@@ -1896,7 +1908,7 @@ function createChart(links) {
         .attr("width", 30)
         .attr("height", 30)
         .on("click", function (event, d) {
-            //console.log(d.id);
+       
             showDialog(d.id, d.id);
         });
 
@@ -1958,7 +1970,6 @@ function createChart(links) {
 
     // Enable drag behavior for nodes
     function drag(simulation) {
-        // console.log("Setting up drag behavior..."); 
         function dragStarted(event, d) {
             if (!event.active) simulation.alphaTarget(0.3).restart();
             d.fx = d.x;
@@ -1983,7 +1994,6 @@ function createChart(links) {
 
     // Button click handlers
     d3.select(".zoom-in-btn").on("click", function () {
-        //console.log("Zoom in called");
         zoom.scaleBy(svg.transition().duration(750), 1.1);  // scale up by 10%
     });
 
@@ -2198,9 +2208,14 @@ function createLegend() {
     var legendContent = d3.select("#legend-content");
 
     var legendContent2 = d3.select("#legend-content_disease");
+
+    var legendContent3 = d3.select("#trial_to_hide");
     //console.log("interaction legend",legendContent);
     //console.log("disease legend",legendContent2);
-    var uniqueInteractions = new Set();
+
+    
+
+    var uniqueInteractions = [];
 
     links.forEach(function (link) {
       var interaction = link.type; // No need to convert to lowercase
@@ -2208,14 +2223,14 @@ function createLegend() {
         interactions.includes(
           interaction.charAt(0).toUpperCase() + interaction.slice(1)
         ) &&
-        !uniqueInteractions.has(interaction)
+        !uniqueInteractions.includes(interaction)
       ) {
         if (["phase1", "phase2", "phase3", "phase4"].includes(interaction)) {
           createLegendItem(interaction, getColor(interaction), legendContent2);
         } else {
           createLegendItem(interaction, getColor(interaction), legendContent);
         }
-        uniqueInteractions.add(interaction);
+        uniqueInteractions.push(interaction);
       }
     });
     //console.log("unique Interactions", uniqueInteractions);
@@ -2328,8 +2343,7 @@ function createLegend() {
         uniqueInteractions.includes("phase4")
         ) {
 
-        //console.log(uniqueInteractions, ' here are unique interaction ')
-        //console.log("check")
+    
         legendContent3.style("display", "block");
         }
         else {
@@ -2711,8 +2725,7 @@ let DiseaseColorMap = {
 
 
         if (diseases.some(disease => uniqueDisease.has(disease))) {
-          //console.log(uniqueDisease, ' here are unique interactions');
-          //console.log("check");
+      
           legendContent4.style("display", "block");
         } else {
           legendContent4.style("display", "none");
@@ -2720,17 +2733,17 @@ let DiseaseColorMap = {
         }
   }
 
-var legendContent4 = d3.select("#Disease_to_hide");
+// var legendContent4 = d3.select("#Disease_to_hide");
 
 
-        if (diseases.some(disease => uniqueDisease.has(disease))) {
-          //console.log(uniqueDisease, ' here are unique interactions');
-          //console.log("check");
-          legendContent4.style("display", "block");
-        } else {
-          legendContent4.style("display", "none");
-          // Set display to "block" or any other desired value
-        }
+//         if (diseases.some(disease => uniqueDisease.has(disease))) {
+//           console.log(uniqueDisease, ' here are unique interactions');
+//           console.log("check");
+//           legendContent4.style("display", "block");
+//         } else {
+//           legendContent4.style("display", "none");
+//           // Set display to "block" or any other desired value
+//         }
 
 // Call the function to create the legend
 function createLegend_status() {

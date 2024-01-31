@@ -221,7 +221,7 @@
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
               <li role="presentation" class="active"><a href="#tab_network_statistics" aria-controls="tab_network_statistics" role="tab" data-toggle="tab">Network statistics</a></li>
-              <li role="presentation"><a href="#tab_network_visualization" aria-controls="tab_network_visualization" role="tab" data-toggle="tab">Network visualization</a></li>
+              <li role="presentation"><a href="#tab_network_visualization" onclick="clickCheck()" aria-controls="tab_network_visualization" role="tab" data-toggle="tab">Network visualization</a></li>
               <li role="presentation"><a href="#tab_network_comparison" aria-controls="tab_network_comparison" role="tab" data-toggle="tab">Network comparison</a></li>
               <li role="presentation"><a href="#tab_network_pgx" aria-controls="tab_network_pgx" role="tab" data-toggle="tab">Network pharmacogenomics</a></li>
             </ul>
@@ -315,17 +315,34 @@
 
 {% block addon_js %}
 
+
+
 <script src="{% static 'home/js/d3.v7.min.js' %}"></script>
 <script src="{% static 'drug/js/target_table_statistics.js' %}"></script>
 <script src="{% static 'drug/js/atc_network_statistics.js' %}"></script>
 <script src="{% static 'drug/js/atc_network_comparison.js' %}"></script>
-
+<!-- <script src="{% static 'drug/js/drug_network.js' %}"></script> -->
 <script src="{% static 'home/js/datatables.min.js' %}"></script>
 <script src="{% static 'home/js/bootstrap2-toggle.min.js' %}"></script>
 <script src="{% static 'home/js/jquery.dataTables.yadcf.js' %}"></script>
 <script src="{% static 'home/js/dataTables.buttons.min.js' %}"></script>
 
+<!-- <script>
+    function clickCheck(){
+        alert("network visualization is clicked");
+        if(!flag_tabclicked ){
+            flag_tabclicked = true ; 
+             if(flag_processData ){
+                
+        console.log('chart is created on clicked ');
+              createChart(links);
+             }
+          }
+    }
+</script> -->
+
 <script>
+
     // JavaScript for toggling the visibility of nested lists
     document.querySelectorAll('.tree .desc').forEach(function (el) {
         el.addEventListener('click', function () {
@@ -574,10 +591,11 @@
             tableHtml += '</tbody></table>';
             var verb = "";
             if (associations.length == 1) {
-                right_panel_text.innerHTML = "Drug '" + associations[0].name + "' and " + response.total_interaction + " proteins are in the network associated with " + response.atc_code;
+                right_panel_text.innerHTML = "Drug '" + associations[0].name + "', " + response.total_interaction + "proteins and "+ response.total_interaction + " interactions are in the network associated with " + response.atc_code;
             } else {
                 right_panel_text.innerHTML = "There are " + associations.length + " drugs, " + response.no_of_interacted_protein + " proteins, " + response.total_interaction + " interactions in the network associated with " + response.atc_code;
             }
+
             var atc_url = "{% url 'drugs_network' %}" + "?drug_bank_ids=" + drug_bank_ids.toString();
             right_panel_text_guide.style.fontWeight = "italic";
             right_panel_text_guide.style.display = "block";
