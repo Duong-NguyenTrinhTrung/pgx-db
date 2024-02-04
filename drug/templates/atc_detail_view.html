@@ -221,9 +221,9 @@
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
               <li role="presentation" class="active"><a href="#tab_network_statistics" aria-controls="tab_network_statistics" role="tab" data-toggle="tab">Network statistics</a></li>
-              <li role="presentation"><a href="#tab_network_visualization" onclick="clickCheck()" aria-controls="tab_network_visualization" role="tab" data-toggle="tab">Network visualization</a></li>
-              <li role="presentation"><a href="#tab_network_comparison" aria-controls="tab_network_comparison" role="tab" data-toggle="tab">Network comparison</a></li>
-              <li role="presentation"><a href="#tab_network_pgx" aria-controls="tab_network_pgx" role="tab" data-toggle="tab">Network pharmacogenomics</a></li>
+              <li role="presentation"><a href="#tab_network_visualization" onclick="network_visual_tab_clicked()" aria-controls="tab_network_visualization" role="tab" data-toggle="tab">Network visualization</a></li>
+              <li role="presentation"><a href="#tab_network_comparison" onclick="network_comparison_tab_clicked()" aria-controls="tab_network_comparison" role="tab" data-toggle="tab">Network comparison</a></li>
+              <li role="presentation"><a href="#tab_network_pgx" onclick="network_pgx_tab_clicked()" aria-controls="tab_network_pgx" role="tab" data-toggle="tab">Network pharmacogenomics</a></li>
             </ul>
           
             <!-- Tab panes -->
@@ -328,7 +328,7 @@
 <script src="{% static 'home/js/dataTables.buttons.min.js' %}"></script>
 
 <!-- <script>
-    function clickCheck(){
+    function network_visual_tab_clicked(){
         alert("network visualization is clicked");
         if(!flag_tabclicked ){
             flag_tabclicked = true ; 
@@ -340,6 +340,22 @@
           }
     }
 </script> -->
+
+<script>
+    // var isNetworkPGxTabClicked = false;
+    function network_pgx_tab_clicked()
+    {
+        if (!hasPGxData){
+            var d = document.getElementById('tab_network_pgx');
+            var paragraph = document.createElement('p');
+            paragraph.textContent = 'There is no pharmacogenomics data associated with drugs and genes (proteins) this ATC code!';
+            paragraph.style.color = '#c1121f'; 
+            paragraph.style.fontStyle = 'italic'; 
+            d.appendChild(document.createElement('br'));
+            d.appendChild(paragraph);
+        }
+    }
+</script>
 
 <script>
 
