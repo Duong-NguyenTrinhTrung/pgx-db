@@ -371,7 +371,6 @@
                     console.log(response);
                     var dataAtcCode = response.atc_code;
                     var dataAtcComparison = response.atc_comparison;
-                    alert("calculatePathLength");
                     calculatePathLength(dataAtcCode, "atc_code_box", `${compareText} for <span style="color: #3498db">${atc_code}</span>`);
                     calculatePathLength(dataAtcComparison, "atc_comparison_box", `${compareText} for <span style="color: #3498db">${atc_comparison}</span>`);
                 },

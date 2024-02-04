@@ -57,12 +57,13 @@ function createBarChartForATCDiseaseClass(disease_classes, disease_class_count)
     group
     .append('g')
     .attr('transform', `translate(0 ${height})`)
-    .call(xAxis);
+    .call(xAxis)
+    .style('font-size', '19px');
     
     group
     .append('g')
     .call(yAxis)
-    .style('font-size', '19px');
+    .style('font-size', '17px');
     
     // include a group element for each data point, to nest connected elements
     const groups = group

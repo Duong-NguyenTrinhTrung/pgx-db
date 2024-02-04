@@ -58,6 +58,7 @@
 
 {% block addon_js %}
 <script>
+    var hasPGxData = true;
     function getHeaderContent(element) {
         var content = "";
         element.childNodes.forEach(function (value) {
@@ -510,6 +511,14 @@
                                                 geneBasedRadio.checked = false;
                                                 geneBasedRadio.disabled = true;
                                                 render_variant_based_burden_data(burden_response);
+                                            }
+                                            else{
+                                                //alert("isNetworkPGxTabClicked ="+isNetworkPGxTabClicked+"*");
+                                                //if (isNetworkPGxTabClicked)
+                                                //{   
+                                                //    alert("There is no PGx data");
+                                                //}
+                                                hasPGxData = false
                                             }
                                         },
                                         error: function (xhr, status, error) {

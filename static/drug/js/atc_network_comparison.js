@@ -138,7 +138,8 @@ function createDistributionPlot(data, data_all, elementID, text)
     .append('g')
     .attr('class', 'axis x-axis')
     .attr('transform', `translate(0 ${height})`)
-    .call(xAxis);
+    .call(xAxis)
+    .attr('font-size', '17px');
 }
 
 function createDistributionPlotForCategoryData(classes, class_count, elementID, text)
@@ -207,7 +208,8 @@ function createDistributionPlotForCategoryData(classes, class_count, elementID, 
     group
     .append('g')
     .attr('transform', `translate(0 ${height})`)
-    .call(xAxis);
+    .call(xAxis)
+    .style('font-size', '17px');
     
     group
     .append('g')
