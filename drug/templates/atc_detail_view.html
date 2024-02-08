@@ -201,9 +201,11 @@
             border-radius: 4px;
             box-shadow: 0 0 10px #c1c1c1;
     }
+
+    #commonUniqueNodesTable tr{
+        border-bottom: 1px solid #ccc; 
+    }
    
-
-
 </style>
 
 {% endblock %}
@@ -220,16 +222,15 @@
 
             <!-- Nav tabs -->
             <ul class="nav nav-tabs" role="tablist">
-              <li role="presentation" class="active"><a href="#tab_network_statistics" aria-controls="tab_network_statistics" role="tab" data-toggle="tab">Network statistics</a></li>
-              <li role="presentation"><a href="#tab_network_visualization" onclick="network_visual_tab_clicked()" aria-controls="tab_network_visualization" role="tab" data-toggle="tab">Network visualization</a></li>
+              <li role="presentation" class="active"><a href="#tab_network_visualization" onclick="network_visual_tab_clicked()" aria-controls="tab_network_visualization" role="tab" data-toggle="tab">Network visualization</a></li>
+              <li role="presentation"><a href="#tab_network_statistics" aria-controls="tab_network_statistics" role="tab" data-toggle="tab">Network statistics</a></li>
               <li role="presentation"><a href="#tab_network_comparison" onclick="network_comparison_tab_clicked()" aria-controls="tab_network_comparison" role="tab" data-toggle="tab">Network comparison</a></li>
               <li role="presentation"><a href="#tab_network_pgx" onclick="network_pgx_tab_clicked()" aria-controls="tab_network_pgx" role="tab" data-toggle="tab">Network pharmacogenomics</a></li>
             </ul>
           
             <!-- Tab panes -->
             <div class="tab-content">
-                {% include "network_statistics_tab.html" %}
-                <div role="tabpanel" class="tab-pane" id="tab_network_visualization">
+                <div role="tabpanel" class="tab-pane active" id="tab_network_visualization">
                     <!-- block for showing network -->
                     <div class="forcenetworkgraph" id="graphvisibility"
                     style="display: none; width: 100%; margin: 10px 0; height: 1300px; ">
@@ -244,7 +245,7 @@
                     </div>
                 </div>
                 
-              
+              {% include "network_statistics_tab.html" %}
               {% include "network_comparison_tab.html" %}
               {% include "network_pgx_tab.html" %}
             </div>
@@ -327,19 +328,12 @@
 <script src="{% static 'home/js/jquery.dataTables.yadcf.js' %}"></script>
 <script src="{% static 'home/js/dataTables.buttons.min.js' %}"></script>
 
-<!-- <script>
+<script>
     function network_visual_tab_clicked(){
-        alert("network visualization is clicked");
-        if(!flag_tabclicked ){
-            flag_tabclicked = true ; 
-             if(flag_processData ){
-                
-        console.log('chart is created on clicked ');
-              createChart(links);
-             }
-          }
+        // alert("network visualization is clicked");
+        // draw_atc_level_network(button, response);
     }
-</script> -->
+</script>
 
 <script>
     // var isNetworkPGxTabClicked = false;
@@ -354,6 +348,20 @@
             d.appendChild(document.createElement('br'));
             d.appendChild(paragraph);
         }
+    }
+
+    function network_comparison_tab_clicked(){
+        alert("network_comparison_tab_clicked");
+        const e1 = $("#result-compare-area-text");
+        e1.html("");
+        const e2 = $("#result-compare-table");
+        e2.html("");
+        const e3 = $("#atc_code_box");
+        e3.html("");
+        const e4 = $("#atc_comparison_box");
+        e4.html("");
+        const e5 = $("#atc_comparison");
+        e5.val("");
     }
 </script>
 
@@ -696,9 +704,9 @@
                         console.log("showATCLevelNetwork: " + $("#tabs_network").attr("data-atc-code") + "; response.atc_code: " + response.atc_code);
                         if (response.associations.length>0)
                         {
+                            draw_atc_level_network(button, response);
                             showAtcLevelNetworkStatistics2(response.atc_code);
                             showPGxTable(response.atc_code);
-                            draw_atc_level_network(button, response);
                         }
                     },
                     error: function (xhr, status, error) {

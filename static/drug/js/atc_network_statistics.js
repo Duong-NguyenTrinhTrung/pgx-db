@@ -32,10 +32,11 @@ function createBarChartForATCDiseaseClass(disease_classes, disease_class_count)
     .attr('transform', `translate(${margin.left} -${margin.top})`);
     
     // describe a quantitative scale for the x axis, for the racers' points
-    const xScale = d3
-    .scaleLinear()
+    
+    const xScale = d3.scaleLinear()
     .domain([0, d3.max(data, ({ value }) => value)])
     .range([0, width]);
+
     
     // describe a qualitative scale for the y axis, for the racers' names
     const yScale = d3
@@ -46,10 +47,13 @@ function createBarChartForATCDiseaseClass(disease_classes, disease_class_count)
     // 0.2 means 20% is dedicated to white space around the band
     .padding(0.2);
     
-    
-    // add axes describing the values
-    const xAxis = d3
-    .axisBottom(xScale);
+    const maxValue = d3.max(data, ({ value }) => value);
+    const integerTicks = d3.range(0, maxValue + 1); // +1 to include the maxValue itself
+
+    const xAxis = d3.axisBottom(xScale)
+    .tickValues(integerTicks) // Use the generated array of integers for tick values
+    .tickFormat(d3.format('d')); // Ensure the format is set to integers
+
     
     const yAxis = d3
     .axisLeft(yScale);
@@ -87,6 +91,10 @@ function createBarChartForATCDiseaseClass(disease_classes, disease_class_count)
 
 //------------------------
 function createPieChartForATCClinicalTrialPhase(data) {
+    const totalSum = data.reduce((accumulator, currentItem) => {
+        return accumulator + currentItem.value;
+      }, 0); // 0 is the initial value of the accumulator
+      
     const container = document.getElementById("chart-container-ATC-interaction-type");
     const containerWidth =  300;//container.clientWidth;
     const containerHeight = 300; //container.clientHeight;
@@ -137,7 +145,8 @@ function createPieChartForATCClinicalTrialPhase(data) {
                 .duration(200)
                 .attr("d", newArc);
 
-            const tooltipText = `${d.data.category}: ${d.data.value}`;
+            const percent = parseFloat((d.data.value * 100 / totalSum).toFixed(2));
+            const tooltipText = `${d.data.category}: ${d.data.value} (${percent}%)`;
             tooltip.transition()
                 .duration(200)
                 .style("opacity", 0.9);
@@ -162,6 +171,9 @@ function createPieChartForATCClinicalTrialPhase(data) {
 
 //-----------------------------------------------
 function createPieChartForATCTargetType(data) {
+    const totalSum = data.reduce((accumulator, currentItem) => {
+        return accumulator + currentItem.value;
+      }, 0); // 0 is the initial value of the accumulator
     const container = document.getElementById("chart-container-ATC-interaction-type");
     const containerWidth =  300;//container.clientWidth;
     const containerHeight = 300; //container.clientHeight;
@@ -212,7 +224,8 @@ function createPieChartForATCTargetType(data) {
                 .duration(200)
                 .attr("d", newArc);
 
-            const tooltipText = `${d.data.category}: ${d.data.value}`;
+            const percent = parseFloat((d.data.value * 100 / totalSum).toFixed(2));
+            const tooltipText = `${d.data.category}: ${d.data.value} (${percent}%)`;
             tooltip.transition()
                 .duration(200)
                 .style("opacity", 0.9);
@@ -238,6 +251,9 @@ function createPieChartForATCTargetType(data) {
 
 // ----------------------- 
 function createPieChartForATCDrugStatus(data) {
+    const totalSum = data.reduce((accumulator, currentItem) => {
+        return accumulator + currentItem.value;
+      }, 0); // 0 is the initial value of the accumulator
     const container = document.getElementById("chart-container-ATC-drug-status");
     const containerWidth =  300;//container.clientWidth;
     const containerHeight = 300; //container.clientHeight;
@@ -287,7 +303,8 @@ function createPieChartForATCDrugStatus(data) {
                 .duration(200)
                 .attr("d", newArc);
 
-            const tooltipText = `${d.data.category}: ${d.data.value}`;
+            const percent = parseFloat((d.data.value * 100 / totalSum).toFixed(2));
+            const tooltipText = `${d.data.category}: ${d.data.value} (${percent}%)`;
             tooltip.transition()
                 .duration(200)
                 .style("opacity", 0.9);
@@ -313,6 +330,9 @@ function createPieChartForATCDrugStatus(data) {
 
 // ----------------------- 
 function createPieChartForATCDrugType(data) {
+    const totalSum = data.reduce((accumulator, currentItem) => {
+        return accumulator + currentItem.value;
+      }, 0); // 0 is the initial value of the accumulator
     const container = document.getElementById("chart-container-ATC-drug-type");
     const containerWidth =  300;//container.clientWidth;
     const containerHeight = 300; //container.clientHeight;
@@ -361,8 +381,8 @@ function createPieChartForATCDrugType(data) {
                 .transition()
                 .duration(200)
                 .attr("d", newArc);
-
-            const tooltipText = `${d.data.category}: ${d.data.value}`;
+            const percent = parseFloat((d.data.value * 100 / totalSum).toFixed(2));
+            const tooltipText = `${d.data.category}: ${d.data.value} (${percent}%)`;
             tooltip.transition()
                 .duration(200)
                 .style("opacity", 0.9);

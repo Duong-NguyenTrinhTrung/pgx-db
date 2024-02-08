@@ -1,6 +1,8 @@
 {% load static %}
 {% csrf_token %}
 
+
+
 <div role="tabpanel" class="tab-pane" id="tab_network_comparison">
 
     <div style="display: flex; flex-direction: row; gap: 20px; margin-top: 15px;">
@@ -51,9 +53,8 @@
 
         </div>
     </div>
-
     <div id="result-compare-area" style="margin-top: 30px; display: flex; flex-direction: column; align-items: center;">
-        <h4 id="result-compare-area-text"></h4>
+        <div id="result-compare-area-text"></div>
         <table id="result-compare-table">
         </table>
         <div id="result-compare-box" style="display: flex; margin-top: 20px; width: 100%;">
@@ -243,6 +244,8 @@
                     var dataAtcCode = response.atc_code.distribution;
                     var dataAtcComparison = response.atc_comparison.distribution;
                     var dataAll = response.both.distribution;
+                    console.log("dataAtcCode "+dataAtcCode);
+                    console.log("dataAtcComparison "+dataAtcComparison);
                     createDistributionPlot(dataAtcCode, dataAll, "atc_code_box", `${compareText} <br><br>ATC code: <span style="color: #3498db">${atc_code}</span>`);
                     createDistributionPlot(dataAtcComparison, dataAll, "atc_comparison_box", `${compareText} <br><br>ATC code: <span style="color: #3498db">${atc_comparison}</span>`);
                 },
@@ -404,7 +407,7 @@
                 success: function (response) {
                     console.log(response);
                     var data = response;
-                    commonAndUniqueNodes(data,`${compareText} <br> for <span style="color: #3498db">${atc_code}</span> and <span style="color: #3498db">${atc_comparison}</span>`);
+                    commonAndUniqueNodes(data,`${compareText} for <span style="color: #3498db">${atc_code}</span> and <span style="color: #3498db">${atc_comparison}</span>`);
                 },
             error: function (xhr, status, error) {
                 console.log('AJAX Error:', error);

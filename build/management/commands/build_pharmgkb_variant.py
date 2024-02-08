@@ -11,6 +11,7 @@ import logging
 import csv
 import os
 import pandas as pd
+import numpy as np
 
 
 class Command(BaseCommand):
@@ -54,6 +55,21 @@ class Command(BaseCommand):
             self.logger.warning(
                 "Pharmgkb mod not found: nothing to delete.")
 
+    def convert(self, s):
+        # print(s, " ", type(s))
+        if not (isinstance(s, float)):
+            sign = s.split()[0]
+            if sign=="=":
+                return float(s.split()[1])
+            else:
+                if sign==">":
+                    return float(s.split()[1]) + 0.00001
+                else:
+                    return float(s.split()[1]) - 0.00001
+        else:
+            return None
+        
+        
 
     def create_pharmgkb_data(self, filenames=False):
         print("checkpoint 1.4 start of create_pharmgkb_data function ")
@@ -91,6 +107,7 @@ class Command(BaseCommand):
                 Sentence = data[index: index + 1]["Sentence"].values[0] 
                 Alleles = data[index: index + 1]["Alleles"].values[0]
                 P_Value = data[index: index + 1]["P_Value"].values[0]
+                P_Value_numeric = self.convert(data[index: index + 1]["P_Value"].values[0])
                 Biogeographical_Groups = data[index: index + 1]["Biogeographical_Groups"].values[0]
                 Study_Type = data[index: index + 1]["Study_Type"].values[0]
                 Study_Cases = data[index: index + 1]["Study_Cases"].values[0]
@@ -135,6 +152,7 @@ class Command(BaseCommand):
                     Sentence = Sentence ,
                     Alleles = Alleles,
                     P_Value = P_Value,
+                    P_Value_numeric = P_Value_numeric,
                     Biogeographical_Groups = Biogeographical_Groups,
                     Study_Type = Study_Type,
                     Study_Cases = Study_Cases,
@@ -146,6 +164,6 @@ class Command(BaseCommand):
                     geneid = g,
                 )
                 interaction.save()
-                print("a record is saved")
+                # print("a record is saved")
 
         self.logger.info("COMPLETED CREATING PHARMGKB")
