@@ -18,6 +18,10 @@ function createBarChartForATCDiseaseClass(disease_classes, disease_class_count)
       
     const width = 800 - (margin.left + margin.right);
     const height = 350 - (margin.top + margin.bottom);
+    const container = document.getElementById("chart-container-ATC-disease-class");
+    const containerWidth =  300;//container.clientWidth;
+    const containerHeight = 300; //container.clientHeight;
+    const size = Math.min(containerWidth, containerHeight);
     
     const svg = d3
     .select('#chart-container-ATC-disease-class')
@@ -38,17 +42,24 @@ function createBarChartForATCDiseaseClass(disease_classes, disease_class_count)
     .range([0, width]);
 
     
-    // describe a qualitative scale for the y axis, for the racers' names
+    // describe a qualitative scale for the y axis, for the disease's names
     const yScale = d3
     .scaleBand()
     .domain(data.map(({ name }) => name))
     .range([0, height])
-    // padding allows to separate the shapes making use of the scale and the value returned by the yScale.bandwidth() function
-    // 0.2 means 20% is dedicated to white space around the band
     .padding(0.2);
     
     const maxValue = d3.max(data, ({ value }) => value);
-    const integerTicks = d3.range(0, maxValue + 1); // +1 to include the maxValue itself
+    let stepSize;
+
+    if (maxValue > 10) {
+        // Determine the step size based on some condition or preference
+        stepSize = (maxValue <= 20) ? 2 : 5;
+    } else {
+        stepSize = 1; // Keep a step size of 1 if maxValue is 10 or less
+    }
+
+    const integerTicks = d3.range(0, maxValue + stepSize, stepSize); // Include the step size in the range function
 
     const xAxis = d3.axisBottom(xScale)
     .tickValues(integerTicks) // Use the generated array of integers for tick values
@@ -78,6 +89,11 @@ function createBarChartForATCDiseaseClass(disease_classes, disease_class_count)
     .attr('class', 'group')
     // translate the group vertically according to the y scale
     .attr('transform', ({ name }) => `translate(0 ${yScale(name)})`);
+
+    const tooltip = d3.select("#chart-container-ATC-disease-class")
+        .append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0); //opacity of 0 (hidden)
     
     // for each data point add a rectangle describing the points awarded to the respective racer
     groups
@@ -86,7 +102,33 @@ function createBarChartForATCDiseaseClass(disease_classes, disease_class_count)
     .attr('y', 0)
     .style("fill", "violet") // add more colors here
     .attr('width', ({ value }) => xScale(value))
-    .attr('height', yScale.bandwidth());
+    .attr('height', yScale.bandwidth())
+    .on('mouseover', function(event, d) {
+        // Position the tooltip and set its content
+        tooltip
+        .transition()
+        .duration(200)
+        .style("opacity", 0.9);
+        tooltip.style("left", (container.offsetLeft+ size/2 +148) + "px")
+          .style("top", (container.offsetTop + size/2) + "px")
+          .html(`Count: ${d.value}`);
+        
+        d3.select(this).style("fill", "blue");
+      })
+      .on('mouseout', function() {
+        d3.select(this)
+                .transition()
+                .duration(200)
+                .attr("x", 0)
+                .attr("y", 0)
+                .style("fill", "violet") // add more colors here
+                .attr('width', ({ value }) => xScale(value))
+                .attr('height', yScale.bandwidth());
+
+            tooltip.transition()
+                .duration(500)
+                .style("opacity", 0);
+      });
 }
 
 //------------------------
