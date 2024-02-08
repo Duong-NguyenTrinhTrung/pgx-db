@@ -16,7 +16,7 @@ def sort_alpha_numeric(strings):
 
 
                     
-
+#l2 text -> ok, not need for change
 with open("Data/circos-0.69-9/Data/atc/l2-text.txt", "w") as f:
     for ch in ["A", "B", "C","D","G","H","J","L","M","N","P","R","S","V"]:
         l = list(AtcTherapeuticGroup.objects.filter(id__istartswith=ch).values_list("id", flat=True))
@@ -36,6 +36,7 @@ with open("Data/circos-0.69-9/Data/atc/l2-text.txt", "w") as f:
             else:
                 color="black"
 
+#l2 data -> ok, not need for change
 with open("Data/circos-0.69-9/Data/atc/l2-data.txt", "w") as f:
     for ch in ["A", "B", "C","D","G","H","J","L","M","N","P","R","S","V"]:
         l = list(AtcTherapeuticGroup.objects.filter(id__istartswith=ch).values_list("id", flat=True))

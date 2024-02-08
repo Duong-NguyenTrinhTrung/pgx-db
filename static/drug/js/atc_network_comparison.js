@@ -1,11 +1,30 @@
+
+function getLimitedTicks(integerTicks, maxTicks = 10) {
+    const tickCount = integerTicks.length;
+    if (tickCount <= maxTicks) {
+        // If there are 10 or fewer ticks, return the original array
+        return integerTicks;
+    } else {
+        // Calculate the interval at which to pick ticks
+        const interval = Math.floor(tickCount / maxTicks);
+        const limitedTicks = [];
+        for (let i = 0; i < tickCount; i += interval) {
+            limitedTicks.push(integerTicks[i]);
+        }
+        // Ensure the last element is always included
+        if (limitedTicks[limitedTicks.length - 1] !== integerTicks[tickCount - 1]) {
+            limitedTicks.push(integerTicks[tickCount - 1]);
+        }
+        return limitedTicks;
+    }
+}
+
 function createDistributionPlot(data, data_all, elementID, text)
 {
     $("#result-compare-table").html("");
     // target the .viz container
     const viz = d3.select('#'+elementID)
     .html("");
-
-    
     // have the visualizations share the same margin, width and height
     const margin = {
         top: 30,
@@ -28,33 +47,10 @@ function createDistributionPlot(data, data_all, elementID, text)
     .attr('class', 'histogram')
     .attr('viewBox', `0 0 ${width + (margin.left + margin.right)} ${height + (margin.top + margin.bottom)}`);
 
-    // linear gradient described for the entire visualization
-    // the idea is to have lighter colors toward the top of the svg
-    //Defines a linear gradient for the histogram, creating a color transition from top to bottom.
-    const linearGradient = svgHistogram
-    .append('defs')
-    .append('linearGradient')
-    .attr('id', 'gradient-histogram')
-    .attr('gradientUnits', 'userSpaceOnUse')
-    .attr('x1', 0)
-    .attr('x2', 0)
-    .attr('y1', 0)
-    .attr('y2', height);
-
-    linearGradient
-    .append('stop')
-    .attr('stop-color', 'white')
-    .attr('offset', 0);
-
-    linearGradient
-    .append('stop')
-    .attr('stop-color', '#d90429')
-    .attr('offset', 1);
-
     //Sets up the group for the histogram, defines the x and y scales, and prepares the data for the histogram.
     const groupHistogram = svgHistogram
     .append('g')
-    .attr('transform', `translate(${margin.left}+20  ${margin.top})`);
+    .attr('transform', `translate(${margin.left}  ${margin.top})`);
 
     // for the horizontal dimension the scale is defined for both the histogram and the density plot
     // ! the function is also used by the histogram function to determine the different bins
@@ -62,6 +58,10 @@ function createDistributionPlot(data, data_all, elementID, text)
     .scaleLinear()
     .domain([d3.min(data_all), d3.max(data_all)])
     .range([0, width]);
+
+    const maxValue = d3.max(data_all);
+    const integerTicks = d3.range(0, maxValue + 1); // +1 to include the maxValue itself
+
 
     // histogram used to create the bins from the input data
     const histogram = d3
@@ -85,17 +85,13 @@ function createDistributionPlot(data, data_all, elementID, text)
     .tickFormat(d3.format('d'))
     .tickValues(d3.ticks(yScaleHistogram.domain()[0], yScaleHistogram.domain()[1], Math.ceil(yScaleHistogram.domain()[1])));
 ;
-
-    
-
     // give a class to the axis to later identify and style the elements
     groupHistogram
     .append('g')
     .attr('class', 'axis y-axis')
-    .call(yAxisHistogram);
+    .call(yAxisHistogram)
+    .attr('transform', `translate(0 20)`);
 
-    // HISTOGRAM ELEMENTS
-    // add one group for each bin
     const binsHistogram = groupHistogram
     .selectAll('g.bin')
     .data(dataHistogram)
@@ -109,37 +105,41 @@ function createDistributionPlot(data, data_all, elementID, text)
     binsHistogram
     .append('rect')
     .attr('x', 0)
-    .attr('y', d => yScaleHistogram(d.length))
+    .attr('y', d => yScaleHistogram(d.length)+20)
     .attr('width', ({ x0, x1 }) => xScale(x1) - xScale(x0))
     .attr('height', d => height - yScaleHistogram(d.length))
-    .attr('fill', 'url(#gradient-histogram)')
+    // .attr('fill', 'url(#gradient-histogram)')
+    .attr('fill', '#69b3a2') // Solid fill color for the bars
     .attr('stroke', '#0c1620')
-    .attr('stroke-width', 2);
+    .attr('stroke-width', 1);
 
     // at the top of the rectangles include a text describing the precise count
     binsHistogram
     .append('text')
     .attr('x', ({ x0, x1 }) => (xScale(x1) - xScale(x0)) / 2)
-    .attr('y', d => yScaleHistogram(d.length) - margin.top / 3)
-    .attr('fill', 'url(#gradient-histogram)')
+    .attr('y', d => yScaleHistogram(d.length) - margin.top / 3 + 25)
+    // .attr('fill', 'url(#gradient-histogram)')
+    .attr('fill', 'grey')
     .attr('text-anchor', 'middle')
     .attr('font-weight', 'bold')
     .attr('font-size', '1.1rem')
     .text(d => d.length);
 
-    // draw the y axis on top of the rectangles
+    const limitedIntegerTicks = getLimitedTicks(integerTicks);
+
     const xAxis = d3
     .axisBottom(xScale)
     .tickPadding(10)
     .tickFormat(d3.format('d'))
-    .tickValues(d3.ticks(xScale.domain()[0], xScale.domain()[1], Math.ceil(xScale.domain()[1])));
+    .tickValues(limitedIntegerTicks);
+    // .tickValues(d3.ticks(xScale.domain()[0], xScale.domain()[1], Math.ceil(xScale.domain()[1])));
 
     groupHistogram
     .append('g')
     .attr('class', 'axis x-axis')
-    .attr('transform', `translate(0 ${height})`)
+    .attr('transform', `translate(0 ${height+20})`)
     .call(xAxis)
-    .attr('font-size', '17px');
+    .attr('font-size', '10px');
 }
 
 function createDistributionPlotForCategoryData(classes, class_count, elementID, text)
@@ -187,6 +187,13 @@ function createDistributionPlotForCategoryData(classes, class_count, elementID, 
     .scaleLinear()
     .domain([0, d3.max(data, ({ value }) => value)])
     .range([0, width]);
+
+    const maxValue = d3.max(data, ({ value }) => value);
+    const integerTicks = d3.range(0, maxValue + 1); // +1 to include the maxValue itself
+
+    const xAxis = d3.axisBottom(xScale)
+    .tickValues(integerTicks) // Use the generated array of integers for tick values
+    .tickFormat(d3.format('d')); // Ensure the format is set to integers
     
     // describe a qualitative scale for the y axis, for the racers' names
     const yScale = d3
@@ -196,11 +203,6 @@ function createDistributionPlotForCategoryData(classes, class_count, elementID, 
     // padding allows to separate the shapes making use of the scale and the value returned by the yScale.bandwidth() function
     // 0.2 means 20% is dedicated to white space around the band
     .padding(0.2);
-    
-    
-    // add axes describing the values
-    const xAxis = d3
-    .axisBottom(xScale);
     
     const yAxis = d3
     .axisLeft(yScale);
@@ -428,10 +430,10 @@ function calculatePathLength(data, elementID, text){
 
 
 function convert(objects){
-    if (objects==[]){
-        objects = "None";
+    if (objects.length==0){
+        return "None";
     }else{
-        objects = objects.join(", ");
+        return objects.join(", ");
     }
 }
 function commonAndUniqueNodes(data, text)
@@ -439,16 +441,12 @@ function commonAndUniqueNodes(data, text)
     $("#atc_code_box").html("");
     $("#atc_comparison_box").html("");
     $("#result-compare-table").css("width", "40%");
-    $("#result-compare-area-text").html(`<h4>${text}</h4>`);
+    $("#result-compare-area-text").append(`<h4>${text}</h4>`);
     $("#result-compare-area-text").css("color", "#3498db");
-    console.log("data ", data.common_proteins);
     var common_drugs = convert(data.common_drugs);
-    // alert("data.common_drugs: "+data.common_drugs);
-    // alert("common_drugs: "+common_drugs);
     var common_proteins = convert(data.common_proteins); 
-    // alert("data.common_proteins: "+data.common_proteins);
-    // alert("common_proteins: "+common_proteins);
     var common_diseases = convert(data.common_diseases); 
+    
     var unique_drug_atc_code = convert(data.unique_drug_atc_code); 
     var unique_protein_atc_code = convert(data.unique_protein_atc_code);
     var unique_disease_atc_code = convert(data.unique_disease_atc_code);
@@ -456,11 +454,11 @@ function commonAndUniqueNodes(data, text)
     var unique_protein_atc_comparison = convert(data.unique_protein_atc_comparison);
     var unique_disease_atc_comparison = convert(data.unique_disease_atc_comparison);
 
-    $("#result-compare-area-text").append(`</h5>Common drugs: <span style="color: #d90429">${common_drugs}</span></h5><br>`);
-    $("#result-compare-area-text").append(`</h5>Common proteins: <span style="color: #d90429">${common_proteins}</span></h5><br>`);
-    $("#result-compare-area-text").append(`</h5>Common disease: <span style="color: #d90429">${common_diseases}</span></h5><br><br>`);
+    $("#result-compare-area-text").append(`</h6>Common drugs: <span style="color: #d90429">${common_drugs}</span></h6><br>`);
+    $("#result-compare-area-text").append(`</h6>Common proteins: <span style="color: #d90429">${common_proteins}</span></h6><br>`);
+    $("#result-compare-area-text").append(`</h6>Common disease: <span style="color: #d90429">${common_diseases}</span></h6><br><br>`);
 
-    var htmlData = `<table><thead><tr style="color: #d90429"><th>Atc code</th><th>${data.atc_code}</th><th>${data.atc_comparison}</th></tr></thead><tbody>`;
+    var htmlData = `<table id="commonUniqueNodesTable"><thead><tr style="color: #d90429; "><th>Atc code</th><th>${data.atc_code}</th><th>${data.atc_comparison}</th></tr></thead><tbody>`;
     htmlData += `<tr><td>Unique drugs</td><td>${unique_drug_atc_code}</td><td>${unique_drug_atc_comparison}</td></tr>`;
     htmlData += `<tr><td>Unique proteins</td><td>${unique_protein_atc_code}</td><td>${unique_protein_atc_comparison}</td></tr>`;
     htmlData += `<tr><td>Unique disease</td><td>${unique_disease_atc_code}</td><td>${unique_disease_atc_comparison}</td></tr>`;

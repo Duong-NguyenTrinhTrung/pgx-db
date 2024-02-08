@@ -221,6 +221,7 @@ class Pharmgkb(models.Model):
     Sentence = models.TextField()
     Alleles = models.TextField()
     P_Value = models.CharField(max_length=100)
+    P_Value_numeric = models.FloatField(null=True)
     Biogeographical_Groups = models.TextField()
     Study_Type = models.CharField(max_length=100)
     Study_Cases= models.FloatField()
