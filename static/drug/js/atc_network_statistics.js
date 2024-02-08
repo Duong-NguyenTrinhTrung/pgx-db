@@ -59,7 +59,7 @@ function createBarChartForATCDiseaseClass(disease_classes, disease_class_count)
         stepSize = 1; // Keep a step size of 1 if maxValue is 10 or less
     }
 
-    const integerTicks = d3.range(0, maxValue + stepSize, stepSize); // Include the step size in the range function
+    const integerTicks = d3.range(0, maxValue + 1, stepSize); // Include the step size in the range function
 
     const xAxis = d3.axisBottom(xScale)
     .tickValues(integerTicks) // Use the generated array of integers for tick values

@@ -340,13 +340,8 @@
     function network_pgx_tab_clicked()
     {
         if (!hasPGxData){
-            var d = document.getElementById('tab_network_pgx');
-            var paragraph = document.createElement('p');
-            paragraph.textContent = 'There is no pharmacogenomics data associated with drugs and genes (proteins) this ATC code!';
-            paragraph.style.color = '#c1121f'; 
-            paragraph.style.fontStyle = 'italic'; 
-            d.appendChild(document.createElement('br'));
-            d.appendChild(paragraph);
+            var p = document.getElementById('tab_network_pgx_message');
+            p.style.display="block";
         }
     }
 
