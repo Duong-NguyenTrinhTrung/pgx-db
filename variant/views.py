@@ -159,15 +159,27 @@ def get_genebass_tables(request):
         'Pvalue',
     )
 
-    html = render_to_string(
-        template_name="variant/genebass_tables.html",
-        context={
+    if list_genebass.count() > 0:
+        context = {
             "gene": gene,
             "list_genebass": list_genebass,
             "transcript_ids": transcript_ids,
             "variant": variant,
-        },
+                }
+    else:
+        context = {
+            "gene": gene,
+            "list_genebass": None,  # or keep it as an empty list, depending on your template logic
+            "transcript_ids": transcript_ids,
+            "variant": variant,
+            "message": "There are no associations for this variant."
+        }
+
+    html = render_to_string(
+        template_name="variant/genebass_tables.html",
+        context=context,
         request=request,
     )
 
     return HttpResponse(html)
+

@@ -9,28 +9,35 @@
     <h4 class="modal-title" id="modalLabel">{% translate 'Variant ID: ' %}<span style="color: orangered;">{{ variant.VariantMarker }}</span></h4>
     <h4 class="modal-title" id="modalLabel">{% translate 'Transcripts: ' %}<span style="color: orangered">{{ transcript_ids|join:", "|escape }}</span></h4>
 </div>
-<div class="modal-body">
-<button
-        onclick="genebassVariantTableToExcel()"
-        type="button"
-        class="btn btn-primary"
-        style="margin-top: 10px; margin-top: 3px"
->
-    Export to Excel
-</button>
-    <div class="table-responsive">
-        <table class="table" id="genebass-tables">
-            <thead>
-            {% include 'variant/table-header.html' %}
-            </thead>
-            <tbody>
-            {% for genebass in list_genebass %}
-                {% render_genebass_variant_row genebass %}
-            {% endfor %}
-            </tbody>
-        </table>
+
+{% if list_genebass %}
+    <div class="modal-body">
+    <button
+            onclick="genebassVariantTableToExcel()"
+            type="button"
+            class="btn btn-primary"
+            style="margin-top: 10px; margin-top: 3px"
+    >
+        Export to Excel
+    </button>
+        <div class="table-responsive">
+            <table class="table" id="genebass-tables">
+                <thead>
+                {% include 'variant/table-header.html' %}
+                </thead>
+                <tbody>
+                {% for genebass in list_genebass %}
+                    {% render_genebass_variant_row genebass %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
-<div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-</div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+    </div>
+    
+{% else %}
+    <!-- Display the message when there are no associations -->
+    <p style="margin-top: 30px; color: blue; text-align: center;">{{ "There is no significant burden associations of this variant" }}</p>
+{% endif %}
