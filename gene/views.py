@@ -291,6 +291,9 @@ class GeneDetailBaseView(object):
         data_subset["PhyloP30way_mammalian_rankscore"] = vep_variant[48]
         data_subset["AM_pathogenicity"] = vep_variant[49]
         data_subset["primary"] = is_primary_ts(vep_variant[0])
+        # print("data_subset[primary] ", data_subset["primary"])
+        # print("data_subset last ", type(data_subset))
+        # print("len data_subset ", len(data_subset))
 
         return data_subset
 

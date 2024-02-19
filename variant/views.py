@@ -134,11 +134,19 @@ def get_genebass_tables(request):
     # Get gene
     if variant:
         gene = variant.Gene_ID
+        primary_transcript = variant.Gene_ID.primary_transcript
+        gene_id= variant.Gene_ID.gene_id
     else:
         gene = None
+        primary_transcript = None
+        gene_id = None
 
     # Get transcript
-    transcript_ids = VepVariant.objects.filter(Variant_marker=variant_marker).values_list('Transcript_ID', flat=True)
+    transcript_ids = list(set(VepVariant.objects.filter(Variant_marker=variant_marker).values_list('Transcript_ID', flat=True)))
+    try:
+        transcript_ids.remove(primary_transcript)
+    except ValueError:
+        pass  # Do nothing if primary_transcript is not in the list
 
     list_genebass = GenebassVariant.objects.filter(markerID=variant_marker).values(
         'n_cases',
@@ -164,15 +172,18 @@ def get_genebass_tables(request):
             "gene": gene,
             "list_genebass": list_genebass,
             "transcript_ids": transcript_ids,
+            "primary_transcript": primary_transcript,
             "variant": variant,
+            "gene_id": gene_id,
                 }
     else:
         context = {
             "gene": gene,
             "list_genebass": None,  # or keep it as an empty list, depending on your template logic
             "transcript_ids": transcript_ids,
+            "primary_transcript": primary_transcript,
             "variant": variant,
-            "message": "There are no associations for this variant."
+            "gene_id": gene_id,
         }
 
     html = render_to_string(

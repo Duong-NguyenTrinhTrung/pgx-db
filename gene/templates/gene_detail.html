@@ -107,7 +107,8 @@
                             <tr class="data-row">
                                 <td class="align-left variant">{{ value.0 }}</td> <!--  Variant -->
                                 <td class="align-left">{{ value.1 }}</td> <!--  Transcript -->
-                                <td class="align-left">{{ value.50 }}</td> <!--  Canonical -->
+                                <td class="align-left">YES</td> <!--  Canonical -->
+                                <!-- <td class="align-left">{{ value.50 }}</td>  Canonical -->
                                 <td class="align-left">{{ value.5 }}</td> <!--  Sequence position -->
                                 <td class="align-left">{{ value.6|slice:":1" }}</td> <!-- Wildtype  -->
                                 <td class="align-left">{{ value.6|slice:"2:3" }}</td> <!-- Mutant  -->
@@ -227,7 +228,6 @@
                  aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content" id="genebass-variant-list">
-                        Data will be loaded here by jQuery
                     </div>
                 </div>
             </div>
@@ -279,7 +279,7 @@
                 e.preventDefault();
                 let variant_marker = $(this).data('variant-marker');
                 let url = $(this).data('remote-url');
-                $("#genebass-variant-list").html('<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Genebass variants are loading ...')
+                //$("#genebass-variant-list").html('<span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span> Genebass variants are loading ...')
                 $.ajax(
                     {
                         url: url,
@@ -698,23 +698,55 @@
 
             let column_filters = [];
 
-            // Phenocode
-            //column_filters = column_filters.concat(createYADCFfilters(3, 1, "multi_select", "select2", "Select", false, null, null));
+            // 
+            column_filters = column_filters.concat(createYADCFfilters(0, 1, "select", null, "", false, null, null));
+            column_filters = column_filters.concat(createYADCFfilters(1, 1, "select", "select", "Select", false, null, null));
+            column_filters = column_filters.concat(createYADCFfilters(2, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "40px"));
+            column_filters = column_filters.concat(createYADCFfilters(3, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "40px"));
+            column_filters = column_filters.concat(createYADCFfilters(4, 1, "select", "select", "Select", false, null, null, width = "600px"));
+
+            //AC
+            column_filters = column_filters.concat(createYADCFfilters(5, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "40px"));
+            //AF
+            column_filters = column_filters.concat(createYADCFfilters(6, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "40px"));
+            column_filters = column_filters.concat(createYADCFfilters(7, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "40px"));
+            column_filters = column_filters.concat(createYADCFfilters(8, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "40px"));
+            column_filters = column_filters.concat(createYADCFfilters(9, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "40px"));
+            column_filters = column_filters.concat(createYADCFfilters(10, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "40px"));
+            column_filters = column_filters.concat(createYADCFfilters(11, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "40px"));
+
+
+
 
             yadcf.init(
                 genebass_variant_table,
-                //column_filters, 
-                [
-                    {
-                        column_number: 3,
-                        filter_type: "multi_select",
-                        select_type: "select2",
-                    },
-                ],
+                column_filters, 
+              
                 {
                     cumulative_filtering: false
                 },
             );
+            $('#yadcf-filter--genebass-tables-0').css('width', '300px');
+            $('#yadcf-filter--genebass-tables-4').css('width', '300px');
+            
+            $('#yadcf-filter--genebass-tables-to-2').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-from-2').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-to-3').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-from-3').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-to-5').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-from-5').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-to-6').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-from-6').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-to-7').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-from-7').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-to-8').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-from-8').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-to-9').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-from-9').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-to-10').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-from-10').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-to-11').css('width', '20px');
+            $('#yadcf-filter--genebass-tables-from-11').css('width', '20px');
 
             gray_scale_table(genebass_table);
 
