@@ -5,12 +5,13 @@
     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
         <span aria-hidden="true">&times;</span>
     </button>
-    <h4 class="modal-title" id="modalLabel">{% translate "Gene: " %}<span style="color: orangered">{{ gene.genename }}</span></h4>
-    <h4 class="modal-title" id="modalLabel">{% translate 'Variant ID: ' %}<span style="color: orangered;">{{ variant.VariantMarker }}</span></h4>
-    <h4 class="modal-title" id="modalLabel">{% translate 'Transcripts: ' %}<span style="color: orangered">{{ transcript_ids|join:", "|escape }}</span></h4>
+    <h5 class="modal-title" id="modalLabel">{% translate "Gene: " %}<span style="color: orangered">{{ gene.genename }}</span><span style="color: #337ab7;"> (Gene ID: {{ gene_id }}) </span></h5>
+    <h5 class="modal-title" id="modalLabel">{% translate 'Variant ID: ' %}<span style="color: orangered;">{{ variant.VariantMarker }}</span></h5>
+    <h5 class="modal-title" id="modalLabel">{% translate 'Appear in transcripts: ' %}<span style="color: #337ab7;">{{ primary_transcript }} (primary), </span><span style="color: orangered">{{ transcript_ids|join:", "|escape }}</span></h5>
 </div>
 
 {% if list_genebass %}
+    <h4 style="margin-top: 30px; color: #337ab7; text-align: center; ">Significant burden associations of variant {{ variant.VariantMarker }}</h4>
     <div class="modal-body">
     <button
             onclick="genebassVariantTableToExcel()"
@@ -39,5 +40,5 @@
     
 {% else %}
     <!-- Display the message when there are no associations -->
-    <p style="margin-top: 30px; color: blue; text-align: center;">{{ "There is no significant burden associations of this variant" }}</p>
+    <p style="margin-top: 30px; color: #337ab7; text-align: center;">{{ "There is no significant burden associations of this variant" }}</p>
 {% endif %}
