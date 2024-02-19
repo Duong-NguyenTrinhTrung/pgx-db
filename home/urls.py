@@ -9,22 +9,22 @@ urlpatterns = [
     path("about_pgx/", about_pgx, name='about-pgx'),
     path("contribute_to_pgx/", contribute_to_pgx, name='contribute-pgx'),
 
-    path("drug_lookup/", cache_page(3600*24*7)(drug_lookup), name='drug_lookup'),
+    path("drug_lookup/", cache_page(3600*24*365)(drug_lookup), name='drug_lookup'),
     path('drug-autocomplete/', drug_autocomplete_view, name='drug_autocomplete_view'),
     path("drug_target_network/", drug_target_network, name='drug_target_network'),
 
-    path("target_lookup/", cache_page(3600*24*7)(target_lookup), name='target_lookup'),
-    path("target_statistics/", target_statistics, name='target_statistics'),
+    path("target_lookup/", cache_page(3600*24*365)(target_lookup), name='target_lookup'),
+    path("target_statistics/", cache_page(3600*24*365)(target_statistics), name='target_statistics'),
     path('protein-autocomplete/', protein_autocomplete_view, name='protein_autocomplete_view'),
 
-    path("variant_lookup/", cache_page(3600*24*7)(variant_lookup), name='variant_lookup'),
-    path("chromosome_mapper/", chromosome_mapper, name='chromosome_mapper'),
+    path("variant_lookup/", cache_page(3600*24*365)(variant_lookup), name='variant_lookup'),
+    path("chromosome_mapper/", cache_page(3600*24*365)(chromosome_mapper), name='chromosome_mapper'),
     path("get_chromosome_mapping/", get_chromosome_mapping, name='get_chromosome_mapping'),
     path("get_chromosome_mapping_example/", get_chromosome_mapping_example, name='get_chromosome_mapping_example'),
     path("anno_from_autocomplete_view/", anno_from_autocomplete_view, name='anno-from-autocomplete-view'),
     path('variant-autocomplete/', variant_autocomplete_view, name='variant_autocomplete_view'),
     
-    path('disease_lookup/', disease_lookup, name='disease_lookup'),
-    path('disease_statistics/', disease_statistics, name='disease-statistics'),
+    path('disease_lookup/', cache_page(3600*24*365)(disease_lookup), name='disease_lookup'),
+    path('disease_statistics/', cache_page(3600*24*365)(disease_statistics), name='disease-statistics'),
     path('disease_autocomplete_view/', disease_autocomplete_view, name='disease_autocomplete_view'),
 ]
