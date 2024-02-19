@@ -25,9 +25,9 @@ from .views import (
 
 urlpatterns = [
     path('search_drugs', views.search_drugs, name='search_drugs'),
-    path('atc-lookup', cache_page(3600*24*7)(views.atc_lookup), name='atc-lookup'),
+    path('atc-lookup', cache_page(3600*24*365)(views.atc_lookup), name='atc-lookup'),
     path('atc-anatomical-groups', views.AtcAnatomicalGroupListView.as_view(), name='atc-anatomical-groups'),
-    path('atc_search_view', cache_page(3600*24*7)(views.atc_search_view), name='atc_search_view'),
+    path('atc_search_view', cache_page(3600*24*365)(views.atc_search_view), name='atc_search_view'),
 
     path('atc-detail-view/', views.atc_detail_view, name='atc-detail-view'),
     path('get_drug_atc_association/', views.get_drug_atc_association, name='get-drug-atc-association'),
@@ -43,8 +43,7 @@ urlpatterns = [
     path('get_drug_network/', views.get_drug_network, name='get-drug-network'),
     path('get-atc-sub-levels/', views.get_atc_sub_levels, name='get-atc-sub-levels'),
     path('drugbrowser', views.drugbrowser, name='drugbrowser'),  # load all the drugs - cached but still slow - might need to remove
-    # path('drugstatistic', (DrugStatistics.as_view()), name='drugstatistic'),  # okie but with dummy data
-    path('drugstatistic', (views.DrugStatistics), name='drugstatistic'),  # okie but with dummy data
+    path('drugstatistic', cache_page(3600*24*365)(views.DrugStatistics), name='drugstatistic'),
     path('drug/autocomplete', (SelectionAutocomplete), name='autocomplete'),
     path('drug/<str:drugbank_id>/', views.drug_atc_expansion, name='drug_detail'),  # still ok but template does not have much info
 

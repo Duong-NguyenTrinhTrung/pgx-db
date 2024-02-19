@@ -514,7 +514,7 @@ def drugbrowser(request):
 
         cache.set(name_of_cache, context, 60 * 60 * 24 * 28)
 
-    return render(request, 'drug_browser copy.html', {'drugdata': context})
+    return render(request, 'drug_browser.html', {'drugdata': context})
 
 
 # This is a helper function that takes a request object and checks if it's an AJAX request. It does this by checking if the 'HTTP_X_REQUESTED_WITH' key in the request.META dictionary is set to 'XMLHttpRequest'. If it is, it returns True, otherwise it returns False.
