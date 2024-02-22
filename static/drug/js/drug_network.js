@@ -1541,177 +1541,165 @@ let flag_tabclicked = false;
 let flag_processData  = false;
 
 function processData() {
+    
     const jsonFilePath = json_GeneralFile; // JSON file path
     //console.log("Inside Process Data Function11");
     fetch(jsonFilePath)
-        .then((response) => response.json())
-        .then((data) => {
-            // Extract nodes and links from the JSON data
-            // console.log("inside processData: ", data);
-            chartDataJ = data;
-            data.forEach(function (row) {
-                //  console.log("ProcessData");
-                // console.log("ProcessData: ", row);
-                // console.log("ProcessData: " + JSON.stringify(row));
-                var drugName = row.drug_name;
-                var drugID = row.drugbank_id;
-                var protein = row.protein;
-                var genename = row.gene_name;
-                var interaction = row.interaction_type.charAt(0).toUpperCase() + row.interaction_type.slice(1);;
-                // var interaction = row.interaction;
-                
-                var disease_interaction;
-                if (row.Phase !== 1) {
-                  disease_interaction = "Phase" + row.Phase;
-                }
-                else {
-                  disease_interaction = "temp";
-                }
-
-
-                //console.log("row.interaction = " + row.interaction_type);
-                //var drugStatus = row.Drug_status; // Get the "Drug_status" value
-                var drugStatus = clinicalStatusMap[row.Drug_status];
-                var drugType = row.drugtype; // Get the "Drug_status" value
-                var proteinClass = row.Protein_Class;
-
-                //var disease_interaction = "phase" + row.Phase;
-                //console.log("row.Phase = " + row.Phase +" disease_interaction "+ disease_interaction);
-                var disease = row.Disease_name; // getting the new disease
-                var Disease_class = row.Disease_class
-                var disease_phase = row.Phase;
-
-                //console.log("printing disease_interaction :" + disease_interaction);
-                //console.log("printing disease :" + disease);
-                //console.log("printing Disease_class :" + Disease_class);
-
-                if (
-                    !nodes.find(function (node) {
-                        return node.id === drugName;
-                    })
-                ) {
-                    nodes.push({
-                        id: drugName,
-                        isParent: true,
-                        radius: 10,
-                        Drug_status: drugStatus,
-                        Drug_type: drugType,
-                        Drug_ID: drugID,
-                    }); // Include the "Drug_status" value in the node object
-                }
-
-                if (
-                    !nodes.find(function (node) {
-                        return node.id === protein;
-                    })
-                ) {
-                    nodes.push({
-                        id: protein,
-                        isParent: false,
-                        radius: 5,
-                        genename :genename ,
-                        Protein_Class: proteinClass,
-                        child_type: "protein_type",
-                    }); // Include the "Protein_Class" value in the node object
-                }
-                // tag1
-                if (
-                    !nodes.find(function (node) {
-                        return node.id === disease;
-                    })
-                ) {
-                    nodes.push({
-                        id: disease,
-                        isParent: false,
-                        child_type: "disease_type",
-                        radius: 5,
-                        DiseaseClass: Disease_class,
-                        disease_phase: disease_phase
-                        // Protein_Class: proteinClass,
-                    }); // Include the "Protein_Class" value in the node object
-                }
-
-                if (
-                    !nodes.find(function (node) {
-                        return node.id === drugName;
-                    })
-                ) {
-                    nodes.push({ id: drugName, isParent: true, radius: 10 });
-                }
-
-                if (
-                    !nodes.find(function (node) {
-                        return node.id === protein;
-                    })
-                ) {
-                    nodes.push({ id: protein, isParent: false, radius: 5 });
-                }
-
-                links.push({
-                    source: drugName,
-                    target: protein,
-                    type: interaction,
-                    // disease_type: "temp"
-                });
-
-                links.push({
-                    source: drugName,
-                    target: disease,
-                    type: disease_interaction,
-                    // disease_type: disease_interaction // You can customize the type for disease links
-                });
-
-                //console.log(links, "here are the type")
-            });
-            //console.log("here are the links", links);
-            var childNodeMap = {};
-            links.forEach(function (link) {
-                if (!link.target.isParent) {
-                    var childNodeId = link.target.id;
-                    childNodeMap[childNodeId] =
-                        (childNodeMap[childNodeId] || 0) + 1;
-                }
-            });
-
-            // Assign the parent count to each child node
-            nodes
-                .filter(function (d) {
-                    return !d.isParent;
-                })
-                .forEach(function (node) {
-                    node.degree = childNodeMap[node.id] || 0;
-                });
-
-
-
-            // Set the maximum value of the threshold slider
-            thresholdSlider.max = nodes.filter(function (node) { return node.isParent; }).length;
-
-            // Set the default value of the threshold slider to the maximum
-            thresholdSlider.value = 50;
-            thresholdValueLabel.textContent = thresholdSlider.value;
-            createChart(links);
-            // if(flag_tabclicked){
-         
-            //     createChart(links);
-                
-            // }
-            flag_processData = true ; 
-
-
-
-            // Add an event listener to detect changes in the threshold slider value
-            thresholdSlider.addEventListener('input', function () {
-                thresholdValueLabel.textContent = thresholdSlider.value;
-                updateChartVisibility();
-            });
-        })
-        .catch((error) => {
-            console.error("Error reading the JSON file:", error);
+      .then((response) => response.json())
+      .then((data) => {
+        // Extract nodes and links from the JSON data
+        // console.log("inside processData: ", data);
+        chartDataJ = data;
+  
+        const filteredData = data.filter(row => row.Phase !== "1" && row.Phase !== "2");
+  
+        filteredData.forEach(function (row) {
+        
+          var drugName = row.drug_name;
+          var drugID = row.drugbank_id;
+          var protein = row.protein;
+          var genename = row.gene_name;
+          var interaction =
+            row.interaction_type.charAt(0).toUpperCase() +
+            row.interaction_type.slice(1);
+          // var interaction = row.interaction
+  
+          var disease_interaction;
+          var disease_phase ; 
+          disease_interaction = "Phase" + row.Phase;
+          disease_phase = row.Phase;
+       
+  
+          var drugStatus = clinicalStatusMap[row.Drug_status];
+          var drugType = row.drugtype;
+          var proteinClass = row.Protein_Class;
+  
+          var disease = row.Disease_name; // getting the new disease
+          var Disease_class = row.Disease_class;
+          
+          if (
+            !nodes.find(function (node) {
+              return node.id === drugName;
+            })
+          ) {
+            nodes.push({
+              id: drugName,
+              isParent: true,
+              radius: 10,
+              Drug_status: drugStatus,
+              Drug_type: drugType,
+              Drug_ID: drugID,
+            }); // Include the "Drug_status" value in the node object
+          }
+  
+          if (
+            !nodes.find(function (node) {
+              return node.id === protein;
+            })
+          ) {
+            nodes.push({
+              id: protein,
+              isParent: false,
+              radius: 5,
+              genename: genename,
+              Protein_Class: proteinClass,
+              child_type: "protein_type",
+            }); // Include the "Protein_Class" value in the node object
+          }
+          // tag1
+          if (
+            !nodes.find(function (node) {
+              return node.id === disease;
+            })
+          ) {
+            nodes.push({
+              id: disease,
+              isParent: false,
+              child_type: "disease_type",
+              radius: 5,
+              DiseaseClass: Disease_class,
+              disease_phase: disease_phase,
+              // Protein_Class: proteinClass,
+            }); // Include the "Protein_Class" value in the node object
+          }
+  
+          if (
+            !nodes.find(function (node) {
+              return node.id === drugName;
+            })
+          ) {
+            nodes.push({ id: drugName, isParent: true, radius: 10 });
+          }
+  
+          if (
+            !nodes.find(function (node) {
+              return node.id === protein;
+            })
+          ) {
+            nodes.push({ id: protein, isParent: false, radius: 5 });
+          }
+  
+          links.push({
+            source: drugName,
+            target: protein,
+            type: interaction,
+            // disease_type: "temp"
+          });
+  
+          links.push({
+            source: drugName,
+            target: disease,
+            type: disease_interaction,
+            // disease_type: disease_interaction // You can customize the type for disease links
+          });
+  
+          //console.log(links, "here are the type")
         });
-
+        //console.log("here are the links", links);
+        var childNodeMap = {};
+        links.forEach(function (link) {
+          if (!link.target.isParent) {
+            var childNodeId = link.target.id;
+            childNodeMap[childNodeId] = (childNodeMap[childNodeId] || 0) + 1;
+          }
+        });
+  
+        // Assign the parent count to each child node
+        nodes
+          .filter(function (d) {
+            return !d.isParent;
+          })
+          .forEach(function (node) {
+            node.degree = childNodeMap[node.id] || 0;
+          });
+  
+        // Set the maximum value of the threshold slider
+        thresholdSlider.max = nodes.filter(function (node) {
+          return node.isParent;
+        }).length;
+  
+        // Set the default value of the threshold slider to the maximum
+        thresholdSlider.value = 50;
+        thresholdValueLabel.textContent = thresholdSlider.value;
+        // tag5
+        // Create the chart using D3.js
+  
+        createChart(links);
+       
+  
+        // Add an event listener to detect changes in the threshold slider value
+        thresholdSlider.addEventListener("input", function () {
+          thresholdValueLabel.textContent = thresholdSlider.value;
+          updateChartVisibility();
+        });
+      })
+      .catch((error) => {
+        console.error("Error reading the JSON file:", error);
+      });
+  
     // d3.select("#loading").style("height", "800px");
-}
+  }
+  
 
 // Read the data from the Excel file
 

@@ -3,7 +3,7 @@
 
 <div role="tabpanel" class="tab-pane" id="tab_network_pgx">
         <p id="tab_network_pgx_message" style="color: #c1121f; font-style: italic; display: none;">
-            There is no pharmacogenomics data associated with drugs and genes (proteins) this ATC code!
+            There is no pharmacogenomics data associated with drugs and genes (proteins) in this ATC code!
         </p>
         <div class="row" id="pgx_data_display_area">
                 <!-- indise pgx data display area  -->
@@ -61,7 +61,7 @@
 
 {% block addon_js %}
 <script>
-    var hasPGxData = true;
+    
     function getHeaderContent(element) {
         var content = "";
         element.childNodes.forEach(function (value) {
@@ -412,7 +412,9 @@
 </script>
 
 <script>
+    var hasPGxData;
     function showPGxTable(atc_code){
+        // alert("at beginning of showPGxTable : hasPGxData = "+hasPGxData);
         var pgx_data_display_area = document.getElementById("pgx_data_display_area");
         var pgx_data_display_area_inner = document.getElementById("pgx_data_display_area_inner");
         var clinical_pgx_data_control_area = document.getElementById("clinical-pgx-data-control-div");
@@ -433,10 +435,11 @@
                 success: function (clinical_response) {
                     // If there are clinical pgx data
                     if (clinical_response.length > 0 ){
-                        //alert("yes, there are clinical_response data, length= "+ clinical_response.length);
+                        // alert("yes, there are clinical_response data, length= "+ clinical_response.length);
                         pgx_data_display_area.style.display = "block";
                         pgx_data_display_area_inner.style.display = "block";
                         clinical_pgx_data_control_area.style.display = "block";
+                        hasPGxData = true;
                         // show it
                         render_clinical_pgx_data(clinical_response);
                         // also check if there are burden data (either gene- or variant-based)
@@ -448,7 +451,7 @@
                             success: function (burden_response) {
                                 // if there are gene-based burden data
                                 if (burden_response.length > 0 ){
-                                    //alert("yes, there are GENE burden_response data, length = "+burden_response.length);
+                                    // alert("yes, there are GENE burden_response data, length = "+burden_response.length);
                                     pgx_data_display_area.style.display = "block";
                                     pgx_data_display_area_inner.style.display = "block";
                                     burden_data_control_area.style.display = "block";
@@ -463,7 +466,7 @@
                                         success: function (burden_response) {
                                             // if there are variant-based burden data
                                             if (burden_response.length > 0 ){
-                                                //alert("yes, there are VARIANT burden_response data");
+                                                // alert("yes, there are VARIANT burden_response data");
                                                 pgx_data_display_area.style.display = "block";
                                                 pgx_data_display_area_inner.style.display = "block";
                                                 burden_data_control_area.style.display = "block";
@@ -482,7 +485,7 @@
                             }
                         });
                     }else{
-                        //alert("no, there are no clinical_response data");
+                        // alert("no, there are no clinical_response data");
                         $.ajax(
                         {
                             url: "{% url 'get-gene-based-burden-data-by-atc' %}?atc_code=" + atc_code,
@@ -490,10 +493,11 @@
                             success: function (burden_response) {
                                 //check if there are gene-based burden data
                                 if (burden_response.length > 0 ){
-                                    //alert("yes, there are burden_response data, length = "+ burden_response.length);
+                                    // alert("yes, there are burden_response data, length = "+ burden_response.length);
                                     pgx_data_display_area.style.display = "block";
                                     pgx_data_display_area_inner.style.display = "block";
                                     burden_data_control_area.style.display = "block";
+                                    hasPGxData = true
                                     //if yes, show it, its radio button is checked
                                     geneBasedRadio.checked = true;
                                     render_gene_based_burden_data(burden_response);
@@ -505,10 +509,11 @@
                                         type: "GET",
                                         success: function (burden_response) {
                                             if (burden_response.length > 0 ){
-                                                //alert("yes, there are VARIANT burden_response data, length = "+burden_response.length);
+                                                alert("yes, there are VARIANT burden_response data, length = "+burden_response.length);
                                                 pgx_data_display_area.style.display = "block";
                                                 pgx_data_display_area_inner.style.display = "block";
                                                 burden_data_control_area.style.display = "block";
+                                                hasPGxData = true;
                                                 //yes --> show it
                                                 variantBasedRadio.checked = true;
                                                 geneBasedRadio.checked = false;
@@ -516,12 +521,8 @@
                                                 render_variant_based_burden_data(burden_response);
                                             }
                                             else{
-                                                //alert("isNetworkPGxTabClicked ="+isNetworkPGxTabClicked+"*");
-                                                //if (isNetworkPGxTabClicked)
-                                                //{   
-                                                //    alert("There is no PGx data");
-                                                //}
-                                                hasPGxData = false
+                                                hasPGxData = false;
+                                                // alert("no pgx data, hasPGxData = "+hasPGxData);
                                             }
                                         },
                                         error: function (xhr, status, error) {

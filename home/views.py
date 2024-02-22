@@ -856,11 +856,14 @@ def contribute_to_pgx(request):
 
 def disease_lookup(request):
     disease = request.GET.get('disease')
+    print("disease requested = ", disease)
     context = {}
     if disease:
         if disease != 'default':
+            print("are we here at disease != default???")
             diseases = Disease.objects.filter(disease_name__icontains=disease)
         else:
+            print("are we here at disease = default???")
             diseases = Disease.objects.all()[:8]
         response_data = []
         for d in diseases:
@@ -872,7 +875,7 @@ def disease_lookup(request):
                         'drugname': Drug.objects.get(drug_bankID=item[0]).name,
                         'clinical_trial': item[1],
                         'link': item[2],
-                        'atc_code': DrugAtcAssociation.objects.filter(drug_id=item[0]).values_list('atc_id', flat=True).first(),
+                        'atc_code': str(DrugAtcAssociation.objects.filter(drug_id=item[0]).values_list('atc_id', flat=True).first()),
                         })
                 response_data.append({
                     'disease_name':d.disease_name,
@@ -881,8 +884,10 @@ def disease_lookup(request):
                     "drugs": temp,
                 })
             
-        print("length = ",len(response_data))
+        print("there is disease para, length = ",len(response_data))
+        # context["response_data"] = response_data
         return JsonResponse({'response_data': response_data})
+        # return render(request, 'home/disease_lookup.html', context)
     else:
         diseases = Disease.objects.all()[:8]
         response_data = []
@@ -895,7 +900,7 @@ def disease_lookup(request):
                         'drugname': Drug.objects.get(drug_bankID=item[0]).name,
                         'clinical_trial': item[1],
                         'link': item[2],
-                        'atc_code': DrugAtcAssociation.objects.filter(drug_id=item[0]).values_list('atc_id', flat=True).first(),
+                        'atc_code': str(DrugAtcAssociation.objects.filter(drug_id=item[0]).values_list('atc_id', flat=True).first()),
                         })
                 response_data.append({
                     'disease_name':d.disease_name,
@@ -904,7 +909,8 @@ def disease_lookup(request):
                     "drugs": temp,
                 })
         context["response_data"] = response_data
-        print("length = ",len(response_data))
+        print("there is no disease para, length = ",len(response_data))
+        # print("response data: ", response_data)
         return render(request, 'home/disease_lookup.html', context)
 
 def disease_statistics(request):

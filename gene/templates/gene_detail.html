@@ -312,8 +312,8 @@
                 order: [[0, "asc"]],
                 pagingType: 'full_numbers',
                 lengthMenu: [
-                    [5, 10, 15, 20, 25, 50],
-                    [5, 10, 15, 20, 25, 50],
+                    [10, 15, 20, 25, 50],
+                    [10, 15, 20, 25, 50],
                 ],
                 drawCallback: function(){
                     $('.paginate_button:not(.disabled)', this.api().table().container())          
@@ -366,11 +366,11 @@
             let column_filters = [];
             // createYADCFfilters(start_column, num_cols, filter_type, select_type = null, filter_default_label = "", filter_reset_button_text = false, filter_match_mode = null, column_data_type = null, width = null)
             // Variant
-            column_filters = column_filters.concat(createYADCFfilters(0, 1, "auto_complete", null, "select", false, null, null, "60px"));
+            column_filters = column_filters.concat(createYADCFfilters(0, 1, "multi_select", "select2", "Select", false, null, null, "100px"));
             //Transcript
-            column_filters = column_filters.concat(createYADCFfilters(1, 1, "auto_complete", null, "select", false, null, null, "60px"));
+            column_filters = column_filters.concat(createYADCFfilters(1, 1, "multi_select", "select2", "Select", false, null, null, "110px"));
             //Canonical
-            column_filters = column_filters.concat(createYADCFfilters(2, 1, "select", null, "select", "YES", null, null, "80px"));
+            column_filters = column_filters.concat(createYADCFfilters(2, 1, "select", null, "Select", "YES", null, null, "80px"));
             //Sequence position
             column_filters = column_filters.concat(createYADCFfilters(3, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
             //Wildtype position
