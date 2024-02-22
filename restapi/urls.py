@@ -2,7 +2,7 @@ from django.urls import path, re_path
 
 from restapi.views import GeneVariantRestApiView, GeneVariantRestApiView, DrugByGeneRestApiView, TargetByAtcRestApiView, AtcToDescriptionRestApiView, \
                             AtcCodesByLevelRestApiView, TargetsByDrugRestApiView, GenebasedAssociationStatisticsRestApiView, AtcCodesByDrugRestApiView, AtcToPgxRestApiView, \
-                            DrugTargetInteractionByAtcRestApiView, VariantToVepRestApiView
+                            DrugTargetInteractionByAtcRestApiView, VariantToVepRestApiView, TargetToBundleRestApiView
 
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -40,4 +40,6 @@ urlpatterns = [
     
     path('drug/target/<slug:drug_id>/', TargetsByDrugRestApiView.as_view(), name='targets_by_drug_RestApiView'),
     path('drug/atc_code/<slug:drug_id>/', AtcCodesByDrugRestApiView.as_view(), name='atc_codes_by_drug_RestApiView'),
+
+    path('target/<slug:uniprot_id>/', TargetToBundleRestApiView.as_view(), name='bundle_data_by_target_RestApiView'),
 ]

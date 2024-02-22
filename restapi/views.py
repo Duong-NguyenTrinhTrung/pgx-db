@@ -4,10 +4,11 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from drf_yasg.inspectors import PaginatorInspector
 from gene.views import GeneDetailBaseView, DrugByGeneBaseView, GenebasedAssociationStatisticsView
-from restapi.serializers import GeneDetailSerializer, AtcDetailSerializer, AtcByLevelSerializer, TargetDrugSerializer, VariantSerializer
+from restapi.serializers import GeneDetailSerializer, AtcDetailSerializer, AtcByLevelSerializer, TargetDrugSerializer, VariantSerializer, TargetSerializer
 from drug.views import TargetByAtcBaseView, DescriptionByAtcBaseView, AtcCodesByLevelBaseView, TargetsByDrugBaseView, AtcCodesByDrugView, PGxByAtcCodeView, \
                         DrugTargetInteractionByAtcBaseView
 from variant.views import VEPFromVariantBaseView
+from protein.views import BundleByTargetCodeView
 
 
 class VariantToVepRestApiView(VEPFromVariantBaseView, APIView,):
@@ -203,7 +204,7 @@ class AtcCodesByLevelRestApiView(AtcCodesByLevelBaseView,APIView,):
     allowed_method = ["get"]
     @swagger_auto_schema(
             operation_description="operation_description",
-            operation_summary="Get all ATC codes belonging to an ATC group",
+            operation_summary="Get all ATC codes belonging to an ATC group ()",
     )
 
     def get(self, request, *args, **kwargs):
@@ -267,7 +268,6 @@ class AtcToPgxRestApiView(PGxByAtcCodeView,APIView,):
         else:
             return Response(serializer.errors, status=400)
         
-    
 
 class AtcCodesByDrugRestApiView(AtcCodesByDrugView,APIView,):
     allowed_method = ["get"]
@@ -333,3 +333,21 @@ class GenebasedAssociationStatisticsRestApiView(GenebasedAssociationStatisticsVi
             return Response({"Gene-based association statistics of "+variant_marker: returned_data})
         else:
             return Response(serializer.errors, status=400)
+
+
+class TargetToBundleRestApiView(BundleByTargetCodeView,APIView,):
+    allowed_method = ["get"]
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get bundle data given a UniProt ID",
+    )
+
+    def get(self, request, *args, **kwargs):
+        serializer = TargetSerializer(data=self.kwargs)
+
+        if serializer.is_valid():
+            data = self.get_bundle_data_by_target(serializer.validated_data.get('uniprot_id'))
+            return Response({"Bundle data:": data})
+        else:
+            return Response(serializer.errors, status=400)
+    

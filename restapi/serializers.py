@@ -23,3 +23,8 @@ class TargetDrugSerializer(serializers.Serializer):
     drug_id = serializers.CharField( 
         required=True,
     )
+
+class TargetSerializer(serializers.Serializer):
+    uniprot_id = serializers.CharField( 
+        required=True,
+    )
