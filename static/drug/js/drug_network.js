@@ -2764,18 +2764,17 @@ let DiseaseColorMap = {
         }
   }
 
-// var legendContent4 = d3.select("#Disease_to_hide");
+ // disable the Legends where data is empty
+ var legendContent4 = d3.select("#Disease_to_hide");
 
-
-//         if (diseases.some(disease => uniqueDisease.has(disease))) {
-//           console.log(uniqueDisease, ' here are unique interactions');
-//           console.log("check");
-//           legendContent4.style("display", "block");
-//         } else {
-//           legendContent4.style("display", "none");
-//           // Set display to "block" or any other desired value
-//         }
-
+ if (diseases.some((disease) => uniqueDisease.has(disease))) {
+   legendContent4.style("display", "block");
+ } else {
+   legendContent4.style("display", "none");
+   console.log("check1");
+   // Set display to "block" or any other desired value
+ }
+ 
 // Call the function to create the legend
 function createLegend_status() {
     var legendContent = d3.select("#legend_drug_status-content");
