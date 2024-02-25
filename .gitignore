@@ -98,7 +98,7 @@ data/
 
 # Virtualenv folder
 venv
-.venv
+
 
 # New Relic files
 #newrelic.ini
