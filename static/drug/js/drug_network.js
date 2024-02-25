@@ -2618,7 +2618,7 @@ let DiseaseColorMap = {
   // tag5 
   // funtion to the disease in the legend 
   function createDiseaseLegend() {
-    var hiddendisease = {}; // Change this to 
+    var hiddendisease = {}; // Change this to
     var diseases = [
       "Congenital and Neonatal",
       "Respiratory Tract",
@@ -2644,63 +2644,61 @@ let DiseaseColorMap = {
       "Endocrine System",
       "Male Urogenital",
       "Occupational Diseases",
-      "Genetic Inborn"
+      "Genetic Inborn",
     ];
-
-
+  
     var legendContent = d3.select("#legend_disease_status-content");
-
-
+  
     // links.forEach(function (link) {
     //   for(let i=0 ; i<diseases.length ; i++){
     //     if(link.target.DiseaseClass === diseases[i])
     //     {
     //       console.log(link.target.DiseaseClass , "Disease_class");
-
+  
     //     }
-
+  
     //   }
     // })
-
+  
     // links.forEach(function (link) {
     //   var diceaseClass11 = link.target.Protein_Class; // No need to convert to lowercase
     //   //console.log(proteinClass11);
     // for(let i=0 ; i<diseases.length ; i++){
-
+  
     //   if (true) {
-
-    //     createLegendItem(diseases[i], diseaseColors[i]);   
-
+  
+    //     createLegendItem(diseases[i], diseaseColors[i]);
+  
     //   }
-
+  
     // }
     var uniqueDisease = new Set();
-
+  
     links.forEach(function (link) {
       var diseaseClass11 = link.target.DiseaseClass; // No need to convert to lowercase
       //console.log(proteinClass11);
-
-
+  
       if (
         diseases.includes(diseaseClass11) &&
         !uniqueDisease.has(diseaseClass11)
       ) {
         //console.log(link.target.DiseaseClass);
-        createLegendItem(diseaseClass11, DiseaseColorMap[diseaseClass11], diseaseClass11);
+        createLegendItem(
+          diseaseClass11,
+          DiseaseColorMap[diseaseClass11],
+          diseaseClass11
+        );
         uniqueDisease.add(diseaseClass11);
       }
     });
-
-
-
-
+  
     function createLegendItem(disease, color, diseasetemp) {
       var legendItem = legendContent
         .append("div")
         .style("display", "flex")
         .style("align-items", "center")
         .style("margin-bottom", "5px");
-
+  
       var dropdown = legendItem
         .append("div")
         .attr("class", "triangle")
@@ -2710,8 +2708,8 @@ let DiseaseColorMap = {
         .style("border-left", "10px solid transparent")
         .style("border-right", "10px solid transparent")
         .style("border-bottom", "17px solid " + color)
-        .style("border-radius", "0")
-
+        .style("border-radius", "0");
+  
       var dropdownMenu = dropdown
         .append("div")
         .attr("class", "dropdown-menu2")
@@ -2720,7 +2718,7 @@ let DiseaseColorMap = {
         .style("left", "25px")
         .style("height", "20px")
         .style("flex-direction", "row");
-
+  
       for (let i = 0; i < diseases.length; i++) {
         dropdownMenu
           .append("div")
@@ -2732,13 +2730,11 @@ let DiseaseColorMap = {
         .append("span")
         .style("margin-left", "10px")
         .text(disease);
-
-
+  
       legendText.on("click", function () {
-
         var clickedText = d3.select(this);
         var diseaseClass = clickedText.text();
-
+  
         if (clickedText.classed("text-through")) {
           clickedText.classed("text-through", false);
           hiddenDiseaseClasses[diseaseClass] = false;
@@ -2746,35 +2742,38 @@ let DiseaseColorMap = {
           clickedText.classed("text-through", true);
           hiddenDiseaseClasses[diseaseClass] = true;
         }
-
+  
         updateAllFilters();
-
       });
-
     }
+  
+    // disable the change  
     var legendContent4 = d3.select("#Disease_to_hide");
-
-
-        if (diseases.some(disease => uniqueDisease.has(disease))) {
-      
-          legendContent4.style("display", "block");
-        } else {
-          legendContent4.style("display", "none");
-          // Set display to "block" or any other desired value
-        }
+  
+    if (diseases.some((disease) => uniqueDisease.has(disease))) {
+      legendContent4.style("display", "block");
+    } else {
+      legendContent4.style("display", "none");
+      console.log("check1");
+      // Set display to "block" or any other desired value
+    }
   }
+  
 
- // disable the Legends where data is empty
- var legendContent4 = d3.select("#Disease_to_hide");
+// var legendContent4 = d3.select("#Disease_to_hide");
 
- if (diseases.some((disease) => uniqueDisease.has(disease))) {
-   legendContent4.style("display", "block");
- } else {
-   legendContent4.style("display", "none");
-   console.log("check1");
-   // Set display to "block" or any other desired value
- }
- 
+
+//         if (diseases.some(disease => uniqueDisease.has(disease))) {
+//           console.log(uniqueDisease, ' here are unique interactions');
+//           console.log("check");
+//           legendContent4.style("display", "block");
+//         } else {
+//           legendContent4.style("display", "none");
+//           // Set display to "block" or any other desired value
+//         }
+
+
+
 // Call the function to create the legend
 function createLegend_status() {
     var legendContent = d3.select("#legend_drug_status-content");
