@@ -1,3 +1,4 @@
+
 """
 WSGI config for Phar_project project.
 
