@@ -3,26 +3,46 @@
 {% csrf_token %}
 
 {% block addon_css %}
-    
     <link rel="stylesheet" type="text/css" href="{% static 'drug/css/atc_lookup.css' %}">
+    <style>
+        #sub-atc-intro {
+            display: flex;
+        }
+        #sub-atc-intro-text{
+            width: 65%;
+        }
+        #sub-atc-intro-image{
+            width: 35%;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
     {% autoescape off %}
         <div class="atc-intro">
-            <h1>ATC/DDD Index 2023</h1>
-            <div>
-                <p>
-                    A searchable version of the complete ATC index with DDDs is available below. The search options
-                    enable you to find ATC codes and DDDs for substance name <br>
-                    and/or ATC levels. In your search result you may choose to show or hide the text from the Guidelines
-                    for ATC classification and DDD assignment linked to <br>
-                    the ATC level. The text in the Guidelines will give information related to the background for the
-                    ATC and DDD assignment.
-                </p>
+            <h3>ATC</h3>
+            <div id="sub-atc-intro">
+                <div id="sub-atc-intro-text">
+                    <p>
+                        The Anatomical Therapeutic Chemical (ATC) classification system is used for the classification of drugs.
+                        It is published by the World Health Organization (WHO). <br>The classification is based on therapeutic and
+                        chemical characteristics of the drugs. Each ATC code is divided into 5 levels:<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1st level: Anatomical main group<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2nd level: Therapeutic main group<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3rd level: Therapeutic/pharmacological subgroup<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4th level: Chemical/therapeutic/pharmacological subgroup<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5th level: Chemical substance<br>
+                        Substances or combination of substances in the 5th level refer to a single indication. Drugs having more than one indication belong to more than one ATC code. Tretinoin for example has 3 ATC codes assigned.
+                        <br>
+                        </p>
+                </div>
+                <div id="sub-atc-intro-image">
+                    <img src="static/drug/image/atc2.png" alt="Atc code example" style="width: 70%; margin-left: 50px;">
+                </div>
             </div>
-
-            <h2 style="margin-top: 10px;">Search query</h2>
+            <h3 style="margin-top: 10px;">Search</h3>
+            <p>A searchable version of the complete ATC index is available below. The search options enable you to find ATC codes and/or ATC levels. </p> 
+                
         </div>
 
         <div class="row">
@@ -42,15 +62,12 @@
         </div>
 
         <div id="atc-intro">
-            <h2>ATC code</h2>
-            <div>
-                <p>All ATC levels are searchable.
-                    A search will result in showing the exact substance or level and all ATC levels above (up to 1st ATC level).</p>
-            </div>
+            <h3 style="margin-bottom: 5px;">ATC tree</h3>
         </div>
-        <div id="atc-l1">
+        <div id="atc-l1" style="margin-top: 15px;">
+            <p style="margin-top: 0px; margin-bottom: 15px;">All ATC levels are browsable from 1st to 5th ATC level</p>
             {% for group in atc_groups %}
-                <p><a href="{% url 'atc-detail-view' %}?group_id={{ group.id }}">{{ group.id }}: {{ group.name }}</a></p>
+                <p style="margin-top: 0px; margin-bottom: 4px;"><a href="{% url 'atc-detail-view' %}?group_id={{ group.id }}">{{ group.id }}: {{ group.name }}</a></p>
             {% empty %}
                 <p>No data available</p>
             {% endfor %}
@@ -87,7 +104,7 @@
                 }
 
                 // Change text of the atc-intro panel
-                $("#atc-intro h2").text("Result");
+                $("#atc-intro h3").text("Result");
                 $("#atc-intro p").text('');
 
 
