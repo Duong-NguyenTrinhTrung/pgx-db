@@ -18,7 +18,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.cache import cache
 
 from protein.models import Protein
-from variant.models import Variant, VepVariant, GenebassPGx, GenebassVariantPGx, Pharmgkb
+from variant.models import Variant, VepVariant, GenebassPGx, GenebassVariantPGx, Pharmgkb, VariantMapper
 from interaction.models import Interaction
 from gene.models import Gene
 from disease.models import Disease, DrugDiseaseStudy
@@ -28,6 +28,19 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
+
+def variant_mapper(request):
+    context = {}
+    return render(request, 'home/variant_mapper.html', context)
+
+def get_variant_mapping(request):
+    pass
+
+def get_variant_mapping_example(request):
+    pass
+
+def variant_anno_from_autocomplete_view(request):
+    pass
 
 def anno_from_autocomplete_view(request):
     version = request.GET.get('version')

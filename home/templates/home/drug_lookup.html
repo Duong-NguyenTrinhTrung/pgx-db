@@ -263,6 +263,7 @@
                         $("#drug-result-tbody").html('');
                         var html_data = '';
                         data.drugs.forEach(item => {
+                            console.log("submit function item.drug_bankID ", item.drug_bankID);
                             html_data += `<tr>
                                 <td>${item.drug_bankID}</td>
                                 <td>${item.name}</td>
@@ -287,6 +288,7 @@
                         $("#drug-result-tbody").html('');
                         var html_data = '';
                         data.drugs.forEach(item => {
+                            console.log("reset function item.drug_bankID ", item.drug_bankID);
                             html_data += `<tr>
                                 <td>${item.drug_bankID}</td>
                                 <td>${item.name}</td>

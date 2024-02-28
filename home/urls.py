@@ -1,7 +1,7 @@
 # from django.conf.urls import url
 from django.urls import path
 from django.views.decorators.cache import cache_page
-from .views import Home, drug_target_network, drug_lookup, target_lookup, drug_autocomplete_view, protein_autocomplete_view, variant_autocomplete_view, variant_lookup, chromosome_mapper, target_statistics, about_pgx, get_chromosome_mapping, get_chromosome_mapping_example, anno_from_autocomplete_view, disease_lookup, disease_statistics, disease_autocomplete_view, contribute_to_pgx
+from .views import Home, drug_target_network, drug_lookup, target_lookup, drug_autocomplete_view, protein_autocomplete_view, variant_autocomplete_view, variant_lookup, chromosome_mapper, variant_mapper, target_statistics, about_pgx, get_chromosome_mapping, get_variant_mapping, get_chromosome_mapping_example, get_variant_mapping_example, anno_from_autocomplete_view, variant_anno_from_autocomplete_view, disease_lookup, disease_statistics, disease_autocomplete_view, contribute_to_pgx
 
 
 urlpatterns = [
@@ -19,9 +19,13 @@ urlpatterns = [
 
     path("variant_lookup/", cache_page(3600*24*365)(variant_lookup), name='variant_lookup'),
     path("chromosome_mapper/", cache_page(3600*24*365)(chromosome_mapper), name='chromosome_mapper'),
+    path("variant_mapper/", cache_page(3600*24*365)(variant_mapper), name='variant_mapper'),
     path("get_chromosome_mapping/", get_chromosome_mapping, name='get_chromosome_mapping'),
+    path("get_variant_mapping/", get_variant_mapping, name='get_variant_mapping'),
     path("get_chromosome_mapping_example/", get_chromosome_mapping_example, name='get_chromosome_mapping_example'),
+    path("get_variant_mapping_example/", get_variant_mapping_example, name='get_variant_mapping_example'),
     path("anno_from_autocomplete_view/", anno_from_autocomplete_view, name='anno-from-autocomplete-view'),
+    path("variant_anno_from_autocomplete_view/", variant_anno_from_autocomplete_view, name='variant-anno-from-autocomplete-view'),
     path('variant-autocomplete/', variant_autocomplete_view, name='variant_autocomplete_view'),
     
     path('disease_lookup/', cache_page(3600*24*365)(disease_lookup), name='disease_lookup'),

@@ -68,7 +68,7 @@
 
 
     #variant form {
-        background-color: #caf0f8;
+        background-color: #dde5b6;
         /* Use a different pastel background color for the form if desired */
         padding: 3px;
         /* Add some padding to the form */
@@ -165,7 +165,7 @@
         flex-direction: row;
         gap: 15px;
         width: 100%;
-        background-color: #caf0f8;
+        background-color: #dde5b6;
     }
 
     #ensembl,
@@ -220,8 +220,8 @@
 
 {% block content %}
 <div id="variant">
-    <h2>Chromosome/contig name mappings between <a href=""><i><span>UCSC</span></i></a>, <a href=""><i><span>Ensembl</span></i></a>, <a href=""><i><span>Gencode</span></i></a>, <a href=""><i><span>RefSeq</span></i></a> and <a href=""><i><span>NCBI</span></i></a></h2>
-    <p style="text-align: center;">Source: <a href="https://github.com/dpryan79/ChromosomeMappings" target="_blank">Ref</a></p>
+    <h2>Variant mappings between <a href=""><i><span>Ensembl</span></i></a>, <a href=""><i><span>RefSeq</span></i></a></h2>
+    <p style="text-align: center;">Source: Ensembl, dbSNP databases </p>
     <br>
     <div class="select-version" >
         <p>Select a genome version</p>
@@ -236,10 +236,7 @@
                     <div class="select-version">
                         <p>Select a namming system</p>
                         <select id="anno-from-select" onchange="updateExample(this)" multiple class="form-control input-sm" style="width: 100px; font-size: 14px;" size="5">
-                            <option value="ucsc" selected="selected" >UCSC</option>
-                            <option value="ensembl">Ensembl</option>
-                            <option  value="gencode">Gencode</option>
-                            <option  value="ncbi">NCBI</option>
+                            <option value="ensembl" selected="selected" >Ensembl</option>
                             <option  value="refseq">RefSeq</option>
                         </select>
                     </div>
@@ -250,7 +247,7 @@
                         <div id="anno-from-autocomplete-results">
                         </div>
                     </div>
-                    <div id="anno_from_example" style="text-align: left;"><span >Examples: <i style="color:#0077b6;">GL000208.1</i></span></div>
+                    <div id="anno_from_example" style="text-align: left;"><span >Examples: <i style="color:#0077b6;">1_225839224_C/T</i></span></div>
             </div>
             <div id="switch">
                     <button type="button" onclick="reset()" style="margin-top: 7px;">
@@ -264,11 +261,8 @@
                     <div class="select-version">
                         <p>Select a namming system</p>
                         <select id="anno-to-select" onchange="updateExample(this)" multiple class="form-control input-sm" style="width: 100px; font-size: 14px;"  size="5">
-                            <option value="ucsc">UCSC</option>
-                            <option value="ensembl" selected="selected">Ensembl</option>
-                            <option  value="gencode">Gencode</option>
-                            <option  value="ncbi">NCBI</option>
-                            <option  value="refseq">RefSeq</option>
+                            <option  value="refseq" selected="selected">RefSeq</option>
+                            <option value="ensembl" >Ensembl</option>
                         </select>
                     </div>
                     <input id="search-anno-to"
@@ -278,7 +272,7 @@
                         <div id="anno-to-autocomplete-results">
                         </div>
                     </div>
-                    <div id="anno_to_example" style="text-align: left;"><span>Examples: <i style="color:#0077b6;">chr5_GL000208v1_random</i></span></div>
+                    <div id="anno_to_example" style="text-align: left;"><span>Examples: <i style="color:#0077b6;">rs1200840629</i></span></div>
             </div>
         </div>
 
@@ -293,6 +287,7 @@
 
 <script>
     $(document).ready(function () {
+        alert("Please kindly noted that this function is under construction");
         var autocompleteResults = $('#anno-from-autocomplete-results');
         var version = $("#genome_select option:selected").text();
         var anno_from = $("#anno-from-select").val();
