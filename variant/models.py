@@ -1,5 +1,4 @@
 from django.db import models
-
 from gene.models import Gene
 from drug.models import Drug
 
@@ -9,6 +8,11 @@ class Variant(models.Model):
     Gene_ID = models.ForeignKey(
         "gene.gene", on_delete=models.CASCADE, default="None"
     )
+
+class VariantMapper(models.Model):
+    genome_version = models.CharField(max_length=50)
+    ensembl = models.CharField(max_length=50)  # string values
+    refseq = models.CharField(max_length=50)  # string values
 
 
 class VariantPhenocode(models.Model):
