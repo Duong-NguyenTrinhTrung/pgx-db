@@ -26,12 +26,62 @@ class VepVariantListView(generics.ListAPIView):
 class VEPFromVariantBaseView:
     def get_vep_from_variant(self, slug):
         context = {}
+        slug = slug[:-1] if slug[-1] == "/" else slug
+        print("processed vm ", slug)
+        
         if slug is not None:
             if cache.get("vep_by_variant_marker_" + slug) is not None:
                 returned_data = cache.get("vep_by_variant_marker_" + slug)
             else:
-                vep = VepVariant.objects.get(Variant_marker=slug)
+                vep_rows = VepVariant.objects.filter(Variant_marker=slug)
                 returned_data = []
+                for r in vep_rows:
+                    row = {
+                            "Transcript_ID": str(r.Transcript_ID),
+                            "AM_pathogenicity": str(r.AM_pathogenicity),
+                            "BayesDel_addAF_rankscore": str(r.BayesDel_addAF_rankscore),
+                            "BayesDel_noAF_rankscore": str(r.BayesDel_noAF_rankscore),
+                            "CADD_raw_rankscore": str(r.CADD_raw_rankscore),
+                            "ClinPred_rankscore": str(r.ClinPred_rankscore),
+                            "DANN_rankscore": str(r.DANN_rankscore),
+                            "DEOGEN2_rankscore": str(r.DEOGEN2_rankscore),
+                            "Eigen_PC_raw_coding_rankscore": str(r.Eigen_PC_raw_coding_rankscore),
+                            "Eigen_raw_coding_rankscore": str(r.Eigen_raw_coding_rankscore),
+                            "FATHMM_converted_rankscore": str(r.FATHMM_converted_rankscore),
+                            "GERP_RS_rankscore": str(r.GERP_RS_rankscore),
+                            "GM12878_fitCons_rankscore": str(r.GM12878_fitCons_rankscore),
+                            "GenoCanyon_rankscore": str(r.GenoCanyon_rankscore),
+                            "H1_hESC_fitCons_rankscore": str(r.H1_hESC_fitCons_rankscore),
+                            "HUVEC_fitCons_rankscore": str(r.HUVEC_fitCons_rankscore),
+                            "LIST_S2_rankscore": str(r.LIST_S2_rankscore),
+                            "LRT_converted_rankscore": str(r.LRT_converted_rankscore),
+                            "M_CAP_rankscore": str(r.M_CAP_rankscore),
+                            "MPC_rankscore": str(r.MPC_rankscore),
+                            "MVP_rankscore": str(r.MVP_rankscore),
+                            "MetaLR_rankscore": str(r.MetaLR_rankscore),
+                            "MetaRNN_rankscore": str(r.MetaRNN_rankscore),
+                            "MetaSVM_rankscore": str(r.MetaSVM_rankscore),
+                            "MutPred_rankscore": str(r.MutPred_rankscore),
+                            "MutationAssessor_rankscore": str(r.MutationAssessor_rankscore),
+                            "MutationTaster_converted_rankscore": str(r.MutationTaster_converted_rankscore),
+                            "PROVEAN_converted_rankscore": str(r.PROVEAN_converted_rankscore),
+                            "Polyphen2_HDIV_rankscore": str(r.Polyphen2_HDIV_rankscore),
+                            "Polyphen2_HVAR_rankscore": str(r.Polyphen2_HVAR_rankscore),
+                            "PrimateAI_rankscore": str(r.PrimateAI_rankscore),
+                            "REVEL_rankscore": str(r.REVEL_rankscore),
+                            "SIFT4G_converted_rankscore": str(r.SIFT4G_converted_rankscore),
+                            "SIFT_converted_rankscore": str(r.SIFT_converted_rankscore),
+                            "SiPhy_29way_logOdds_rankscore": str(r.SiPhy_29way_logOdds_rankscore),
+                            "VEST4_rankscore": str(r.VEST4_rankscore),
+                            "bStatistic_converted_rankscore": str(r.bStatistic_converted_rankscore),
+                            "Fathmm_MKL_coding_rankscore": str(r.Fathmm_MKL_coding_rankscore),
+                            "Fathmm_XF_coding_rankscore": str(r.Fathmm_XF_coding_rankscore),
+                            "Integrated_fitCons_rankscore": str(r.Integrated_fitCons_rankscore),
+                            "PhastCons30way_mammalian_rankscore": str(r.PhastCons30way_mammalian_rankscore),
+                            "PhyloP30way_mammalian_rankscore": str(r.PhyloP30way_mammalian_rankscore),
+                            "LINSIGHT_rankscore": str(r.LINSIGHT_rankscore),
+                         }
+                    returned_data.append(row)
                 context = dict()
                 cache.set("vep_by_variant_marker_" + slug, returned_data, 60 * 60)
             context['vep'] = returned_data

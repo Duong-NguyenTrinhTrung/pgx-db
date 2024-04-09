@@ -2041,14 +2041,36 @@ class DescriptionByAtcBaseView:
             if cache.get("description_by_atc_data_" + slug) is not None:
                 description = cache.get("description_by_atc_data_" + slug)
             else:
-                description = retrieving_atc_description(slug).name
+                description = retrieving_atc_description(slug)
                 context = dict()
                 cache.set("description_by_atc_data_" + slug, description, 60 * 60)
             context['description'] = description
         return context
 
+def retrieving_atc_description(atc_code):
+    rs = ""
+    if len(atc_code)==1:
+        rs = list(AtcAnatomicalGroup.objects.filter(id=atc_code).values_list("name", flat=True))
+    else:
+        if len(atc_code)==3:
+            rs = list(AtcTherapeuticGroup.objects.filter(id=atc_code).values_list("name", flat=True))
+        else:
+            if len(atc_code)==4:
+                rs = list(AtcPharmacologicalGroup.objects.filter(id=atc_code).values_list("name", flat=True))
+            else:
+                if len(atc_code)==5:
+                    rs = list(AtcChemicalGroup.objects.filter(id=atc_code).values_list("name", flat=True))
+                else:
+                    if len(atc_code)==7:
+                        rs = list(AtcChemicalSubstance.objects.filter().values_list("name", flat=True))
 
-def retrieving_atc_description(level):
+    if len(rs)==1:
+            return rs[0]
+    else:
+            return "Wrong Atc code"
+
+
+def retrieving_atc_sublevel(level):
     if level.lower()=="anatomical":
         return list(AtcAnatomicalGroup.objects.all().values_list("id", "name"))
     else:
@@ -2111,17 +2133,41 @@ class AtcCodesByDrugView:
     
 
 class PGxByAtcCodeView:
-    def get_pgx_by_atc_code(self, slug):
+    def get_pharmgkb_pgx_by_atc_code(self, slug):
         context = {}
         if slug is not None:
             if cache.get("pgx_by_atc_codes_" + slug) is not None:
                 returned_data = cache.get("pgx_by_atc_codes_" + slug)
             else:
-                pgx = ""
+                drug_ids = list(set(list(DrugAtcAssociation.objects.filter(atc_id__id__icontains=slug).values_list("drug_id", flat=True))))
+                print("drug_ids ", drug_ids)
+
+                pgx = Pharmgkb.objects.filter(drugbank_id__in=drug_ids)
                 returned_data = []
-                # for code in pgx:
-                #     name = AtcChemicalSubstance.objects.get(id=code[0]).name
-                #     returned_data.append({"Atc code": code, "Description": name })
+                for row in pgx:
+                    drug_id = row.drugbank_id.drug_bankID
+                    print("inside loop, drug_id = ", drug_id)
+                    r = {
+                            "DrugbankID": drug_id,
+                            "Drugname": Drug.objects.get(drug_bankID=drug_id).name,
+                            "Variant_or_Haplotypes": row.Variant_or_Haplotypes,
+                            "PMID": row.PMID,
+                            "Phenotype_Category": row.Phenotype_Category,
+                            "Significance": row.Significance,
+                            "Notes": row.Notes,
+                            "Sentence": row.Sentence,
+                            "Alleles": row.Alleles,
+                            "P_Value": row.P_Value,
+                            "Biogeographical_Groups": row.Biogeographical_Groups,
+                            "Study_Type": row.Study_Type,
+                            # "Study_Cases": row.Study_Cases,
+                            # "Study_Controls": row.Study_Controls,
+                            "Direction_of_effect": row.Direction_of_effect,
+                            "PD_PK_terms": row.PD_PK_terms,
+                            "Metabolizer_types": row.Metabolizer_types,
+                        }
+                    returned_data.append(r)
+                print("returned_data : ", returned_data)
 
                 context = dict()
                 cache.set("pgx_by_atc_codes_" + slug, returned_data, 60 * 60)
@@ -2135,7 +2181,9 @@ class DrugTargetInteractionByAtcBaseView:
             if cache.get("interactions_by_atc_code_" + slug) is not None:
                 returned_data = cache.get("interactions_by_atc_code_" + slug)
             else:
-                drug_ids = DrugAtcAssociation.objects.filter(atc_id=slug).values_list("drug_id", flat=True)
+                print("slug ", slug)
+                drug_ids = DrugAtcAssociation.objects.filter(atc_id__id__istartswith=slug).values_list("drug_id", flat=True)
+                print("drug_ids ", drug_ids)
                 returned_data = []
                 for drug_id in drug_ids:
                     interactions = Interaction.objects.filter(drug_bankID=drug_id).values_list("uniprot_ID", "actions", "known_action", "interaction_type")

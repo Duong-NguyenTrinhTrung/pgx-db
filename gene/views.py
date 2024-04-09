@@ -34,6 +34,7 @@ from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
 
 
+
 warnings.filterwarnings('ignore')
 
 class GenebasedAssociationStatisticsView:
@@ -307,7 +308,6 @@ class GeneDetailBaseView(object):
                 browser_columns = self.browser_columns
 
                 table = pd.DataFrame(columns=browser_columns)
-
                 # Retrieve all variant markers from a gene
                 if slug.startswith("ENSG"):
                     marker_ID_data = Variant.objects.filter(Gene_ID=slug).values_list(
