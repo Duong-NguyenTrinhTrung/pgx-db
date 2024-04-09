@@ -10,7 +10,7 @@ class Variant(models.Model):
     )
 
 class VariantMapper(models.Model):
-    genome_version = models.CharField(max_length=50)
+    genome_version = models.CharField(max_length=2) #38
     ensembl = models.CharField(max_length=50)  # string values
     refseq = models.CharField(max_length=50)  # string values
 

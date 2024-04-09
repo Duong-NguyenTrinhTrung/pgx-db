@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 
-from restapi.views import GeneVariantRestApiView, GeneVariantRestApiView, DrugByGeneRestApiView, TargetByAtcRestApiView, AtcToDescriptionRestApiView, \
+from restapi.views import GeneVariantRestApiView, DrugByGeneRestApiView, TargetByAtcRestApiView, AtcToDescriptionRestApiView, \
                             AtcCodesByLevelRestApiView, TargetsByDrugRestApiView, GenebasedAssociationStatisticsRestApiView, AtcCodesByDrugRestApiView, AtcToPgxRestApiView, \
                             DrugTargetInteractionByAtcRestApiView, VariantToVepRestApiView, TargetToBundleRestApiView
 
@@ -23,14 +23,10 @@ schema_view = get_schema_view(
 app_name = 'restapi'
 urlpatterns = [
     path('gene/variant/<slug:gene_id>/', GeneVariantRestApiView.as_view(), name='gene'),
-    path('gene/vep_score/<slug:gene_id>/', GeneVariantRestApiView.as_view(), name='gene_detail_vep_RestApiView'),
-    #allow query by using gene_id or gene name
     path('gene/drug/', DrugByGeneRestApiView.as_view(), name='drug_by_gene_RestApiView'),
-    # path('gene/drug/<slug:gene_id>/', DrugByGeneRestApiView.as_view(), name='drug_by_gene_RestApiView'),
-    # path('gene/associateStatictics/<slug:variant_marker>/', GenebasedAssociationStatisticsRestApiView.as_view(), name='genebased_association_statistics_RestApiView'),
-    #Learn about slud with special character, handle the cases when no data returned
     re_path('gene/associateStatictics/(?P<variant_marker>[a-zA-Z0-9_\-\/]+)', GenebasedAssociationStatisticsRestApiView.as_view(), name='genebased_association_statistics_RestApiView'),
-    path('variant/VEPscore/<slug:variant_marker>/', VariantToVepRestApiView.as_view(), name='variant_to_VEP_RestApiView'),
+    
+    re_path('variant/VEPscore/(?P<variant_marker>[a-zA-Z0-9_\-\/]+)', VariantToVepRestApiView.as_view(), name='variant_to_VEP_RestApiView'),
 
     path('atc/target/<slug:atc_code>/', TargetByAtcRestApiView.as_view(), name='target_by_atc_RestApiView'),
     path('atc/interaction/<slug:atc_code>/', DrugTargetInteractionByAtcRestApiView.as_view(), name='drug_target_interaction_by_atc_RestApiView'),

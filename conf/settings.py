@@ -68,7 +68,6 @@ INSTALLED_APPS = [
     "restapi",
     "chromosome",
     "disease",
-    "feedback",
 ]
 
 MIDDLEWARE = [
