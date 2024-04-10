@@ -187,9 +187,14 @@
                     <td>{{ drug.name }}</td>
                     <!-- <td><a href="#">{{ drug.atc_code }}</a></td> -->
                     {% if drug.atc_code != 'Not assigned' %}
-                        <td><a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id={{ drug.atc_code.0 }}&detail={{ drug.atc_code }}">{{ drug.atc_code }}</a></td>
+                        <td>
+                            {% for item in drug.atc_code %}
+                                <a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id={{ item.0 }}&detail={{ item }}">{{ item }}</a>{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                        </td>
                     {% else %}
                         <td>{{ drug.atc_code }}</td>
+                        
                     {% endif %}
                     <td>{{ drug.drug_type }}</td>
                     <td>{{ drug.Clinical_status }}</td>
@@ -255,27 +260,39 @@
                     }
                 });
         }); */
+        
         $("#submit_drug").click(function() {
             $.ajax({
-                    url: "{% url 'drug_lookup' %}?drug="+ $("#search_drug").val(),
-                    success: function (data) {
-                        // console.log(data.drugs);
-                        $("#drug-result-tbody").html('');
-                        var html_data = '';
-                        data.drugs.forEach(item => {
-                            console.log("submit function item.drug_bankID ", item.drug_bankID);
-                            html_data += `<tr>
-                                <td>${item.drug_bankID}</td>
-                                <td>${item.name}</td>
-                                <td><a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id=${item.atc_code.charAt(0)}&detail=${item.atc_code}">${item.atc_code}</a></td>
-                                <td>${item.drug_type}</td>
-                                <td>${item.Clinical_status}</td>
-                                <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ item.drug_bankID }}"   target="_blank" rel="noopener noreferrer">Link</a></td>
-                            </tr>`;
-                        });
-                        $("#drug-result-tbody").html(html_data);
-                    }
-                });
+                url: "{% url 'drug_lookup' %}?drug="+ $("#search_drug").val(),
+                success: function (data) {
+                    $("#drug-result-tbody").html('');
+                    var html_data = '';
+                    data.drugs.forEach(item => {
+                        console.log("submit function item.drug_bankID ", item.drug_bankID);
+                        var atcCodeHtml = '';
+                        if (item.atc_code !== 'Not assigned' && Array.isArray(item.atc_code)) {
+                            item.atc_code.forEach((c, index) => {
+                                atcCodeHtml += `<a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id=${c.charAt(0)}&detail=${c}">${c}</a>`;
+                                if (index < item.atc_code.length - 1) {
+                                    atcCodeHtml += ', ';
+                                }
+                            });
+                        } else {
+                            atcCodeHtml = item.atc_code;
+                        }
+        
+                        html_data += `<tr>
+                                        <td>${item.drug_bankID}</td>
+                                        <td>${item.name}</td>
+                                        <td>${atcCodeHtml}</td>
+                                        <td>${item.drug_type}</td>
+                                        <td>${item.Clinical_status}</td>
+                                        <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/${item.drug_bankID}" target="_blank" rel="noopener noreferrer">Link</a></td>
+                                      </tr>`;
+                    });
+                    $("#drug-result-tbody").html(html_data);
+                }
+            });
         });
         
         $("#reset_drug").click(function() {
@@ -284,19 +301,30 @@
                     // method: "GET",
                     // dataType: "html", // Specify the expected response type
                     success: function (data) {
-                        console.log("data.drugs: "+data.drugs);
                         $("#drug-result-tbody").html('');
                         var html_data = '';
                         data.drugs.forEach(item => {
-                            console.log("reset function item.drug_bankID ", item.drug_bankID);
+                            console.log("submit function item.drug_bankID ", item.drug_bankID);
+                            var atcCodeHtml = '';
+                            if (item.atc_code !== 'Not assigned' && Array.isArray(item.atc_code)) {
+                                item.atc_code.forEach((c, index) => {
+                                    atcCodeHtml += `<a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id=${c.charAt(0)}&detail=${c}">${c}</a>`;
+                                    if (index < item.atc_code.length - 1) {
+                                        atcCodeHtml += ', ';
+                                    }
+                                });
+                            } else {
+                                atcCodeHtml = item.atc_code;
+                            }
+            
                             html_data += `<tr>
-                                <td>${item.drug_bankID}</td>
-                                <td>${item.name}</td>
-                                <td><a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id=${item.atc_code.charAt(0)}&detail=${item.atc_code}">${item.atc_code}</a></td>
-                                <td>${item.drug_type}</td>
-                                <td>${item.Clinical_status}</td>
-                                <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ item.drug_bankID }}"   target="_blank" rel="noopener noreferrer">Link</a></td>
-                            </tr>`;
+                                            <td>${item.drug_bankID}</td>
+                                            <td>${item.name}</td>
+                                            <td>${atcCodeHtml}</td>
+                                            <td>${item.drug_type}</td>
+                                            <td>${item.Clinical_status}</td>
+                                            <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/${item.drug_bankID}" target="_blank" rel="noopener noreferrer">Link</a></td>
+                                          </tr>`;
                         });
                         $("#drug-result-tbody").html(html_data);
                     }
