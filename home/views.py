@@ -231,8 +231,11 @@ def drug_lookup(request):
             data = Drug.objects.all()[:30]
         drugs = []
         for item in data:
-            atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True).first()
-            code = atc_code if atc_code is not None else "Not assigned"
+            atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True)
+            if len(atc_code)==0:
+                code = "Not assigned"
+            else:
+                code = list(atc_code)
             drugs.append({
                 'drug_bankID': item.drug_bankID,
                 'name': item.name,
@@ -240,14 +243,17 @@ def drug_lookup(request):
                 'drug_type': item.drugtype.type_detail,
                 'Clinical_status': clinical_status_dict.get(item.Clinical_status)
             })
-
+        print("drugs : ", drugs)
         return JsonResponse({'drugs': drugs})
     else:
         data = Drug.objects.all()[:30]
         drugs = []
         for item in data:
-            atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True).first()
-            code = atc_code if atc_code is not None else "Not assigned"
+            atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True)
+            if len(atc_code)==0:
+                code = "Not assigned"
+            else:
+                code = list(atc_code)
 
             drugs.append({
                 'drug_bankID': item.drug_bankID,
@@ -257,6 +263,7 @@ def drug_lookup(request):
                 'Clinical_status': clinical_status_dict.get(item.Clinical_status)
             })
         context["drugs"] = drugs
+        print("context ", context)
         return render(request, 'home/drug_lookup.html', context)
     
 def get_atc_code(drug_bankID):
