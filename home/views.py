@@ -93,7 +93,7 @@ def variant_autocomplete_view(request):
 
 def drug_autocomplete_view(request):
     query = request.GET.get('query', '')
-    drugs = Drug.objects.filter(Q(drug_bankID__icontains=query))
+    drugs = Drug.objects.filter(Q(drug_bankID__icontains=query)|Q(name__icontains=query))
     if len(drugs) > 0:
         results = [drug.drug_bankID + " - "+ drug.name for drug in drugs]
     return JsonResponse({'suggestions': results})
@@ -905,6 +905,7 @@ def disease_lookup(request):
                 })
             
         print("there is disease para, length = ",len(response_data))
+        print("response_data = ", response_data)
         # context["response_data"] = response_data
         return JsonResponse({'response_data': response_data})
         # return render(request, 'home/disease_lookup.html', context)
@@ -930,7 +931,7 @@ def disease_lookup(request):
                 })
         context["response_data"] = response_data
         print("there is no disease para, length = ",len(response_data))
-        # print("response data: ", response_data)
+        print("response data: ", response_data)
         return render(request, 'home/disease_lookup.html', context)
 
 def disease_statistics(request):
@@ -975,4 +976,7 @@ def disease_autocomplete_view(request):
     diseases = Disease.objects.filter(Q(disease_name__icontains=query))
     if len(diseases) > 0:
         results = [disease.disease_name  for disease in diseases]
+    else:
+        results = []
+    print("inside disease_autocomplete_view : ", results)
     return JsonResponse({'suggestions': results})
