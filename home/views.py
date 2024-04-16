@@ -86,9 +86,22 @@ def protein_autocomplete_view(request):
 
 def variant_autocomplete_view(request):
     query = request.GET.get('query', '')
-    variants = Variant.objects.filter(Q(VariantMarker__icontains=query))
-    if len(variants) > 0:
-        results = [variant.VariantMarker + " in gene "+ variant.Gene_ID.genename +" (" + variant.Gene_ID.gene_id +")" for variant in variants]
+    # variants = Variant.objects.filter(Q(VariantMarker__icontains=query))
+    variants = Variant.objects.filter(
+        Q(VariantMarker__icontains=query) | 
+        Q(Gene_ID__gene_id__icontains=query) | 
+        Q(Gene_ID__genename__icontains=query)
+    )
+    # if len(variants) > 0:
+    #     results = [variant.VariantMarker + " in gene "+ variant.Gene_ID.genename +" (" + variant.Gene_ID.gene_id +")" for variant in variants]
+    # return JsonResponse({'suggestions': results})
+    results = []
+    if variants.exists():
+        results = [
+            variant.VariantMarker + " in gene " + variant.Gene_ID.genename +
+            " (" + variant.Gene_ID.gene_id + ")"
+            for variant in variants
+        ]
     return JsonResponse({'suggestions': results})
 
 def drug_autocomplete_view(request):
@@ -300,7 +313,8 @@ def variant_lookup(request):
                 'geneID': item.Gene_ID.gene_id,
                 'pt': item.Gene_ID.primary_transcript, # primary transcript
             })
-        return render(request, 'home/variant_lookup.html', {'variants': variants})
+        # return render(request, 'home/variant_lookup.html', {'variants': variants})
+        return render(request, 'home/Drugs_Indications_Targets.html', {'variants': variants})
 
 def target_lookup(request):
     target = request.GET.get('target')
