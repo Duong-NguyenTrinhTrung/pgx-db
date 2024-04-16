@@ -254,6 +254,8 @@
     <script src="{% static 'home/js/select2.full.js' %}"></script>
     <script src="{% static 'home/js/grayscale.js' %}"></script>
     <script src="{% static 'home/js/gpcrdb.js' %}"></script>
+    <script src="{% static 'home/js/NorgesDTFilterBuilder.js' %}"></script>
+    <script src="{% static 'home/js/select2_4.1.0-rc.0_full.js' %}"></script>
     <script src='https://cdn.plot.ly/plotly-2.20.0.min.js'></script>
     <script src="https://code.jquery.com/jquery-migrate-1.4.1.min.js"></script>
 
@@ -366,7 +368,11 @@
             let column_filters = [];
             // createYADCFfilters(start_column, num_cols, filter_type, select_type = null, filter_default_label = "", filter_reset_button_text = false, filter_match_mode = null, column_data_type = null, width = null)
             // Variant
-            column_filters = column_filters.concat(createYADCFfilters(0, 1, "multi_select", "select2", "Select", false, null, null, "100px"));
+            // column_filters = column_filters.concat(createYADCFfilters(0, 1, "multi_select", "select2", "Select", false, null, null, "100px"));
+
+            // Soren lib: CreateColumnFilters --> CreateColumnFilters(datatable_selector,column_number, column_range, header_row, filter_type)
+            // column_filters = column_filters.concat(CreateColumnFilters(table1,0,3,3,"Multi-select"));
+            column_filters = column_filters.concat(CreateColumnFilters(oTable1, 0, 1, 3, "Multi_select"));
             //Transcript
             column_filters = column_filters.concat(createYADCFfilters(1, 1, "multi_select", "select2", "Select", false, null, null, "110px"));
             //Canonical
