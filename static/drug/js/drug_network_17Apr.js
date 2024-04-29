@@ -22,10 +22,10 @@ var json_interactionData = "/static/json-sample/json_interactionData.json"
 
 
 if (drug_bank_ids) {
-    json_GeneralFile = "/drugs_network/general_data?drug_bank_ids=" + drug_bank_ids.join(',');
-    json_drugData = "/drugs_network/drug_data?drug_bank_ids=" + drug_bank_ids.join(',');
-    json_proteinData = "/drugs_network/protein_data?drug_bank_ids=" + drug_bank_ids.join(',');
-    json_interactionData = "/drugs_network/interaction_data?drug_bank_ids=" + drug_bank_ids.join(',');
+    json_GeneralFile = "/drugs-network/general-data?drug_bank_ids=" + drug_bank_ids.join(',');
+    json_drugData = "/drugs-network/drug-data?drug_bank_ids=" + drug_bank_ids.join(',');
+    json_proteinData = "/drugs-network/protein-data?drug_bank_ids=" + drug_bank_ids.join(',');
+    json_interactionData = "/drugs-network/interaction-data?drug_bank_ids=" + drug_bank_ids.join(',');
 }
 
 if (drug_bank_id) {
@@ -146,9 +146,9 @@ function readInteractionJSON() {
 
 
 window.onload = function () {
-     readDrugJSON();
+    // readDrugJSON();
     // processData(numberofnodes);
-    //getDrugJsonData(drugBankId);
+    getDrugJsonData(drugBankId);
 };
 
 function getDrugJsonData(drugBankId) {

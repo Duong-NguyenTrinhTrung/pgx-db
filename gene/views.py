@@ -11,6 +11,7 @@ from django.http import (
     HttpResponseBadRequest,
     JsonResponse,
 )
+import json
 from django.views import View
 from django.views.decorators.http import require_http_methods
 from django.views.generic import TemplateView
@@ -250,52 +251,48 @@ class GeneDetailBaseView(object):
         data_subset["Codons"] = vep_variant[6]
         data_subset["Impact"] = vep_variant[7]
         data_subset["Strand"] = vep_variant[8]
-        data_subset["BayesDel_addAF_rankscore"] = vep_variant[9]
-        data_subset["BayesDel_noAF_rankscore"] = vep_variant[10]
-        data_subset["CADD_raw_rankscore"] = vep_variant[11]
-        data_subset["ClinPred_rankscore"] = vep_variant[12]
-        data_subset["DANN_rankscore"] = vep_variant[13]
-        data_subset["DEOGEN2_rankscore"] = vep_variant[14]
-        data_subset["Eigen_PC_raw_coding_rankscore"] = vep_variant[15]
-        data_subset["Eigen_raw_coding_rankscore"] = vep_variant[16]
-        data_subset["FATHMM_converted_rankscore"] = vep_variant[17]
-        data_subset["GERP_RS_rankscore"] = vep_variant[18]
-        data_subset["GM12878_fitCons_rankscore"] = vep_variant[19]
-        data_subset["GenoCanyon_rankscore"] = vep_variant[20]
-        data_subset["H1_hESC_fitCons_rankscore"] = vep_variant[21]
-        data_subset["HUVEC_fitCons_rankscore"] = vep_variant[22]
-        data_subset["LIST_S2_rankscore"] = vep_variant[23]
-        data_subset["LRT_converted_rankscore"] = vep_variant[24]
-        data_subset["M_CAP_rankscore"] = vep_variant[25]
-        data_subset["MPC_rankscore"] = vep_variant[26]
-        data_subset["MVP_rankscore"] = vep_variant[27]
-        data_subset["MetaLR_rankscore"] = vep_variant[28]
-        data_subset["MetaRNN_rankscore"] = vep_variant[29]
-        data_subset["MetaSVM_rankscore"] = vep_variant[30]
-        data_subset["MutPred_rankscore"] = vep_variant[31]
-        data_subset["MutationAssessor_rankscore"] = vep_variant[32]
-        data_subset["MutationTaster_converted_rankscore"] = vep_variant[33]
-        data_subset["PROVEAN_converted_rankscore"] = vep_variant[34]
-        data_subset["Polyphen2_HDIV_rankscore"] = vep_variant[35]
-        data_subset["Polyphen2_HVAR_rankscore"] = vep_variant[36]
-        data_subset["PrimateAI_rankscore"] = vep_variant[37]
-        data_subset["REVEL_rankscore"] = vep_variant[38]
-        data_subset["SIFT4G_converted_rankscore"] = vep_variant[39]
-        data_subset["SIFT_converted_rankscore"] = vep_variant[40]
-        data_subset["SiPhy_29way_logOdds_rankscore"] = vep_variant[41]
-        data_subset["VEST4_rankscore"] = vep_variant[42]
-        data_subset["bStatistic_converted_rankscore"] = vep_variant[43]
-        data_subset["Fathmm_MKL_coding_rankscore"] = vep_variant[44]
-        data_subset["Fathmm_XF_coding_rankscore"] = vep_variant[45]
-        data_subset["Integrated_fitCons_rankscore"] = vep_variant[46]
-        data_subset["PhastCons30way_mammalian_rankscore"] = vep_variant[47]
-        data_subset["PhyloP30way_mammalian_rankscore"] = vep_variant[48]
-        data_subset["AM_pathogenicity"] = vep_variant[49]
-        data_subset["primary"] = is_primary_ts(vep_variant[0])
-        # print("data_subset[primary] ", data_subset["primary"])
-        # print("data_subset last ", type(data_subset))
-        # print("len data_subset ", len(data_subset))
-
+        data_subset["BayesDel_addAF_rankscore"] = str(vep_variant[9])
+        data_subset["BayesDel_noAF_rankscore"] = str(vep_variant[10])
+        data_subset["CADD_raw_rankscore"] = str(vep_variant[11])
+        data_subset["ClinPred_rankscore"] = str(vep_variant[12])
+        data_subset["DANN_rankscore"] = str(vep_variant[13])
+        data_subset["DEOGEN2_rankscore"] = str(vep_variant[14])
+        data_subset["Eigen_PC_raw_coding_rankscore"] = str(vep_variant[15])
+        data_subset["Eigen_raw_coding_rankscore"] = str(vep_variant[16])
+        data_subset["FATHMM_converted_rankscore"] = str(vep_variant[17])
+        data_subset["GERP_RS_rankscore"] = str(vep_variant[18])
+        data_subset["GM12878_fitCons_rankscore"] = str(vep_variant[19])
+        data_subset["GenoCanyon_rankscore"] = str(vep_variant[20])
+        data_subset["H1_hESC_fitCons_rankscore"] = str(vep_variant[21])
+        data_subset["HUVEC_fitCons_rankscore"] = str(vep_variant[22])
+        data_subset["LIST_S2_rankscore"] = str(vep_variant[23])
+        data_subset["LRT_converted_rankscore"] = str(vep_variant[24])
+        data_subset["M_CAP_rankscore"] = str(vep_variant[25])
+        data_subset["MPC_rankscore"] = str(vep_variant[26])
+        data_subset["MVP_rankscore"] = str(vep_variant[27])
+        data_subset["MetaLR_rankscore"] = str(vep_variant[28])
+        data_subset["MetaRNN_rankscore"] = str(vep_variant[29])
+        data_subset["MetaSVM_rankscore"] = str(vep_variant[30])
+        data_subset["MutPred_rankscore"] = str(vep_variant[31])
+        data_subset["MutationAssessor_rankscore"] = str(vep_variant[32])
+        data_subset["MutationTaster_converted_rankscore"] = str(vep_variant[33])
+        data_subset["PROVEAN_converted_rankscore"] = str(vep_variant[34])
+        data_subset["Polyphen2_HDIV_rankscore"] = str(vep_variant[35])
+        data_subset["Polyphen2_HVAR_rankscore"] = str(vep_variant[36])
+        data_subset["PrimateAI_rankscore"] = str(vep_variant[37])
+        data_subset["REVEL_rankscore"] = str(vep_variant[38])
+        data_subset["SIFT4G_converted_rankscore"] = str(vep_variant[39])
+        data_subset["SIFT_converted_rankscore"] = str(vep_variant[40])
+        data_subset["SiPhy_29way_logOdds_rankscore"] = str(vep_variant[41])
+        data_subset["VEST4_rankscore"] = str(vep_variant[42])
+        data_subset["bStatistic_converted_rankscore"] = str(vep_variant[43])
+        data_subset["Fathmm_MKL_coding_rankscore"] = str(vep_variant[44])
+        data_subset["Fathmm_XF_coding_rankscore"] = str(vep_variant[45])
+        data_subset["Integrated_fitCons_rankscore"] = str(vep_variant[46])
+        data_subset["PhastCons30way_mammalian_rankscore"] = str(vep_variant[47])
+        data_subset["PhyloP30way_mammalian_rankscore"] = str(vep_variant[48])
+        data_subset["AM_pathogenicity_rankscore"] = str(vep_variant[49])
+        data_subset["primary"] = is_primary_ts(str(vep_variant[0]))
         return data_subset
 
     def get_gene_detail_data(self, slug):
@@ -307,7 +304,8 @@ class GeneDetailBaseView(object):
             else:
                 browser_columns = self.browser_columns
 
-                table = pd.DataFrame(columns=browser_columns)
+                # table = pd.DataFrame(columns=browser_columns)
+                table = []
                 # Retrieve all variant markers from a gene
                 if slug.startswith("ENSG"):
                     marker_ID_data = Variant.objects.filter(Gene_ID=slug).values_list(
@@ -327,36 +325,40 @@ class GeneDetailBaseView(object):
                     for vep_variant in vep_variants:
                         data_subset = self.parse_marker_data(marker, vep_variant)
                         if data_subset["primary"]=="YES":
-                            table = table.append(data_subset, ignore_index=True)
+                            table.append(data_subset)
 
-                table.fillna('', inplace=True)
+                # table.fillna('', inplace=True)
 
                 context = dict()
 
                 table_with_mean_vep_score = []
                 table_index = 0
                 cleaned_value_index = 0
-                for data_row in table.to_numpy():
+                for data_row in table:
                     table_index += 1
                     try:
-                        cleaned_values = [x for x in data_row[10:-1] if str(x) != '']
+                        # cleaned_values = [x for x in data_row[10:-1] if str(x) != '']
+                        cleaned_values = [float(data_row[x]) for x in data_row.keys() if x.endswith("rankscore") and data_row[x] != '']
+                        # print("cleaned value: ", cleaned_values)
                         if len(cleaned_values) != 0:
                             cleaned_value_index += 1
-                            mean_vep_score = round(np.mean(cleaned_values), 2)
-                            table_with_mean_vep_score.append(np.append(data_row, mean_vep_score))
+                            data_row["mean_vep_score"] = str(round(np.mean(cleaned_values), 2))
+                            table_with_mean_vep_score.append(data_row)
                     except Exception as e:
                         pass
 
                 table_with_protein_pos_int = []
                 for data_row in table_with_mean_vep_score:
                     try:
-                        data_row[5] = int(data_row[5])  # protein position
+                        data_row["Protein_position"] = int(data_row["Protein_position"])  # protein position
                         table_with_protein_pos_int.append(data_row)
                     except Exception as e:
                         pass
 
                 cache.set("variant_data_" + slug, table_with_protein_pos_int, 60 * 60)
-            context['array'] = table_with_protein_pos_int
+                # print("table_with_protein_pos_int: ", table_with_protein_pos_int)
+                # print("table_with_mean_vep_score: ", table_with_mean_vep_score)
+            context['array'] = json.dumps(table_with_protein_pos_int)
             context['length'] = len(table_with_protein_pos_int)
             context["name_dic"] = self.name_dic
 
@@ -374,20 +376,22 @@ class GeneDetailBaseView(object):
             chunks[-1]["position"] = len(amino_seq)
             context["chunks"] = chunks
             context["af_pdb"] = Protein.objects.filter(geneID=slug).values_list("af_pdb", flat=True)[0]
-
-            transcripts = [item[1] for item in table_with_protein_pos_int]
+            # print("len table_with_protein_pos_int: ", len(table_with_protein_pos_int))
+            print("table_with_protein_pos_int [0] ", table_with_protein_pos_int[0])
+            transcripts = [item["Transcript_ID"] for item in table_with_protein_pos_int]
+            
             context['transcripts'] = list(set(transcripts))
-            variants = [item[0] for item in table_with_protein_pos_int]
+            variants = [item["Variant_marker"] for item in table_with_protein_pos_int]
             context['variants'] = list(set(variants))
 
             consequences = []
             for item in table_with_protein_pos_int:
-                coseq = item[2].split(",")
+                coseq = item["Consequence"].split(",")
                 if len(coseq) >= 1:
                     consequences += coseq
 
             context['consequences'] = list(set(consequences))
-
+        # print("Context array: ", context["array"][:3])
         return context
 
 
@@ -396,12 +400,14 @@ class GeneDetailBrowser(
     TemplateView,
 ):
     template_name = 'gene_detail.html'
+    # template_name = 'gene_detail-test.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         slug = kwargs.get('slug')
         context.update(self.get_gene_detail_data(slug))
         # context.update(self.get_gene_detail_data(slug))
+        print(context)
         return context
 
 
