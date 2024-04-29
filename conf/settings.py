@@ -34,6 +34,9 @@ DEBUG = True
 # ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost" cast=str).split(",")
 ALLOWED_HOSTS = ["*"]
 
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
+
 DOCUMENTATION_URL = 'https://pgx-documentation.readthedocs.io/'
 
 # Application definition
