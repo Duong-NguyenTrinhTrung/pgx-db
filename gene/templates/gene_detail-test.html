@@ -19,10 +19,6 @@
         th.width-80px {
             width: 80px;
         }
-
-        #headers {
-            background-color: #B69121;
-        }
     </style>
 {% endblock addon_css %}
 
@@ -49,172 +45,31 @@
                 <div id="structures_scrollable_table">
                     <table class="display compact text-nowrap" id="structures_scrollable">
                         <thead id="headers">
-
                             <tr> 
                                 <td style="text-align: center" data-dt-order="disable"></td>
                                 <td style="text-align: center" data-dt-order="disable"></td>
                                 <td style="text-align: center" data-dt-order="disable"></td>
                                 <td style="text-align: center" data-dt-order="disable"></td>
                                 <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                                <td style="text-align: center" data-dt-order="disable"></td>
-                      </tr>
-                        
+                            </tr>
                         <!-- ## Super header row ## -->
                         <tr>
-                            <th colspan="11" id="Complex_header_1" data-dt-order="disable">Basic annotation</th>
-                            <th colspan="41" id="Complex_header_2" data-dt-order="disable">VEP scores from different algorithms <a href="#" id="vep-score-algorithms">Hide VEP scores</a></th>
+                            <th colspan="3" id="Complex_header_1" data-dt-order="disable">Basic annotation</th>
+                            <th colspan="2" id="Complex_header_2" data-dt-order="disable">VEP scores from different algorithms <a href="#" id="vep-score-algorithms">Hide VEP scores</a></th>
                         </tr>
                         <!-- ## header row ## -->
                         <tr>
                             <!-- Basic annotation block -->
                             <th>Variant</th>
                             <th>Transcript</th>
-                            <th>Canonical</th>
-                            <th>Sequence<br>position</th>
-                            <th>Wildtype AA</th>
-                            <th>Mutant AA</th>
-                            <th>Codons</th>
-                            <th>Consequence</th>
-                            <th>Allele<br>frequency</th>
                             <th style="width: 80px !important;" class="width-80px">Mean <br> VEP scores</th>
-                            <!-- <th><a id="show-all-vep-score" href="#">Show VEP Scores</a></th> -->
                             <!-- Score block -->
                             <th>Alpha missense</br>Pathogenicity</th>
                             <th>BayesDel</br>(addAF)</th>
-                            <th>BayesDel</br>(noAF)</th>
-                            <th>bStatistic</th>
-                            <th>CADD</th>
-                            <th>ClinPred</th>
-                            <th>DANN</th>
-                            <th>DEOGEN2</th>
-                            <th>Eigen_PC</th>
-                            <th>Eigen</th>
-                            <th>FATHMM</th>
-                            <th>Fathmm_</br>MKL</th>
-                            <th>Fathmm_XF</th>
-                            <th>GM12878</th>
-                            <th>Geno</br>Canyon</th>
-                            <th>GERP_RS</th>
-                            <th>H1_hESC</th>
-                            <th>HUVEC</th>
-                            <th>Integrated</th>
-                            <th>LRT</th>
-                            <th>LIST_S2</th>
-                            <th>MetaLR</th>
-                            <th>MetaRNN</th>
-                            <th>MetaSVM</th>
-                            <th>MutPred</th>
-                            <th>Mutation</br>Assessor</th>
-                            <th>Mutation</br>Taster</th>
-                            <th>M_CAP</th>
-                            <th>MPC</th>
-                            <th>MVP</th>
-                            <th>Polyphen2_</br>HDIV</th>
-                            <th>Polyphen2_</br>HVAR</th>
-                            <th>PROVEAN</th>
-                            <th>PhastCons</br>30way</th>
-                            <th>Phylo_</br>P30way</th>
-                            <th>PrimateAI</th>
-                            <th>REVEL</th>
-                            <th>SIFT4G</th>
-                            <th>SIFT</th>
-                            <th>SiPhy_</br>29way</th>
-                            <th>VEST4</th>
+                            
                         </tr>
                         <!-- ## Filter row ## -->
                         <tr>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
-                            <td style="text-align: center" data-dt-order="disable"></td>
                             <td style="text-align: center" data-dt-order="disable"></td>
                             <td style="text-align: center" data-dt-order="disable"></td>
                             <td style="text-align: center" data-dt-order="disable"></td>
@@ -405,7 +260,6 @@
                 // ###################
 
                 columns:[
-                
                     // #############################
                     // # Column 0 -   #
                     // #############################
@@ -418,55 +272,6 @@
                     // #############################
                     {data: "Transcript_ID",
                     name: "Transcript ID",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "primary",
-                    name: "Primary",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "Protein_position",
-                    name: "Protein position",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "Amino_acids",
-                    name: "Amino acids",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 3 -   #
-                    // #############################
-                    {data: "cDNA_position",
-                    name: "cDNA position",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "Codons",
-                    name: "Codons",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 2 -   #
-                    // #############################
-                    {data: "Consequence",
-                    name: "Consequence",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "Impact", 
-                    name: "Allele frequency",
                     width:'8%'},
 
                     // #############################
@@ -488,284 +293,6 @@
                     // #############################
                     {data: "BayesDel_addAF_rankscore",
                     name: "BayesDel_addAF_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "BayesDel_noAF_rankscore",
-                    name: "BayesDel_noAF_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "bStatistic_converted_rankscore",
-                    name: "bStatistic_converted_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "CADD_raw_rankscore",
-                    name: "CADD_raw_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "ClinPred_rankscore",
-                    name: "ClinPred_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "DANN_rankscore",
-                    name: "DANN_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "DEOGEN2_rankscore",
-                    name: "DEOGEN2_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "Eigen_PC_raw_coding_rankscore",
-                    name: "Eigen_PC_raw_coding_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "Eigen_raw_coding_rankscore",
-                    name: "Eigen_raw_coding_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "FATHMM_converted_rankscore",
-                    name: "FATHMM_converted_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "Fathmm_MKL_coding_rankscore",
-                    name: "Fathmm_MKL_coding_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "Fathmm_XF_coding_rankscore",
-                    name: "Fathmm_XF_coding_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "GM12878_fitCons_rankscore",
-                    name: "GM12878_fitCons_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "GenoCanyon_rankscore",
-                    name: "GenoCanyon_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "GERP_RS_rankscore",
-                    name: "GERP_RS_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "H1_hESC_fitCons_rankscore",
-                    name: "H1_hESC_fitCons_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "HUVEC_fitCons_rankscore",
-                    name: "HUVEC_fitCons_rankscore",
-                    width:'8%'},
-
-                    
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "Integrated_fitCons_rankscore",
-                    name: "Integrated_fitCons_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "LRT_converted_rankscore",
-                    name: "LRT_converted_rankscore",
-                    width:'8%'},
-                    
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "LIST_S2_rankscore",
-                    name: "LIST_S2_rankscore",
-                    width:'8%'},
-
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "MetaLR_rankscore",
-                    name: "MetaLR_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "MetaRNN_rankscore",
-                    name: "MetaRNN_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "MetaSVM_rankscore",
-                    name: "MetaSVM_rankscore",
-                    width:'8%'},
-                    
-
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "MutPred_rankscore",
-                    name: "MutPred_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "MutationAssessor_rankscore",
-                    name: "MutationAssessor_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "MutationTaster_converted_rankscore",
-                    name: "MutationTaster_converted_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "M_CAP_rankscore",
-                    name: "M_CAP_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "MPC_rankscore",
-                    name: "MPC_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "MVP_rankscore",
-                    name: "MVP_rankscore",
-                    width:'8%'},
-
-                    
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "Polyphen2_HDIV_rankscore",
-                    name: "Polyphen2_HDIV_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "Polyphen2_HVAR_rankscore",
-                    name: "Polyphen2_HVAR_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "PROVEAN_converted_rankscore",
-                    name: "PROVEAN_converted_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "PhastCons30way_mammalian_rankscore",
-                    name: "PhastCons30way_mammalian_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "PhyloP30way_mammalian_rankscore",
-                    name: "PhyloP30way_mammalian_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "PrimateAI_rankscore",
-                    name: "PrimateAI_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "REVEL_rankscore",
-                    name: "REVEL_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "SIFT4G_converted_rankscore",
-                    name: "SIFT4G_converted_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "SIFT_converted_rankscore",
-                    name: "SIFT_converted_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "SiPhy_29way_logOdds_rankscore",
-                    name: "SiPhy_29way_logOdds_rankscore",
-                    width:'8%'},
-
-                    // #############################
-                    // # Column 5 -   #
-                    // #############################
-                    {data: "VEST4_rankscore",
-                    name: "VEST4_rankscore",
                     width:'8%'},
                     ],
                 
@@ -801,16 +328,7 @@
                             );
                         });       
                 }
-            }) // end of datatables
-
-            // #############################
-            // ###    Create Filters     ###
-            // #############################
-
-            var column_filters = [];
-            // CreateColumnFilters --> CreateColumnFilters(datatable_selector,column_number, column_range, header_row, filter_type)
-            column_filters = column_filters.concat(CreateColumnFilters(oTable1,0,1,3,"Multi-select"));
-            createDropdownFilters(oTable1,column_filters);
+            })
             
             // get data currently seen in the table to make multiple violin plot 
             var variant_maker_list = [];
@@ -834,14 +352,53 @@
                 }
             );
             
-            
-            // oTable1.column(10).visible(false); // Hide the column `Show all VEP Scores` initially
-            // $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').parentsUntil('th').css('width', '80x');
-            // $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').parentsUntil('td').css('width', '80x');
-            // $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '15');
-            // $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').parentsUntil('th').css('width', '80x');
-            // $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').parentsUntil('td').css('width', '80x');
-            // $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').attr('size', '15');
+            // draw_multiple_variant_plot(variant_maker_data_draw_plot);
+            let column_filters = [];
+            // createYADCFfilters(start_column, num_cols, filter_type, select_type = null, filter_default_label = "", filter_reset_button_text = false, filter_match_mode = null, column_data_type = null, width = null)
+            // Variant
+            // column_filters = column_filters.concat(createYADCFfilters(0, 1, "multi_select", "select2", "Select", false, null, null, "100px"));
+
+            // Soren lib: CreateColumnFilters --> CreateColumnFilters(datatable_selector,column_number, column_range, header_row, filter_type)
+            // column_filters = column_filters.concat(CreateColumnFilters(table1,0,3,3,"Multi-select"));
+            column_filters = column_filters.concat(CreateColumnFilters(oTable1, 0, 1, 3, "Multi_select"));
+            //Transcript
+            column_filters = column_filters.concat(createYADCFfilters(1, 1, "multi_select", "select2", "Select", false, null, null, "110px"));
+            //Canonical
+            column_filters = column_filters.concat(createYADCFfilters(2, 1, "select", null, "Select", "YES", null, null, "80px"));
+            //Sequence position
+            column_filters = column_filters.concat(createYADCFfilters(3, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
+            //Wildtype position
+            column_filters = column_filters.concat(createYADCFfilters(4, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
+            //Mutant position
+            column_filters = column_filters.concat(createYADCFfilters(5, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
+            //Codon
+            column_filters = column_filters.concat(createYADCFfilters(6, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
+            //Consequence
+            column_filters = column_filters.concat(createYADCFfilters(7, 1, "select", null, "Select", false, null, null, "80px"));
+            //AF
+            // column_filters = column_filters.concat(createYADCFfilters(8, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
+            //Score columns
+            column_filters = column_filters.concat(createYADCFfilters(9, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"))
+
+            // update filters
+            // yadcf.init(
+            //     oTable1,column_filters, {
+            //         cumulative_filtering: false,
+            //         rowCallBack: function(row, data) {
+            //             console.log("row");
+            //         }
+		    //     }
+            // );
+            // yadcf.exFilterColumn(oTable1, [[2, ["YES"]]], true);
+            oTable1.column(10).visible(false); // Hide the column `Show all VEP Scores` initially
+            // let table = $('#structures_scrollable').DataTable();
+            // console.log("Change Canonical: "+ yadcf.exGetColumnFilterVal(oTable1, 2));
+            $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').parentsUntil('th').css('width', '80x');
+            $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').parentsUntil('td').css('width', '80x');
+            $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '15');
+            $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').parentsUntil('th').css('width', '80x');
+            $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').parentsUntil('td').css('width', '80x');
+            $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').attr('size', '15');
         })
         $(document).ready(function() {
 
@@ -1132,6 +689,8 @@
                     [10, 25, 50, 100, 200, 'All'],
                 ],
             })
+
+            let column_filters = [];
 
             // 
             column_filters = column_filters.concat(createYADCFfilters(0, 1, "select", null, "", false, null, null));

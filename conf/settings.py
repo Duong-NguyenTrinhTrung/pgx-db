@@ -20,8 +20,6 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = os.path.join(BASE_DIR, 'data')
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -35,8 +33,6 @@ DEBUG = True
 
 # ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="localhost" cast=str).split(",")
 ALLOWED_HOSTS = ["*"]
-
-X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 DOCUMENTATION_URL = 'https://pgx-documentation.readthedocs.io/'
 
@@ -80,7 +76,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "conf.urls"
+ROOT_URLCONF = "conf.urls" # project urls, as opposed to app urls
 
 TEMPLATES = [
     {
@@ -135,7 +131,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = 'Europe/Copenhagen'
 
 USE_I18N = True
 
@@ -154,7 +150,6 @@ STATICFILES_DIRS = (
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 INTERNAL_IPS = ["127.0.0.1", ]
