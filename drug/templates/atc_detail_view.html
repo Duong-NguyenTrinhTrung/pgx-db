@@ -512,7 +512,7 @@
 
         var drug_list = [];
         for (var j = 0; j < data.ListOfDrugIDs.length; j++) {
-            var drug_url = "{% url 'drug_network' %}" + "?drug_bank_id=" + data.ListOfDrugIDs[j];
+            var drug_url = "{% url 'drug-network' %}" + "?drug_bank_id=" + data.ListOfDrugIDs[j];
             drug_list.push(`<i class="fa-solid fa-pills"><a href="#" class="associated_drug" 
                                     data-drugbank_id="${data.ListOfDrugIDs[j]}"
                                     onclick="toggleDivVisibility(this, '${drug_url}'); #chart" 
@@ -583,7 +583,7 @@
             for (var i = 0; i < associations.length; i++) {
                 var row = associations[i];
                 drug_bank_ids.push(row.drug_bankID);
-                var drug_url = "{% url 'drug_network' %}" + "?drug_bank_id=" + row.drug_bankID;
+                var drug_url = "{% url 'drug-network' %}" + "?drug_bank_id=" + row.drug_bankID;
                 var targetLinks = [];
                 for (var j = 0; j < row.target_list.length; j++) {
                     var className = "enzyme"
@@ -618,12 +618,12 @@
             tableHtml += '</tbody></table>';
             var verb = "";
             if (associations.length == 1) {
-                right_panel_text.innerHTML = "Drug '" + associations[0].name + "', " + response.total_interaction + "proteins and "+ response.total_interaction + " interactions are in the network associated with " + response.atc_code;
+                right_panel_text.innerHTML = "Drug '" + associations[0].name + "', " + response.total_interaction + " proteins and "+ response.total_interaction + " interactions are in the network associated with " + response.atc_code;
             } else {
                 right_panel_text.innerHTML = "There are " + associations.length + " drugs, " + response.no_of_interacted_protein + " proteins, " + response.total_interaction + " interactions in the network associated with " + response.atc_code;
             }
 
-            var atc_url = "{% url 'drugs_network' %}" + "?drug_bank_ids=" + drug_bank_ids.toString();
+            var atc_url = "{% url 'drugs-network' %}" + "?drug_bank_ids=" + drug_bank_ids.toString();
             right_panel_text_guide.style.fontWeight = "italic";
             right_panel_text_guide.style.display = "block";
             right_panel_text_guide.style.marginBottom = "10px";
@@ -727,7 +727,7 @@
                     var row = associations[i];
                     drug_bank_ids.push(row.drug_bankID);
                 }
-                var atc_url = "{% url 'drugs_network' %}" + "?drug_bank_ids=" + drug_bank_ids.toString();
+                var atc_url = "{% url 'drugs-network' %}" + "?drug_bank_ids=" + drug_bank_ids.toString();
                 toggleDivVisibility(button, atc_url)
             }
         }

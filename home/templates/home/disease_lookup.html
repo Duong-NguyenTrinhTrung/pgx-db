@@ -141,7 +141,7 @@
                     <td class="h-center"><input id="submit_disease" type="submit" value="Search"
                             class="button js-form-submit form-submit form-type-submit btn btn-default btn-block"></td>
                     <td class="h-center"><input id="reset_disease" type="button" value="Reset"
-                            class="button js-form-submit form-submit form-type-submit btn btn-default btn-block" data-url="{% url 'disease_lookup' %}?disease=default"></td>
+                            class="button js-form-submit form-submit form-type-submit btn btn-default btn-block" data-url="{% url 'disease-lookup' %}?disease=default"></td>
                 </tr>
                 <tr>
                     <td colspan="3" style="text-align: left; padding-left: 30px;">Examples: <a
@@ -208,7 +208,7 @@
         $('#search_disease').autocomplete({
             source: function (request, response) {
                 $.ajax({
-                    url: "{% url 'disease_autocomplete_view' %}",
+                    url: "{% url 'disease-autocomplete-view' %}",
                     data: {
                         query: request.term
                     },
@@ -238,7 +238,7 @@
             var d = $("#search_disease").val();
             console.log("search_disease.val(): "+d);
             $.ajax({
-                url: "{% url 'disease_lookup' %}?disease=" + $("#search_disease").val(),
+                url: "{% url 'disease-lookup' %}?disease=" + $("#search_disease").val(),
                 success: function (data) {
                     $("#disease-result-tbody").html('');
                     var html_data = '';
@@ -290,7 +290,7 @@
         // reset
         $("#reset_disease").click(function() {
             $.ajax({
-                    url: "{% url 'disease_lookup' %}?disease=default",
+                    url: "{% url 'disease-lookup' %}?disease=default",
                     success: function (data) {
                         // alert("data "+data);
                         // alert("reset success response, length = "+ data.response_data.length);

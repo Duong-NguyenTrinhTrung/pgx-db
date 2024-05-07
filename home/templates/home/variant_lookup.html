@@ -257,7 +257,7 @@
                     <td>{{variant.geneID}}</td>
                     <td>{{variant.genename}}</td>
                     <td>{{variant.pt}}</td>
-                    <td><a href="/gene/{{variant.geneID}}" target="_blank" rel="noopener noreferrer"><i>Go to detail page</i></a></td>
+                    <td><a href="/gene/{{variant.geneID}}?variant_marker={{variant.VariantMarker}}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -272,7 +272,7 @@
         $('#search_variant').autocomplete({
             source: function (request, response) {
                 $.ajax({
-                    url: "{% url 'variant_autocomplete_view' %}",
+                    url: "{% url 'variant-autocomplete-view' %}",
                     data: {
                         query: request.term
                     },
@@ -302,7 +302,7 @@
             var search_term = $(this).val().split("-")[0].trim();
             if (search_term.length>=2){
                 $.ajax({
-                    url: "{% url 'variant_lookup' %}?variant="+ search_term,
+                    url: "{% url 'variant-lookup' %}?variant="+ search_term,
                     success: function(data){
                         $("#variant-result-tbody").html("");
                         var html_data = "";
@@ -312,7 +312,7 @@
                                 <td>${item.geneID}</td>
                                 <td>${item.genename}</td>
                                 <td>${item.pt}</td>
-                                <td><a href="/gene/${item.geneID}" target="_blank" rel="noopener noreferrer"><i>Go to detail page</i></a></td>
+                                <td><a href="/gene/${item.geneID}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
                             </tr>`;
                         });
                         $("#variant-result-tbody").html(html_data);
@@ -324,7 +324,7 @@
         function variant_search(){
             var variant_id = $("#search_variant").val().split(" ")[0].trim();
             var method = "GET";
-            var url= "{% url 'variant_lookup' %}?variant_id=" + variant_id;
+            var url= "{% url 'variant-lookup' %}?variant_id=" + variant_id;
 
             $.ajax({
                 url: url,
@@ -339,7 +339,7 @@
                             <td>${item.geneID}</td>
                             <td>${item.genename}</td>
                             <td>${item.pt}</td>
-                            <td><a href="/gene/${item.geneID}" target="_blank" rel="noopener noreferrer"><i>Go to detail page</i></a></td>
+                            <td><a href="/gene/${item.geneID}?variant_marker=${item.VariantMarker}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
                         </tr>`;
                     });
                     $("#variant-result-tbody").html(html_data);
@@ -352,7 +352,7 @@
 
         function variant_reset(){
             var method = "GET";
-            var url= "{% url 'variant_lookup' %}?variant_id=default";
+            var url= "{% url 'variant-lookup' %}?variant_id=default";
             $.ajax({
                 url: url,
                 method: method,
@@ -366,7 +366,7 @@
                             <td>${item.geneID}</td>
                             <td>${item.genename}</td>
                             <td>${item.pt}</td>
-                            <td><a href="/gene/${item.geneID}" target="_blank" rel="noopener noreferrer"><i>Go to detail page</i></a></td>
+                            <td><a href="/gene/${item.geneID}?variant_marker=${item.VariantMarker}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
                         </tr>`;
                     });
                     $("#variant-result-tbody").html(html_data);

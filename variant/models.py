@@ -54,6 +54,7 @@ class VepVariant(models.Model):
     Codons = models.CharField(max_length=255)
     Impact = models.CharField(max_length=50)
     Strand = models.IntegerField()
+    HighestAF = models.FloatField(null=True)
     # This code will create a float field that can store null values, which is the equivalent of NA in Django.
     AM_pathogenicity = models.FloatField(null=True)
     BayesDel_addAF_rankscore = models.FloatField()

@@ -77,7 +77,7 @@
         $('#atc_comparison').autocomplete({
             source: function (request, response) {
                 $.ajax({
-                    url: "{% url 'atc_comparison_autocomplete_view' %}",
+                    url: "{% url 'atc-comparison-autocomplete-view' %}",
                     data: {
                         query: request.term
                     },
@@ -163,69 +163,69 @@
                     alert("Please select a comparison type!");
                 }
                 else if(compare_type == "align_network") {
-                    urlCompare = "{% url 'get_statistics_by_atc_for_network_size_comparison' %}";
+                    urlCompare = "{% url 'get-statistics-by-atc-for-network-size-comparison' %}";
                     compareTask= "alignNetwork";
                     $("#optionExplanation").html("abc");
                 }
                 else if(compare_type == "compare_network_size") { //not yet
-                    urlCompare = "{% url 'get_statistics_by_atc_for_network_size_comparison' %}";
+                    urlCompare = "{% url 'get-statistics-by-atc-for-network-size-comparison' %}";
                     compareTask= "compareNetworkSize";
                     compareText = "Network size"
                     $("#optionExplanation").html("compare_network_size");
                 }
                 else if(compare_type == "compare_degree_distritution") {
-                    urlCompare = "{% url 'get_data_for_comparing_network_degree_distribution' %}";
+                    urlCompare = "{% url 'get-data-for-comparing-network-degree-distribution' %}";
                     compareTask= "distributionPlot";
                     compareText = "Degree distribution of DRUG-PROTEIN network ";
                     $("#optionExplanation").html("compare_degree_distritution");
                 }
                 else if(compare_type == "compare_association_distritution") {
-                    urlCompare = "{% url 'get_data_for_comparing_network_associate_distribution' %}";
+                    urlCompare = "{% url 'get-data-for-comparing-network-associate-distribution' %}";
                     compareTask= "distributionPlot";
                     compareText = "Degree distribution of DRUG-DISEASE network ";
                 }
                 else if(compare_type == "compare_moa_distribution") {
-                    urlCompare = "{% url 'get_statistics_by_atc_code_for_MOA_comparison' %}";
+                    urlCompare = "{% url 'get-statistics-by-atc-code-for-MOA-comparison' %}";
                     compareTask= "distributionPlotCategory";
                     compareText = "DRUG-PROTEIN Mode of action distribution";
                 }
                 else if(compare_type == "see_clinical_trial_phase_distribution") {
-                    urlCompare = "{% url 'get_statistics_by_atc_for_clinical_trial_phase_comparison' %}";
+                    urlCompare = "{% url 'get-statistics-by-atc-for-clinical-trial-phase-comparison' %}";
                     compareTask= "distributionPlotCategory";
                     compareText = "DRUG-DISEASE clinical trial phase distribution";
                 }
                 else if(compare_type == "calculate_path_length_DD") {
-                    urlCompare = "{% url 'get_statistics_by_atc_for_calculating_average_path_length_drug_disease' %}";
+                    urlCompare = "{% url 'get-statistics-by-atc-for-calculating-average-path-length-drug-disease' %}";
                     compareTask= "calculatePathLengthDD";
                     compareText = "Calculate path length of DRUG-DISEASE network";
                 }
                 else if(compare_type == "calculate_path_length_DP") {
-                    urlCompare = "{% url 'get_statistics_by_atc_for_calculating_average_path_length_drug_protein' %}";
+                    urlCompare = "{% url 'get-statistics-by-atc-for-calculating-average-path-length-drug-protein' %}";
                     compareTask= "calculatePathLengthDP";
                     compareText = "Calculate path length of DRUG-PROTEIN network";
                 }
                 else if(compare_type == "measure_centralization_dd") {
-                    urlCompare = "{% url 'get_statistics_by_atc_for_measure_centralization_drug_disease' %}";
+                    urlCompare = "{% url 'get-statistics-by-atc-for-measure-centralization-drug-disease' %}";
                     compareTask= "measureCentralizationDD";
                     compareText = "Centrality measurement of DRUG-DISEASE network";
                 }
                 else if(compare_type == "measure_centralization_dp") {
-                    urlCompare = "{% url 'get_statistics_by_atc_for_measure_centralization_drug_protein' %}";
+                    urlCompare = "{% url 'get-statistics-by-atc-for-measure-centralization-drug-protein' %}";
                     compareTask= "measureCentralizationDP";
                     compareText = "Centrality measurement of DRUG-PROTEIN network";
                 }
                 else if(compare_type == "detect_community_dd") {
-                    urlCompare = "{% url 'get_statistics_by_atc_for_detecting_community_drug_disease' %}";
+                    urlCompare = "{% url 'get-statistics-by-atc-for-detecting-community-drug-disease' %}";
                     compareTask= "detectCommunityDD";
                     compareText = "Community of DRUG-DISEASE network";
                 }
                 else if(compare_type == "detect_community_dp") {
-                    urlCompare = "{% url 'get_statistics_by_atc_for_detecting_community_drug_protein' %}";
+                    urlCompare = "{% url 'get-statistics-by-atc-for-detecting-community-drug-protein' %}";
                     compareTask= "detectCommunityDP";
                     compareText = "Community of DRUG-PROTEIN network";
                 }
                 else if(compare_type == "see_common_and_unique_elements") {
-                    urlCompare = "{% url 'get_data_for_comparing_common_and_unique_network_element' %}";
+                    urlCompare = "{% url 'get-data-for-comparing-common-and-unique-network-element' %}";
                     compareTask= "commonUniqueElement";
                     compareText = "Common and Unique network elements";
                 }
