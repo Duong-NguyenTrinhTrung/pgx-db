@@ -35,8 +35,6 @@ if (drug_bank_id) {
     json_interactionData = "/drug_network/" + drug_bank_id + "/interaction_data";
 }
 
-// console.log("is this json_drugData available "+json_drugData);
-
 
 // code to get the li of the network visualization 
 
@@ -81,7 +79,6 @@ function readDrugJSON() {
     fetch(jsonFilePath)
         .then((response) => response.json())
         .then((jsonData) => {
-            console.log("in readDrugJSON function : jsonData ",jsonData);
             // Assuming your JSON data is an array of objects, adjust this code accordingly
             // drug_xlsxData = jsonData.map(item => item.fields);
             if (typeof jsonData === 'string') {
@@ -149,9 +146,9 @@ function readInteractionJSON() {
 
 
 window.onload = function () {
-    readDrugJSON();
+     readDrugJSON();
     // processData(numberofnodes);
-    // getDrugJsonData(drugBankId);
+    //getDrugJsonData(drugBankId);
 };
 
 function getDrugJsonData(drugBankId) {
@@ -1553,22 +1550,15 @@ function processData(numberofnodes) {
     fetch(jsonFilePath)
       .then((response) => response.json())
       .then((data) => {
-        
-        console.log(data.length, "here is the json file ");
-        
-        if (data.length < 200 || numberofnodes >= data.length ) {
-            document.getElementById('GetmoreData').style.visibility = 'hidden';
-        }
-        
-data  = data.slice(0, numberofnodes);
+        data  = data.slice(0, numberofnodes);
 
-        console.log(data, "here is the json file ")
+        console.log(data , "here is the json file ")
         // Extract nodes and links from the JSON data
         // console.log("inside processData: ", data);
         chartDataJ = data;
-        
-        const filteredData = data.filter(row => row.Phase !== "1" && row.Phase !== "2");
   
+        const filteredData = data.filter(row => row.Phase !== "1" && row.Phase !== "2");
+        console.log("filteredData: "+filteredData)
         filteredData.forEach(function (row) {
         
           var drugName = row.drug_name;
@@ -1927,7 +1917,7 @@ function createChart(links) {
             return DiseaseColorMap[d.DiseaseClass] || "black";
         })
         .on("click", function (event, d) {
-            window.open(`https://clinicaltrials.gov/search?cond=${d.id}`, "_blank");
+            window.open(`https://www.triangle.com/${d.id}`, "_blank");
 
         });
 
@@ -2471,22 +2461,15 @@ function redrawLinks() {
 
 //Protein Class Color Map
 var proteinColorMap = {
-    "Adhesion": "#ff7f0e",
-    "Secreted protein": "#17becf",
     "Enzyme": "#1f77b4",
-    "GPCR": "#2ca02c",
-    "Membrane receptor": "#9467bd",
-    "Kinase": "#9467bd",
-    "Transporter": "#7f7f7f",
-    "Unknown": "#8c564b",
     "Epigenetic regulator": "black",
-    "Structural protein": "#d62728",
-    "Surface antigen": "#bcbd22",
+    "GPCR": "#2ca02c",
     "Ion channel": "#d62728",
-    "Transcription factor": "#2ca02c",
-    "Nuclear receptor": "#ff7f0e"
+    "Kinase": "#9467bd",
+    "Nuclear receptor": "#ff7f0e",
+    "Transporter": "#7f7f7f",
+    "Unknown": "#8c564b"
 };
-
 function updateChildNodeColors() {
     d3.selectAll(".node circle")
         .style("fill", function (d) { return proteinColorMap[d.Protein_Class] || "steelblue"; });
@@ -2494,7 +2477,7 @@ function updateChildNodeColors() {
 
 function createProteinsLegend() {
     var hiddenProteins = {}; // Change this to hiddenProteinClasses
-    var proteins = ["Adhesion", "Secreted protein", "Enzyme", "GPCR", "Membrane receptor", "Kinase", "Transporter", "Unknown", "Epigenetic regulator", "Structural protein", "Surface antigen", "Ion channel", "Transcription factor", "Nuclear receptor"];
+    var proteins = ["Enzyme", "Epigenetic regulator", "GPCR", "Ion channel", "Kinase", "Nuclear receptor", "Transporter", "Unknown"];
     var legendContent = d3.select("#legend_protein_status-content");
     legendContent.selectAll('div').remove() ; 
     var uniqueProteins = new Set();

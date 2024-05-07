@@ -66,21 +66,21 @@ def anno_from_autocomplete_view(request):
 def protein_autocomplete_view(request):
     query = request.GET.get('query', '')
     proteins = Protein.objects.filter(Q(uniprot_ID__icontains=query) | Q(protein_name__icontains=query) | Q(geneID__icontains=query) | Q(genename__icontains=query))
-    result_uniprot_ID = Protein.objects.filter(uniprot_ID__icontains=query)
+    result_uniprot_id = Protein.objects.filter(uniprot_ID__icontains=query)
     
-    if len(result_uniprot_ID) == 0:
+    if len(result_uniprot_id) == 0:
         result_protein_name = Protein.objects.filter(protein_name__icontains=query)
         if len(result_protein_name) == 0:
-            result_geneID = Protein.objects.filter(geneID__icontains=query)
-            if len(result_geneID) == 0:
+            result_gene_id = Protein.objects.filter(geneID__icontains=query)
+            if len(result_gene_id) == 0:
                 result_genename = Protein.objects.filter(genename__icontains=query)
                 results = [protein.genename for protein in result_genename]
             else:
-                results = [protein.geneID for protein in result_geneID]
+                results = [protein.geneID for protein in result_gene_id]
         else:
             results = [protein.protein_name for protein in result_protein_name]
     else:
-        results = [protein.uniprot_ID for protein in result_uniprot_ID]
+        results = [protein.uniprot_ID for protein in result_uniprot_id]
     # results = [protein.geneID + "(" + protein.genename + ") " + protein.uniprot_ID + " (" + protein.protein_name +")" for protein in proteins]
     return JsonResponse({'suggestions': results})
 
@@ -227,6 +227,9 @@ def drug_target_network(request):
     return render(request, 'home/drug_and_target_network.html', context)
     # return render(request, 'home/drug_and_target_network copy.html', context)
 
+def tutorial(request):
+    context = {}
+    return render(request, 'home/tutorial.html', context)
 
 
 def drug_lookup(request):
@@ -313,8 +316,8 @@ def variant_lookup(request):
                 'geneID': item.Gene_ID.gene_id,
                 'pt': item.Gene_ID.primary_transcript, # primary transcript
             })
-        # return render(request, 'home/variant_lookup.html', {'variants': variants})
-        return render(request, 'home/Drugs_Indications_Targets.html', {'variants': variants})
+        return render(request, 'home/variant_lookup.html', {'variants': variants})
+        # return render(request, 'home/Drugs_Indications_Targets.html', {'variants': variants})
 
 def target_lookup(request):
     target = request.GET.get('target')

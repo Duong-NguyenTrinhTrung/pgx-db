@@ -8,6 +8,6 @@ from .views import (
 app_name = 'variant'
 
 urlpatterns = [
-    path('genebass-variants/', get_genebass_tables, name='get-genebass-tables'),
+    path('genebass_variants/', get_genebass_tables, name='get-genebass-tables'),
     path('plot-variants/', get_variant_vep_scores_and_plot, name='get-plots'),
     ]

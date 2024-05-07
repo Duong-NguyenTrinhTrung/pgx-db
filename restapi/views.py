@@ -6,7 +6,7 @@ from drf_yasg.inspectors import PaginatorInspector
 from gene.views import GeneDetailBaseView, DrugByGeneBaseView, GenebasedAssociationStatisticsView
 from restapi.serializers import GeneDetailSerializer, AtcDetailSerializer, AtcByLevelSerializer, TargetDrugSerializer, VariantSerializer, TargetSerializer
 from drug.views import TargetByAtcBaseView, DescriptionByAtcBaseView, AtcCodesByLevelBaseView, TargetsByDrugBaseView, AtcCodesByDrugView, PGxByAtcCodeView, \
-                        DrugTargetInteractionByAtcBaseView
+                        DrugTargetInteractionByAtcBaseView, DrugDiseaseAssociationByAtcBaseView
 from variant.views import VEPFromVariantBaseView
 from protein.views import BundleByTargetCodeView
 from django.core.cache import cache
@@ -181,6 +181,24 @@ class DrugTargetInteractionByAtcRestApiView(DrugTargetInteractionByAtcBaseView,A
             interactions_by_atc_code = data.get('interactions_by_atc_code', [])
             
             return Response({"List of drug-protein interations: ": interactions_by_atc_code})
+        else:
+            return Response(serializer.errors, status=400)
+        
+class DrugDiseaseAssociationByAtcRestApiView(DrugDiseaseAssociationByAtcBaseView,APIView,):
+    allowed_method = ["get"]
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get the list of drug-disease associations of a given ATC code",
+    )
+    
+    def get(self, request, *args, **kwargs):
+        serializer = AtcDetailSerializer(data=self.kwargs)
+
+        if serializer.is_valid():
+            data = self.get_association_by_atc_code(serializer.validated_data.get('atc_code'))
+            associations_by_atc_code = data.get('associations_by_atc_code', [])
+            
+            return Response({"List of drug-diease associations: ": associations_by_atc_code})
         else:
             return Response(serializer.errors, status=400)
         

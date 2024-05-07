@@ -25,6 +25,10 @@ subprocess.run(['python', 'manage.py', 'build_protein'])
 subprocess.run(['python', 'manage.py', 'build_adding_updated_protein_class'])
 subprocess.run(['python', 'manage.py', 'build_adding_sequence_and_structure_to_protein'])
 subprocess.run(['python', 'manage.py', 'build_interaction'])
+subprocess.run(['python', 'manage.py', 'build_disease'])
+subprocess.run(['python', 'manage.py', 'build_drug_disease_study'])
+
+
 subprocess.run(['python', 'manage.py', 'build_variant_phenocode'])
 subprocess.run(['python', 'manage.py', 'build_variant_marker'])
 subprocess.run(['python', 'manage.py', 'build_vep_variant'])

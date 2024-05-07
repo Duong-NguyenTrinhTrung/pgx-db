@@ -215,7 +215,7 @@
         $('#search_drug').autocomplete({
             source: function (request, response) {
                 $.ajax({
-                    url: "{% url 'drug_autocomplete_view' %}",
+                    url: "{% url 'drug-autocomplete-view' %}",
                     data: {
                         query: request.term
                     },
@@ -241,7 +241,7 @@
         // Hide autocomplete results when clicking outside of the input and results
         /* $("#search_drug").on('keyup', function() {
             $.ajax({
-                    url: "{% url 'drug_lookup' %}?drug="+ $(this).val(),
+                    url: "{% url 'drug-lookup' %}?drug="+ $(this).val(),
                     success: function (data) {
                         $("#drug-result-tbody").html('');
                         var html_data = '';
@@ -263,7 +263,7 @@
         
         $("#submit_drug").click(function() {
             $.ajax({
-                url: "{% url 'drug_lookup' %}?drug="+ $("#search_drug").val(),
+                url: "{% url 'drug-lookup' %}?drug="+ $("#search_drug").val(),
                 success: function (data) {
                     $("#drug-result-tbody").html('');
                     var html_data = '';
@@ -297,7 +297,7 @@
         
         $("#reset_drug").click(function() {
             $.ajax({
-                    url: "{% url 'drug_lookup' %}?drug=default",
+                    url: "{% url 'drug-lookup' %}?drug=default",
                     // method: "GET",
                     // dataType: "html", // Specify the expected response type
                     success: function (data) {

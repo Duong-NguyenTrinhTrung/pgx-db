@@ -522,7 +522,7 @@ def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
 
-def SelectionAutocomplete(request):
+def selection_autocomplete(request):
     if is_ajax(request=request):
 
         # This line gets the 'term' parameter from the GET data of the request, removes any leading and trailing whitespace, and assigns the result to the variable 'q'. The 'term' parameter is the search term entered by the user.
@@ -618,7 +618,7 @@ def SelectionAutocomplete(request):
 
 
 # Create your views here.
-def DrugStatistics(request):
+def get_drug_statistics(request):
     #0 -> Nutraceutical, 1 - Experimental, 2- Investigational, 3- Approved , 4 - Vet approved, 5 - Illicit
 
     no_of_others = len(list(set(Drug.objects.filter(Clinical_status__in=[0, 4, 5]).values_list("drug_bankID", flat=True))))
@@ -2199,5 +2199,35 @@ class DrugTargetInteractionByAtcBaseView:
                 context = dict()
                 cache.set("interactions_by_atc_code_" + slug, returned_data, 60 * 60)
             context['interactions_by_atc_code'] = returned_data
+        return context
+    
+class DrugDiseaseAssociationByAtcBaseView:
+    def get_association_by_atc_code(self, slug):
+        context = {}
+        if slug is not None:
+            if cache.get("associations_by_atc_code_" + slug) is not None:
+                returned_data = cache.get("associations_by_atc_code_" + slug)
+            else:
+                print("slug ", slug)
+                drug_ids = DrugAtcAssociation.objects.filter(atc_id__id__istartswith=slug).values_list("drug_id", flat=True)
+                print("drug_ids ", drug_ids)
+                returned_data = []
+                for drug_id in drug_ids:
+                    associations = DrugDiseaseStudy.objects.filter(drug_bankID=drug_id).values_list("disease_name__disease_name", "disease_name__disease_class", "clinical_trial", "link", "standard_inchiKey")
+                    drug_name = Drug.objects.get(drug_bankID=drug_id).name
+                    for association in associations:
+                        temp={
+                            "drug_bankID":drug_id,
+                            "drug_name": drug_name,
+                            "disease_name":association[0],
+                            "disease_class":association[1],
+                            "clinical_trial":association[2],
+                            "link":association[3],
+                            "standard_inchiKey":association[4],
+                        }
+                        returned_data.append(temp)
+                context = dict()
+                cache.set("associations_by_atc_code_" + slug, returned_data, 60 * 60)
+            context['associations_by_atc_code'] = returned_data
         return context
     

@@ -22,10 +22,10 @@ var json_interactionData = "/static/json-sample/json_interactionData.json"
 
 
 if (drug_bank_ids) {
-    json_GeneralFile = "/drugs_network/general_data?drug_bank_ids=" + drug_bank_ids.join(',');
-    json_drugData = "/drugs_network/drug_data?drug_bank_ids=" + drug_bank_ids.join(',');
-    json_proteinData = "/drugs_network/protein_data?drug_bank_ids=" + drug_bank_ids.join(',');
-    json_interactionData = "/drugs_network/interaction_data?drug_bank_ids=" + drug_bank_ids.join(',');
+    json_GeneralFile = "/drugs-network/general-data?drug_bank_ids=" + drug_bank_ids.join(',');
+    json_drugData = "/drugs-network/drug-data?drug_bank_ids=" + drug_bank_ids.join(',');
+    json_proteinData = "/drugs-network/protein-data?drug_bank_ids=" + drug_bank_ids.join(',');
+    json_interactionData = "/drugs-network/interaction-data?drug_bank_ids=" + drug_bank_ids.join(',');
 }
 
 if (drug_bank_id) {
@@ -34,8 +34,6 @@ if (drug_bank_id) {
     json_proteinData = "/drug_network/" + drug_bank_id + "/protein_data";
     json_interactionData = "/drug_network/" + drug_bank_id + "/interaction_data";
 }
-
-// console.log("is this json_drugData available "+json_drugData);
 
 
 // code to get the li of the network visualization 
@@ -81,7 +79,6 @@ function readDrugJSON() {
     fetch(jsonFilePath)
         .then((response) => response.json())
         .then((jsonData) => {
-            console.log("in readDrugJSON function : jsonData ",jsonData);
             // Assuming your JSON data is an array of objects, adjust this code accordingly
             // drug_xlsxData = jsonData.map(item => item.fields);
             if (typeof jsonData === 'string') {

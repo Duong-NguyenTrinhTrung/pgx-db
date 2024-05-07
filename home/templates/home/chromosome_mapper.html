@@ -350,7 +350,7 @@
         var ex_to = $("#anno_to_example span");
 
         $.ajax({
-                    url: `{% url 'get_chromosome_mapping_example' %}?version=${version}&anno_from=${anno_from}&anno_to=${anno_to}`,
+                    url: `{% url 'get-chromosome-mapping-example' %}?version=${version}&anno_from=${anno_from}&anno_to=${anno_to}`,
                     
                     success: function (response) {
                         ex_from.html(`Examples: <i style="color:#0077b6;">${response.anno_from_example}</i>`);
@@ -365,7 +365,7 @@
         var anno_to = $("#anno-to-select").val();
         var query = $('#search-anno-from').val();
         $.ajax({
-                    url: `{% url 'get_chromosome_mapping' %}?version=${version}&input=${query}&anno_from=${anno_from}&anno_to=${anno_to}`,
+                    url: `{% url 'get-chromosome-mapping' %}?version=${version}&input=${query}&anno_from=${anno_from}&anno_to=${anno_to}`,
                     success: function (response) {
                         $('#search-anno-to').val(response.result);
                     }

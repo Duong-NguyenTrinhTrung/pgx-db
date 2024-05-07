@@ -155,7 +155,7 @@ class ProteinBrowser(TemplateView):
         return context
 
 #@cache_page(60 * 60 * 24 * 7)
-def detail(request, slug):
+def get_protein_details(request, slug):
     # get protein
     slug = slug.upper()
 
@@ -172,8 +172,8 @@ def detail(request, slug):
     # for p in ps:
 
     # get family list
-    uniprot_ID = p.uniprot_ID
+    uniprot_id = p.uniprot_ID
     protein_name = p.protein_name
 
-    context = {'uniprot_ID': uniprot_ID, 'protein_name': protein_name}
+    context = {'uniprot_ID': uniprot_id, 'protein_name': protein_name}
     return render(request, 'protein_detail.html', context)
