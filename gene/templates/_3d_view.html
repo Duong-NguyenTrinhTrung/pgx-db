@@ -23,7 +23,9 @@
 
     
     // Load the 3D structure from a PDB file hosted online
-    var pdbUrl = "{% static 'gene/pdb-test/6bsz.pdb' %}"; // Replace with your PDB file URL
+    // var pdbUrl = "{% static 'gene/pdb-test/A5X5Y0.pdb' %}"; 
+    var pdbUrl = "{% static 'gene/pdb/' %}" + "{{ protein_name }}" + ".pdb";
+
     jQuery.ajax( pdbUrl, {
         success: function(data) {
             // let v = viewer;
