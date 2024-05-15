@@ -17,6 +17,22 @@ import subprocess
 # subprocess.run(['python', 'manage.py', 'build_drugchembl'])
 # subprocess.run(['python', 'manage.py', 'build_drugpubchemsubstance'])
 
+subprocess.run(['python', 'manage.py', 'build_drug'])
+subprocess.run(['python', 'manage.py', 'build_adding_drug_clinical_status'])
+subprocess.run(['python', 'manage.py', 'build_drug_atc'])
+subprocess.run(['python', 'manage.py', 'build_gene'])
+subprocess.run(['python', 'manage.py', 'build_protein'])
+subprocess.run(['python', 'manage.py', 'build_adding_updated_protein_class'])
+subprocess.run(['python', 'manage.py', 'build_adding_sequence_and_structure_to_protein'])
+subprocess.run(['python', 'manage.py', 'build_interaction'])
+subprocess.run(['python', 'manage.py', 'build_disease'])
+subprocess.run(['python', 'manage.py', 'build_drug_disease_study'])
+
+
+subprocess.run(['python', 'manage.py', 'build_variant_phenocode'])
+subprocess.run(['python', 'manage.py', 'build_variant_marker'])
+subprocess.run(['python', 'manage.py', 'build_vep_variant'])
+subprocess.run(['python', 'manage.py', 'build_genebass_variant'])
 # subprocess.run(['python', 'manage.py', 'build_drug'])
 # subprocess.run(['python', 'manage.py', 'build_adding_drug_clinical_status'])
 # subprocess.run(['python', 'manage.py', 'build_drug_atc'])

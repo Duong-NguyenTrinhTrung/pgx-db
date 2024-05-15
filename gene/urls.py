@@ -10,6 +10,6 @@ app_name = 'gene' # to distingush different app names when using url names
 urlpatterns = [
     path('gene/<slug:slug>/', GeneDetailBrowser.as_view(), name='gene'),
     path('gene/<str:id>/filter', filter_gene_detail_page, name='filter-gene-detail-page'),
-    path('gene/<str:pk>/genebass-variants/', GenebassVariantListView.as_view(), name='genebass-variants'),
+    path('gene/<str:pk>/genebass_variants/', GenebassVariantListView.as_view(), name='genebass-variants'),
     
 ]

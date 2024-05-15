@@ -1,0 +1,145 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+
+{% block addon_css %}
+<style>
+    .tutorial_container{
+        margin-top: 5px;
+        padding: 15px 30px;
+        /* min-height: calc(100vh - 75px); */
+        text-align: left;
+        
+    }
+    section header {
+        margin: 10px;
+        position: relative;
+        padding-left: 10px;
+    }
+
+    section header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -10px;
+    width: 10px; 
+    background-color: #bf0603; 
+    z-index: -1; /* Push the pseudo-element behind the header text */
+    }
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<main>
+
+    <!-- atc  -->
+    <section class="tutorial_container" >
+        <div style="width: 1000px; margin: 0 auto; display: flex; flex-direction: column;">
+            <header>
+                <h2>
+                    Search or Browse to any ATC code of interest
+                </h2>
+            </header>
+            <p>From Drugs/ATC tree browser, users can input a single ATC code or browse in the ATC tree to launch the search process. The ATC tree starts with 14 Anatomical groups and ends with chemical substance nodes. At any level, users can click on the rightmost button to show the network.</p>
+            <img src="/static/home/images/atc_browse.png" alt="">
+        </div>
+    </section>
+
+    <section class="tutorial_container">
+        <div style="width: 1000px; margin: 0 auto; display: flex; flex-direction: column;">
+            <header>
+                <h2>
+                    Explore the drug-disease and -target network associated with an ATC code of interest
+                </h2>
+            </header>
+            <p>Users can input a single drug name or drug bank ID on the homepage to launch the search process. For a quick trial, user just click an example displayed below the input box to view the list of drug combinations.</p>
+            <img src="/static/home/images/atc_level_network1.png" alt="">
+            <img src="/static/home/images/atc_level_network2.png" alt="">
+        </div>
+    </section>
+
+    <!-- drug  -->
+    <section class="tutorial_container">
+        <div style="width: 1000px; margin: 0 auto; height: 65%; display: flex; flex-direction: column;">
+            <header>
+                <h2>
+                    Search a drug of interest
+                </h2>
+            </header>
+            <p>Users can input a single drug name or drug bank ID on the homepage to launch the search process. For a quick trial, user just click an example displayed below the input box to view the list of drug combinations.</p>
+            <img src="/static/home/images/drug_search.png" alt="">
+        </div>
+    </section>
+
+    <!-- disease  -->
+    <section class="tutorial_container">
+        <div style="width: 1000px; margin: 0 auto; height: 65%; display: flex; flex-direction: column;">
+            <header>
+                <h2>
+                    Search a disease of interest
+                </h2>
+            </header>
+            <p>Users can input a single drug name or drug bank ID on the homepage to launch the search process. For a quick trial, user just click an example displayed below the input box to view the list of drug combinations.</p>
+            <img src="/static/home/images/disease_search.png" alt="">
+        </div>
+    </section>
+
+    <!-- target  -->
+    <section class="tutorial_container">
+        <div style="width: 1000px; margin: 0 auto; display: flex; flex-direction: column;">
+            <header>
+                <h2>
+                    Search a protein/target/gene of interest
+                </h2>
+            </header>
+            <p>Users can input a single drug name or drug bank ID on the homepage to launch the search process. For a quick trial, user just click an example displayed below the input box to view the list of drug combinations.</p>
+            <img src="/static/home/images/target_search.png" alt="">
+        </div>
+    </section>
+
+    <!-- variant  -->
+    <section class="tutorial_container">
+        <div style="width: 1000px; margin: 0 auto; display: flex; flex-direction: column;">
+            <header>
+                <h2>
+                    Search a variant of interest
+                </h2>
+            </header>
+            <p>Users can input a single drug name or drug bank ID on the homepage to launch the search process. For a quick trial, user just click an example displayed below the input box to view the list of drug combinations.</p>
+            <img src="/static/home/images/variant_search.png" alt="">
+        </div>
+    </section>
+
+    <!-- overall statistics   -->
+    <section class="tutorial_container">
+        <div style="width: 1000px; margin: 0 auto; display: flex; flex-direction: column;">
+            <header>
+                <h2>
+                    Download data programmatically
+                </h2>
+            </header>
+            <p>We used the REST framework (https://www.django-rest-framework.org/) to implemented API calls enabling programmatic retrieval of PGx information.</p>
+            <img src="/static/home/images/download_api.png" alt="">
+        </div>
+    </section>
+
+    <!-- overall statistics   -->
+    <section class="tutorial_container">
+        <div style="width: 1000px; margin: 0 auto; display: flex; flex-direction: column;">
+            <header>
+                <h2>
+                    Grasp a quick overview of data of each types (drug, gene/target, disease) in PGx
+                </h2>
+            </header>
+            <p>User can ... A screenshot of statistics for targets is provided below as an example.</p>
+            <img src="/static/home/images/target_statistics.png" alt="">
+        </div>
+    </section>
+</main>
+{% endblock %}
+
+

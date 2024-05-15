@@ -3,14 +3,14 @@
 echo "Start run build data scripts" 
 
 # Activate virtual environment
-source venv/bin/activate
+# source venv/bin/activate
 
 # Run build data scripts
 
 echo "Start run many builds" 
 
-#python manage.py build_atc_anatomic_group
-python scripts/run_many_builds.py
+python manage.py build_variant_mapping
+# python scripts/run_many_builds.py
 
 echo "End run many builds"
 
@@ -21,4 +21,4 @@ echo "End run many builds"
 echo "End run build data scripts"
 
 # Deactivate virtual environment
-deactivate
+# deactivate

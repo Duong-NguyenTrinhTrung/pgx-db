@@ -51,6 +51,9 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+GraphNeuralNetwork/
+
+static/gene/pdb
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

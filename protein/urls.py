@@ -12,8 +12,8 @@ urlpatterns = [
     #  url(r'^browser$', cache_page(3600*24*7)(views.LigandBrowser.as_view()), name='ligand_browser'),
     path('protein',
          (ProteinBrowser.as_view()), name='protein_browser'),
-    re_path(r'^protein/(?P<slug>[\w-]+)/$', views.detail, name='detail'), 
-    path('protein_view_ex', views.protein_view_ex, name='protein_view'),
+    re_path(r'^protein/(?P<slug>[\w-]+)/$', views.get_protein_details, name='detail'),
+    path('protein_view_ex', views.protein_view_ex, name='protein-view'),
 ]
 
 # Define a URL route for serving data files

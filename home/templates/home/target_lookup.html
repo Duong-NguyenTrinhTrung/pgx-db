@@ -222,7 +222,7 @@
         $('#search_protein').autocomplete({
             source: function (request, response) {
                 $.ajax({
-                    url: "{% url 'protein_autocomplete_view' %}",
+                    url: "{% url 'protein-autocomplete-view' %}",
                     data: {
                         query: request.term
                     },
@@ -249,7 +249,7 @@
         
         $("#search_protein").on('keyup', function() {
             $.ajax({
-                    url: "{% url 'target_lookup' %}?target="+ $(this).val(),
+                    url: "{% url 'target-lookup' %}?target="+ $(this).val(),
                     success: function (data) {
                         console.log(data.items);
                         $("#target-result-tbody").html('');
@@ -282,7 +282,7 @@
         }); 
         $("#submit_protein").click(function() {
             $.ajax({
-                    url: "{% url 'target_lookup' %}?target="+ $("#search_protein").val(),
+                    url: "{% url 'target-lookup' %}?target="+ $("#search_protein").val(),
                     success: function (data) {
                         // console.log(data.proteins);
                         $("#target-result-tbody").html('');
@@ -315,7 +315,7 @@
         
         $("#reset_protein").click(function() {
             $.ajax({
-                    url: "{% url 'target_lookup' %}?target=default",
+                    url: "{% url 'target-lookup' %}?target=default",
                     // method: "GET",
                     // dataType: "html", // Specify the expected response type
                     success: function (data) {

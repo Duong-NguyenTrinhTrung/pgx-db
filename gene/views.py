@@ -34,6 +34,7 @@ from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
 
 
+
 warnings.filterwarnings('ignore')
 
 class GenebasedAssociationStatisticsView:
@@ -160,6 +161,7 @@ class GeneDetailBaseView(object):
         "PhastCons30way_mammalian_rankscore",
         "PhyloP30way_mammalian_rankscore",
         "AM_pathogenicity",
+        "HighestAF"
     ]
 
     list_necessary_columns = [
@@ -213,6 +215,7 @@ class GeneDetailBaseView(object):
         "PhastCons30way_mammalian_rankscore",
         "PhyloP30way_mammalian_rankscore",
         "AM_pathogenicity",
+        "HighestAF",
     ]
 
     name_dic = {'NMD': 'NMD_transcript', 'cse': 'coding_sequence', 'fsh': 'frameshift',
@@ -290,6 +293,7 @@ class GeneDetailBaseView(object):
         data_subset["PhastCons30way_mammalian_rankscore"] = vep_variant[47]
         data_subset["PhyloP30way_mammalian_rankscore"] = vep_variant[48]
         data_subset["AM_pathogenicity"] = vep_variant[49]
+        data_subset["HighestAF"] = vep_variant[50]
         data_subset["primary"] = is_primary_ts(vep_variant[0])
         # print("data_subset[primary] ", data_subset["primary"])
         # print("data_subset last ", type(data_subset))
@@ -307,7 +311,6 @@ class GeneDetailBaseView(object):
                 browser_columns = self.browser_columns
 
                 table = pd.DataFrame(columns=browser_columns)
-
                 # Retrieve all variant markers from a gene
                 if slug.startswith("ENSG"):
                     marker_ID_data = Variant.objects.filter(Gene_ID=slug).values_list(
@@ -339,11 +342,14 @@ class GeneDetailBaseView(object):
                 for data_row in table.to_numpy():
                     table_index += 1
                     try:
-                        cleaned_values = [x for x in data_row[10:-1] if str(x) != '']
-                        if len(cleaned_values) != 0:
-                            cleaned_value_index += 1
-                            mean_vep_score = round(np.mean(cleaned_values), 2)
-                            table_with_mean_vep_score.append(np.append(data_row, mean_vep_score))
+                        cleaned_values = [x for x in data_row[10:-2] if str(x) != '']
+                        # if len(cleaned_values) != 0:
+                        #     cleaned_value_index += 1
+                        #     mean_vep_score = round(np.mean(cleaned_values), 2)
+                        #     table_with_mean_vep_score.append(np.append(data_row, mean_vep_score))
+                        cleaned_value_index += 1
+                        mean_vep_score = round(np.mean(cleaned_values), 2)
+                        table_with_mean_vep_score.append(np.append(data_row, mean_vep_score))
                     except Exception as e:
                         pass
 
@@ -374,20 +380,16 @@ class GeneDetailBaseView(object):
             chunks[-1]["position"] = len(amino_seq)
             context["chunks"] = chunks
             context["af_pdb"] = Protein.objects.filter(geneID=slug).values_list("af_pdb", flat=True)[0]
-
             transcripts = [item[1] for item in table_with_protein_pos_int]
             context['transcripts'] = list(set(transcripts))
             variants = [item[0] for item in table_with_protein_pos_int]
             context['variants'] = list(set(variants))
-
             consequences = []
             for item in table_with_protein_pos_int:
                 coseq = item[2].split(",")
                 if len(coseq) >= 1:
                     consequences += coseq
-
             context['consequences'] = list(set(consequences))
-
         return context
 
 
