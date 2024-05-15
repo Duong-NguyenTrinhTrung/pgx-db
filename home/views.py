@@ -22,7 +22,7 @@ from variant.models import Variant, VepVariant, GenebassPGx, GenebassVariantPGx,
 from interaction.models import Interaction
 from gene.models import Gene
 from disease.models import Disease, DrugDiseaseStudy
-from drug.models import Drug, DrugAtcAssociation
+from drug.models import Drug, DrugAtcAssociation, AdverseDrugReaction, SideEffect
 from chromosome.models import Chromosome
 from django.conf import settings
 from django.http import JsonResponse
@@ -231,6 +231,56 @@ def tutorial(request):
     context = {}
     return render(request, 'home/tutorial.html', context)
 
+def sort_dict(my_dict):
+    sorted_items_desc = sorted(my_dict.items(), key=lambda item: item[1])
+    sorted_dict_desc = dict(sorted_items_desc)
+    return sorted_dict_desc
+
+def get_se_definition(request):
+    se_name = request.GET.get("se-name")
+    try:
+        definition = SideEffect.objects.get(side_effect_name=se_name).side_effect_definition
+    except SideEffect.DoesNotExist:
+        definition = "NA"
+
+    context = {
+        "se_definition": definition
+    }
+    return JsonResponse(context)
+
+
+def get_adr(drugbank_id):
+    try:
+        adr_data = AdverseDrugReaction.objects.get(drug_bankID=drugbank_id).adr_data
+        color1_data = {}
+        color2_data = {}
+        color3_data = {}
+        color4_data = {}
+
+        pairs = adr_data.split(", ")
+        for pair in pairs:
+            if pair!="":
+                se = pair.split()[:-1]
+                freq = float(pair.split()[-1][1:-2])
+                if freq<=25:
+                    color1_data[" ".join(se)]=freq
+                elif freq<=50:
+                    color2_data[" ".join(se)]=freq
+                elif freq<=75:
+                    color3_data[" ".join(se)]=freq
+                else:
+                    color4_data[" ".join(se)]=freq
+        adr = {
+                "color1": sort_dict(color1_data), 
+                "color2": sort_dict(color2_data), 
+                "color3": sort_dict(color3_data), 
+                "color4": sort_dict(color4_data), 
+            }
+        
+    except AdverseDrugReaction.DoesNotExist:
+        adr = "NA"
+
+    return adr
 
 def drug_lookup(request):
     drug = request.GET.get('drug')
@@ -252,12 +302,24 @@ def drug_lookup(request):
                 code = "Not assigned"
             else:
                 code = list(atc_code)
+            adr = get_adr(item.drug_bankID)
+            if adr!="NA":
+                adr_json = {
+                    "color1": [f"{key} ({value}" for key, value in adr.get("color1", {}).items()],
+                    "color2": [f"{key} ({value}" for key, value in adr.get("color2", {}).items()],
+                    "color3": [f"{key} ({value}" for key, value in adr.get("color3", {}).items()],
+                    "color4": [f"{key} ({value}" for key, value in adr.get("color4", {}).items()],
+                }
+            else:
+                adr_json = "NA"
             drugs.append({
                 'drug_bankID': item.drug_bankID,
                 'name': item.name,
                 'atc_code': code,
                 'drug_type': item.drugtype.type_detail,
-                'Clinical_status': clinical_status_dict.get(item.Clinical_status)
+                'Clinical_status': clinical_status_dict.get(item.Clinical_status),
+                "adr": adr,
+                "adr_json": adr_json
             })
         print("drugs : ", drugs)
         return JsonResponse({'drugs': drugs})
@@ -270,16 +332,27 @@ def drug_lookup(request):
                 code = "Not assigned"
             else:
                 code = list(atc_code)
-
+            adr = get_adr(item.drug_bankID)
+            if adr!="NA":
+                adr_json = {
+                    "color1": [f"{key} ({value}" for key, value in adr.get("color1", {}).items()],
+                    "color2": [f"{key} ({value}" for key, value in adr.get("color2", {}).items()],
+                    "color3": [f"{key} ({value}" for key, value in adr.get("color3", {}).items()],
+                    "color4": [f"{key} ({value}" for key, value in adr.get("color4", {}).items()],
+                }
+            else:
+                adr_json = "NA"
             drugs.append({
                 'drug_bankID': item.drug_bankID,
                 'name': item.name,
                 'atc_code': code,
                 'drug_type': item.drugtype.type_detail,
-                'Clinical_status': clinical_status_dict.get(item.Clinical_status)
+                'Clinical_status': clinical_status_dict.get(item.Clinical_status),
+                "adr": adr,
+                "adr_json": adr_json
             })
         context["drugs"] = drugs
-        print("context ", context)
+        print("This is context ", context)
         return render(request, 'home/drug_lookup.html', context)
     
 def get_atc_code(drug_bankID):

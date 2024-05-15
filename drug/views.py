@@ -39,6 +39,7 @@ from disease.models import DrugDiseaseStudy, Disease
 from .models import (
     Drug,
     DrugAtcAssociation,
+    AdverseDrugReaction
 )
 from .services import DrugNetworkGetDataService, DrugsNetworkGetDataService
 from time import perf_counter
@@ -77,6 +78,44 @@ def drawNetworkAndSaveInAPlot(G, pat, name, title):
 #     AtcTherapeuticGroup,
 #     DrugAtcAssociation,
 # )
+
+def sort_dict(my_dict):
+    # Sorting in descending order by values
+    sorted_items_desc = sorted(my_dict.items(), key=lambda item: item[1], reverse=True)
+    # Converting sorted items back to a dictionary for descending order
+    sorted_dict_desc = dict(sorted_items_desc)
+    return sorted_dict_desc
+
+
+def get_adr_data(request):
+    drugbank_id = request.GET.get('drugbank_id')
+    adr_data = AdverseDrugReaction.objects.get(drug_bankID=drugbank_id).adr_data
+    color1_data = {}
+    color2_data = {}
+    color3_data = {}
+    color4_data = {}
+
+    pairs = adr_data.split(", ")
+    for pair in pairs:
+        if pair!="":
+            se = pair.split()[:-1]
+            freq = float(pair.split()[-1][1:-2])
+            if freq<=25:
+                color1_data[" ".join(se)]=freq
+            elif freq<=50:
+                color2_data[" ".join(se)]=freq
+            elif freq<=75:
+                color3_data[" ".join(se)]=freq
+            else:
+                color4_data[" ".join(se)]=freq
+    adr = {
+            "color1": sort_dict(color1_data), 
+            "color2": sort_dict(color2_data), 
+            "color3": sort_dict(color3_data), 
+            "color4": sort_dict(color4_data), 
+        }
+    return JsonResponse({'adr_data': adr})
+
 
 def atc_comparison_autocomplete_view(request):
     query = request.GET.get('query', '')

@@ -18,6 +18,12 @@
         th.width-80px {
             width: 80px;
         }
+        .long-text {
+            /* word-wrap: break-word; For older browsers
+            overflow-wrap: break-word; For modern browsers */
+            white-space: normal;
+        }
+        
     </style>
 {% endblock addon_css %}
 
@@ -44,14 +50,14 @@
                     <table class="display compact text-nowrap" id="structures_scrollable">
                         <thead id="headers">
                         <tr>
-                            <th rowspan="2">Variant</th>
+                            <th rowspan="2" class="long-text" style="width: 90px !important;">Variant</th>
                             <th rowspan="2">Transcript</th>
                             <th rowspan="2">Canonical</th>
                             <th rowspan="2">Sequence<br>position</th>
                             <th rowspan="2">Wildtype AA</th>
                             <th rowspan="2">Mutant AA</th>
                             <th rowspan="2">Codons</th>
-                            <th rowspan="2">Consequence</th>
+                            <th rowspan="2" class="long-text" style="width: 80px !important;">Consequence</th>
                             <th rowspan="2">Allele<br>frequency</th>
                             <th rowspan="2" style="width: 80px !important;" class="width-80px">Mean <br> VEP scores</th>
                             <th rowspan="2"><a id="show-all-vep-score" href="#">Show VEP Scores</a></th>
@@ -105,10 +111,9 @@
                         <tbody id='structures_scrollable_body'>
                         {% for value in array %}
                             <tr class="data-row">
-                                <td class="align-left variant">{{ value.0 }}</td> <!--  Variant -->
+                                <td class="align-left variant long-text" style="width: 90px !important;">{{ value.0 }}</td> <!--  Variant -->
                                 <td class="align-left">{{ value.1 }}</td> <!--  Transcript -->
                                 <td class="align-left">YES</td> <!--  Canonical -->
-                                <!-- <td class="align-left">{{ value.50 }}</td>  Canonical -->
                                 <td class="align-left">{{ value.5 }}</td> <!--  Sequence position -->
                                 {% if value.6|length == 3 %}
                                     <td class="align-left">{{ value.6|slice:":1" }}</td> <!-- Wildtype  -->
@@ -119,8 +124,14 @@
                                 {% endif %}
 
                                 <td class="align-left">{{ value.7 }}</td> <!-- Codons  -->
-                                <td class="align-left">{{ value.2 }}</td> <!--Consequence   -->
-                                <td class="align-left">{{ value.51|floatformat:"0.2e"}}</td> <!--  Highest AF -->
+                                <td class="align-left long-text" style="width: 80px !important;">{{ value.2 }}</td> <!--Consequence   -->
+                                {% with num=value.51|floatformat:"0.2e" %}
+                                    {% if not num %}
+                                        <td class="align-left" style="color: #d62828;">None</td> <!--  Highest AF -->
+                                    {% else %}
+                                        <td class="align-left">{{ value.51|floatformat:"0.2e"}}</td> <!--  Highest AF -->
+                                    {% endif %}
+                                {% endwith %}
                                 <!--  Mean VEP scores -->
                                 {% with num=value|last|add:0 %}
                                         {% if not num %}
@@ -128,7 +139,7 @@
                                                 <td class="align-left" >{{ value|last }}</td> 
                                         {% else %}
                                                 <!-- Handle case where Mean VEP scores is a number -->
-                                                <td class="align-left" style="color: #9d0208;">None</td> 
+                                                <td class="align-left" style="color: #d62828;">None</td> 
                                         {% endif %}
                                 {% endwith %}
                                 <td><a href="#" class="variant_associate_statistics"
@@ -188,15 +199,7 @@
                 <div class="col-sm-3" style="padding: 0px;">
                     <p style="font-size:16px; padding-left:0; margin-left:0;">3D structure:</p>
                     <div id="filter_3d">
-                        <div id="filter_3d_row1">
-                            <div id="filter_3d_source">
-                                <p>Source:</p>
-                                <select id="sourceSelect" name="sourceSelect">
-                                    <option value="pdb">PDB</option>
-                                    <option value="af2">AlphaFold2</option>
-                                </select>
-                            </div>
-                        </div>
+                        
                         <div id="filter_3d_row2">
                             <div id="filter_chain">
                                 <p>Chain:</p>
@@ -223,13 +226,14 @@
                         </div>
                             
                         <div id="seqquence_filter_row">
-                            
                         </div>
                     </div>
                 </div>
 
                 <div id="structure_3D" class="col-sm-9">
-                    {% include '_3d_view.html' %}
+                    {% with protein_name=protein_name %}
+                        {% include '_3d_view.html' %}
+                    {% endwith %}
                 </div>
 
             </div>
@@ -267,7 +271,6 @@
     <script src="{% static 'home/js/gpcrdb.js' %}"></script>
     <script src='https://cdn.plot.ly/plotly-2.20.0.min.js'></script>
     <script src="https://code.jquery.com/jquery-migrate-1.4.1.min.js"></script>
-
     <script>
         
         $(document).ready(function () {
@@ -879,21 +882,10 @@
             }
             viewer.render();
         });
-
-        const sourceSelect = document.getElementById('sourceSelect');
-        sourceSelect.addEventListener('change', (event) => {
-            const sourceSelect = event.target.value;
-            if (sourceSelect === 'pdb') {
-            } else {
-            }
-        });
-        
         function addLabelForResidueNth(nth, labelText, labelOptions) {
             const labels = viewer.addResLabels({resi: nth}, labelOptions);
             return labels;
         }
-
-        
         </script>
         <script src="{% static 'home/js/d3.v7.min.js' %}"></script>   
 {% endblock addon_js %}

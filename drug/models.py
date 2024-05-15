@@ -181,3 +181,12 @@ class Drug(models.Model):
         indexes = [
                     models.Index(fields=['drug_bankID']),
                 ]
+
+class AdverseDrugReaction(models.Model):
+    drug_bankID = models.ForeignKey(
+        "drug.drug", on_delete=models.CASCADE)
+    adr_data = models.TextField(default="None")
+
+class SideEffect(models.Model):
+    side_effect_name = models.CharField(max_length=255, primary_key=True)
+    side_effect_definition = models.TextField()
