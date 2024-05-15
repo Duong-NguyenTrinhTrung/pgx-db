@@ -6,9 +6,12 @@ from drf_yasg.inspectors import PaginatorInspector
 from gene.views import GeneDetailBaseView, DrugByGeneBaseView, GenebasedAssociationStatisticsView
 from restapi.serializers import GeneDetailSerializer, AtcDetailSerializer, AtcByLevelSerializer, TargetDrugSerializer, VariantSerializer, TargetSerializer
 from drug.views import TargetByAtcBaseView, DescriptionByAtcBaseView, AtcCodesByLevelBaseView, TargetsByDrugBaseView, AtcCodesByDrugView, PGxByAtcCodeView, \
-                        DrugTargetInteractionByAtcBaseView
+                        DrugTargetInteractionByAtcBaseView, DrugDiseaseAssociationByAtcBaseView
 from variant.views import VEPFromVariantBaseView
 from protein.views import BundleByTargetCodeView
+from django.core.cache import cache
+from variant.models import GenebassVariant, GenebassCategory, VariantPhenocode
+import pandas as pd
 
 
 class VariantToVepRestApiView(VEPFromVariantBaseView, APIView,):
@@ -19,8 +22,8 @@ class VariantToVepRestApiView(VEPFromVariantBaseView, APIView,):
     )
 
     def get(self, request, *args, **kwargs):
+        print("inside VariantToVepRestApiView")
         serializer = VariantSerializer(data=self.kwargs)
-
         if serializer.is_valid():
             data = self.get_vep_from_variant(serializer.validated_data.get('variant_marker'))
             print(len(data))
@@ -36,13 +39,12 @@ class GeneVariantRestApiView(GeneDetailBaseView,APIView,):
     )
 
     def get(self, request, *args, **kwargs):
+        print("self.kwargs ", self.kwargs)
         serializer = GeneDetailSerializer(data=self.kwargs)
 
         if serializer.is_valid():
-            gene_data = self.get_gene_detail_data(serializer.validated_data.get('gene_id'))
-            # print("gene_data: ", gene_data.keys())
+            gene_data = self.get_gene_detail_data(self.kwargs.get('gene_id'))
             array_data = gene_data.get('array', [])
-            print("type(array_data): ",type(array_data), " len of data ", len(array_data))
             returned_data = []
             for variant in array_data:
                 d = {
@@ -58,7 +60,8 @@ class GeneVariantRestApiView(GeneDetailBaseView,APIView,):
                 }
                 
                 returned_data.append(d)
-            return Response({'Basic information about the variant of gene '+self.kwargs: returned_data})
+            print("self.kwargs : ", self.kwargs)
+            return Response({'Basic information about variants of gene '+self.kwargs.get("gene_id"): returned_data})
         else:
             return Response(serializer.errors, status=400)
         
@@ -181,6 +184,24 @@ class DrugTargetInteractionByAtcRestApiView(DrugTargetInteractionByAtcBaseView,A
         else:
             return Response(serializer.errors, status=400)
         
+class DrugDiseaseAssociationByAtcRestApiView(DrugDiseaseAssociationByAtcBaseView,APIView,):
+    allowed_method = ["get"]
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get the list of drug-disease associations of a given ATC code",
+    )
+    
+    def get(self, request, *args, **kwargs):
+        serializer = AtcDetailSerializer(data=self.kwargs)
+
+        if serializer.is_valid():
+            data = self.get_association_by_atc_code(serializer.validated_data.get('atc_code'))
+            associations_by_atc_code = data.get('associations_by_atc_code', [])
+            
+            return Response({"List of drug-diease associations: ": associations_by_atc_code})
+        else:
+            return Response(serializer.errors, status=400)
+        
 class AtcToDescriptionRestApiView(DescriptionByAtcBaseView,APIView,):
     allowed_method = ["get"]
     @swagger_auto_schema(
@@ -252,14 +273,14 @@ class AtcToPgxRestApiView(PGxByAtcCodeView,APIView,):
     allowed_method = ["get"]
     @swagger_auto_schema(
             operation_description="operation_description",
-            operation_summary="Get pharmacogenomics data given an ATC code",
+            operation_summary="Get PharmgKB pharmacogenomics data given an ATC code",
     )
 
     def get(self, request, *args, **kwargs):
         serializer = AtcDetailSerializer(data=self.kwargs)
 
         if serializer.is_valid():
-            data = self.get_pgx_by_atc_code(serializer.validated_data.get('atc_code'))
+            data = self.get_pharmgkb_pgx_by_atc_code(serializer.validated_data.get('atc_code'))
             Pharmacogenomics = data.get('pgx', [])
             returned_data = [{
                     "Pharmacogenomics":Pharmacogenomics,
@@ -291,19 +312,23 @@ class AtcCodesByDrugRestApiView(AtcCodesByDrugView,APIView,):
             return Response({"ATC code of drug "+self.kwargs.get("drug_id"): returned_data})
         else:
             return Response(serializer.errors, status=400)
+        
+
 
 class GenebasedAssociationStatisticsRestApiView(GenebasedAssociationStatisticsView,APIView,):
     allowed_method = ["get"]
     @swagger_auto_schema(
             operation_description="operation_description",
-            operation_summary="Get gene-based association statistics given a gene Ensembl ID or gene name",
+            operation_summary="Get gene-based association statistics given a variant identifier, i.e. 9_133445803_C/T",
     )
 
     def get(self, request, *args, **kwargs):
         serializer = VariantSerializer(data=self.kwargs)
         if serializer.is_valid():
             variant_marker = serializer.validated_data.get('variant_marker')
+            print("original vm ", variant_marker)
             variant_marker = variant_marker[:-1] if variant_marker[-1] == "/" else variant_marker
+            print("processed vm ", variant_marker)
             data = self.get_association_statistics_by_variant_marker(variant_marker)
             if not data:
                 return Response({"error" : f"{variant_marker} not found"}, status=404)

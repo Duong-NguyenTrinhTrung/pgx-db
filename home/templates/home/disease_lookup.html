@@ -141,11 +141,11 @@
                     <td class="h-center"><input id="submit_disease" type="submit" value="Search"
                             class="button js-form-submit form-submit form-type-submit btn btn-default btn-block"></td>
                     <td class="h-center"><input id="reset_disease" type="button" value="Reset"
-                            class="button js-form-submit form-submit form-type-submit btn btn-default btn-block" data-url="{% url 'disease_lookup' %}?disease=default"></td>
+                            class="button js-form-submit form-submit form-type-submit btn btn-default btn-block" data-url="{% url 'disease-lookup' %}?disease=default"></td>
                 </tr>
                 <tr>
                     <td colspan="3" style="text-align: left; padding-left: 30px;">Examples: <a
-                            href="#"  hreflang="en">Radiation Pneumonitis</a>; 
+                            href="https://clinicaltrials.gov/search?id=%22NCT03803787%22"  target="_blank" hreflang="en">Radiation Pneumonitis</a>; 
                             </td>
                 </tr>
             </tbody>
@@ -208,18 +208,19 @@
         $('#search_disease').autocomplete({
             source: function (request, response) {
                 $.ajax({
-                    url: "{% url 'disease_autocomplete_view' %}",
+                    url: "{% url 'disease-autocomplete-view' %}",
                     data: {
                         query: request.term
                     },
                     dataType: 'json',
                     success: function (data) {
                         response(data.suggestions);
+                        console.log(data.suggestions);
                     }
                 });
             },
             autoFocus: true,
-            minLength: 4,
+            minLength: 3,
             select: function (event, ui) {
                 $('#search_disease').val(ui.item.value);
                 return false;
@@ -234,23 +235,26 @@
 
         // submit
         $("#submit_disease").click(function () {
+            var d = $("#search_disease").val();
+            console.log("search_disease.val(): "+d);
             $.ajax({
-                url: "{% url 'disease_lookup' %}?disease=" + $("#search_disease").val(),
+                url: "{% url 'disease-lookup' %}?disease=" + $("#search_disease").val(),
                 success: function (data) {
                     $("#disease-result-tbody").html('');
                     var html_data = '';
                     var bgColor;
                     for (var i = 0; i < data.response_data.length; i++) 
                     {
+                        console.log(i+ " data.response_data =  "+data.response_data[i]);
                         var goToNetworkURL;
-                                if (data.response_data[i].drugs[j].atc_code === "None") {
-                                    goToNetworkURL = "";
-                                }
-                                else {
-                                    goToNetworkURL = `<a href="{% url 'atc-detail-view' %}?group_id=${data.response_data[i].drugs[j].atc_code.charAt(0)}&detail=${data.response_data[i].drugs[j].atc_code}">Go to network</a>`;
-                                }
                         bgColor = i % 2 === 0 ? "#f2f2f2" : "#ffffff";
                         for (var j = 0; j < data.response_data[i].drugs.length; j++) {
+                            if (data.response_data[i].drugs[j].atc_code === "None") {
+                                goToNetworkURL = "";
+                            }
+                            else {
+                                goToNetworkURL = `<a href="{% url 'atc-detail-view' %}?group_id=${data.response_data[i].drugs[j].atc_code.charAt(0)}&detail=${data.response_data[i].drugs[j].atc_code}">Go to network</a>`;
+                            }
                             if (j==0){
                                 html_data += `<tr style="background-color:${bgColor};">
                                             <td style="vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_name}</td>
@@ -286,7 +290,7 @@
         // reset
         $("#reset_disease").click(function() {
             $.ajax({
-                    url: "{% url 'disease_lookup' %}?disease=default",
+                    url: "{% url 'disease-lookup' %}?disease=default",
                     success: function (data) {
                         // alert("data "+data);
                         // alert("reset success response, length = "+ data.response_data.length);

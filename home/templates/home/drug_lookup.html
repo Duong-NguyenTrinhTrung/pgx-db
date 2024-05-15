@@ -3,6 +3,8 @@
 
 
 {% block addon_css %}
+<!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"> -->
+
 
 <style>
     #drug, #drug-result{
@@ -34,8 +36,6 @@
         border-bottom-right-radius: 5px;
     }
 
-
-
     #drug-result-table th{
         height: 40px;
         text-align: left;
@@ -46,47 +46,35 @@
     }
 
     #drug-result-table th, td {
-        /* border: 1px solid rgb(91, 142, 188);
-        border: 1px solid rgb(91, 142, 188); */
         padding: 0 7px;
     }
 
-    /* Apply alternating row colors */
     #drug-result-table tr:nth-child(even) {
         background-color: rgba(255, 203, 119, 0.4); /* Color 1 for even rows */
     }
 
     #drug-result-table tr:nth-child(odd) {
-        /* background-color: rgba(241, 124, 14, 0.2); */
         background-color: white; /* Color 2 for odd rows */
     }
 
-    /* Add background colors to the form and the paragraph */
     #drug p
    {
         display: block;
         width: 70%;
         background-color: rgb(255, 203, 119);
-        /* Use your desired pastel background color */
         padding: 10px;
-        /* Add some padding to the paragraph */
         border-radius: 5px;
-        /* Optional: Add rounded corners to the paragraph */
     }
 
     #drug form
     {
         background-color: #F2F5F6;
-        /* Use a different pastel background color for the form if desired */
         padding: 3px;
-        /* Add some padding to the form */
         border-radius: 5px;
-        /* Optional: Add rounded corners to the form */
         width: 70%;
         height: 95px
     }
 
-    /* Style the input elements and buttons */
     #drug input
     {
         padding: 5px;
@@ -94,7 +82,6 @@
         border-radius: 5px;
     }
 
-    /* Add some spacing between buttons */
     #drug_search,
     #drug_reset
      {
@@ -106,9 +93,7 @@
     }
 
     td {
-        /* text-align: center;  */
         vertical-align: middle;
-        /* Vertically center the content within the td */
     }
 
     .autocomplete-outer{
@@ -127,6 +112,16 @@
     #gene-autocomplete-results {
         max-width: 100%;
         overflow-x: auto;
+    }
+
+    .color1 { color: #f48c06; }
+    .color2 { color: #d00000; }
+    .color3 { color: #9d0208; }
+    .color4 { color: #6a040f; }
+
+    .se-definition-button {
+        border: none;
+        background-color: white;
     }
 
 </style>
@@ -177,6 +172,7 @@
                 <th>ATC code</th>
                 <th>Drug type</th>
                 <th>Clinical status</th>
+                <th>Side effects</th>
                 <th>Reference</th>
             </tr>
         </thead>
@@ -185,14 +181,52 @@
                 <tr>
                     <td>{{ drug.drug_bankID }}</td>
                     <td>{{ drug.name }}</td>
-                    <!-- <td><a href="#">{{ drug.atc_code }}</a></td> -->
                     {% if drug.atc_code != 'Not assigned' %}
-                        <td><a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id={{ drug.atc_code.0 }}&detail={{ drug.atc_code }}">{{ drug.atc_code }}</a></td>
+                        <td>
+                            {% for item in drug.atc_code %}
+                                <a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id={{ item.0 }}&detail={{ item }}">{{ item }}</a>{% if not forloop.last %},{% endif %}
+                            {% endfor %}
+                        </td>
                     {% else %}
                         <td>{{ drug.atc_code }}</td>
+                        
                     {% endif %}
                     <td>{{ drug.drug_type }}</td>
                     <td>{{ drug.Clinical_status }}</td>
+                    <td>
+                    {% if drug.adr == "NA" %}
+                        NA
+                    {% else %}
+                        <a href="#" data-toggle="modal" data-target="#adrModal">View Details</a>
+
+                        <div class="modal fade"  id="adrModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalLabel">Adverse Drug Reactions</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        {% for color, reactions in drug.adr.items %}
+                                            {% for reaction, value in reactions.items %}
+                                                <span style="display: inline;" class="{{ color }}">
+                                                    {{ reaction }} ({{ value }}%) <button data-se-name="{{ reaction }}" data-remote-url="{% url 'get-se-definition' %}" class="se-definition-button"><span class="glyphicon glyphicon-info-sign"></span></button><br>
+                                                </span>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </td>
+
                     <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ drug.drug_bankID }}"  target="_blank" rel="noopener noreferrer">Link</a></td>
                 </tr>
             {% endfor %}
@@ -202,15 +236,28 @@
 
 </div>
 
+<!-- Custom modal for showing side effect definition-->
+<div id="side_effect_definition" style="display: none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 1000000;">
+    <div style="background-color: white; width: 300px; padding: 20px; margin: 100px auto; text-align: center; border-radius: 10px;">
+        <p id="seText" style="font-weight: bold;"></p>
+        <p id="seDefinition" style="color: #337ab7; text-align: justify;"></p>
+        <button onclick="document.getElementById('side_effect_definition').style.display='none';">Close</button>
+    </div>
+</div>
+
+
 {% endblock %}
 {% block addon_js %}
+<!-- <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script> -->
 <script>
     $(document).ready(function () {
         var autocompleteResults = $('#drug-autocomplete-results');
         $('#search_drug').autocomplete({
             source: function (request, response) {
                 $.ajax({
-                    url: "{% url 'drug_autocomplete_view' %}",
+                    url: "{% url 'drug-autocomplete-view' %}",
                     data: {
                         query: request.term
                     },
@@ -236,7 +283,7 @@
         // Hide autocomplete results when clicking outside of the input and results
         /* $("#search_drug").on('keyup', function() {
             $.ajax({
-                    url: "{% url 'drug_lookup' %}?drug="+ $(this).val(),
+                    url: "{% url 'drug-lookup' %}?drug="+ $(this).val(),
                     success: function (data) {
                         $("#drug-result-tbody").html('');
                         var html_data = '';
@@ -247,6 +294,7 @@
                                 <td><a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id=${item.atc_code.charAt(0)}&detail=${item.atc_code}">${item.atc_code}</a></td>
                                 <td>${item.drug_type}</td>
                                 <td>${item.Clinical_status}</td>
+                                <td>Side effects</td>
                                 <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ item.drug_bankID }}"   target="_blank" rel="noopener noreferrer">Link</a></td>
                             </tr>`;
                         });
@@ -255,55 +303,195 @@
                     }
                 });
         }); */
+        
         $("#submit_drug").click(function() {
             $.ajax({
-                    url: "{% url 'drug_lookup' %}?drug="+ $("#search_drug").val(),
-                    success: function (data) {
-                        // console.log(data.drugs);
-                        $("#drug-result-tbody").html('');
-                        var html_data = '';
-                        data.drugs.forEach(item => {
-                            html_data += `<tr>
-                                <td>${item.drug_bankID}</td>
-                                <td>${item.name}</td>
-                                <td><a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id=${item.atc_code.charAt(0)}&detail=${item.atc_code}">${item.atc_code}</a></td>
-                                <td>${item.drug_type}</td>
-                                <td>${item.Clinical_status}</td>
-                                <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ item.drug_bankID }}"   target="_blank" rel="noopener noreferrer">Link</a></td>
-                            </tr>`;
-                        });
-                        $("#drug-result-tbody").html(html_data);
-                    }
-                });
+                url: "{% url 'drug-lookup' %}?drug="+ $("#search_drug").val(),
+                success: function (data) {
+                    $("#drug-result-tbody").html('');
+                    var html_data = '';
+                    data.drugs.forEach(item => {
+                        var atcCodeHtml = '';
+                        if (item.atc_code !== 'Not assigned' && Array.isArray(item.atc_code)) {
+                            item.atc_code.forEach((c, index) => {
+                                atcCodeHtml += `<a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id=${c.charAt(0)}&detail=${c}">${c}</a>`;
+                                if (index < item.atc_code.length - 1) {
+                                    atcCodeHtml += ', ';
+                                }
+                            });
+                        } else {
+                            atcCodeHtml = item.atc_code;
+                        }
+                        var adr_cell = '';
+                        var model_body ='';
+                        if (item.adr == "NA"){adr_cell="NA"}
+                        else
+                        {
+                            item.adr_json.color1.forEach((c) => {
+                                model_body += `<span style="display: inline;" class="color1">
+                                                    ${c}%) <button data-se-name=${c.split("(")[0].trim()} data-remote-url="{% url 'get-se-definition' %}" class="se-definition-button"><span class="glyphicon glyphicon-info-sign"></span></button><br>
+                                                </span>`;
+                            });
+                            item.adr_json.color2.forEach((c) => {
+                                model_body += `<span style="display: inline;" class="color2">
+                                                    ${c}%) <button data-se-name=${c.split("(")[0].trim()} data-remote-url="{% url 'get-se-definition' %}" class="se-definition-button"><span class="glyphicon glyphicon-info-sign"></span></button><br>
+                                                </span>`;
+                            });
+                            item.adr_json.color3.forEach((c) => {
+                                model_body += `<span style="display: inline;" class="color3">
+                                                    ${c}%) <button data-se-name=${c.split("(")[0].trim()} data-remote-url="{% url 'get-se-definition' %}" class="se-definition-button"><span class="glyphicon glyphicon-info-sign"></span></button><br>
+                                                </span>`;
+                            });
+                            item.adr_json.color4.forEach((c) => {
+                                model_body += `<span style="display: inline;" class="color4">
+                                                    ${c}%) <button data-se-name=${c.split("(")[0].trim()} data-remote-url="{% url 'get-se-definition' %}" class="se-definition-button"><span class="glyphicon glyphicon-info-sign"></span></button><br>
+                                                </span>`;
+                            });
+                            adr_cell=`<a href="#" data-toggle="modal" data-target="#adrModal">View Details</a>
+                            <div class="modal fade" id="adrModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalLabel">Adverse Drug Reactions</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ${model_body}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`
+                        }
+                        html_data += `<tr>
+                                        <td>${item.drug_bankID}</td>
+                                        <td>${item.name}</td>
+                                        <td>${atcCodeHtml}</td>
+                                        <td>${item.drug_type}</td>
+                                        <td>${item.Clinical_status}</td>
+                                        <td>${adr_cell}</td>
+                                        <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/${item.drug_bankID}" target="_blank" rel="noopener noreferrer">Link</a></td>
+                                      </tr>`;
+                    });
+                    $("#drug-result-tbody").html(html_data);
+                }
+            });
         });
         
         $("#reset_drug").click(function() {
             $.ajax({
-                    url: "{% url 'drug_lookup' %}?drug=default",
-                    // method: "GET",
-                    // dataType: "html", // Specify the expected response type
+                    url: "{% url 'drug-lookup' %}?drug=default",
                     success: function (data) {
-                        console.log("data.drugs: "+data.drugs);
                         $("#drug-result-tbody").html('');
                         var html_data = '';
                         data.drugs.forEach(item => {
+                            var atcCodeHtml = '';
+                            if (item.atc_code !== 'Not assigned' && Array.isArray(item.atc_code)) {
+                                item.atc_code.forEach((c, index) => {
+                                    atcCodeHtml += `<a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id=${c.charAt(0)}&detail=${c}">${c}</a>`;
+                                    if (index < item.atc_code.length - 1) {
+                                        atcCodeHtml += ', ';
+                                    }
+                                });
+                            } else {
+                                atcCodeHtml = item.atc_code;
+                            }
+
+                            var adr_cell = '';
+                            var model_body ='';
+                            
+                            if (item.adr == "NA"){adr_cell="NA"}
+                            else
+                            {
+                                item.adr_json.color1.forEach((c) => {
+                                model_body += `<span style="display: inline;" class="color1">
+                                                    ${c}%) <button data-se-name=${c.split("(")[0].trim()} data-remote-url="{% url 'get-se-definition' %}" class="se-definition-button"><span class="glyphicon glyphicon-info-sign"></span></button><br>
+                                                </span>`;
+                                });
+                                item.adr_json.color2.forEach((c) => {
+                                    model_body += `<span style="display: inline;" class="color2">
+                                                        ${c}%) <button data-se-name=${c.split("(")[0].trim()} data-remote-url="{% url 'get-se-definition' %}" class="se-definition-button"><span class="glyphicon glyphicon-info-sign"></span></button><br>
+                                                    </span>`;
+                                });
+                                item.adr_json.color3.forEach((c) => {
+                                    model_body += `<span style="display: inline;" class="color3">
+                                                        ${c}%) <button data-se-name=${c.split("(")[0].trim()} data-remote-url="{% url 'get-se-definition' %}" class="se-definition-button"><span class="glyphicon glyphicon-info-sign"></span></button><br>
+                                                    </span>`;
+                                });
+                                item.adr_json.color4.forEach((c) => {
+                                    model_body += `<span style="display: inline;" class="color4">
+                                                        ${c}%) <button data-se-name=${c.split("(")[0].trim()} data-remote-url="{% url 'get-se-definition' %}" class="se-definition-button"><span class="glyphicon glyphicon-info-sign"></span></button><br>
+                                                    </span>`;
+                                });
+                                adr_cell=`<a href="#" data-toggle="modal" data-target="#adrModal">View Details</a>
+                                <div class="modal fade" id="adrModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="modalLabel">Adverse Drug Reactions</h5>
+                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                ${model_body}
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>`
+                            }
                             html_data += `<tr>
-                                <td>${item.drug_bankID}</td>
-                                <td>${item.name}</td>
-                                <td><a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id=${item.atc_code.charAt(0)}&detail=${item.atc_code}">${item.atc_code}</a></td>
-                                <td>${item.drug_type}</td>
-                                <td>${item.Clinical_status}</td>
-                                <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ item.drug_bankID }}"   target="_blank" rel="noopener noreferrer">Link</a></td>
-                            </tr>`;
-                        });
+                                                <td>${item.drug_bankID}</td>
+                                                <td>${item.name}</td>
+                                                <td>${atcCodeHtml}</td>
+                                                <td>${item.drug_type}</td>
+                                                <td>${item.Clinical_status}</td>
+                                                <td>${adr_cell}</td>
+                                                <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/${item.drug_bankID}" target="_blank" rel="noopener noreferrer">Link</a></td>
+                                            </tr>`;
+                            });
                         $("#drug-result-tbody").html(html_data);
                     }
                 });
         });
 
-        // Handle the form submission when the form is submitted
         $("form").submit(function (event) {
             event.preventDefault(); // Prevent the form from submitting normally
+        });
+
+        function showAlert(se_name, definition) {
+            document.getElementById('seText').innerHTML = se_name;
+            document.getElementById('seDefinition').innerHTML = definition;
+            document.getElementById('side_effect_definition').style.display = 'block';
+        }
+
+        // Event handler for button clicks
+        $(document).on('click', '.se-definition-button', function() {
+            // Retrieve data attributes from the button
+            var seName = $(this).data('se-name');
+            var remoteUrl = $(this).data('remote-url');
+
+            // Perform the AJAX request
+            $.ajax({
+                url: remoteUrl,
+                type: 'GET',
+                data: {
+                    'se-name': seName
+                },
+                success: function(response) {
+                    showAlert(seName, response.se_definition); 
+                },
+                error: function() {
+                    alert('Error retrieving the data.');
+                }
+            });
         });
 
     });

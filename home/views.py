@@ -18,16 +18,29 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.cache import cache
 
 from protein.models import Protein
-from variant.models import Variant, VepVariant, GenebassPGx, GenebassVariantPGx, Pharmgkb
+from variant.models import Variant, VepVariant, GenebassPGx, GenebassVariantPGx, Pharmgkb, VariantMapper
 from interaction.models import Interaction
 from gene.models import Gene
 from disease.models import Disease, DrugDiseaseStudy
-from drug.models import Drug, DrugAtcAssociation
+from drug.models import Drug, DrugAtcAssociation, AdverseDrugReaction, SideEffect
 from chromosome.models import Chromosome
 from django.conf import settings
 from django.http import JsonResponse
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
+
+def variant_mapper(request):
+    context = {}
+    return render(request, 'home/variant_mapper.html', context)
+
+def get_variant_mapping(request):
+    pass
+
+def get_variant_mapping_example(request):
+    pass
+
+def variant_anno_from_autocomplete_view(request):
+    pass
 
 def anno_from_autocomplete_view(request):
     version = request.GET.get('version')
@@ -53,34 +66,47 @@ def anno_from_autocomplete_view(request):
 def protein_autocomplete_view(request):
     query = request.GET.get('query', '')
     proteins = Protein.objects.filter(Q(uniprot_ID__icontains=query) | Q(protein_name__icontains=query) | Q(geneID__icontains=query) | Q(genename__icontains=query))
-    result_uniprot_ID = Protein.objects.filter(uniprot_ID__icontains=query)
+    result_uniprot_id = Protein.objects.filter(uniprot_ID__icontains=query)
     
-    if len(result_uniprot_ID) == 0:
+    if len(result_uniprot_id) == 0:
         result_protein_name = Protein.objects.filter(protein_name__icontains=query)
         if len(result_protein_name) == 0:
-            result_geneID = Protein.objects.filter(geneID__icontains=query)
-            if len(result_geneID) == 0:
+            result_gene_id = Protein.objects.filter(geneID__icontains=query)
+            if len(result_gene_id) == 0:
                 result_genename = Protein.objects.filter(genename__icontains=query)
                 results = [protein.genename for protein in result_genename]
             else:
-                results = [protein.geneID for protein in result_geneID]
+                results = [protein.geneID for protein in result_gene_id]
         else:
             results = [protein.protein_name for protein in result_protein_name]
     else:
-        results = [protein.uniprot_ID for protein in result_uniprot_ID]
+        results = [protein.uniprot_ID for protein in result_uniprot_id]
     # results = [protein.geneID + "(" + protein.genename + ") " + protein.uniprot_ID + " (" + protein.protein_name +")" for protein in proteins]
     return JsonResponse({'suggestions': results})
 
 def variant_autocomplete_view(request):
     query = request.GET.get('query', '')
-    variants = Variant.objects.filter(Q(VariantMarker__icontains=query))
-    if len(variants) > 0:
-        results = [variant.VariantMarker + " in gene "+ variant.Gene_ID.genename +" (" + variant.Gene_ID.gene_id +")" for variant in variants]
+    # variants = Variant.objects.filter(Q(VariantMarker__icontains=query))
+    variants = Variant.objects.filter(
+        Q(VariantMarker__icontains=query) | 
+        Q(Gene_ID__gene_id__icontains=query) | 
+        Q(Gene_ID__genename__icontains=query)
+    )
+    # if len(variants) > 0:
+    #     results = [variant.VariantMarker + " in gene "+ variant.Gene_ID.genename +" (" + variant.Gene_ID.gene_id +")" for variant in variants]
+    # return JsonResponse({'suggestions': results})
+    results = []
+    if variants.exists():
+        results = [
+            variant.VariantMarker + " in gene " + variant.Gene_ID.genename +
+            " (" + variant.Gene_ID.gene_id + ")"
+            for variant in variants
+        ]
     return JsonResponse({'suggestions': results})
 
 def drug_autocomplete_view(request):
     query = request.GET.get('query', '')
-    drugs = Drug.objects.filter(Q(drug_bankID__icontains=query))
+    drugs = Drug.objects.filter(Q(drug_bankID__icontains=query)|Q(name__icontains=query))
     if len(drugs) > 0:
         results = [drug.drug_bankID + " - "+ drug.name for drug in drugs]
     return JsonResponse({'suggestions': results})
@@ -201,7 +227,60 @@ def drug_target_network(request):
     return render(request, 'home/drug_and_target_network.html', context)
     # return render(request, 'home/drug_and_target_network copy.html', context)
 
+def tutorial(request):
+    context = {}
+    return render(request, 'home/tutorial.html', context)
 
+def sort_dict(my_dict):
+    sorted_items_desc = sorted(my_dict.items(), key=lambda item: item[1])
+    sorted_dict_desc = dict(sorted_items_desc)
+    return sorted_dict_desc
+
+def get_se_definition(request):
+    se_name = request.GET.get("se-name")
+    try:
+        definition = SideEffect.objects.get(side_effect_name=se_name).side_effect_definition
+    except SideEffect.DoesNotExist:
+        definition = "NA"
+
+    context = {
+        "se_definition": definition
+    }
+    return JsonResponse(context)
+
+
+def get_adr(drugbank_id):
+    try:
+        adr_data = AdverseDrugReaction.objects.get(drug_bankID=drugbank_id).adr_data
+        color1_data = {}
+        color2_data = {}
+        color3_data = {}
+        color4_data = {}
+
+        pairs = adr_data.split(", ")
+        for pair in pairs:
+            if pair!="":
+                se = pair.split()[:-1]
+                freq = float(pair.split()[-1][1:-2])
+                if freq<=25:
+                    color1_data[" ".join(se)]=freq
+                elif freq<=50:
+                    color2_data[" ".join(se)]=freq
+                elif freq<=75:
+                    color3_data[" ".join(se)]=freq
+                else:
+                    color4_data[" ".join(se)]=freq
+        adr = {
+                "color1": sort_dict(color1_data), 
+                "color2": sort_dict(color2_data), 
+                "color3": sort_dict(color3_data), 
+                "color4": sort_dict(color4_data), 
+            }
+        
+    except AdverseDrugReaction.DoesNotExist:
+        adr = "NA"
+
+    return adr
 
 def drug_lookup(request):
     drug = request.GET.get('drug')
@@ -218,32 +297,62 @@ def drug_lookup(request):
             data = Drug.objects.all()[:30]
         drugs = []
         for item in data:
-            atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True).first()
-            code = atc_code if atc_code is not None else "Not assigned"
+            atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True)
+            if len(atc_code)==0:
+                code = "Not assigned"
+            else:
+                code = list(atc_code)
+            adr = get_adr(item.drug_bankID)
+            if adr!="NA":
+                adr_json = {
+                    "color1": [f"{key} ({value}" for key, value in adr.get("color1", {}).items()],
+                    "color2": [f"{key} ({value}" for key, value in adr.get("color2", {}).items()],
+                    "color3": [f"{key} ({value}" for key, value in adr.get("color3", {}).items()],
+                    "color4": [f"{key} ({value}" for key, value in adr.get("color4", {}).items()],
+                }
+            else:
+                adr_json = "NA"
             drugs.append({
                 'drug_bankID': item.drug_bankID,
                 'name': item.name,
                 'atc_code': code,
                 'drug_type': item.drugtype.type_detail,
-                'Clinical_status': clinical_status_dict.get(item.Clinical_status)
+                'Clinical_status': clinical_status_dict.get(item.Clinical_status),
+                "adr": adr,
+                "adr_json": adr_json
             })
-
+        print("drugs : ", drugs)
         return JsonResponse({'drugs': drugs})
     else:
         data = Drug.objects.all()[:30]
         drugs = []
         for item in data:
-            atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True).first()
-            code = atc_code if atc_code is not None else "Not assigned"
-
+            atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True)
+            if len(atc_code)==0:
+                code = "Not assigned"
+            else:
+                code = list(atc_code)
+            adr = get_adr(item.drug_bankID)
+            if adr!="NA":
+                adr_json = {
+                    "color1": [f"{key} ({value}" for key, value in adr.get("color1", {}).items()],
+                    "color2": [f"{key} ({value}" for key, value in adr.get("color2", {}).items()],
+                    "color3": [f"{key} ({value}" for key, value in adr.get("color3", {}).items()],
+                    "color4": [f"{key} ({value}" for key, value in adr.get("color4", {}).items()],
+                }
+            else:
+                adr_json = "NA"
             drugs.append({
                 'drug_bankID': item.drug_bankID,
                 'name': item.name,
                 'atc_code': code,
                 'drug_type': item.drugtype.type_detail,
-                'Clinical_status': clinical_status_dict.get(item.Clinical_status)
+                'Clinical_status': clinical_status_dict.get(item.Clinical_status),
+                "adr": adr,
+                "adr_json": adr_json
             })
         context["drugs"] = drugs
+        print("This is context ", context)
         return render(request, 'home/drug_lookup.html', context)
     
 def get_atc_code(drug_bankID):
@@ -281,6 +390,7 @@ def variant_lookup(request):
                 'pt': item.Gene_ID.primary_transcript, # primary transcript
             })
         return render(request, 'home/variant_lookup.html', {'variants': variants})
+        # return render(request, 'home/Drugs_Indications_Targets.html', {'variants': variants})
 
 def target_lookup(request):
     target = request.GET.get('target')
@@ -885,6 +995,7 @@ def disease_lookup(request):
                 })
             
         print("there is disease para, length = ",len(response_data))
+        print("response_data = ", response_data)
         # context["response_data"] = response_data
         return JsonResponse({'response_data': response_data})
         # return render(request, 'home/disease_lookup.html', context)
@@ -910,7 +1021,7 @@ def disease_lookup(request):
                 })
         context["response_data"] = response_data
         print("there is no disease para, length = ",len(response_data))
-        # print("response data: ", response_data)
+        print("response data: ", response_data)
         return render(request, 'home/disease_lookup.html', context)
 
 def disease_statistics(request):
@@ -955,4 +1066,7 @@ def disease_autocomplete_view(request):
     diseases = Disease.objects.filter(Q(disease_name__icontains=query))
     if len(diseases) > 0:
         results = [disease.disease_name  for disease in diseases]
+    else:
+        results = []
+    print("inside disease_autocomplete_view : ", results)
     return JsonResponse({'suggestions': results})
