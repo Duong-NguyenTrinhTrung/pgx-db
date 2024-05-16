@@ -161,10 +161,10 @@
                 <th>Disease name</th>
                 <th>Disease class</th>
                 <th>Disease_UML_CUI</th>
-                <th>Associated drug name</th>
+                <th>Associated drug(s)</th>
                 <th>ATC code</th>
                 <th style="text-align: center;">Phase of clinical study</th>
-                <th>Study</th>
+                <th>Association study</th>
                 <th style="text-align: center;">Drug-disease network</th>
             </tr>
         </thead>
@@ -232,6 +232,55 @@
                 autocompleteResults.hide(); 
             }
         });
+
+        var urlParams = new URLSearchParams(window.location.search);
+
+        //case 1: drug_id is passed when the drug has no atc code --> left panel just has None, no atc hierachy tree
+        if (urlParams.has('disease_info')) {
+            var disease = urlParams.get('disease_info');
+            $.ajax({
+                url: "{% url 'disease-lookup' %}?disease=" +disease,
+                success: function (data) {
+                    $("#disease-result-tbody").html('');
+                    var html_data = '';
+                    var bgColor;
+                    for (var i = 0; i < data.response_data.length; i++) 
+                    {
+                        console.log(i+ " data.response_data =  "+data.response_data[i]);
+                        var goToNetworkURL;
+                        bgColor = i % 2 === 0 ? "#f2f2f2" : "#ffffff";
+                        for (var j = 0; j < data.response_data[i].drugs.length; j++) {
+                            if (data.response_data[i].drugs[j].atc_code === "None") {
+                                goToNetworkURL = "";
+                            }
+                            else {
+                                goToNetworkURL = `<a href="{% url 'atc-detail-view' %}?group_id=${data.response_data[i].drugs[j].atc_code.charAt(0)}&detail=${data.response_data[i].drugs[j].atc_code}">Go to network</a>`;
+                            }
+                            if (j==0){
+                                html_data += `<tr style="background-color:${bgColor};">
+                                            <td style="vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_name}</td>
+                                            <td style="vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_class}</td>
+                                            <td style="text-align: center; vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_UML_CUI}</td>
+                                            <td>${data.response_data[i].drugs[j].drugname} (<i>id: ${data.response_data[i].drugs[j].drug_bankID}</i>)</td>
+                                            <td>${data.response_data[i].drugs[j].atc_code}</td>
+                                            <td style="text-align: center;">${data.response_data[i].drugs[j].clinical_trial}</td>
+                                            <td><a href="${data.response_data[i].drugs[j].link}" target="_blank">Ref</a></td>
+                                            <td style="text-align: center;">${goToNetworkURL}</td></tr>`;
+                                        }
+                            else{
+                                html_data += `<tr style="background-color:${bgColor};">
+                                            <td>${data.response_data[i].drugs[j].drugname} (<i>id: ${data.response_data[i].drugs[j].drug_bankID}</i>)</td>
+                                            <td>${data.response_data[i].drugs[j].atc_code}</td>
+                                            <td style="text-align: center;">${data.response_data[i].drugs[j].clinical_trial}</td>
+                                            <td><a href="${data.response_data[i].drugs[j].link}" target="_blank">Ref</a></td>
+                                            <td style="text-align: center;">${goToNetworkURL}</td></tr>`;
+                            }
+                        }
+                    }
+                    $("#disease-result-tbody").html(html_data);
+                }
+            });
+        }
 
         // submit
         $("#submit_disease").click(function () {
