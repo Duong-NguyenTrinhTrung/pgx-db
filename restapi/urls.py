@@ -2,7 +2,7 @@ from django.urls import path, re_path
 
 from restapi.views import GeneVariantRestApiView, DrugByGeneRestApiView, TargetByAtcRestApiView, AtcToDescriptionRestApiView, \
                             AtcCodesByLevelRestApiView, TargetsByDrugRestApiView, GenebasedAssociationStatisticsRestApiView, AtcCodesByDrugRestApiView, AtcToPgxRestApiView, \
-                            DrugTargetInteractionByAtcRestApiView, VariantToVepRestApiView, TargetToBundleRestApiView, DrugDiseaseAssociationByAtcRestApiView
+                            DrugTargetInteractionByAtcRestApiView, VariantToVepRestApiView, TargetToBundleRestApiView, DrugDiseaseAssociationByAtcRestApiView, DrugToDrugAdrRestApiView, DrugToDiseaseAssociationRestApiView
 
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
@@ -37,6 +37,9 @@ urlpatterns = [
     
     path('drug/target/<slug:drug_id>/', TargetsByDrugRestApiView.as_view(), name='targets-by-drug-RestApiView'),
     path('drug/atc_code/<slug:drug_id>/', AtcCodesByDrugRestApiView.as_view(), name='atc-codes-by-drug-RestApiView'),
+    path('drug/adr/<slug:drug_id>/', DrugToDrugAdrRestApiView.as_view(), name='adverse-drug-reaction-by-drug-RestApiView'),
+
+    path('disease/association/<slug:drug_id>/', DrugToDiseaseAssociationRestApiView.as_view(), name='disease-association-by-drug-view-RestApiView'),
 
     path('target/<slug:uniprot_id>/', TargetToBundleRestApiView.as_view(), name='bundle-data-by-target-RestApiView'),
 ]

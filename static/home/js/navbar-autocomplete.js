@@ -36,38 +36,40 @@ $.widget( "custom.catcomplete", $.ui.autocomplete,
   }
   ); //end of widget
 
-$(function() { 
-    redirect_on_select =''
+  $(function() { 
+      redirect_on_select =''
+      $("#nav-selection-autocomplete").catcomplete(
+        {
+          source: "/drug/autocomplete?type_of_selection=navbar",
+          minLength: 3,
+          autoFocus: true,
+          delay: 500,
+          create: function(event, ui) { this.focus();return false; },
+          focus: function(event, ui) { return false; },
+          select: function(event, ui) {
+              $( '#selection-autocomplete' ).val('');
+              redirect_url = ui.item['redirect']+ui.item['id'];
+              setTimeout(function(){window.location = redirect_url;}, 1);
+              return false;
+          },
+          open:function(){
+            $(this).catcomplete("widget").css({
+              "margin-top": "2px",
+              "z-index": "99999",
 
-    //selects the input element with the id "nav-selection-autocomplete" and calls the "catcomplete" widget on it. The options for the widget are specified inside the curly braces.
-    $("#nav-selection-autocomplete").catcomplete(
-      {
-        //This line sets the source option of the widget to the given url. The widget will send a GET request to this url with the current input of the user.
-        source: "/drug/autocomplete?type_of_selection=navbar",
-        minLength: 3,
-        autoFocus: true,
-        delay: 500,
-        //sets the create option of the widget to a function. This function will be called when the widget is created and it will focus on the input element and return false to prevent default behavior.
-        create: function(event, ui) { this.focus();return false; },
-        //sets the focus option of the widget to a function. This function will be called when an item is focused and it will return false to prevent default behavior.
-        focus: function(event, ui) { return false; },
-        //sets the select option of the widget to a function. This function will be called when an item is selected.
-        select: function(event, ui) {
-            $( '#selection-autocomplete' ).val('');
-            console.log(ui.item['id'],ui.item['type'],ui.item['label']);
-            //This line sets the value of the redirect_url variable to the url '/drug/' concatenated with the drug_bankID property of the selected item.
-            redirect_url = ui.item['redirect']+ui.item['id'];
-            console.log("drug_bankID: ", ui.item['id']);
-            // sets a timeout of 1ms that redirects the user to the redirect_url.
-            setTimeout(function(){window.location = redirect_url;}, 1);
-            return false;
-        }
-      }).data("custom-catcomplete")._renderItem = function (ul, item) {
-        return $("<li></li>")
-        .data("item.autocomplete", item)
-        // .data( "ui-autocomplete-item", item )
-        .append("<a>" + item.label + "</a>")
-        .appendTo(ul);
-    };
-});
+            });
+          },
+          // response: function() {
+          //   // Apply styles each time the suggestion list is updated
+          //   $(this).catcomplete("widget").css({
+          //     "margin-top": "30px"
+          //   });
+          // }
+        }).data("custom-catcomplete")._renderItem = function (ul, item) {
+          return $("<li></li>")
+          .data("item.autocomplete", item)
+          .append("<a>" + item.label + "</a>")
+          .appendTo(ul);
+      };
+  });
 

@@ -7,7 +7,7 @@ $(function () {
 
 
 // var json_GeneralFile = "json/json_GeneralFile.json";
-// var json_GeneralFile = "json/json4.json";
+// var json_GeneralFile = "json/data.json";
 // var json_drugData = "json/json_drugData.json";
 // var json_proteinData = "json/json_proteinData.json";
 // var json_interactionData = "json/json_interactionData.json";
@@ -1547,9 +1547,6 @@ let numberofnodes =1 ;
 let slicedata = 200 ; 
 
 console.log(slicedata ,'slicedata')
-
-window.parent.postMessage({ data: slicedata }, "*");
-        
 function processData(numberofnodes , slicedata ) {
     
     const jsonFilePath = json_GeneralFile; // JSON file path
@@ -1558,11 +1555,11 @@ function processData(numberofnodes , slicedata ) {
     fetch(jsonFilePath)
       .then((response) => response.json())
       .then((data) => {
-
-
-      
+        
+        console.log(data, "here is the json file ");
         
 
+        
 
 const uniqueProteinClasses = [...new Set(data.map(d => d.protein_name))];
 
@@ -1578,8 +1575,6 @@ const uniqueProteinClasses = [...new Set(data.map(d => d.protein_name))];
         }
         
         console.log(filteredData , "filternodes" )
-
-
         
         filteredData.forEach(function (row) {
         
@@ -1715,9 +1710,7 @@ const uniqueProteinClasses = [...new Set(data.map(d => d.protein_name))];
         if ( thredhold_value <= numberofnodes || slicedata > filteredData.length  ) {
              
             thresholdSlider.max = thredhold_value;
-            document.getElementById('GetmoreData').disabled = true;
-            document.getElementById('GetmoreData').innerHTML = 'Maximum data reached';
-
+            document.getElementById('GetmoreData').style.visibility = 'hidden';
 
         }
 
@@ -1970,31 +1963,10 @@ console.log(links.length ,'link length')
         .style("fill", function (d) {
             return DiseaseColorMap[d.DiseaseClass] || "black";
         })
-       
-node.on("click", function (event, d) {
-    window.open(`https://clinicaltrials.gov/search?cond=${d.id}`, "_blank");
+        .on("click", function (event, d) {
+            window.open(`https://clinicaltrials.gov/search?cond=${d.id}`, "_blank");
 
-}).on("mouseover", function(d) {
-
-
-    let r = event.target.__data__;
-    tooltip2.transition()
-      .style("opacity", 0.9);
-    tooltip2.html("<strong>Id:</strong> " + r.id)
-      .style("left", d.pageX + "px")
-      .style("top", d.pageY + "px");
-  })
-  .on("mouseout", function(d) {
-    tooltip2.transition()
-    //   .duration(500) 
-      .style("opacity", 0);
-  });
-
-
-    // Define a tooltip div with class "tooltip2"
-var tooltip2 = d3.select("body").append("div")
-.attr("class", "tooltip2")
-.style("opacity", 0);
+        });
 
 
     node
@@ -2032,9 +2004,9 @@ var tooltip2 = d3.select("body").append("div")
         })
         .attr("class", "node-label");
 
-    // node.append("title").text(function (d) {
-    //     return d.id;
-    // });
+    node.append("title").text(function (d) {
+        return d.id;
+    });
 
     node
         .filter(function (d) {
@@ -2114,18 +2086,6 @@ var tooltip2 = d3.select("body").append("div")
     //$("#loading").hide();
     updateChartVisibility();
     createLegend();
-
-    // here is the logic to add the height  of the  iframe there 
-
-    $(function () {
-        
-        // Get the height of the #all-legends element
-        var height = $("#all-legends").height()+180;
-        console.log( height ,svgHeight, "Height of #all-legends: " + height + "px");
-    
-        localStorage.setItem('jsonData', height);
-    });
-
     createLegend_status();
     createLegend_drugType();
     createProteinsLegend();
@@ -2470,8 +2430,6 @@ function createLegend() {
           );
       }
 
-
-   
       var legendText = legendItem
         .append("span")
         .style("margin-left", "10px")
@@ -3026,15 +2984,7 @@ function updateVisibility_legends() {
             // If the link is neither hidden by interaction type, drug status, nor protein class
             return 'visible';
         });
-
-
-
-
-      
 }
-
-
-
 
 
 
