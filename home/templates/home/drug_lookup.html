@@ -303,7 +303,88 @@
                     }
                 });
         }); */
-        
+        var urlParams = new URLSearchParams(window.location.search);
+
+        //case 1: drug_id is passed when the drug has no atc code --> left panel just has None, no atc hierachy tree
+        if (urlParams.has('drugbank_id')) {
+            var drugbank_id = urlParams.get('drugbank_id');
+            $.ajax({
+                url: "{% url 'drug-lookup' %}?drug="+ drugbank_id,
+                success: function (data) {
+                    $("#drug-result-tbody").html('');
+                    var html_data = '';
+                    data.drugs.forEach(item => {
+                        var atcCodeHtml = '';
+                        if (item.atc_code !== 'Not assigned' && Array.isArray(item.atc_code)) {
+                            item.atc_code.forEach((c, index) => {
+                                atcCodeHtml += `<a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id=${c.charAt(0)}&detail=${c}">${c}</a>`;
+                                if (index < item.atc_code.length - 1) {
+                                    atcCodeHtml += ', ';
+                                }
+                            });
+                        } else {
+                            atcCodeHtml = item.atc_code;
+                        }
+                        var adr_cell = '';
+                        var model_body ='';
+                        if (item.adr == "NA"){adr_cell="NA"}
+                        else
+                        {
+                            item.adr_json.color1.forEach((c) => {
+                                model_body += `<span style="display: inline;" class="color1">
+                                                    ${c}%) <button data-se-name=${c.split("(")[0].trim()} data-remote-url="{% url 'get-se-definition' %}" class="se-definition-button"><span class="glyphicon glyphicon-info-sign"></span></button><br>
+                                                </span>`;
+                            });
+                            item.adr_json.color2.forEach((c) => {
+                                model_body += `<span style="display: inline;" class="color2">
+                                                    ${c}%) <button data-se-name=${c.split("(")[0].trim()} data-remote-url="{% url 'get-se-definition' %}" class="se-definition-button"><span class="glyphicon glyphicon-info-sign"></span></button><br>
+                                                </span>`;
+                            });
+                            item.adr_json.color3.forEach((c) => {
+                                model_body += `<span style="display: inline;" class="color3">
+                                                    ${c}%) <button data-se-name=${c.split("(")[0].trim()} data-remote-url="{% url 'get-se-definition' %}" class="se-definition-button"><span class="glyphicon glyphicon-info-sign"></span></button><br>
+                                                </span>`;
+                            });
+                            item.adr_json.color4.forEach((c) => {
+                                model_body += `<span style="display: inline;" class="color4">
+                                                    ${c}%) <button data-se-name=${c.split("(")[0].trim()} data-remote-url="{% url 'get-se-definition' %}" class="se-definition-button"><span class="glyphicon glyphicon-info-sign"></span></button><br>
+                                                </span>`;
+                            });
+                            adr_cell=`<a href="#" data-toggle="modal" data-target="#adrModal">View Details</a>
+                            <div class="modal fade" id="adrModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalLabel">Adverse Drug Reactions</h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            ${model_body}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`
+                        }
+                        html_data += `<tr>
+                                        <td>${item.drug_bankID}</td>
+                                        <td>${item.name}</td>
+                                        <td>${atcCodeHtml}</td>
+                                        <td>${item.drug_type}</td>
+                                        <td>${item.Clinical_status}</td>
+                                        <td>${adr_cell}</td>
+                                        <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/${item.drug_bankID}" target="_blank" rel="noopener noreferrer">Link</a></td>
+                                      </tr>`;
+                    });
+                    $("#drug-result-tbody").html(html_data);
+                }
+            });
+
+         }
         $("#submit_drug").click(function() {
             $.ajax({
                 url: "{% url 'drug-lookup' %}?drug="+ $("#search_drug").val(),

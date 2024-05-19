@@ -539,7 +539,22 @@
         var drug_type_statistics_plot = document.createElement("div");
         drug_type_statistics_plot.setAttribute("id", "drug_type_statistics_plot");
     }
+    document.addEventListener('DOMContentLoaded', (event) => {
+        // Retrieve data from localStorage
+        const storedData = localStorage.getItem('jsonData');
+        
+        if (storedData) {
+            const data = JSON.parse(storedData);
+            console.log( data,'Data retrieved from localStorage:' );
+            
+            var iframe = document.getElementById('myIframe');
+            iframe.style.height = data+'px'
 
+            // Process your data heres
+        } else {
+            console.error('No data found in localStorage');
+        }
+    });
     // Function to show visualization
     function toggleDivVisibility(element, url) {
         var drugBankId = element.getAttribute('data-drugbank_id');
