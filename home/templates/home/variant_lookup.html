@@ -232,7 +232,7 @@
                 </tr>
                 <tr>
                     <td colspan="3" style="text-align: left; padding-left: 30px;">Input format: <span style="color: #0582ca"><i>Chromosome_Coordinate_Reference/Alternative allele</i></span>. Examples: <a
-                            href="/gene/ENSG00000196396/" target='_blank' hreflang="en">20_50581449_C/G</a></td>
+                            href="{% url 'variant-lookup' %}?variant_marker=20_50581449_C/G" target='_blank' hreflang="en">20_50581449_C/G</a></td>
                 </tr>
                 
             </tbody>
@@ -287,6 +287,7 @@
             minLength: 5,
             select: function (event, ui) {
                 $('#search_variant').val(ui.item.value);
+                $("#submit_variant").click();
                 return false;
             },
             open: function (event, ui) {
