@@ -6,13 +6,40 @@ from drf_yasg.inspectors import PaginatorInspector
 from gene.views import GeneDetailBaseView, DrugByGeneBaseView, GenebasedAssociationStatisticsView
 from restapi.serializers import GeneDetailSerializer, AtcDetailSerializer, AtcByLevelSerializer, TargetDrugSerializer, VariantSerializer, TargetSerializer
 from drug.views import TargetByAtcBaseView, DescriptionByAtcBaseView, AtcCodesByLevelBaseView, TargetsByDrugBaseView, AtcCodesByDrugView, PGxByAtcCodeView, \
-                        DrugTargetInteractionByAtcBaseView, DrugDiseaseAssociationByAtcBaseView
+                        DrugTargetInteractionByAtcBaseView, DrugDiseaseAssociationByAtcBaseView, AdrByDrugView, DiseaseAssociationByDrugView
 from variant.views import VEPFromVariantBaseView
 from protein.views import BundleByTargetCodeView
 from django.core.cache import cache
 from variant.models import GenebassVariant, GenebassCategory, VariantPhenocode
 import pandas as pd
 
+class DrugToDiseaseAssociationRestApiView(DiseaseAssociationByDrugView, APIView,):
+    allowed_methods = ['get']
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get a list of disease association studies of a drug given its drugbank ID",
+    )
+    def get(self, request, *args, **kwargs):
+        serializer = TargetDrugSerializer(data=self.kwargs)
+        if serializer.is_valid():
+            data = self.get_disease_association_by_drug(serializer.validated_data.get('drug_id'))
+            return Response(data)
+        else:
+            return Response(serializer.errors, status=400)
+
+class DrugToDrugAdrRestApiView(AdrByDrugView, APIView,):
+    allowed_methods = ['get']
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get adverse drug reaction for a drug given its drugbank ID",
+    )
+    def get(self, request, *args, **kwargs):
+        serializer = TargetDrugSerializer(data=self.kwargs)
+        if serializer.is_valid():
+            data = self.get_drug_adr_for_api(serializer.validated_data.get('drug_id'))
+            return Response(data)
+        else:
+            return Response(serializer.errors, status=400)
 
 class VariantToVepRestApiView(VEPFromVariantBaseView, APIView,):
     allowed_methods = ['get']
@@ -225,22 +252,31 @@ class AtcCodesByLevelRestApiView(AtcCodesByLevelBaseView,APIView,):
     allowed_method = ["get"]
     @swagger_auto_schema(
             operation_description="operation_description",
-            operation_summary="Get all ATC codes belonging to an ATC group ()",
+            operation_summary="Get all ATC codes belonging to an ATC group (Enter 'A' for 'Anatomical', 'T' for 'Therapeutic', 'P' for 'Pharmacological', 'C' for 'Chemical', or 'CS' for 'Chemical substance')",
     )
 
     def get(self, request, *args, **kwargs):
         serializer = AtcByLevelSerializer(data=self.kwargs)
-
         if serializer.is_valid():
-            data = self.get_atc_codes_by_level(serializer.validated_data.get('atc_level'))
-            returned_data = []
-            for pair in data.get("list_of_codes"):
-                temp = {
-                    "ATC code": pair[0],
-                    "Description": pair[1],
-                }
-                returned_data.append(temp)
-            return Response({"All ATC codes in "+self.kwargs.get("atc_level")+" group ": returned_data})
+            fullname = {
+                        "c": 'Anatomical',
+                        "t": 'Therapeutic',
+                        "p": 'Pharmacological',
+                        "c": 'Chemical',
+                        "cs": 'ChemicalSubstance',
+                        }
+            data = self.get_atc_codes_by_level(self.kwargs.get("atc_level"))
+            if fullname.get(serializer.validated_data.get('atc_level')):
+                returned_data = []
+                for pair in data.get("list_of_codes"):
+                    temp = {
+                        "ATC code": pair[0],
+                        "Description": pair[1],
+                    }
+                    returned_data.append(temp)
+                return Response({"All ATC codes in "+fullname.get(self.kwargs.get("atc_level"))+" group ": returned_data})
+            else:
+                return Response("Wrong input!")
         else:
             return Response(serializer.errors, status=400)
 

@@ -1,6 +1,10 @@
 {% extends "home/base.html" %}
 {% load static %}
-{% comment %} {% load humanize %} {% endcomment %}
+
+{% block add_css %}
+    <link rel="stylesheet" type="text/css" href="{% static 'home/css/cookies_consent.css' %}" />
+{% endblock %}
+
 
 {% block content %}
 
@@ -80,7 +84,7 @@
 
     </div>
 
-    <!-- GPCRdb intro -->
+    <!-- PGx intro -->
     <div class="row">
 
         <div  class="col-md-9">
@@ -224,7 +228,7 @@
                     <div class="panel-body">
                         <h3>Release & Accessibility </a></h3>
                         <br />
-                        <strong>First release: </strong><span>to be in Dec-2023</span>
+                        <strong>First release: </strong><span>to be in Aug-2024</span>
                         <br /> 
                         <strong>Accessibility: </strong><span>This website is freely accessible to all users</span>
                     </div>
@@ -264,7 +268,7 @@
                             <li style="--cardColor:#fc374e">
                               <div class="content">
                                 <div class="title">6,259</div>
-                                <div class="text" id="drug-data">Drugs collected from Drugbank among with 3,676 has associated ATC codes <br/> </div>
+                                <div class="text" id="drug-data">6,259  Drugs (3,676 with ATC codes) <br/> </div>
                               </div>
                             </li>
                             <li style="--cardColor:#7678ed">
@@ -310,12 +314,21 @@
         </div>
     </div>
 
-            
+    <!-- Cookies consent  -->
+    <!-- <div  style="display: flex; align-items: center;">
+        <div id="cookie-consent-banner" class="cookie-consent-banner">
+            <p>We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies. <a href="/privacy-policy">Learn more</a></p>
+            <button id="accept-cookies">Accept</button>
+            <button id="decline-cookies">Decline</button>
+        </div>
+    </div> -->
 {% endblock %}
 
 {% block addon_js %}
     <!-- <script src="https://d3js.org/d3.v7.min.js"></script>        -->
     <script src="{% static 'home/js/d3.v7.min.js' %}"></script>       
     <script src="{% static 'home/js/piechart.js' %}"></script>
+    <script src="{% static 'home/js/cookies_script.js' %}"></script>
+    
 
 {% endblock %}

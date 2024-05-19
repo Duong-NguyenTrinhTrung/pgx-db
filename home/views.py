@@ -251,31 +251,36 @@ def get_se_definition(request):
 
 def get_adr(drugbank_id):
     try:
-        adr_data = AdverseDrugReaction.objects.get(drug_bankID=drugbank_id).adr_data
-        color1_data = {}
-        color2_data = {}
-        color3_data = {}
-        color4_data = {}
+        adr_instance = AdverseDrugReaction.objects.filter(drug_bankID=drugbank_id).first()
+        # Check if an instance was found
+        if adr_instance:
+            adr_data = adr_instance.adr_data
+            color1_data = {}
+            color2_data = {}
+            color3_data = {}
+            color4_data = {}
 
-        pairs = adr_data.split(", ")
-        for pair in pairs:
-            if pair!="":
-                se = pair.split()[:-1]
-                freq = float(pair.split()[-1][1:-2])
-                if freq<=25:
-                    color1_data[" ".join(se)]=freq
-                elif freq<=50:
-                    color2_data[" ".join(se)]=freq
-                elif freq<=75:
-                    color3_data[" ".join(se)]=freq
-                else:
-                    color4_data[" ".join(se)]=freq
-        adr = {
-                "color1": sort_dict(color1_data), 
-                "color2": sort_dict(color2_data), 
-                "color3": sort_dict(color3_data), 
-                "color4": sort_dict(color4_data), 
-            }
+            pairs = adr_data.split(", ")
+            for pair in pairs:
+                if pair!="":
+                    se = pair.split()[:-1]
+                    freq = float(pair.split()[-1][1:-2])
+                    if freq<=25:
+                        color1_data[" ".join(se)]=freq
+                    elif freq<=50:
+                        color2_data[" ".join(se)]=freq
+                    elif freq<=75:
+                        color3_data[" ".join(se)]=freq
+                    else:
+                        color4_data[" ".join(se)]=freq
+            adr = {
+                    "color1": sort_dict(color1_data), 
+                    "color2": sort_dict(color2_data), 
+                    "color3": sort_dict(color3_data), 
+                    "color4": sort_dict(color4_data), 
+                }
+        else:
+            adr = "NA"  
         
     except AdverseDrugReaction.DoesNotExist:
         adr = "NA"
@@ -294,7 +299,7 @@ def drug_lookup(request):
                 Q(name__icontains=drug) 
             )
         else:
-            data = Drug.objects.all()[:30]
+            data = Drug.objects.all()[:20]
         drugs = []
         for item in data:
             atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True)
@@ -324,7 +329,7 @@ def drug_lookup(request):
         print("drugs : ", drugs)
         return JsonResponse({'drugs': drugs})
     else:
-        data = Drug.objects.all()[:30]
+        data = Drug.objects.all()[:20]
         drugs = []
         for item in data:
             atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True)
@@ -369,7 +374,7 @@ def variant_lookup(request):
         if variant_id != 'default':
             objects = Variant.objects.filter(VariantMarker__icontains=variant_id)
         else:
-            objects = Variant.objects.all()[:30]
+            objects = Variant.objects.all()[:20]
         variants = []
         for item in objects:
             variants.append({
@@ -380,7 +385,7 @@ def variant_lookup(request):
             })
         return JsonResponse({'variants': variants})
     else:
-        objects = Variant.objects.all()[:30]
+        objects = Variant.objects.all()[:20]
         variants = []
         for item in objects:
             variants.append({
@@ -448,7 +453,6 @@ def target_lookup(request):
                 ],
             })
         context["items"] = items
-        print("no target provided, get 10 records ")
         return render(request, 'home/target_lookup.html', context)
     
 def target_statistics(request):

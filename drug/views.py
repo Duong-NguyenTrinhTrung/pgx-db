@@ -29,6 +29,8 @@ from drug.models import (AtcAnatomicalGroup,
     AtcChemicalGroup,
     AtcChemicalSubstance,
     DrugAtcAssociation,
+    AdverseDrugReaction,
+    SideEffect
 )
 from gene.models import Gene
 from interaction.models import Interaction
@@ -39,7 +41,6 @@ from disease.models import DrugDiseaseStudy, Disease
 from .models import (
     Drug,
     DrugAtcAssociation,
-    AdverseDrugReaction
 )
 from .services import DrugNetworkGetDataService, DrugsNetworkGetDataService
 from time import perf_counter
@@ -47,9 +48,69 @@ import networkx as nx
 from community import community_louvain
 import matplotlib.pyplot as plt
 import seaborn as sns
-
-
 app_name = 'drug'
+
+class DiseaseAssociationByDrugView:
+    def get_disease_association_by_drug(self, drug_id):
+        if drug_id is not None:
+            if cache.get("get_disease_association_by_drug_"+drug_id):
+                response_data = cache.get("get_disease_association_by_drug_"+drug_id)
+            else:
+                result = []
+                try:
+                    drug = Drug.objects.get(drug_bankID=drug_id)
+                    if drug:
+                        associations = DrugDiseaseStudy.objects.filter(drug_bankID=drug_id)
+                        if len(associations):
+                            for association in associations:
+                                    temp = {
+                                            "Disease name": association.disease_name.disease_name,
+                                            "Disease class": association.disease_name.disease_class,
+                                            "Clinical trial phase": association.clinical_trial,
+                                            "Reference link": association.link,
+                                            }
+                                    result.append(temp)
+                        response_data = {
+                            f"Disease(s) associated with the drug {drug.name} ({drug_id})": result,
+                        }
+                        cache.set("get_disease_association_by_drug_"+drug_id, response_data, timeout=60 * 15)
+                    return response_data
+                except:
+                    raise Http404("Drug does not exist")
+
+
+class AdrByDrugView:
+    def get_drug_adr_for_api(self, drug_id):
+        if drug_id is not None:
+            if cache.get("get_drug_adr_"+drug_id):
+                response_data = cache.get("get_drug_adr_"+drug_id)
+            else:
+                result = []
+                adr = AdverseDrugReaction.objects.filter(drug_bankID=drug_id)
+                if len(adr):
+                    se_pair_list = adr.first().adr_data.split(", ")
+                    for pair in se_pair_list:
+                        if pair:
+                            se_name = " ".join(pair.split()[:-1])
+                            percentage = float(pair.split()[-1][1:-2])
+                            se = SideEffect.objects.filter(side_effect_name=se_name)
+                            if se:
+                                definition = se.first().side_effect_definition
+                            else:
+                                definition = "NA"
+                            temp = {
+                                    "Side effect": se_name,
+                                    "Definition": definition,
+                                    "Frequency (in percentage)": percentage,
+                                    }
+                            result.append(temp)
+                # Create a JSON response with the data
+                response_data = {
+                    "Adverse drug reaction": result,
+                }
+                
+                cache.set("get_drug_adr_"+drug_id, response_data, timeout=60 * 15)
+            return response_data
 
 def drawNetworkAndSaveInAPlot(G, pat, name, title):
     # Create a simple graph
@@ -563,13 +624,11 @@ def is_ajax(request):
 
 def selection_autocomplete(request):
     if is_ajax(request=request):
-
-        # This line gets the 'term' parameter from the GET data of the request, removes any leading and trailing whitespace, and assigns the result to the variable 'q'. The 'term' parameter is the search term entered by the user.
         q = request.GET.get('term').strip()
         type_of_selection = request.GET.get('type_of_selection')
         results = []
 
-        if type_of_selection != 'navbar':
+        if type_of_selection != 'navbar': # we don't need this
             ps = Protein.objects.filter(Q(name__icontains=q) | Q(entry_name__icontains=q),
                                         species__in=(species_list),
                                         source__in=(protein_source_list)).exclude(
@@ -580,79 +639,58 @@ def selection_autocomplete(request):
             ps1 = Drug.objects.filter(Q(drug_bankID__icontains=q) | Q(name__icontains=q) | Q(aliases__icontains=q))
             ps2 = Gene.objects.filter(Q(gene_id__icontains=q) | Q(genename__icontains=q))
             ps3 = Protein.objects.filter(Q(uniprot_ID__icontains=q) | Q(protein_name__icontains=q))
-            # ps4 = Protein.objects.filter(Q(uniprot_ID__icontains=q) | Q(protein_name__icontains=q))
-            # if len(ps1) > 0:
-            #     redirect = '/drug/'
-            #     ps = ps1
-            # if len(ps2) > 0:
-            #     redirect = "/gene/"
-            #     ps = ps2
-            # if len(ps3) > 0:
-            #     redirect = "/protein/"
-            #     ps = ps3
+            ps4 = Disease.objects.filter(Q(disease_name__icontains=q) | Q(disease_UML_CUI__icontains=q))
+            ps5 = Variant.objects.filter(Q(VariantMarker__icontains=q))
 
         for p in ps1:
             p_json = {}
             p_json['id'] = p.drug_bankID
             p_json['label'] = p.name
             p_json['type'] = 'drug'
-            p_json['redirect'] = '/drug/'
+            p_json['redirect'] = '/drug_lookup/?drugbank_id='
             p_json['category'] = 'Drugs'
             results.append(p_json)
 
         for p in ps2:
             p_json = {}
             p_json['id'] = p.gene_id
-            p_json['type'] = 'Gene'
-            p_json['category'] = 'Genes'
             p_json['label'] = p.genename
+            p_json['type'] = 'Gene'
             p_json['redirect'] = '/gene/'
+            p_json['category'] = 'Genes'
             results.append(p_json)
 
         for p in ps3:
             p_json = {}
             p_json['id'] = p.uniprot_ID
-            p_json['type'] = 'Protein'
-            p_json['category'] = 'Proteins'
             p_json['label'] = p.protein_name
-            p_json['redirect'] = '/protein/'
+            p_json['type'] = 'Protein'
+            p_json['redirect'] = '/target_lookup/?uniprot_id='
+            p_json['category'] = 'Proteins'
             results.append(p_json)
 
-        # if redirect == '/drug/':
-        #     for p in ps:
-        #         p_json = {}
-        #         p_json['id'] = p.drug_bankID
-        #         p_json['label'] = p.name
-        #         p_json['type'] = 'drug'
-        #         p_json['redirect'] = redirect
-        #         p_json['category'] = 'Drugs'
-        #         results.append(p_json)
-        # else:
-        #     if redirect == '/gene/':
-        #         for p in ps:
-        #             p_json = {}
-        #             p_json['id'] = p.gene_id
-        #             p_json['type'] = 'Gene'
-        #             p_json['category'] = 'Genes'
-        #             p_json['label'] = p.genename
-        #             p_json['redirect'] = redirect
-        #             results.append(p_json)
-        #     else:
-        #         if redirect == "/protein/":
-        #             for p in ps:
-        #                 p_json = {}
-        #                 p_json['id'] = p.uniprot_ID
-        #                 p_json['type'] = 'Protein'
-        #                 p_json['category'] = 'Proteins'
-        #                 p_json['label'] = p.protein_name
-        #                 p_json['redirect'] = redirect
-        #                 results.append(p_json)
+        for p in ps4:
+            p_json = {}
+            p_json['id'] = p.disease_name
+            p_json['label'] = p.disease_name
+            p_json['type'] = 'Disease'
+            p_json['redirect'] = '/disease_lookup/?disease_info='
+            p_json['category'] = 'Diseases'
+            results.append(p_json)
+
+        for p in ps5:
+            p_json = {}
+            p_json['id'] = p.VariantMarker
+            p_json['label'] = p.VariantMarker
+            p_json['type'] = 'Variant'
+            p_json['redirect'] = '/variant_lookup/?variant_marker='
+            p_json['category'] = 'Variant'
+            results.append(p_json)
+
         data = json.dumps(results)
     else:
         data = 'fail'
     mimetype = 'application/json'
-    # return an HTTP response containing the data in JSON format, which is specified by the 'application/json' mimetype
-    # JSON format can be understood by the browser and other clients as a JavaScript object. This could be useful if the view is returning data that is meant to be consumed by JavaScript code running on the client side
     return HttpResponse(data, mimetype)
 
 
@@ -2110,19 +2148,22 @@ def retrieving_atc_description(atc_code):
 
 
 def retrieving_atc_sublevel(level):
-    if level.lower()=="anatomical":
+    if level.lower()=="a":
         return list(AtcAnatomicalGroup.objects.all().values_list("id", "name"))
     else:
-        if level.lower()=="therapeutic":
+        if level.lower()=="t":
             return list(AtcTherapeuticGroup.objects.all().values_list("id", "name"))
         else:
-            if level.lower()=="pharmacological":
+            if level.lower()=="p":
                 return list(AtcPharmacologicalGroup.objects.all().values_list("id", "name"))
             else:
-                if level.lower()=="chemical":
+                if level.lower()=="c":
                     return list(AtcChemicalGroup.objects.all().values_list("id", "name"))
                 else:
-                    return list(AtcChemicalSubstance.objects.all().values_list("id", "name"))
+                    if level.lower()=="cs":
+                        return list(AtcChemicalSubstance.objects.all().values_list("id", "name"))
+                    else:
+                        return []
 
 class AtcCodesByLevelBaseView:
     def get_atc_codes_by_level(self, slug):
@@ -2131,7 +2172,7 @@ class AtcCodesByLevelBaseView:
             if cache.get("atc_codes_by_level_" + slug) is not None:
                 list_of_codes = cache.get("atc_codes_by_level_" + slug)
             else:
-                list_of_codes = retrieving_atc_description(slug)
+                list_of_codes = retrieving_atc_sublevel(slug)
                 context = dict()
                 cache.set("atc_codes_by_level_" + slug, list_of_codes, 60 * 60)
             context['list_of_codes'] = list_of_codes

@@ -14,7 +14,7 @@
     }
 
     #variant-result{
-        margin-top: 20px;
+        
         width: 70%;
         margin: 20px auto;
     }
@@ -38,7 +38,7 @@
     #variant-result-table th{
         height: 40px;
         
-        background-color: rgb(255, 143, 171);
+        background-color: #ff99ac;
         font-weight: normal;
         color: white;
         font-size: 14px;
@@ -51,7 +51,7 @@
 
     /* Apply alternating row colors */
     #variant-result-table tr:nth-child(even) {
-        background-color: rgba(255, 143, 171, 0.2); /* Color 1 for even rows */
+        background-color: #fae0e4; /* Color 1 for even rows */
     }
 
     #variant-result-table tr:nth-child(odd) {
@@ -140,7 +140,7 @@
     {
         display: block;
         width: 70%;
-        background-color: rgb(255, 143, 171);
+        background-color: #ff99ac;
         /* Use your desired pastel background color */
         padding: 10px;
         /* Add some padding to the paragraph */
@@ -231,15 +231,16 @@
                             class="button js-form-submit form-submit form-type-submit btn btn-default btn-block"></td>
                 </tr>
                 <tr>
-                    <td colspan="3" style="text-align: left; padding-left: 30px;">Input format: <span style="color: #0582ca"><i>Chromosome_Coordinate_Reference/Alternative allele</i></span>. <br>Examples: <a
+                    <td colspan="3" style="text-align: left; padding-left: 30px;">Input format: <span style="color: #0582ca"><i>Chromosome_Coordinate_Reference/Alternative allele</i></span>. Examples: <a
                             href="/gene/ENSG00000196396/" target='_blank' hreflang="en">20_50581449_C/G</a></td>
                 </tr>
+                
             </tbody>
         </table>
     </form>
 </div>
 
-<div id="variant-result">
+<div id="variant-result" style="margin-top: 40px;">
     <table id="variant-result-table">
         <thead>
             <tr>
@@ -320,6 +321,36 @@
                 })
             }
         }); */
+
+        var urlParams = new URLSearchParams(window.location.search);
+
+        //case 1: drug_id is passed when the drug has no atc code --> left panel just has None, no atc hierachy tree
+        if (urlParams.has('variant_marker')) {
+            var variant_marker = urlParams.get('variant_marker');
+            var url= "{% url 'variant-lookup' %}?variant_id=" + variant_marker;
+            $.ajax({
+                url: url,
+                method: "GET",
+                
+                success: function(data){
+                    $("#variant-result-tbody").html("");
+                    var html_data = "";
+                    data.variants.forEach(item => {
+                        html_data+=`<tr>
+                            <td>${item.VariantMarker}</td>
+                            <td>${item.geneID}</td>
+                            <td>${item.genename}</td>
+                            <td>${item.pt}</td>
+                            <td><a href="/gene/${item.geneID}?variant_marker=${item.VariantMarker}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
+                        </tr>`;
+                    });
+                    $("#variant-result-tbody").html(html_data);
+                },
+                error: function(error){
+                    console.error("Error:", error);
+                }
+            });
+        }
     
         function variant_search(){
             var variant_id = $("#search_variant").val().split(" ")[0].trim();

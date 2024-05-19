@@ -7,7 +7,7 @@ $(function () {
 
 
 // var json_GeneralFile = "json/json_GeneralFile.json";
-// var json_GeneralFile = "json/json6.json";
+// var json_GeneralFile = "json/json4.json";
 // var json_drugData = "json/json_drugData.json";
 // var json_proteinData = "json/json_proteinData.json";
 // var json_interactionData = "json/json_interactionData.json";
@@ -1562,7 +1562,7 @@ function processData(numberofnodes , slicedata ) {
 
       
         
-console.log(data ,'here is the data ')
+
 
 const uniqueProteinClasses = [...new Set(data.map(d => d.protein_name))];
 
@@ -1980,7 +1980,7 @@ node.on("click", function (event, d) {
     let r = event.target.__data__;
     tooltip2.transition()
       .style("opacity", 0.9);
-    tooltip2.html( r.id)
+    tooltip2.html("<strong>Id:</strong> " + r.id)
       .style("left", d.pageX + "px")
       .style("top", d.pageY + "px");
   })
@@ -3505,39 +3505,39 @@ d3.select("#GetmoreData").on("click", function () {
 
 
 
-if(thredhold_value < 5 && child_nodes>180 ){
+if(thredhold_value <5 && child_nodes>180 ){
 console.log('RAJHFDAJKL;SH')
     slicedata = slicedata +200
 
 }
 
 else{   
-    if(thredhold_value <= 7){    
+    if(thredhold_value < 7){    
         numberofnodes = numberofnodes +1 ;  
-console.log('incease the number of nodes')
+
     }
-    else if(thredhold_value >7 && thredhold_value  <= 14 )
+    else if(thredhold_value >7 && thredhold_value  < 14 )
         {
             
         numberofnodes = numberofnodes + 2 ; 
-        } else if(thredhold_value >14 && thredhold_value  <=50 )
+        } else if(thredhold_value >14 && thredhold_value  < 50 )
                 {
                     
                 numberofnodes = numberofnodes + 6; 
-                } else if(thredhold_value >50 && thredhold_value  <= 150 )
+                } else if(thredhold_value >50 && thredhold_value  < 150 )
                     {
                         
                     numberofnodes = numberofnodes + 20 ; 
-                    } else if(thredhold_value >150 && thredhold_value  <= 300 )
+                    } else if(thredhold_value >150 && thredhold_value  < 300 )
                         {
                             
                         numberofnodes = numberofnodes + 50 ; 
-                        } else if(thredhold_value >300 && thredhold_value  <= 600 )
+                        } else if(thredhold_value >300 && thredhold_value  < 600 )
                             {
                                 
                             numberofnodes = numberofnodes + 100 ; 
                             }
-                            else if(thredhold_value >=600  )
+                            else if(thredhold_value >600  )
                                 {
                                     
                                 numberofnodes = numberofnodes + 200 ; 

@@ -20,7 +20,7 @@ from .views import (
     get_statistics_by_atc_for_detecting_community_drug_disease, 
     get_statistics_by_atc_for_calculating_average_path_length_drug_disease,
     get_statistics_by_atc_for_calculating_average_path_length_drug_protein,
-    atc_comparison_autocomplete_view, get_adr_data
+    atc_comparison_autocomplete_view, get_adr_data, AdrByDrugView
 )
 
 urlpatterns = [
@@ -44,6 +44,8 @@ urlpatterns = [
     path('get_drug_network/', views.get_drug_network, name='get-drug-network'),
     path('get_atc_sub_levels/', views.get_atc_sub_levels, name='get-atc-sub-levels'),
     path('get_drug_statistics', cache_page(3600*24*365)(views.get_drug_statistics), name='get-drug-statistics'),
+
+    #auto complete
     path('drug/autocomplete', (selection_autocomplete), name='autocomplete'),
 
     #old
