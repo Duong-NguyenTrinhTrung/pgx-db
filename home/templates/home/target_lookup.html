@@ -162,10 +162,10 @@
                 </tr>
                 <tr>
                     <td colspan="3" style="text-align: left; padding-left: 30px;">Examples: <a
-                            href="/gene/ENSG00000138075/" target='_blank' hreflang="en">Q9H222</a>; 
-                            <a href="/gene/ENSG00000138075/" target='_blank' hreflang="en">ATP-binding cassette sub-family G member 5 (EC 7.6.2.-) (Sterolin-1)</a>;
-                            <a href="/gene/ENSG00000138075/" target='_blank' hreflang="en">ABCG5</a>;
-                            <a href="/gene/ENSG00000138075/" target='_blank' hreflang="en">ENSG00000138075</a>
+                            href="{% url 'target-lookup' %}?uniprot_id=Q9H222" target='_blank' hreflang="en">Q9H222</a>; 
+                            <a href="{% url 'target-lookup' %}?uniprot_id=Q9H222" target='_blank' hreflang="en">ATP-binding cassette sub-family G member 5 (EC 7.6.2.-) (Sterolin-1)</a>;
+                            <a href="{% url 'target-lookup' %}?uniprot_id=Q9H222" target='_blank' hreflang="en">ABCG5</a>;
+                            <a href="{% url 'target-lookup' %}?uniprot_id=Q9H222" target='_blank' hreflang="en">ENSG00000138075</a>
                             ; ... </td>
                 </tr>
             </tbody>
@@ -238,6 +238,7 @@
             minLength: 3,
             select: function (event, ui) {
                 $('#search_protein').val(ui.item.value);
+                $("#submit_protein").click();
                 return false;
             },
             open: function (event, ui) {
