@@ -60,7 +60,7 @@ class Command(BaseCommand):
             filenames = [
                 fn
                 for fn in os.listdir(self.adr_data_dir)
-                if fn.endswith("SIDER_mapped_matrix_v3.txt")
+                if fn.endswith("SIDER_mapped_matrix_v6.txt")
             ]
             print("checkpoint2")
             print(filenames)
