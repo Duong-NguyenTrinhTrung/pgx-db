@@ -150,7 +150,6 @@ class ProteinBrowser(TemplateView):
 
         table.fillna('', inplace=True)
         # context = dict()
-        print(table.head(3))
         context['Array'] = table.to_numpy()
         return context
 
@@ -162,7 +161,6 @@ def get_protein_details(request, slug):
     try:
         if Protein.objects.filter(uniprot_ID=slug).exists():
             p = Protein.objects.get(uniprot_ID=slug)
-            print("p --------- ",p)
         
     except:
         context = {'protein_no_found': slug}

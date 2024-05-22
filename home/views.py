@@ -162,7 +162,6 @@ def get_chromosome_mapping(request):
     context = {
         "result": data
     }
-    print("---get_chromosome_mapping ->context ", context)
     return JsonResponse(context)
 
 
@@ -172,8 +171,6 @@ def get_chromosome_mapping_example(request):
     anno_to = request.GET.get("anno_to")
     anno_from_example=[]
     anno_to_example=[]
-
-    print("paras: ",version, " ", anno_from, " ", anno_to)
 
     if (anno_from=="ensembl"):
         anno_from_example = list(Chromosome.objects.filter(genome_version=version).values_list("ensembl", flat=True))
@@ -215,7 +212,6 @@ def get_chromosome_mapping_example(request):
         "anno_from_example": anno_from_example,
         "anno_to_example": anno_to_example
     }
-    print("context = ", context)
     return JsonResponse(context)
 
 def chromosome_mapper(request):
@@ -326,7 +322,6 @@ def drug_lookup(request):
                 "adr": adr,
                 "adr_json": adr_json
             })
-        print("drugs : ", drugs)
         return JsonResponse({'drugs': drugs})
     else:
         data = Drug.objects.all()[:20]
@@ -357,7 +352,6 @@ def drug_lookup(request):
                 "adr_json": adr_json
             })
         context["drugs"] = drugs
-        print("This is context ", context)
         return render(request, 'home/drug_lookup.html', context)
     
 def get_atc_code(drug_bankID):
@@ -402,17 +396,14 @@ def target_lookup(request):
     context = {}
     if target:
         if target != 'default':
-            print("do we have target? :", target)
             proteins = Protein.objects.filter(
                 Q(uniprot_ID__icontains=target) |
                 Q(protein_name__icontains=target) |
                 Q(geneID__icontains=target) |
                 Q(genename__icontains=target)
             )
-            print("target is not default, get proteins filtered by target, length = ", len(proteins))
         else:
             proteins = Protein.objects.all()[:10]
-            print("target is default, get 6 records")
         items = []
         for item in proteins:
             interactions = Interaction.objects.filter(uniprot_ID=item.uniprot_ID)
@@ -430,7 +421,6 @@ def target_lookup(request):
                     for interaction in interactions
                 ],
             })
-        print("in the case of target is provided, length items = ", len(items))
         return JsonResponse({'items': items})
     else:
         # If no target parameter provided, get 6 records
@@ -953,7 +943,6 @@ def target_statistics(request):
         }
     }
 
-    # print("context = ", context)
     return render(request,  'home/target_statistics.html', context)
 
 def about_pgx(request):
@@ -970,14 +959,11 @@ def contribute_to_pgx(request):
 
 def disease_lookup(request):
     disease = request.GET.get('disease')
-    print("disease requested = ", disease)
     context = {}
     if disease:
         if disease != 'default':
-            print("are we here at disease != default???")
             diseases = Disease.objects.filter(disease_name__icontains=disease)
         else:
-            print("are we here at disease = default???")
             diseases = Disease.objects.all()[:8]
         response_data = []
         for d in diseases:
@@ -998,8 +984,6 @@ def disease_lookup(request):
                     "drugs": temp,
                 })
             
-        print("there is disease para, length = ",len(response_data))
-        print("response_data = ", response_data)
         # context["response_data"] = response_data
         return JsonResponse({'response_data': response_data})
         # return render(request, 'home/disease_lookup.html', context)
@@ -1024,8 +1008,6 @@ def disease_lookup(request):
                     "drugs": temp,
                 })
         context["response_data"] = response_data
-        print("there is no disease para, length = ",len(response_data))
-        print("response data: ", response_data)
         return render(request, 'home/disease_lookup.html', context)
 
 def disease_statistics(request):
@@ -1060,8 +1042,6 @@ def disease_statistics(request):
         },
     }
 
-    print("context ======== ", context)
-
     return render(request, 'home/disease_statistics.html', context)
 
 
@@ -1072,5 +1052,4 @@ def disease_autocomplete_view(request):
         results = [disease.disease_name  for disease in diseases]
     else:
         results = []
-    print("inside disease_autocomplete_view : ", results)
     return JsonResponse({'suggestions': results})
