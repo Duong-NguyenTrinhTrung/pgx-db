@@ -54,7 +54,7 @@ function createBarChartForATCDiseaseClass(disease_classes, disease_class_count)
 
     if (maxValue > 10) {
         // Determine the step size based on some condition or preference
-        stepSize = (maxValue <= 20) ? 2 : 5;
+        stepSize = (maxValue <= 20) ? 2 : 10;
     } else {
         stepSize = 1; // Keep a step size of 1 if maxValue is 10 or less
     }
@@ -93,7 +93,8 @@ function createBarChartForATCDiseaseClass(disease_classes, disease_class_count)
     const tooltip = d3.select("#chart-container-ATC-disease-class")
         .append("div")
         .attr("class", "tooltip")
-        .style("opacity", 0); //opacity of 0 (hidden)
+        .style("opacity", 0)
+        .style("background-color", "#b5e48c"); //opacity of 0 (hidden)
     
     // for each data point add a rectangle describing the points awarded to the respective racer
     groups
@@ -109,8 +110,8 @@ function createBarChartForATCDiseaseClass(disease_classes, disease_class_count)
         .transition()
         .duration(200)
         .style("opacity", 0.9);
-        tooltip.style("left", (container.offsetLeft+ size/2 +148) + "px")
-          .style("top", (container.offsetTop + size/2) + "px")
+        tooltip.style("left", (container.offsetLeft+ size/2 +200) + "px")
+          .style("top", (container.offsetTop + size/2 - 150) + "px")
           .html(`Count: ${d.value}`);
         
         d3.select(this).style("fill", "blue");
@@ -172,7 +173,8 @@ function createPieChartForATCClinicalTrialPhase(data) {
     const tooltip = d3.select("#chart-container-ATC-clinical-trial-phase")
         .append("div")
         .attr("class", "tooltip")
-        .style("opacity", 0); //opacity of 0 (hidden)
+        .style("opacity", 0)
+        .style("background-color", "#b5e48c"); //opacity of 0 (hidden)
 
     arcs.append("path")
         .attr("d", arc)
@@ -251,7 +253,9 @@ function createPieChartForATCTargetType(data) {
     const tooltip = d3.select("#chart-container-ATC-interaction-type")
         .append("div")
         .attr("class", "tooltip")
-        .style("opacity", 0); //opacity of 0 (hidden)
+        .style("opacity", 0) //opacity of 0 (hidden)
+        .style("width", "130px")
+        .style("background-color", "#b5e48c"); 
 
     arcs.append("path")
         .attr("d", arc)
@@ -267,7 +271,7 @@ function createPieChartForATCTargetType(data) {
                 .attr("d", newArc);
 
             const percent = parseFloat((d.data.value * 100 / totalSum).toFixed(2));
-            const tooltipText = `${d.data.category}: ${d.data.value} (${percent}%)`;
+            const tooltipText = `Drug-${d.data.category} interaction: ${d.data.value} (${percent}%)`;
             tooltip.transition()
                 .duration(200)
                 .style("opacity", 0.9);
@@ -330,7 +334,8 @@ function createPieChartForATCDrugStatus(data) {
     const tooltip = d3.select("#chart-container-ATC-drug-status")
         .append("div")
         .attr("class", "tooltip")
-        .style("opacity", 0); //opacity of 0 (hidden)
+        .style("opacity", 0)
+        .style("background-color", "#b5e48c"); //opacity of 0 (hidden)
 
     arcs.append("path")
         .attr("d", arc)
@@ -409,7 +414,9 @@ function createPieChartForATCDrugType(data) {
     const tooltip = d3.select("#chart-container-ATC-drug-type")
         .append("div")
         .attr("class", "tooltip")
-        .style("opacity", 0); //opacity of 0 (hidden)
+        .style("opacity", 0)
+        .style("width", "130px")
+        .style("background-color", "#b5e48c"); //opacity of 0 (hidden)
 
     arcs.append("path")
         .attr("d", arc)
@@ -430,7 +437,7 @@ function createPieChartForATCDrugType(data) {
                 .style("opacity", 0.9);
             tooltip.html(tooltipText)
                 .style("left", (container.offsetLeft+ size/2 -28) + "px")
-                .style("top", (container.offsetTop + size/2) + "px");
+                .style("top", (container.offsetTop + size/2)-15 + "px");
                 // .style("left", "50px")
                 // .style("top", "50px");
         })

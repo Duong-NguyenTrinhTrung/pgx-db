@@ -3,6 +3,14 @@
 
 {% block add_css %}
     <link rel="stylesheet" type="text/css" href="{% static 'home/css/cookies_consent.css' %}" />
+    <style>
+        #cookie-consent-banner.col-md-12
+        {
+            background-color: #e5e5e5;
+            margin: 20px 20px 0;
+            padding-bottom: 7px;
+        }
+    </style>
 {% endblock %}
 
 
@@ -286,13 +294,13 @@
                             <li style="--cardColor:#0466c8">
                               <div class="content">
                                 <div class="title">1,212,621</div>
-                                <div class="text">Unique genetics variants among which 10,959 influencing drug response</div>
+                                <div class="text">Unique genetics variants (10,959 influencing drug response)</div>
                               </div>
                             </li>
                             <li style="--cardColor:#f15f0e">
                               <div class="content">
                                 <div class="title">4,903,680</div>
-                                <div class="text">Variant effects across differents transcripts from > 40 algorithms</div>
+                                <div class="text">Variant effects from > 40 algorithms</div>
                               </div>
                             </li>
                             <li style="--cardColor:#db9d47">
@@ -314,14 +322,18 @@
         </div>
     </div>
 
+    
+
     <!-- Cookies consent  -->
-    <!-- <div  style="display: flex; align-items: center;">
-        <div id="cookie-consent-banner" class="cookie-consent-banner">
-            <p>We use cookies to enhance your experience. By continuing to visit this site you agree to our use of cookies. <a href="/privacy-policy">Learn more</a></p>
-            <button id="accept-cookies">Accept</button>
-            <button id="decline-cookies">Decline</button>
+    <div id="cookie-consent-banner" class="row" style="margin-bottom: 20px;">
+        <div class="col-md-12" >
+            <p style="text-align: center;";>We use cookies to enhance your browsing experience and analyze our traffic. By continuing to visit this site you agree to our use of cookies. <a href="https://www.aboutcookies.org/" target="_blank">Learn more</a></p>
+            <div style="display: flex; justify-content: center; gap: 10px;">
+                <button id="accept-cookies">Accept</button>
+                <button id="decline-cookies">Decline</button>
+            </div>
         </div>
-    </div> -->
+    </div>
 {% endblock %}
 
 {% block addon_js %}
@@ -329,6 +341,4 @@
     <script src="{% static 'home/js/d3.v7.min.js' %}"></script>       
     <script src="{% static 'home/js/piechart.js' %}"></script>
     <script src="{% static 'home/js/cookies_script.js' %}"></script>
-    
-
 {% endblock %}

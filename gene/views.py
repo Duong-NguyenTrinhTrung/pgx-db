@@ -87,11 +87,8 @@ class DrugByGeneBaseView(object):
                         protein = None
                 else:
                     try:
-                        print("geneID:", slug)
                         protein = Protein.objects.get(genename=slug.upper())
-                        print("Data query geneID: ", protein.__dict__)
                     except ObjectDoesNotExist:
-                        print(f"No Protein found for genename: {slug}")
                         protein = None
                 if protein:
                     protein_ID = protein.uniprot_ID
@@ -295,9 +292,6 @@ class GeneDetailBaseView(object):
         data_subset["AM_pathogenicity"] = vep_variant[49]
         data_subset["HighestAF"] = vep_variant[50]
         data_subset["primary"] = is_primary_ts(vep_variant[0])
-        # print("data_subset[primary] ", data_subset["primary"])
-        # print("data_subset last ", type(data_subset))
-        # print("len data_subset ", len(data_subset))
 
         return data_subset
 

@@ -41,7 +41,7 @@ class Command(BaseCommand):
             filepath = os.sep.join([self.vep_data_dir, filename])
             with open(filepath, "r") as f:
                 lines = f.readlines()
-                for line in lines[1:]:
+                for i,line in enumerate(lines[1:]):
                     values=line[:-1].split(";")
                     variant_marker = values[1]
                     transcript_id = values[2]
@@ -50,9 +50,11 @@ class Command(BaseCommand):
                     # print("transcript_id = ",transcript_id)
                     # Code to add values to the new field
                     try:
-                        obj = VepVariant.objects.get(
+                        obj = VepVariant.objects.filter(
                             Q(Variant_marker=variant_marker) & Q(Transcript_ID=transcript_id)
-                        )
+                        )[0]
+                        if len(obj)>1:
+                            print(i, " variant_marker: ", variant_marker, " transcript_id", transcript_id)
                         obj.AM_pathogenicity = am_score
                         obj.save()
                     except VepVariant.DoesNotExist:
@@ -60,6 +62,3 @@ class Command(BaseCommand):
                         print(f"Object not found for Variant_marker: {variant_marker} and Transcript_ID: {transcript_id}")
                         count+=1
         print("---- end of adding data, number of case not found: ", count)
-
-
-

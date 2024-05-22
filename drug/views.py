@@ -180,7 +180,6 @@ def get_adr_data(request):
 
 def atc_comparison_autocomplete_view(request):
     query = request.GET.get('query', '')
-    print("query = ", query)
     results = []
     if len(query)==3:
         try:
@@ -224,7 +223,6 @@ def atc_comparison_autocomplete_view(request):
                     
     results = list(set(results))
     results = sorted(results, key=lambda x: x.split()[0])
-    print("atc_comparison_autocomplete_view suggestion: ", results)
     return JsonResponse({'suggestions': results})
 
 def get_drug_network(request):
@@ -268,7 +266,6 @@ def get_drug_general_data(request, drug_bank_id):
     # import pdb
     # pdb.set_trace()
     data = DrugNetworkGetDataService(drug=drug).get_general_data() # without s
-    # print("get_drug_general_data: ", data, drug_bank_id)
 
     return JsonResponse(data, safe=False)
 
@@ -835,7 +832,6 @@ def atc_detail_view(request):
     end_time = perf_counter()
     response = render(request, 'atc_detail_view.html', context)
     response['atc_detail_view-Duration'] = end_time - start_time
-    # print("atc_detail_view: group_id: "+group_id+" ", len(context.get("group2s")), " ", len(context.get("group3s")), " ", len(context.get("group4s")), " ", len(context.get("group5s")))
     return response
 
 
@@ -845,8 +841,7 @@ def atc_search_view(request):
     if request.method == 'GET':
         inp = request.GET.get('atc_code_inp', '').strip()
         query_option = request.GET.get('query_option', '')
-
-        if inp != "":
+        if inp != "":       
             # Search "id" field in all models
             if len(inp) > 7:
                 print("invalid inp")
@@ -869,21 +864,25 @@ def atc_search_view(request):
                                     AtcAnatomicalGroup.objects.filter(id__iexact=inp).values('id', 'name'))
             if query_option == 'containing':
                 # Search "name" field in all models
-                results += list(AtcAnatomicalGroup.objects.filter(name__icontains=inp).values('id', 'name'))
-                results += list(AtcTherapeuticGroup.objects.filter(name__icontains=inp).values('id', 'name'))
+                results += list(AtcAnatomicalGroup.objects.filter(Q(id__icontains=inp)|Q(name__icontains=inp)).values('id', 'name'))
+                print("results  AtcAnatomicalGroup contains: ", len(results), results)
+                results += list(AtcTherapeuticGroup.objects.filter(Q(id__icontains=inp)|Q(name__icontains=inp)).values('id', 'name'))
+                print("results  AtcTherapeuticGroup contains: ", len(results), results)
                 results += list(
-                    AtcPharmacologicalGroup.objects.filter(name__icontains=inp).values('id', 'name'))
-                results += list(AtcChemicalGroup.objects.filter(name__icontains=inp).values('id', 'name'))
-                results += list(AtcChemicalSubstance.objects.filter(name__icontains=inp).values('id', 'name'))
-
+                    AtcPharmacologicalGroup.objects.filter(Q(id__icontains=inp)|Q(name__icontains=inp)).values('id', 'name'))
+                print("results  AtcPharmacologicalGroup contains: ", len(results), results)
+                results += list(AtcChemicalGroup.objects.filter(Q(id__icontains=inp)|Q(name__icontains=inp)).values('id', 'name'))
+                print("results  AtcChemicalGroup contains: ", len(results), results)
+                results += list(AtcChemicalSubstance.objects.filter(Q(id__icontains=inp)|Q(name__icontains=inp)).values('id', 'name'))
+                print("results AtcChemicalSubstancecontains: ", len(results), results)
             elif query_option == 'startingwith':
                 # Search "id" field in all models
-                results += list(AtcAnatomicalGroup.objects.filter(name__istartswith=inp).values('id', 'name'))
-                results += list(AtcTherapeuticGroup.objects.filter(name__istartswith=inp).values('id', 'name'))
+                results += list(AtcAnatomicalGroup.objects.filter(Q(id__istartswith=inp)|Q(name__istartswith=inp)).values('id', 'name'))
+                results += list(AtcTherapeuticGroup.objects.filter(Q(id__istartswith=inp)|Q(name__istartswith=inp)).values('id', 'name'))
                 results += list(
-                    AtcPharmacologicalGroup.objects.filter(name__istartswith=inp).values('id', 'name'))
-                results += list(AtcChemicalGroup.objects.filter(name__istartswith=inp).values('id', 'name'))
-                results += list(AtcChemicalSubstance.objects.filter(name__istartswith=inp).values('id', 'name'))
+                    AtcPharmacologicalGroup.objects.filter(Q(id__istartswith=inp)|Q(name__istartswith=inp)).values('id', 'name'))
+                results += list(AtcChemicalGroup.objects.filter(Q(id__istartswith=inp)|Q(name__istartswith=inp)).values('id', 'name'))
+                results += list(AtcChemicalSubstance.objects.filter(Q(id__istartswith=inp)|Q(name__istartswith=inp)).values('id', 'name'))
 
         for rs in results:
             rs["name"] = format_atc_name(rs["name"])
@@ -968,9 +967,6 @@ def _get_clinical_pgx_data_by_drug(drug_id):
                                     "Metabolizer_types": str(item.Metabolizer_types),
                                 } 
                                 for item in pharmgkb_data
-                                #     print("gene_name", gene_name)
-                                #     print("drug_id",drug.drug_bankID)
-                                #     print([genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden])
                                 # if all( 
                                 #     value is not None and float(value) 
                                 #     for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
@@ -981,6 +977,47 @@ def _get_clinical_pgx_data_by_drug(drug_id):
                                 # )
                             ]
                     })
+        if len(response_data)>0:
+            cache.set(cache_str, response_data, 60*60)
+    return response_data
+
+def get_adr_data_by_atc(request):
+    atc_code = request.GET.get("atc_code")
+    response_data = _get_adr_data_by_atc(atc_code)
+    return JsonResponse(response_data, safe=False)
+
+#helper function
+def _get_adr_data_by_atc(atc_code):
+    cache_str = "get_adr_data_by_atc_"+atc_code
+    if cache.get(cache_str):
+        response_data = cache.get(cache_str)
+    else:
+        drugs = DrugAtcAssociation.objects.filter(atc_id__id__startswith=atc_code).select_related('drug_id').values_list("drug_id", flat=True)
+        undup_drugs = list(set(drugs))
+        drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+        response_data=[]
+        for drug_id in drug_objs:
+            adr = AdverseDrugReaction.objects.filter(drug_bankID=drug_id)
+            result=[]
+            if len(adr):
+                se_pair_list = adr.first().adr_data.split(", ")
+                for pair in se_pair_list:
+                    if pair:
+                        se_name = " ".join(pair.split()[:-1])
+                        percentage = float(pair.split()[-1][1:-2])
+                        se = SideEffect.objects.filter(side_effect_name=se_name)
+                        if se:
+                            definition = se.first().side_effect_definition
+                        else:
+                            definition = "NA"
+                        temp = {
+                                "Side effect": se_name,
+                                "Definition": definition,
+                                "Frequency (in percentage)": percentage,
+                                }
+                        result.append(temp)
+                result = sorted(result, key=lambda x: x["Frequency (in percentage)"], reverse=True)
+                response_data.append({"drug_id": drug_id.drug_bankID, "drug_name": drug_id.name, "adr_data": result})    
         if len(response_data)>0:
             cache.set(cache_str, response_data, 60*60)
     return response_data
@@ -1032,9 +1069,6 @@ def _get_clinical_pgx_data_by_atc(atc_code):
                                         "Metabolizer_types": str(item.Metabolizer_types),
                                     } 
                                     for item in pharmgkb_data
-                                    #     print("gene_name", gene_name)
-                                    #     print("drug_id",drug.drug_bankID)
-                                    #     print([genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden])
                                     # if all( 
                                     #     value is not None and float(value) 
                                     #     for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
@@ -1092,9 +1126,6 @@ def get_genebased_data_from_genebass(atc_code):
                                         "SE_Burden": str(genebass.SE_Burden),
                                     } 
                                     for genebass in data_genebass
-                                    #     print("gene_name", gene_name)
-                                    #     print("drug_id",drug.drug_bankID)
-                                    #     print([genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden])
                                     # if all( 
                                     #     value is not None and float(value) 
                                     #     for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
@@ -1139,9 +1170,6 @@ def get_genebased_data_from_genebass_by_drug(drug_id):
                                         "SE_Burden": str(genebass.SE_Burden),
                                     } 
                                     for genebass in data_genebass
-                                    #     print("gene_name", gene_name)
-                                    #     print("drug_id",drug.drug_bankID)
-                                    #     print([genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden])
                                     # if all( 
                                     #     value is not None and float(value) 
                                     #     for value in [genebass.Pvalue, genebass.Pvalue_Burden, genebass.Pvalue_SKAT, genebass.BETA_Burden, genebass.SE_Burden]
@@ -1268,8 +1296,6 @@ def get_statistics_by_atc_for_clinical_trial_phase_comparison(request):
         #max_value = max(my_dict, key=my_dict.get)
         data1 = get_statistics_by_atc_for_ONE_atc_code_for_clinical_trial_phase_comparison(atc_code)
         data2 = get_statistics_by_atc_for_ONE_atc_code_for_clinical_trial_phase_comparison(atc_comparison)
-        print("data1 = ", data1)
-        print("data2 = ", data2)
         if len(list(data1.get("class_count"))):
              max1 = max(list(data1.get("class_count")))
         else:
@@ -1736,7 +1762,6 @@ def get_statistics_by_atc_for_network_size_comparison(request):
 
 # helper
 def get_statistics_by_ONE_atc_for_network_size_comparison(atc_code):
-    print("atc_code:", atc_code)
     if cache.get("get_statistics_by_ONE_atc_for_network_size_comparison_"+atc_code):
         response_data = cache.get("get_statistics_by_ONE_atc_for_network_size_comparison_"+atc_code)
     else:
@@ -2220,13 +2245,10 @@ class PGxByAtcCodeView:
                 returned_data = cache.get("pgx_by_atc_codes_" + slug)
             else:
                 drug_ids = list(set(list(DrugAtcAssociation.objects.filter(atc_id__id__icontains=slug).values_list("drug_id", flat=True))))
-                print("drug_ids ", drug_ids)
-
                 pgx = Pharmgkb.objects.filter(drugbank_id__in=drug_ids)
                 returned_data = []
                 for row in pgx:
                     drug_id = row.drugbank_id.drug_bankID
-                    print("inside loop, drug_id = ", drug_id)
                     r = {
                             "DrugbankID": drug_id,
                             "Drugname": Drug.objects.get(drug_bankID=drug_id).name,
@@ -2247,7 +2269,6 @@ class PGxByAtcCodeView:
                             "Metabolizer_types": row.Metabolizer_types,
                         }
                     returned_data.append(r)
-                print("returned_data : ", returned_data)
 
                 context = dict()
                 cache.set("pgx_by_atc_codes_" + slug, returned_data, 60 * 60)
@@ -2261,9 +2282,7 @@ class DrugTargetInteractionByAtcBaseView:
             if cache.get("interactions_by_atc_code_" + slug) is not None:
                 returned_data = cache.get("interactions_by_atc_code_" + slug)
             else:
-                print("slug ", slug)
                 drug_ids = DrugAtcAssociation.objects.filter(atc_id__id__istartswith=slug).values_list("drug_id", flat=True)
-                print("drug_ids ", drug_ids)
                 returned_data = []
                 for drug_id in drug_ids:
                     interactions = Interaction.objects.filter(drug_bankID=drug_id).values_list("uniprot_ID", "actions", "known_action", "interaction_type")
@@ -2288,9 +2307,7 @@ class DrugDiseaseAssociationByAtcBaseView:
             if cache.get("associations_by_atc_code_" + slug) is not None:
                 returned_data = cache.get("associations_by_atc_code_" + slug)
             else:
-                print("slug ", slug)
                 drug_ids = DrugAtcAssociation.objects.filter(atc_id__id__istartswith=slug).values_list("drug_id", flat=True)
-                print("drug_ids ", drug_ids)
                 returned_data = []
                 for drug_id in drug_ids:
                     associations = DrugDiseaseStudy.objects.filter(drug_bankID=drug_id).values_list("disease_name__disease_name", "disease_name__disease_class", "clinical_trial", "link", "standard_inchiKey")

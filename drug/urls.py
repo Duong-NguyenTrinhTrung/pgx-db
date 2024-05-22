@@ -20,16 +20,17 @@ from .views import (
     get_statistics_by_atc_for_detecting_community_drug_disease, 
     get_statistics_by_atc_for_calculating_average_path_length_drug_disease,
     get_statistics_by_atc_for_calculating_average_path_length_drug_protein,
-    atc_comparison_autocomplete_view, get_adr_data, AdrByDrugView
+    atc_comparison_autocomplete_view, get_adr_data, AdrByDrugView, get_adr_data_by_atc
 )
 
 urlpatterns = [
     path('search_drugs', views.search_drugs, name='search_drugs'),
     path('atc_lookup', cache_page(3600*24*365)(views.atc_lookup), name='atc-lookup'),
     path('atc_anatomical_groups', views.AtcAnatomicalGroupListView.as_view(), name='atc-anatomical-groups'),
-    path('atc_search_view', cache_page(3600*24*365)(views.atc_search_view), name='atc-search-view'),
+    path('atc_search_view',cache_page(3600*24*365)(views.atc_search_view), name='atc-search-view'),
 
     path('get_adr_data/', views.get_adr_data, name='get-adr-data'),
+    path('get_adr_data_by_atc/', views.get_adr_data_by_atc, name='get-adr-data-by-atc'),
     path('atc_detail_view/', views.atc_detail_view, name='atc-detail-view'),
     path('get_drug_atc_association/', views.get_drug_atc_association, name='get-drug-atc-association'),
     path('get_drug_association/', views.get_drug_association, name='get-drug-association'),

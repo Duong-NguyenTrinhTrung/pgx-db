@@ -49,11 +49,9 @@ class VariantToVepRestApiView(VEPFromVariantBaseView, APIView,):
     )
 
     def get(self, request, *args, **kwargs):
-        print("inside VariantToVepRestApiView")
         serializer = VariantSerializer(data=self.kwargs)
         if serializer.is_valid():
             data = self.get_vep_from_variant(serializer.validated_data.get('variant_marker'))
-            print(len(data))
             return Response(data)
         else:
             return Response(serializer.errors, status=400)
@@ -66,7 +64,6 @@ class GeneVariantRestApiView(GeneDetailBaseView,APIView,):
     )
 
     def get(self, request, *args, **kwargs):
-        print("self.kwargs ", self.kwargs)
         serializer = GeneDetailSerializer(data=self.kwargs)
 
         if serializer.is_valid():
@@ -87,7 +84,6 @@ class GeneVariantRestApiView(GeneDetailBaseView,APIView,):
                 }
                 
                 returned_data.append(d)
-            print("self.kwargs : ", self.kwargs)
             return Response({'Basic information about variants of gene '+self.kwargs.get("gene_id"): returned_data})
         else:
             return Response(serializer.errors, status=400)
@@ -116,16 +112,13 @@ class DrugByGeneRestApiView(DrugByGeneBaseView,APIView,):
                     return Response(serializer.errors, status=400)
                 
             table_data = data.get('list_of_targeting_drug', [])
-            print("table_data : ", table_data)
             if len(table_data)>0:
                 for index, row in table_data.iterrows():
-                    print("row : ", row, "type : ", type(row))
                     d={
                         "drug_bankID":row["drug_bankID"],
                         "actions":row["actions"],
                         "known_action":row["known_action"],
                         "interaction_type":row["interaction_type"],
-
                     }
                     returned_data.append(d)
                 return Response({"List of targeting drugs: ": returned_data})
@@ -148,10 +141,8 @@ class DrugByGeneRestApiView(DrugByGeneBaseView,APIView,):
 #         if serializer.is_valid():
 #             data = self.get_drug_by_gene_data(serializer.validated_data.get('gene_id'))
 #             table_data = data.get('list_of_targeting_drug', [])
-#             print("table_data : ", table_data)
 #             returned_data = []
 #             for index, row in table_data.iterrows():
-#                 print("row : ", row, "type : ", type(row))
 #                 d={
 #                     "drug_bankID":row["drug_bankID"],
 #                     "actions":row["actions"],
@@ -174,11 +165,8 @@ class TargetByAtcRestApiView(TargetByAtcBaseView,APIView,):
 
     def get(self, request, *args, **kwargs):
         serializer = AtcDetailSerializer(data=self.kwargs)
-        print("checkpoint 5 in TargetByAtcRestApiView, self.kwargs = ", self.kwargs)
-        print("checkpoint 5 in TargetByAtcRestApiView, serializer = ", serializer)
 
         if serializer.is_valid():
-            print("checkpoint 6 when serializer is valid in TargetByAtcRestApiView")
             data = self.get_target_by_atc_code(serializer.validated_data.get('atc_code'))
             table_data = data.get('list_of_targets', [])
             returned_data = []
@@ -189,7 +177,6 @@ class TargetByAtcRestApiView(TargetByAtcBaseView,APIView,):
                 returned_data.append(d)
             return Response({"List of targets: ": returned_data})
         else:
-            print("checkpoint 7 when serializer is not valid in TargetByAtcRestApiView")
             return Response(serializer.errors, status=400)
 
 
@@ -362,14 +349,10 @@ class GenebasedAssociationStatisticsRestApiView(GenebasedAssociationStatisticsVi
         serializer = VariantSerializer(data=self.kwargs)
         if serializer.is_valid():
             variant_marker = serializer.validated_data.get('variant_marker')
-            print("original vm ", variant_marker)
             variant_marker = variant_marker[:-1] if variant_marker[-1] == "/" else variant_marker
-            print("processed vm ", variant_marker)
             data = self.get_association_statistics_by_variant_marker(variant_marker)
             if not data:
                 return Response({"error" : f"{variant_marker} not found"}, status=404)
-            # print("data = ",data)
-            # print("variant_marker = ",self.kwargs)
             returned_data = []
             for index, row in data.get("association_statistics_data").iterrows():
                 temp = {

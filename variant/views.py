@@ -27,7 +27,6 @@ class VEPFromVariantBaseView:
     def get_vep_from_variant(self, slug):
         context = {}
         slug = slug[:-1] if slug[-1] == "/" else slug
-        print("processed vm ", slug)
         
         if slug is not None:
             if cache.get("vep_by_variant_marker_" + slug) is not None:
@@ -85,7 +84,6 @@ class VEPFromVariantBaseView:
                 context = dict()
                 cache.set("vep_by_variant_marker_" + slug, returned_data, 60 * 60)
             context['vep'] = returned_data
-            print("context : ", context)
         return context
     
 def get_variant_vep_scores_and_plot(request):
