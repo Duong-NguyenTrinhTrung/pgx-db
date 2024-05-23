@@ -294,12 +294,13 @@ function getFilteredSvgContent(svgElement) {
 
     // Remove hidden child nodes. This checks if both the circle and text children are hidden.
     d3ClonedSvg.selectAll(".node:not(.node-parent)")
-        .filter(function () {
-            var circleVisibility = d3.select(this).select('circle').style('visibility');
-            var textVisibility = d3.select(this).select('text').style('visibility');
-            return circleVisibility === 'hidden' && textVisibility === 'hidden';
-        })
-        .remove();
+            .filter(function () {
+                // var circleVisibility = d3.select(this).select('circle').style('visibility');
+                // console.log( circleVisibility , 'circleVisibility')
+                var textVisibility = d3.select(this).select('text').style('visibility');
+                return textVisibility === 'hidden';
+            })
+            .remove();
 
     return new XMLSerializer().serializeToString(clonedSvg);
 }
@@ -621,7 +622,8 @@ function downloadXLS() {
                 link.source.id === row.drug_name &&
                 link.source.Drug_type.toLowerCase() === row.drugtype.toLowerCase() &&
                 link.target.id === row.protein &&
-                link.target.Protein_Class === row.Protein_Class
+                link.target.Protein_Class === row.Protein_Class &&
+                link.target.DiseaseClass  === row.DiseaseClass
             )
         );
 
