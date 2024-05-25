@@ -1922,6 +1922,7 @@ def get_drug_association(request):
     associations_list = [
         {"drug_bankID": drug_id, "name": drug.name, "description": drug.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=drug_id)]}
         ]
+    drug_disease_study_list = [{"disease_name": study.disease_name.disease_name, "clinical_trial": study.clinical_trial, "disease_class": study.disease_name.disease_name} for study in DrugDiseaseStudy.objects.filter(drug_bankID=drug_id)]
     data = get_network_statistics_by_drug(drug_id)
     total_interaction = 0
     interacted_protein = []
