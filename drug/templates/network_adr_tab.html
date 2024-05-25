@@ -6,7 +6,9 @@
     <div id='atc_level_network_adr' style="border: #b4b1b1 1px solid">
         <div style="margin-top: 20px; margin-left: 20px;">
             <p style="text-align: center; font-size: 16px;">
-                <span id="atc_level_network_adr_text"> </span>
+                <span style="display: block; color: red ;" id="atc_level_network_adr_text"> </span>
+                <span style="display: none;" class="documentation" id="atc_level_network_adr_read_more"><a href="">Read More</a></span>
+                <span style="color: grey; font-style: italic;" id="atc_level_network_adr_subtext"> </span>
             </p>
         </div>
         <div>
@@ -28,8 +30,14 @@
     function showAtcLevelNetworkADR(atc_code) {
         // text
         var atc_level_network_adr_text = document.getElementById("atc_level_network_adr_text");
-        atc_level_network_adr_text.style.color = "red";
-        atc_level_network_adr_text.style.fontWeight = "bold";
+        var atc_level_network_adr_read_more = document.getElementById("atc_level_network_adr_read_more");
+        // atc_level_network_adr_text.display = "block";
+        // atc_level_network_adr_text.style.color = "red";
+        // atc_level_network_adr_text.style.fontWeight = "bold";
+
+        var atc_level_network_adr_subtext = document.getElementById("atc_level_network_adr_subtext");
+        // atc_level_network_adr_subtext.style.color = "grey";
+        // atc_level_network_adr_subtext.style.fontWeight = "italic";
         var adr_download = document.getElementById("adr_download");
 
         if (atc_code != "no ATC code") {
@@ -55,7 +63,9 @@
                     if (response.length >0)
                     {
                         atc_level_network_adr_text.innerHTML = "Drug adverse reaction of drugs in the network of " + atc_code;
+                        atc_level_network_adr_subtext.innerHTML = "\n(Drug names are listed in alphabetical order;  Frequencies are listed in descending order)";
                         adr_download.style.display = "block";
+                        atc_level_network_adr_read_more.style.display = "block";
                         atc_level_network_adr_table.style.display = "block";
 
                         var table = document.createElement("table");
