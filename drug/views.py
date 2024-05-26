@@ -843,25 +843,25 @@ def atc_search_view(request):
         query_option = request.GET.get('query_option', '')
         if inp != "":       
             # Search "id" field in all models
-            if len(inp) > 7:
-                print("invalid inp")
-            else:
-                if len(inp) > 5:  # search for id length =7
-                    results += list(AtcChemicalSubstance.objects.filter(id__iexact=inp).values('id', 'name'))
-                else:
-                    if len(inp) == 5:  # search for id length =5
-                        results += list(AtcChemicalGroup.objects.filter(id__iexact=inp).values('id', 'name'))
-                    else:
-                        if len(inp) == 4:  # search for id length =5
-                            results += list(
-                                AtcPharmacologicalGroup.objects.filter(id__iexact=inp).values('id', 'name'))
-                        else:
-                            if len(inp) == 3:  # search for id length =5
-                                results += list(
-                                    AtcTherapeuticGroup.objects.filter(id__iexact=inp).values('id', 'name'))
-                            else:
-                                results += list(
-                                    AtcAnatomicalGroup.objects.filter(id__iexact=inp).values('id', 'name'))
+            # if len(inp) > 7:
+            #     print("invalid inp")
+            # else:
+            #     if len(inp) > 5:  # search for id length =7
+            #         results += list(AtcChemicalSubstance.objects.filter(id__iexact=inp).values('id', 'name'))
+            #     else:
+            #         if len(inp) == 5:  # search for id length =5
+            #             results += list(AtcChemicalGroup.objects.filter(id__iexact=inp).values('id', 'name'))
+            #         else:
+            #             if len(inp) == 4:  # search for id length =5
+            #                 results += list(
+            #                     AtcPharmacologicalGroup.objects.filter(id__iexact=inp).values('id', 'name'))
+            #             else:
+            #                 if len(inp) == 3:  # search for id length =5
+            #                     results += list(
+            #                         AtcTherapeuticGroup.objects.filter(id__iexact=inp).values('id', 'name'))
+            #                 else:
+            #                     results += list(
+            #                         AtcAnatomicalGroup.objects.filter(id__iexact=inp).values('id', 'name'))
             if query_option == 'containing':
                 # Search "name" field in all models
                 results += list(AtcAnatomicalGroup.objects.filter(Q(id__icontains=inp)|Q(name__icontains=inp)).values('id', 'name'))
