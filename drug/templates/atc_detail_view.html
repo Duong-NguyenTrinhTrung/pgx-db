@@ -338,16 +338,20 @@
     // var isNetworkPGxTabClicked = false;
     
     function network_pgx_tab_clicked()
-    {
+    {   
+        var sp = document.getElementById("read_more_pgx");
         var p = document.getElementById('tab_network_pgx_message');
         var d = document.getElementById('pgx_data_display_area');
         p.style.display="none";
         console.log("hasPGxData: " + hasPGxData);
         if (!hasPGxData){
+            sp.style.display = "none";
             p.style.display="block";
             d.style.display="none";
 
         }else{
+            
+            sp.style.display="inline";
             p.style.display="none";
             d.style.display="block";
         }
