@@ -92,15 +92,15 @@
 
     </div>
 
-    <!-- PGx intro -->
+    
     <div class="row">
-
         <div  class="col-md-9">
+            <!-- PGx intro -->
             <div class="panel panel-primary" >
                 <div style="width: 100%; padding: 0;" class="panel-body">
                     <div class="col-md-4" >
-                        <p style='text-align:center; font-size: 32px; margin:0; font-weight: 700; padding: 0;'>
-                            <strong>PGx</strong> 
+                        <p style='text-align:center; font-size: 32px; margin:20px 0; font-weight: 700; padding: 0;'>
+                            <strong>PGxDB</strong> 
                         </p>
                         <p style='text-align:center; padding: 0;'>
                             <img style="width: 50%; height: 40.3%;" src="{% static 'home/logo/PGx/main10.png' %}">
@@ -108,26 +108,24 @@
                     </div>
                     <div class="col-md-4" id='center_menu'>
                         <p style='text-align:justify; margin-top: 20px;'>
-                            <strong><em>PGx (Pharmacogenomics database) </em></strong>is a one-stop shop
+                            <strong><em>PGxDB (Pharmacogenomics database) </em></strong>is a one-stop shop
                             for pharmacogenomics research offering:<br/>
                             <ul>
                               <li>Reference data (see Data box)</li>
-                              <li>Tool to understand variant effects to drug metabolism and drug response
-                            </li>
-                              <li>Data about correlation with expression, sequence-domains, predictions, and structure
-                            </li>
+                              <li>Tools to to compare and customize analysis on high-level indication areas, find and interlink diverse variant effect predictions, associate these to annotated drug response variability associations and interrogate disease or medication associations </li>
+                              <li>Tools explore relationship between ATC-level indexed medications, their molecular target profiles in terms of metabolizing enzymes, transporters, and drug targets</li>
                             </ul>
                         </p>
                     </div>
                     
                     <div class="col-md-4" id='center_menu'>
-                        <p style='text-align:justify; margin-top: 20px;'>Data about all drug target variants are available online by
+                        <p style='text-align:justify; margin-top: 20px;'>Data in PGxDB can be accessed by
                                 <ul>
                                     <li>Any drug</li>
                                     <li>Target, enzyme, or transporter</li>
                                     <li>Disease</li>
+                                    <li>Variant</li>
                                     <li>Adverse reaction</li>
-                                    
                                 </ul>
                         </p>
                     </div>
@@ -136,12 +134,9 @@
             </div>
 
             <!-- pieChart HTML Code -->
-             
             <div style=" width : 100%;  margin-bottom: 20px;" >
                 <div class="container-fluid mt-2 col-12">
                     <div class="row">
-                        
-                    
                         <div class="col-md-3 col-sm-12">
                             <div class="card custom-card">
                                 <div class="card-body text-center">
@@ -198,23 +193,31 @@
             </div>
             <!-- pieChart HTML End Here Code -->
 
-            
-
-            <!-- Introduction video -->
-            <div class="col-md-4" >
-                <div class="panel panel-primary" id='intro-video'>
+            <!-- Related resources -->
+            <!-- Why pharmacogenomics? -->
+            <div class="col-md-4">
+                <div class="panel panel-primary">
                     <div class="panel-body">
-                        <h3>Introduction video</h3>
-                        <a href="https://www.youtube.com/watch?v=RXmrUhSSSlo" target="_blank"><img style="width: 100%;align:center;" src="{% static '/home/images/youtube_intro_image2.png' %}". ></img></a>
-                        <!-- <h3><a href="https://files.gpcrdb.org/video/GPCRdb-David_Gloriam.mp4">Videos</a></h3> -->
+                        <h3>Why pharmacogenomics?</h3>
+                        <div style='max-height: 470px; overflow-y: scroll;'>
+                            <p>
+                            <strong style="color: grey;">Trends in GPCR drug discovery: new agents, targets and indications. </strong><br />
+                            Hauser, A. S., Attwood, M. M., Rask-Andersen, M., Schiöth, H. B., & Gloriam, D. E. (2017). <br />
+                            <a href ='https://www.nature.com/articles/nrd.2017.178' target='_blank'><i>Nature reviews Drug discovery</i>, 2017, 16(12), 829-842.</a><br />
+                            </p>
+                            <p>
+                            <strong style="color: grey;">Pharmacogenomics of GPCR drug targets.  </strong><br />
+                            Hauser, A. S., Chavali, S., Masuho, I., Jahn, L. J., Martemyanov, K. A., Gloriam, D. E., & Babu, M. M. (2018). <br />
+                            <a href ='https://www.cell.com/cell/pdf/S0092-8674(17)31384-3.pdf' target='_blank'><i>Cell</i> 2018, 172(1), 41-54.</a><br />
+                            </p>
+                        </div>
+                        <div style='height: 30px; margin-top: 10px; position: relative;'>
+                        <span style="position: absolute; bottom 0;"><strong><a role="button" id='cite_gpcrdb_pubs'>Citing PGx</a></strong></span>
+                        </div>
                     </div>
                 </div>
-                
             </div>
-
-            <!-- Related resources -->
-            <div class="col-md-4">
-                
+            <div class="col-md-4" >
                 <div class="panel panel-primary">
                     <div class="panel-body">
                         <h3>Related resources</h3>
@@ -244,30 +247,17 @@
             </div>
         </div>
 
-        <!-- Why pharmacogenomics? -->
+        
         <div class="col-md-3">
-            <div class="panel panel-primary">
+            <!-- Introduction video -->
+            <div class="panel panel-primary" id='intro-video'>
                 <div class="panel-body">
-                    <h3>Why pharmacogenomics?</h3>
-                    <div style='max-height: 470px; overflow-y: scroll;'>
-                        <p>
-                          <strong style="color: grey;">Trends in GPCR drug discovery: new agents, targets and indications. </strong><br />
-                          Hauser, A. S., Attwood, M. M., Rask-Andersen, M., Schiöth, H. B., & Gloriam, D. E. (2017). <br />
-                          <a href ='https://www.nature.com/articles/nrd.2017.178' target='_blank'><i>Nature reviews Drug discovery</i>, 2017, 16(12), 829-842.</a><br />
-                        </p>
-                        <p>
-                          <strong style="color: grey;">Pharmacogenomics of GPCR drug targets.  </strong><br />
-                          Hauser, A. S., Chavali, S., Masuho, I., Jahn, L. J., Martemyanov, K. A., Gloriam, D. E., & Babu, M. M. (2018). <br />
-                          <a href ='https://www.cell.com/cell/pdf/S0092-8674(17)31384-3.pdf' target='_blank'><i>Cell</i> 2018, 172(1), 41-54.</a><br />
-                        </p>
-                    </div>
-                    <div style='height: 30px; margin-top: 10px; position: relative;'>
-                      <span style="position: absolute; bottom 0;"><strong><a role="button" id='cite_gpcrdb_pubs'>Citing PGx</a></strong></span>
-                    </div>
+                    <h3>Introduction video</h3>
+                    <a href="https://www.youtube.com/watch?v=RXmrUhSSSlo" target="_blank"><img style="width: 100%;align:center;" src="{% static '/home/images/youtube_intro_image2.png' %}". ></img></a>
+                    <!-- <h3><a href="https://files.gpcrdb.org/video/GPCRdb-David_Gloriam.mp4">Videos</a></h3> -->
                 </div>
             </div>
             
-
             <!-- Stats -->
                 <div class="panel panel-primary">
                     <div class="panel-body">
@@ -287,19 +277,19 @@
                             </li>
                             <li style="--cardColor:#38b000">
                               <div class="content">
-                                <div class="title">2,939</div>
+                                <div class="title">2,937</div>
                                 <div class="text">Interacting proteins spanning 22,909 drug-protein interactions</div>
                               </div>
                             </li>
                             <li style="--cardColor:#0466c8">
                               <div class="content">
                                 <div class="title">1,212,621</div>
-                                <div class="text">Unique genetics variants (10,959 influencing drug response)</div>
+                                <div class="text">Unique genetics variants (5,090 influencing drug responses)</div>
                               </div>
                             </li>
                             <li style="--cardColor:#f15f0e">
                               <div class="content">
-                                <div class="title">4,903,680</div>
+                                <div class="title">4,897,436</div>
                                 <div class="text">Variant effects from > 40 algorithms</div>
                               </div>
                             </li>
@@ -311,7 +301,7 @@
                             </li>
                             <li style="--cardColor:rgb(88, 44, 77)">
                               <div class="content">
-                                <div class="title">3,810,902</div>
+                                <div class="title">2,651,948</div>
                                 <div class="text">Variant-based association statistics burden test scores</div>
                               </div>
                             </li>

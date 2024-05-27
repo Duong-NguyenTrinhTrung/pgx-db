@@ -652,7 +652,7 @@
 
         function draw_multiple_variant_plot(data){
             if ((data.length == 1) && (data[0].values.length == 0)) {
-                $('#variantPlots_content').html('<p style="color: red; text-align: center;">There are no VEP scores and plot for this variant!</p>');
+                $('#variantPlots_content').html('<div style="height: 100px;"><p style="color: red; text-align: center;">There are no VEP scores and plot for this variant!</p></div>');
             }
             else {
                 $('#variantPlots_content').html('');  // clear data
