@@ -205,11 +205,18 @@
     #commonUniqueNodesTable tr{
         border-bottom: 1px solid #ccc; 
     }
+
     span.documentation {
         float: right;
         margin-right: 10px;
         font-weight: bold;
     }
+
+    .color1 { color: #f48c06; }
+    .color2 { color: #d00000; }
+    .color3 { color: #9d0208; }
+    .color4 { color: #6a040f; }
+    
 </style>
 
 {% endblock %}
@@ -557,7 +564,10 @@
         if (storedData) {
             const data = JSON.parse(storedData);
             console.log( data,'Data retrieved from localStorage:' );
-            
+            if (data > 700){ 
+                data = 1180
+                console.log("check" ,data )
+            }
             var iframe = document.getElementById('myIframe');
             iframe.style.height = data+'px'
 

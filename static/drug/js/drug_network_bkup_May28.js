@@ -7,7 +7,7 @@ $(function () {
 
 
 // var json_GeneralFile = "json/json_GeneralFile.json";
-// var json_GeneralFile = "json/data.json";
+// var json_GeneralFile = "json/json6.json";
 // var json_drugData = "json/json_drugData.json";
 // var json_proteinData = "json/json_proteinData.json";
 // var json_interactionData = "json/json_interactionData.json";
@@ -236,58 +236,11 @@ function showExportOptions() {
 function createExportOption(optionText) {
     var optionButton = document.createElement('button');
     optionButton.textContent = optionText;
-    optionButton.className = 'pgx_btn1'; // add class here
+    optionButton.className = 'export-option-button'; // add class here
     optionButton.addEventListener('click', function () {
         handleExportOption(optionText);
     });
-
-    // Add CSS for the buttons directly within the function
-    var buttonContainer = document.createElement('div');
-    buttonContainer.className = 'button-container';
-    buttonContainer.appendChild(optionButton);
-
-    var style = document.createElement('style');
-    style.innerHTML = `
-        
-        .pgx_btn1 {
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background: #fff;
-            color: #333;
-            font-size: 14px;
-            font-weight: 400;
-            line-height: 1.42857143;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: middle;
-            touch-action: manipulation;
-            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            display: block;
-            margin-bottom: 5px;
-            width: 120px;
-            cursor:pointer;
-        }
-
-        .pgx_btn1:hover {
-            color: #333;
-            background-color: #d4d4d4;
-        }
-
-        .pgx_btn1:focus {
-            outline: 5px auto -webkit-focus-ring-color;
-        }
-        .button-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-    `;
-    document.head.appendChild(style);
-    return buttonContainer;
-
-
-    
+    return optionButton;
 }
 
 function handleExportOption(option) {
@@ -429,7 +382,7 @@ function svgToCanvas(svgData, callback) {
 
         if (xlinkHref) {
             //imgObj.src = "http://localhost:8000/" + xlinkHref;
-            imgObj.src = "https://pgx-db.org" + xlinkHref;
+            imgObj.src = "https://pharmacogenomics-database-5pltq.ondigitalocean.app" + xlinkHref;
 
         } else {
             loadedCount++;
@@ -578,7 +531,7 @@ function downloadPDF() {
         // Use the href attribute for the image path
         if (xlinkHref) {
             //imgObj.src = "http://localhost:8000/" + xlinkHref;
-            imgObj.src = "https://pgx-db.org/" + xlinkHref;
+            imgObj.src = "https://pharmacogenomics-database-5pltq.ondigitalocean.app/" + xlinkHref;
         } else {
             loadedCount++;
         }
@@ -2020,33 +1973,26 @@ console.log(links.length ,'link length')
             return DiseaseColorMap[d.DiseaseClass] || "black";
         })
        
-        node.on("click", function(event, d) {
-            window.open(`https://clinicaltrials.gov/search?cond=${d.id}`, "_blank");
-        })
-        // Attach cursor style change on mouseover to all nodes
-        .on("mouseover", function() {
-            d3.select(this).style("cursor", "pointer");
-        });
-    
-        node.filter(d => d.child_type === 'disease_type')
-        .on("mouseover", function(event, d) {
-            
-        d3.select(this).style("cursor", "pointer");
-            tooltip2.transition()
-                .style("opacity", 0.9);
-            tooltip2.html(d.id)
-                .style("left", event.pageX + "px")
-                .style("top", event.pageY + "px");
+node.on("click", function (event, d) {
+    window.open(`https://clinicaltrials.gov/search?cond=${d.id}`, "_blank");
 
-                
-        })
-        .on("mouseout", function() {
-            tooltip2.transition()
-                .style("opacity", 0);
-        });
-    
-    // Attach click event to all nodes
-  
+}).on("mouseover", function(d) {
+
+
+    let r = event.target.__data__;
+    tooltip2.transition()
+      .style("opacity", 0.9);
+    tooltip2.html( r.id)
+      .style("left", d.pageX + "px")
+      .style("top", d.pageY + "px");
+  })
+  .on("mouseout", function(d) {
+    tooltip2.transition()
+    //   .duration(500) 
+      .style("opacity", 0);
+  });
+
+
     // Define a tooltip div with class "tooltip2"
 var tooltip2 = d3.select("body").append("div")
 .attr("class", "tooltip2")

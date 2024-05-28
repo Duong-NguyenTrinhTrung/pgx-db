@@ -31,13 +31,8 @@
         // text
         var atc_level_network_adr_text = document.getElementById("atc_level_network_adr_text");
         var atc_level_network_adr_read_more = document.getElementById("atc_level_network_adr_read_more");
-        // atc_level_network_adr_text.display = "block";
-        // atc_level_network_adr_text.style.color = "red";
-        // atc_level_network_adr_text.style.fontWeight = "bold";
 
         var atc_level_network_adr_subtext = document.getElementById("atc_level_network_adr_subtext");
-        // atc_level_network_adr_subtext.style.color = "grey";
-        // atc_level_network_adr_subtext.style.fontWeight = "italic";
         var adr_download = document.getElementById("adr_download");
 
         if (atc_code != "no ATC code") {
@@ -49,7 +44,6 @@
     }
 
     function showADR(atc_code) {
-        // div to hold a table
         var atc_level_network_adr_table = document.getElementById("atc_level_network_adr_table");
         // clear the old content
         atc_level_network_adr_table.innerHTML = "";
@@ -132,8 +126,18 @@
                                 row.appendChild(definitionCell);
                                 
                                 var frequencyCell = document.createElement("td");
+                                var frequencyValue = adr["Frequency (in percentage)"];
                                 frequencyCell.appendChild(document.createTextNode(adr["Frequency (in percentage)"]));
                                 frequencyCell.style.textAlign = "center";
+                                if (frequencyValue <= 25) {
+                                    frequencyCell.className = "color1";
+                                } else if (frequencyValue <= 50) {
+                                    frequencyCell.className = "color2";
+                                } else if (frequencyValue <= 75) {
+                                    frequencyCell.className = "color3";
+                                } else {
+                                    frequencyCell.className = "color4";  // Corrected the logic to assign 'color4' class for values greater than 75
+                                }
                                 row.appendChild(frequencyCell);
                                 
                                 tbody.appendChild(row);

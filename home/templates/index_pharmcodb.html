@@ -38,7 +38,7 @@
                     <div class="item active">
                         <img style="height: 300px; " src="{% static 'home/carousel/vep and plot.png' %}">
                         <div class="carousel-caption">
-                            <h4><a href="">Variant</a> effect <a href="">prediction</a></h4>
+                            <h4><a href="/gene/ENSG00000138075/">Variant effect prediction scores</a></h4>
                             <p>Collection of variant effect prediction for interested targets</p>
                         </div>
                     </div>
@@ -46,8 +46,8 @@
                     <div class="item">
                         <img  style="height: 300px; " src="{% static 'home/carousel/drug-and-target-network.png' %}">
                         <div class="carousel-caption">
-                            <h4><a href="/alignment/targetselection" target="_blank">Drugs</a> and <a href="/phylogenetic_trees/targetselection" target="_blank">Targets</a></h4>
-                            <p>Drugs and protein interaction network</p>
+                            <h4><a href="{% url 'drug-lookup' %}" target="_blank">Drugs</a>, <a href="{% url 'target-lookup' %}" target="_blank">Targets</a> and <a href="{% url 'disease-lookup' %}" target="_blank">Disease</a></h4>
+                            <p>Tripartite network of drugs, targets and disease</p>
                         </div>
                     </div>
 
