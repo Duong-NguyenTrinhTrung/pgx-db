@@ -50,16 +50,16 @@
                     <table class="display compact text-nowrap" id="structures_scrollable">
                         <thead id="headers">
                         <tr>
-                            <th rowspan="2" class="long-text" style="width: 90px !important;">Variant</th>
+                            <th rowspan="2" class="long-text" style="max-width: 120px;">Variant</th>
                             <th rowspan="2">Transcript</th>
                             <th rowspan="2">Canonical</th>
                             <th rowspan="2">Sequence<br>position</th>
                             <th rowspan="2">Wildtype AA</th>
                             <th rowspan="2">Mutant AA</th>
-                            <th rowspan="2">Codons</th>
-                            <th rowspan="2" class="long-text" style="width: 80px !important;">Consequence</th>
-                            <th rowspan="2">Allele<br>frequency</th>
-                            <th rowspan="2" style="width: 80px !important;" class="width-80px">Mean <br> VEP scores</th>
+                            <th style="max-width: 100px;" rowspan="2">Codons</th>
+                            <th rowspan="2" style="max-width: 125px;" class="long-text">Consequence</th>
+                            <th rowspan="2" style="max-width: 100px;">Allele<br>frequency</th>
+                            <th rowspan="2" style="max-width: 100px;" class="width-80px">Mean <br> VEP scores</th>
                             <th rowspan="2"><a id="show-all-vep-score" href="#">Show VEP Scores</a></th>
                             <th colspan="41">VEP scores from different algorithms <a href="#" id="vep-score-algorithms">Hide VEP scores</a></th>
                         </tr>
@@ -111,7 +111,7 @@
                         <tbody id='structures_scrollable_body'>
                         {% for value in array %}
                             <tr class="data-row">
-                                <td class="align-left variant long-text" style="width: 90px !important;">{{ value.0 }}</td> <!--  Variant -->
+                                <td class="align-left variant long-text" style="max-width: 120px;">{{ value.0 }}</td> <!--  Variant -->
                                 <td class="align-left">{{ value.1 }}</td> <!--  Transcript -->
                                 <td class="align-left">YES</td> <!--  Canonical -->
                                 <td class="align-left">{{ value.5 }}</td> <!--  Sequence position -->
@@ -123,23 +123,23 @@
                                     <td class="align-left">{{ value.6 }}</td> <!-- Mutant  -->
                                 {% endif %}
 
-                                <td class="align-left">{{ value.7 }}</td> <!-- Codons  -->
-                                <td class="align-left long-text" style="width: 80px !important;">{{ value.2 }}</td> <!--Consequence   -->
+                                <td style="max-width: 100px;" class="align-left">{{ value.7 }}</td> <!-- Codons  -->
+                                <td style="max-width: 125px;" class="align-left long-text">{{ value.2 }}</td> <!--Consequence   -->
                                 {% with num=value.51|floatformat:"0.2e" %}
                                     {% if not num %}
-                                        <td class="align-left" style="color: #d62828;">None</td> <!--  Highest AF -->
+                                        <td class="align-left" style="color: #d62828; max-width: 100px;">None</td> <!--  Highest AF -->
                                     {% else %}
-                                        <td class="align-left">{{ value.51|floatformat:"0.2e"}}</td> <!--  Highest AF -->
+                                        <td class="align-left" style="max-width: 100px;">{{ value.51|floatformat:"0.2e"}}</td> <!--  Highest AF -->
                                     {% endif %}
                                 {% endwith %}
                                 <!--  Mean VEP scores -->
                                 {% with num=value|last|add:0 %}
                                         {% if not num %}
                                                 <!-- Handle case where Mean VEP scores is not a number -->
-                                                <td class="align-left" >{{ value|last }}</td> 
+                                                <td style="max-width: 100px;" class="align-left" >{{ value|last }}</td> 
                                         {% else %}
                                                 <!-- Handle case where Mean VEP scores is a number -->
-                                                <td class="align-left" style="color: #d62828;">None</td> 
+                                                <td class="align-left" style="max-width: 100px; color: #d62828;">None</td> 
                                         {% endif %}
                                 {% endwith %}
                                 <td><a href="#" class="variant_associate_statistics"
@@ -392,11 +392,11 @@
             //Codon
             column_filters = column_filters.concat(createYADCFfilters(6, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
             //Consequence
-            column_filters = column_filters.concat(createYADCFfilters(7, 1, "select", null, "Select", false, null, null, "80px"));
+            column_filters = column_filters.concat(createYADCFfilters(7, 1, "select", null, "Select", false, null, null));
             //AF
-            column_filters = column_filters.concat(createYADCFfilters(8, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"));
+            column_filters = column_filters.concat(createYADCFfilters(8, 1, "range_number", null, ["Min", "Max"], false, null, null));
             //Mean VEP Score columns
-            column_filters = column_filters.concat(createYADCFfilters(9, 1, "range_number", null, ["Min", "Max"], false, null, null, width="70px"))
+            column_filters = column_filters.concat(createYADCFfilters(9, 1, "range_number", null, ["Min", "Max"], false, null, null))
 
             // update filters
             yadcf.init(
@@ -806,92 +806,105 @@
         }
 
         // <!-- Script for filtering options of 3d-structure  -->
-        var structureDisplay = document.getElementById('structure_display');
-        // let positionsToColor = [...new Set(list_vep_variants_pos)];
+        $(document).ready(function() {
 
-        viewer_bkup = viewer;
-
-        // Count the number of chains
-        const chains = new Set();
-        const atoms = viewer.getModel().selectedAtoms({});
-        for (let i = 0; i < atoms.length; i++) {
-            const atom = atoms[i];
-            chains.add(atom.chain);
-        }
-
-        const chainSelect = document.getElementById('chainSelect');
-        const chainArray = Array.from(chains); // Convert the set to an array for easier manipulation
-        chainArray.sort(); // Sort the chains in alphabetical order (optional)
-        for (const chain of chainArray) {
-            const option = document.createElement("option");
-            option.value = chain;
-            option.textContent = chain;
-            chainSelect.appendChild(option);
-        }
-
-        chainSelect.addEventListener('change', (event) => {
-            var selectedChain = chainSelect.value;
-
-            if (selectedChain !== "") {
-                viewer.setStyle({}, {cartoon: {color: 'grey', opacity: 0.5}});
-                viewer.addStyle({chain: selectedChain}, {cartoon: {color: 'spectrum', opacity: 1}});
-            }
-            viewer.render();
-        });
-
-        // const resiLabelSelect = document.getElementById('resiLabelSelect');
-        // let toremoveLabel = null;
-        // resiLabelSelect.addEventListener('change', (event) => {
-        //     const selectedResiVisibility = event.target.value;
-        //     if (selectedResiVisibility === 'hide') {
-        //         if (toremoveLabel != null) {
-        //             viewer.removeLabel(toremoveLabel);
-        //             toremoveLabel = null;
-        //         }
-        //     } else {
-        //         toremoveLabel = viewer.addResLabels({hetflag: false}, {
-        //             font: 'Arial',
-        //             fontSize: 6,
-        //             fontColor: 'black',
-        //             showBackground: false,
-        //             screenOffset: {x: 0, y: 0}
-        //         });
-        //     }
-        //     viewer.render();
-        // });
-
-        const variantVisibilitySelect = document.getElementById('variantVisibilitySelect');
-        variantVisibilitySelect.addEventListener('change', (event) => {
-            const selectedvisibility = event.target.value;
-            if (selectedvisibility === 'hide') {
-                viewer.setStyle({}, {cartoon: {color: "spectrum"}});
-            } else {
-                viewer.setStyle({}, {cartoon: {color: 'grey', thickness: 0.5}});
-                viewer.addStyle({resi: [5, 10, 15, 20, 25, 30, 35, 40]}, {stick: {colorscheme: 'greenCarbon'}});
-            }
-            viewer.render();
-        });
-
-        var colorSelect = document.getElementById('colorSelect');
-        colorSelect.addEventListener('change', (event) => {
-            const selectedColor = event.target.value;
-            if (selectedColor === 'grey') {
-                viewer.setStyle({}, {cartoon: {color: 'grey'}});
-            } else {
-                viewer.setStyle({}, {cartoon: {color: 'spectrum'}});
-                for (const option of variantVisibilitySelect.options) {
-                    if (option.value === "hide") {
-                        option.selected = true;
-                        break;
-                    }
+                var structureDisplay = document.getElementById('structure_display');
+                var protein_name = "{{ protein_name }}";
+                console.log("protein_name : "+protein_name);
+                // let positionsToColor = [...new Set(list_vep_variants_pos)];
+                // console.log("positionsToColor: "+positionsToColor);
+                console.log("positionsToColor type : "+ typeof positionsToColor);
+        
+                viewer_bkup = viewer;
+                console.log("viewer : "+viewer);
+        
+                // Count the number of chains
+                const chains = new Set();
+                const model = viewer.getModel()
+                console.log("model : "+model);
+                const atoms = model.selectedAtoms({});
+                console.log("atoms : "+atoms);
+                for (let i = 0; i < atoms.length; i++) {
+                    const atom = atoms[i];
+                    chains.add(atom.chain);
                 }
-            }
-            viewer.render();
+        
+                const chainSelect = document.getElementById('chainSelect');
+                const chainArray = Array.from(chains); // Convert the set to an array for easier manipulation
+                chainArray.sort(); // Sort the chains in alphabetical order (optional)
+                for (const chain of chainArray) {
+                    const option = document.createElement("option");
+                    option.value = chain;
+                    option.textContent = chain;
+                    chainSelect.appendChild(option);
+                }
+        
+                chainSelect.addEventListener('change', (event) => {
+                    var selectedChain = chainSelect.value;
+        
+                    if (selectedChain !== "") {
+                        viewer.setStyle({}, {cartoon: {color: 'grey', opacity: 0.5}});
+                        viewer.addStyle({chain: selectedChain}, {cartoon: {color: 'spectrum', opacity: 1}});
+                    }
+                    viewer.render();
+                });
+        
+                // const resiLabelSelect = document.getElementById('resiLabelSelect');
+                // let toremoveLabel = null;
+                // resiLabelSelect.addEventListener('change', (event) => {
+                //     const selectedResiVisibility = event.target.value;
+                //     if (selectedResiVisibility === 'hide') {
+                //         if (toremoveLabel != null) {
+                //             viewer.removeLabel(toremoveLabel);
+                //             toremoveLabel = null;
+                //         }
+                //     } else {
+                //         toremoveLabel = viewer.addResLabels({hetflag: false}, {
+                //             font: 'Arial',
+                //             fontSize: 6,
+                //             fontColor: 'black',
+                //             showBackground: false,
+                //             screenOffset: {x: 0, y: 0}
+                //         });
+                //     }
+                //     viewer.render();
+                // });
+        
+                const variantVisibilitySelect = document.getElementById('variantVisibilitySelect');
+                variantVisibilitySelect.addEventListener('change', (event) => {
+                    const selectedvisibility = event.target.value;
+                    if (selectedvisibility === 'hide') {
+                        viewer.setStyle({}, {cartoon: {color: "spectrum"}});
+                    } else {
+                        viewer.setStyle({}, {cartoon: {color: 'grey', thickness: 0.5}});
+                        viewer.addStyle({resi: [5, 10, 15, 20, 25, 30, 35, 40]}, {stick: {colorscheme: 'greenCarbon'}});
+                        var colorSelect = document.getElementById("colorSelect");
+                        colorSelect.value = "grey";
+                    }
+                    viewer.render();
+                });
+        
+                var colorSelect = document.getElementById('colorSelect');
+                colorSelect.addEventListener('change', (event) => {
+                    const selectedColor = event.target.value;
+                    if (selectedColor === 'grey') {
+                        viewer.setStyle({}, {cartoon: {color: 'grey'}});
+                    } else {
+                        viewer.setStyle({}, {cartoon: {color: 'spectrum'}});
+                        for (const option of variantVisibilitySelect.options) {
+                            if (option.value === "hide") {
+                                option.selected = true;
+                                break;
+                            }
+                        }
+                    }
+                    viewer.render();
+                });
+                function addLabelForResidueNth(nth, labelText, labelOptions) {
+                    const labels = viewer.addResLabels({resi: nth}, labelOptions);
+                    return labels;
+                }
         });
-        function addLabelForResidueNth(nth, labelText, labelOptions) {
-            const labels = viewer.addResLabels({resi: nth}, labelOptions);
-            return labels;
-        }
         </script>
         <script src="{% static 'home/js/d3.v7.min.js' %}"></script>   
 {% endblock addon_js %}
