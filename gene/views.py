@@ -17,6 +17,7 @@ from django.views.generic import TemplateView
 from django.shortcuts import render
 import numpy as np
 import pandas as pd
+import json
 from gene.models import Gene
 from protein.models import Protein
 from interaction.models import Interaction
@@ -296,16 +297,13 @@ class GeneDetailBaseView(object):
         return data_subset
 
     def get_gene_detail_data(self, slug):
-
         context = {}
         if slug is not None:
             if cache.get("variant_data_" + slug) is not None:
                 table_with_protein_pos_int = cache.get("variant_data_" + slug)
             else:
                 browser_columns = self.browser_columns
-
                 table = pd.DataFrame(columns=browser_columns)
-                # Retrieve all variant markers from a gene
                 if slug.startswith("ENSG"):
                     marker_ID_data = Variant.objects.filter(Gene_ID=slug).values_list(
                         "VariantMarker")
@@ -333,17 +331,25 @@ class GeneDetailBaseView(object):
                 table_with_mean_vep_score = []
                 table_index = 0
                 cleaned_value_index = 0
+                variant_info_for_3D = []
                 for data_row in table.to_numpy():
                     table_index += 1
                     try:
                         cleaned_values = [x for x in data_row[10:-2] if str(x) != '']
-                        # if len(cleaned_values) != 0:
-                        #     cleaned_value_index += 1
-                        #     mean_vep_score = round(np.mean(cleaned_values), 2)
-                        #     table_with_mean_vep_score.append(np.append(data_row, mean_vep_score))
                         cleaned_value_index += 1
                         mean_vep_score = round(np.mean(cleaned_values), 2)
-                        table_with_mean_vep_score.append(np.append(data_row, mean_vep_score))
+                        if np.isnan(mean_vep_score):
+                            mean_vep_score = "nan"
+                        else:
+                            mean_vep_score = round(mean_vep_score, 2)
+                        table_with_mean_vep_score.append(np.append(data_row, "NaN"))
+                        temp = {"variant_marker": data_row[0],
+                                "consequence": data_row[2],
+                                "protein_position": data_row[5],
+                                "amino acid": data_row[6],
+                                "codon": data_row[7],
+                                "mean_vep_score": mean_vep_score}
+                        variant_info_for_3D.append(temp)
                     except Exception as e:
                         pass
 
@@ -354,36 +360,45 @@ class GeneDetailBaseView(object):
                         table_with_protein_pos_int.append(data_row)
                     except Exception as e:
                         pass
-
                 cache.set("variant_data_" + slug, table_with_protein_pos_int, 60 * 60)
-            context['array'] = table_with_protein_pos_int
-            context['length'] = len(table_with_protein_pos_int)
-            context["name_dic"] = self.name_dic
 
-            # Mean of Vep scores form
-            context['gene'] = Gene.objects.filter(gene_id=slug).values_list("genename", flat=True)[0]
-            context['geneID'] = slug
-            amino_seq = Protein.objects.filter(geneID=slug).values_list("sequence", flat=True)[0]
-            amino_seq_num_list = list(range(1, len(amino_seq) + 1))
-            context["amino_seq"] = amino_seq
-            context["seq_length"] = len(amino_seq)
-            protein_name = Protein.objects.filter(geneID=slug).values_list("uniprot_ID", flat=True)[0]
-            context["protein_name"] = protein_name
-            context["amino_seq_num_list"] = amino_seq_num_list
-            chunks = [{"chunk": amino_seq[i:i + 10], "position": i + 10} for i in range(0, len(amino_seq), 10)]
-            chunks[-1]["position"] = len(amino_seq)
-            context["chunks"] = chunks
-            context["af_pdb"] = Protein.objects.filter(geneID=slug).values_list("af_pdb", flat=True)[0]
-            transcripts = [item[1] for item in table_with_protein_pos_int]
-            context['transcripts'] = list(set(transcripts))
-            variants = [item[0] for item in table_with_protein_pos_int]
-            context['variants'] = list(set(variants))
-            consequences = []
-            for item in table_with_protein_pos_int:
-                coseq = item[2].split(",")
-                if len(coseq) >= 1:
-                    consequences += coseq
-            context['consequences'] = list(set(consequences))
+                variant_info_for_3D_view = sorted(variant_info_for_3D, key=lambda x: int(x['protein_position']))
+                context['array'] = table_with_protein_pos_int
+                context['variant_info_for_3D_view'] = json.dumps(variant_info_for_3D_view)
+                # print("variant_info_for_3D_view ", variant_info_for_3D_view)
+                context['length'] = len(table_with_protein_pos_int)
+                context["name_dic"] = self.name_dic
+                context['gene'] = Gene.objects.filter(gene_id=slug).values_list("genename", flat=True)[0]
+                context['geneID'] = slug
+                amino_seq = Protein.objects.filter(geneID=slug).values_list("sequence", flat=True)[0]
+                amino_seq_num_list = list(range(1, len(amino_seq) + 1))
+                context["amino_seq"] = amino_seq
+                context["seq_length"] = len(amino_seq)
+                protein_name = Protein.objects.filter(geneID=slug).values_list("uniprot_ID", flat=True)[0]
+                context["protein_name"] = protein_name
+                context["amino_seq_num_list"] = amino_seq_num_list
+                # chunks = [{"chunk": amino_seq[i:i + 10],"aa_index":[0,1,2,3,4,5,6,7,8,9], "position": i + 10} for i in range(0, len(amino_seq), 10)]
+                chunks = []
+                for i in range(0, len(amino_seq), 10):
+                    temp={
+                        "aa_and_index":[[ amino_seq[i+k-1:i+k],k] for k in range(1, 11)],
+                        "position": i + 10
+                    }
+                    chunks.append(temp)
+                # print("chunks ", chunks)
+                chunks[-1]["position"] = len(amino_seq)
+                context["chunks"] = chunks
+                context["af_pdb"] = Protein.objects.filter(geneID=slug).values_list("af_pdb", flat=True)[0]
+                transcripts = [item[1] for item in table_with_protein_pos_int]
+                context['transcripts'] = list(set(transcripts))
+                variants = [item[0] for item in table_with_protein_pos_int]
+                context['variants'] = list(set(variants))
+                consequences = []
+                for item in table_with_protein_pos_int:
+                    coseq = item[2].split(",")
+                    if len(coseq) >= 1:
+                        consequences += coseq
+                context['consequences'] = list(set(consequences))
         return context
 
 
@@ -396,6 +411,7 @@ class GeneDetailBrowser(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         slug = kwargs.get('slug')
+        print("Slug: ", slug)
         context.update(self.get_gene_detail_data(slug))
         # context.update(self.get_gene_detail_data(slug))
         return context
@@ -451,6 +467,13 @@ class GenebassVariantListView(TemplateView):
         context['categories'] = categories
 
         return context
+
+
+def get_protein_position_of_variant(request):
+    gene_id = request.GET.get("gene_id")
+    primary_transcript = gene.objects.get(gene_id=gene_id)
+    protein_position = VepVariant.objects.filter(Transcript_ID=primary_transcript).values_list("Variant_marker", "Protein_position", "HighestAF")
+
 
 
 @require_http_methods(["GET"])

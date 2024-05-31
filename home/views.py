@@ -28,6 +28,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
+from urllib.parse import unquote
 
 def variant_mapper(request):
     context = {}
@@ -289,10 +290,11 @@ def drug_lookup(request):
     context = {}
     if drug:
         if drug != 'default':
-            drug = drug.split(" - ")[0]
+            drug_id = drug.split(" - ")[0]
+            drug_name = drug.split(" - ")[1]
             data = Drug.objects.filter(
-                Q(drug_bankID__icontains=drug) |
-                Q(name__icontains=drug) 
+                Q(drug_bankID=drug_id) |
+                Q(name=drug_name) 
             )
         else:
             data = Drug.objects.all()[:20]
@@ -366,7 +368,7 @@ def variant_lookup(request):
     variant_id = request.GET.get('variant_id')
     if variant_id:
         if variant_id != 'default':
-            objects = Variant.objects.filter(VariantMarker__icontains=variant_id)
+            objects = Variant.objects.filter(VariantMarker=variant_id)
         else:
             objects = Variant.objects.all()[:20]
         variants = []
@@ -392,36 +394,41 @@ def variant_lookup(request):
         # return render(request, 'home/Drugs_Indications_Targets.html', {'variants': variants})
 
 def target_lookup(request):
-    target = request.GET.get('target')
     context = {}
-    if target:
-        if target != 'default':
-            proteins = Protein.objects.filter(
-                Q(uniprot_ID__icontains=target) |
-                Q(protein_name__icontains=target) |
-                Q(geneID__icontains=target) |
-                Q(genename__icontains=target)
-            )
-        else:
-            proteins = Protein.objects.all()[:10]
-        items = []
-        for item in proteins:
-            interactions = Interaction.objects.filter(uniprot_ID=item.uniprot_ID)
-            items.append({
-                'uniprot_ID': item.uniprot_ID,
-                'genename': item.genename,
-                'geneID': item.geneID,
-                'protein_name': item.protein_name,
-                "drug_data": [
-                    {
-                        "drug_id": interaction.drug_bankID.drug_bankID,
-                        "drug_name": interaction.drug_bankID.name.title(),
-                        "atc_code": get_atc_code(interaction.drug_bankID)
-                    }
-                    for interaction in interactions
-                ],
-            })
-        return JsonResponse({'items': items})
+    # target = request.GET.get('target')
+    encoded_target = request.GET.get('target')
+    if encoded_target:
+        target = unquote(encoded_target)
+        print("Target: ", target) # Transitional endoplasmic reticulum ATPase (TER ATPase) (EC 3.6.4.6) (15S Mg(2+)-ATPase p97 subunit) (Valosin-containing protein) (VCP)
+        
+        if target:
+            if target != 'default':
+                proteins = Protein.objects.filter(
+                    Q(uniprot_ID=target) |
+                    Q(protein_name=target) |
+                    Q(geneID=target) |
+                    Q(genename=target)
+                )
+            else:
+                proteins = Protein.objects.all()[:10]
+            items = []
+            for item in proteins:
+                interactions = Interaction.objects.filter(uniprot_ID=item.uniprot_ID)
+                items.append({
+                    'uniprot_ID': item.uniprot_ID,
+                    'genename': item.genename,
+                    'geneID': item.geneID,
+                    'protein_name': item.protein_name,
+                    "drug_data": [
+                        {
+                            "drug_id": interaction.drug_bankID.drug_bankID,
+                            "drug_name": interaction.drug_bankID.name.title(),
+                            "atc_code": get_atc_code(interaction.drug_bankID)
+                        }
+                        for interaction in interactions
+                    ],
+                })
+            return JsonResponse({'items': items})
     else:
         # If no target parameter provided, get 6 records
         proteins = Protein.objects.all()[:10]
@@ -962,7 +969,7 @@ def disease_lookup(request):
     context = {}
     if disease:
         if disease != 'default':
-            diseases = Disease.objects.filter(disease_name__icontains=disease)
+            diseases = Disease.objects.filter(disease_name=disease)
         else:
             diseases = Disease.objects.all()[:8]
         response_data = []

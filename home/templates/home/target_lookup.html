@@ -329,10 +329,13 @@
                     }
                 });
             }
+        
 
         $("#submit_protein").click(function() {
+            var target = $("#search_protein").val();
+            var encodedTarget = encodeURIComponent(target);
             $.ajax({
-                    url: "{% url 'target-lookup' %}?target="+ $("#search_protein").val(),
+                    url: "{% url 'target-lookup' %}?target="+ encodedTarget,
                     success: function (data) {
                         // console.log(data.proteins);
                         $("#target-result-tbody").html('');
