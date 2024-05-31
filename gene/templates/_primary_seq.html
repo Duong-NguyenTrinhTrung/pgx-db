@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load static %}
+{% load operations %}
 
 <p style="font-size:16px; padding-left:0; margin:40px 0 0;">Encoded protein: {{ protein_name }} -
     length: {{ seq_length }}</p>
@@ -20,20 +21,20 @@
             {% if not forloop.last %}
                 <div class="amino_acid_chunk"
                      style="display: flex; align-items: center; justify-content: space-between; margin: 0 7px;">
-                    {% for a in d.chunk %}
-                        {% if a in "GAVLIFWMP" %}
-                            <div><a href=""><span class="yellow color-coded-text">{{ a }}</span></a></div>
+                    {% for a in d.aa_and_index %}
+                        {% if a.0 in "GAVLIFWMP" %}
+                            <div><a href="#myTextArea" onclick="showAAtooltip('{{ d.position|add:-10|add:a.1 }}')"><span class="yellow color-coded-text">{{ a.0 }}</span></a></div>
                         {% else %}
-                            {% if a in "STCYNQ" %}
-                                <div><a href=""><span class="green color-coded-text">{{ a }}</span></a></div>
+                            {% if a.0 in "STCYNQ" %}
+                                <div><a href="#myTextArea" onclick="showAAtooltip('{{ d.position|add:-10|add:a.1 }}')"><span class="green color-coded-text">{{ a.0 }}</span></a></div>
                             {% else %}
-                                {% if a in "DE" %}
-                                    <div><a href=""><span class="red color-coded-text">{{ a }}</span></a></div>
+                                {% if a.0 in "DE" %}
+                                    <div><a href="#myTextArea" onclick="showAAtooltip('{{ d.position|add:-10|add:a.1 }}')"><span class="red color-coded-text">{{ a.0 }}</span></a></div>
                                 {% else %}
-                                    {% if a in "KHR" %}
-                                        <div><a href=""><span class="blue color-coded-text">{{ a }}</span></a></div>
+                                    {% if a.0 in "KHR" %}
+                                        <div><a href="#myTextArea" onclick="showAAtooltip('{{ d.position|add:-10|add:a.1 }}')"><span class="blue color-coded-text">{{ a.0 }}</span></a></div>
                                     {% else %}
-                                        <div><a href=""><span class="color-coded-text">{{ a }}</span></a></div>
+                                        <div><a href="#myTextArea" onclick="showAAtooltip('{{ d.position|add:-10|add:a.1 }}')"><span class="color-coded-text">{{ a.0 }}</span></a></div>
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
@@ -42,20 +43,20 @@
                 </div>
             {% else %}
                 <div class="amino_acid_chunk" style="display: flex; gap: 5px; align-items: left;  margin: 0 7px;">
-                    {% for a in d.chunk %}
-                        {% if a in "GAVLIFWMP" %}
-                            <div><a href=""><span class="yellow color-coded-text">{{ a }}</span></a></div>
+                    {% for a in d.aa_and_index %}
+                        {% if a.0 in "GAVLIFWMP" %}
+                            <div><a href="#myTextArea" onclick="showAAtooltip('{{ d.position|add:-10|add:a.1 }}')"><span class="yellow color-coded-text">{{ a.0 }}</span></a></div>
                         {% else %}
-                            {% if a in "STCYNQ" %}
-                                <div><a href=""><span class="green color-coded-text">{{ a }}</span></a></div>
+                            {% if a.0 in "STCYNQ" %}
+                                <div><a href="#myTextArea" onclick="showAAtooltip('{{ d.position|add:-10|add:a.1 }}')"><span class="green color-coded-text">{{ a.0 }}</span></a></div>
                             {% else %}
-                                {% if a in "DE" %}
-                                    <div><a href=""><span class="red color-coded-text">{{ a }}</span></a></div>
+                                {% if a.0 in "DE" %}
+                                    <div><a href="#myTextArea" onclick="showAAtooltip('{{ d.position|add:-10|add:a.1 }}')"><span class="red color-coded-text">{{ a.0 }}</span></a></div>
                                 {% else %}
-                                    {% if a in "KHR" %}
-                                        <div><a href=""><span class="blue color-coded-text">{{ a }}</span></a></div>
+                                    {% if a.0 in "KHR" %}
+                                        <div><a href="#myTextArea" onclick="showAAtooltip('{{ d.position|add:-10|add:a.1 }}')"><span class="blue color-coded-text">{{ a.0 }}</span></a></div>
                                     {% else %}
-                                        <div><a href=""><span class="color-coded-text">{{ a }}</span></a></div>
+                                        <div><a href="#myTextArea" onclick="showAAtooltip('{{ d.position|add:-10|add:a.1 }}')"><span class="color-coded-text">{{ a.0 }}</span></a></div>
                                     {% endif %}
                                 {% endif %}
                             {% endif %}
@@ -66,3 +67,12 @@
         </div>
     {% endfor %}
 </div>
+
+
+{% block addon_js %}
+    <script>
+        function showAAtooltip(p){
+            console.log("para of AA "+p);
+        }
+    </script>
+{% endblock addon_js %}

@@ -1,6 +1,7 @@
 {% extends "home/base.html" %}
 {% load static %}
 {% load color_range_for_variants %}
+
 {% csrf_token %}
 {% block addon_css %}
     <link rel="stylesheet" href="{% static 'home/css/jquery.dataTables.min.css' %}" type="text/css"/>
@@ -22,6 +23,24 @@
             /* word-wrap: break-word; For older browsers
             overflow-wrap: break-word; For modern browsers */
             white-space: normal;
+        }
+
+        table#genebass-tables {
+            margin-left: unset;
+            margin-right: unset;
+        }
+
+        /* specific style for filter sizes */
+        #yadcf-filter--structures_scrollable-7{
+            max-width: 120px;
+        }
+        #yadcf-filter--structures_scrollable-from-8, #yadcf-filter--structures_scrollable-to-8, 
+        #yadcf-filter--structures_scrollable-from-9, #yadcf-filter--structures_scrollable-to-9{
+            max-width: 90px;
+        }
+
+        .xtick text, .ytick text, .legendtext {
+            font-size: 14px !important;
         }
         
     </style>
@@ -57,9 +76,9 @@
                             <th rowspan="2">Wildtype AA</th>
                             <th rowspan="2">Mutant AA</th>
                             <th style="max-width: 100px;" rowspan="2">Codons</th>
-                            <th rowspan="2" style="max-width: 125px;" class="long-text">Consequence</th>
-                            <th rowspan="2" style="max-width: 100px;">Allele<br>frequency</th>
-                            <th rowspan="2" style="max-width: 100px;" class="width-80px">Mean <br> VEP scores</th>
+                            <th rowspan="2" style="max-width: 120px;" class="long-text">Consequence</th>
+                            <th rowspan="2" style="max-width: 90px;">Allele<br>frequency</th>
+                            <th rowspan="2" style="max-width: 90px;" class="width-80px">Mean <br> VEP scores</th>
                             <th rowspan="2"><a id="show-all-vep-score" href="#">Show VEP Scores</a></th>
                             <th colspan="41">VEP scores from different algorithms <a href="#" id="vep-score-algorithms">Hide VEP scores</a></th>
                         </tr>
@@ -124,25 +143,25 @@
                                 {% endif %}
 
                                 <td style="max-width: 100px;" class="align-left">{{ value.7 }}</td> <!-- Codons  -->
-                                <td style="max-width: 125px;" class="align-left long-text">{{ value.2 }}</td> <!--Consequence   -->
+                                <td style="max-width: 120px;" class="align-left long-text">{{ value.2 }}</td> <!--Consequence   -->
                                 {% with num=value.51|floatformat:"0.2e" %}
                                     {% if not num %}
-                                        <td class="align-left" style="color: #d62828; max-width: 100px;">None</td> <!--  Highest AF -->
+                                        <td class="align-left" style="color: #d62828; max-width: 90px;">None</td> <!--  Highest AF -->
                                     {% else %}
-                                        <td class="align-left" style="max-width: 100px;">{{ value.51|floatformat:"0.2e"}}</td> <!--  Highest AF -->
+                                        <td class="align-left" style="max-width: 90px;">{{ value.51|floatformat:"0.2e"}}</td> <!--  Highest AF -->
                                     {% endif %}
                                 {% endwith %}
                                 <!--  Mean VEP scores -->
                                 {% with num=value|last|add:0 %}
                                         {% if not num %}
                                                 <!-- Handle case where Mean VEP scores is not a number -->
-                                                <td style="max-width: 100px;" class="align-left" >{{ value|last }}</td> 
+                                                <td style="max-width: 90px;" class="align-left" >{{ value|last }}</td> 
                                         {% else %}
                                                 <!-- Handle case where Mean VEP scores is a number -->
-                                                <td class="align-left" style="max-width: 100px; color: #d62828;">None</td> 
+                                                <td class="align-left" style="max-width: 90px; color: #d62828;">None</td> 
                                         {% endif %}
                                 {% endwith %}
-                                <td><a href="#" class="variant_associate_statistics"
+                                <td style="min-width: 300px;"><a href="#" class="variant_associate_statistics"
                                        data-remote-url="{% url 'variant:get-genebass-tables' %}"
                                        data-variant-marker="{{ value.0 }}" data-toggle="modal"
                                        data-target="#genebassModal">Show variant's associate statistics</a></td> <!--41 col span for VEP scores  -->
@@ -218,8 +237,8 @@
                             <div id="filter_3d_variant">
                                 <p>Variant:</p>
                                 <select id="variantVisibilitySelect" name="variant">
-                                    <option value="hide">Hide</option>
-                                    <option value="show">Show</option>
+                                    <option value="hide">Hide all</option>
+                                    <option value="show">Show all</option>
                                 </select>
                             </div>
                             
@@ -365,8 +384,6 @@
                     type: "GET",
                     
                     success: function (response) {
-                        // console.log("response = "+JSON.stringify(response));
-                        // variant_maker_data_draw_plot.push([response, variant_marker]);
                         draw_multiple_variant_plot(response.variant_maker_list_data);
                     },
                     error: function (response) {
@@ -392,7 +409,7 @@
             //Codon
             column_filters = column_filters.concat(createYADCFfilters(6, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
             //Consequence
-            column_filters = column_filters.concat(createYADCFfilters(7, 1, "select", null, "Select", false, null, null));
+            column_filters = column_filters.concat(createYADCFfilters(7, 1, "select", null, "Select", false, null, null, "100px"));
             //AF
             column_filters = column_filters.concat(createYADCFfilters(8, 1, "range_number", null, ["Min", "Max"], false, null, null));
             //Mean VEP Score columns
@@ -412,7 +429,6 @@
             // [2, ["YES"]
             // ]], true);
             var urlParams = new URLSearchParams(window.location.search);
-            console.log("URL: "+ urlParams);
             if (urlParams.has('variant_marker')) {
                 var variant_marker = urlParams.get('variant_marker');
                 yadcf.exFilterColumn(oTable1, [
@@ -442,8 +458,6 @@
             }
             
             oTable1.column(10).visible(false); // Hide the column `Show all VEP Scores` initially
-            // let table = $('#structures_scrollable').DataTable();
-            // console.log("Change Canonical: "+ yadcf.exGetColumnFilterVal(oTable1, 2));
             $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').parentsUntil('th').css('width', '80x');
             $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').parentsUntil('td').css('width', '80x');
             $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '15');
@@ -520,8 +534,6 @@
                                 type: "GET",
                                 
                                 success: function (response) {
-                                    // console.log("response = "+JSON.stringify(response));
-                                    // variant_maker_data_draw_plot.push([response, variant_marker]);
                                     draw_multiple_variant_plot(response.variant_maker_list_data);
                                 },
                                 error: function (response) {
@@ -561,8 +573,6 @@
             var content = "";
             element.childNodes.forEach(function(value){
                 if(value.nodeType === Node.TEXT_NODE) { 
-                    // console.log("Current textNode value is : ", value.nodeValue.trim());
-                    // sChildTextSum += value.nodeValue;
                     content += ` ${value.nodeValue.trim()}`;
                 }
             });
@@ -676,6 +686,9 @@
                 line: { color: 'rgba(0,0,0,0.6)' },
                 fillcolor: color,
                 meanline: { visible: true },
+                font: {
+                        size: 18,
+                    },
                 boxpoints: 'all'
                 };
             });
@@ -685,7 +698,7 @@
                 title: {
                     text: 'Variant',
                     font: {
-                        size: 16,
+                        size: 18,
                     },
                     color: 'rgb(25, 130, 196)',
                 },
@@ -698,7 +711,7 @@
                 title: {
                     text: 'VEP score',
                     font: {
-                        size: 16,
+                        size: 18,
                     },
                     color: 'rgb(25, 130, 196)',
                 },
@@ -765,9 +778,6 @@
             column_filters = column_filters.concat(createYADCFfilters(10, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "40px"));
             column_filters = column_filters.concat(createYADCFfilters(11, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "40px"));
 
-
-
-
             yadcf.init(
                 genebass_variant_table,
                 column_filters, 
@@ -776,6 +786,12 @@
                     cumulative_filtering: false
                 },
             );
+
+            // Force a redraw after initialization to fix header alignment
+            setTimeout(function() {
+                genebass_variant_table.columns.adjust().draw(false);
+            }, 100);
+            
             $('#yadcf-filter--genebass-tables-0').css('width', '300px');
             $('#yadcf-filter--genebass-tables-4').css('width', '300px');
             
@@ -810,20 +826,19 @@
 
                 var structureDisplay = document.getElementById('structure_display');
                 var protein_name = "{{ protein_name }}";
-                console.log("protein_name : "+protein_name);
-                // let positionsToColor = [...new Set(list_vep_variants_pos)];
-                // console.log("positionsToColor: "+positionsToColor);
-                console.log("positionsToColor type : "+ typeof positionsToColor);
-        
+                
+                var variant_info_for_3D_view = JSON.parse('{{ variant_info_for_3D_view|safe }}');
+                var resi = []
+                for (var v of variant_info_for_3D_view){
+                    resi.push(v.protein_position);
+                }
+                console.log("resi "+resi);
                 viewer_bkup = viewer;
-                console.log("viewer : "+viewer);
         
                 // Count the number of chains
                 const chains = new Set();
                 const model = viewer.getModel()
-                console.log("model : "+model);
                 const atoms = model.selectedAtoms({});
-                console.log("atoms : "+atoms);
                 for (let i = 0; i < atoms.length; i++) {
                     const atom = atoms[i];
                     chains.add(atom.chain);
@@ -877,7 +892,7 @@
                         viewer.setStyle({}, {cartoon: {color: "spectrum"}});
                     } else {
                         viewer.setStyle({}, {cartoon: {color: 'grey', thickness: 0.5}});
-                        viewer.addStyle({resi: [5, 10, 15, 20, 25, 30, 35, 40]}, {stick: {colorscheme: 'greenCarbon'}});
+                        viewer.addStyle({resi: resi}, {stick: {colorscheme: 'greenCarbon'}});
                         var colorSelect = document.getElementById("colorSelect");
                         colorSelect.value = "grey";
                     }
