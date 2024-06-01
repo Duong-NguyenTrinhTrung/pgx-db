@@ -300,7 +300,7 @@ class GeneDetailBaseView(object):
         context = {}
         if slug is not None:
             if cache.get("variant_data_" + slug) is not None:
-                table_with_protein_pos_int = cache.get("variant_data_" + slug)
+                context = cache.get("variant_data_" + slug)
             else:
                 browser_columns = self.browser_columns
                 table = pd.DataFrame(columns=browser_columns)
@@ -360,7 +360,7 @@ class GeneDetailBaseView(object):
                         table_with_protein_pos_int.append(data_row)
                     except Exception as e:
                         pass
-                cache.set("variant_data_" + slug, table_with_protein_pos_int, 60 * 60)
+                
 
                 variant_info_for_3D_view = sorted(variant_info_for_3D, key=lambda x: int(x['protein_position']))
                 context['array'] = table_with_protein_pos_int
@@ -399,6 +399,7 @@ class GeneDetailBaseView(object):
                     if len(coseq) >= 1:
                         consequences += coseq
                 context['consequences'] = list(set(consequences))
+                cache.set("variant_data_" + slug, context, 60 * 60)
         return context
 
 
