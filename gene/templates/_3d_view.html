@@ -13,7 +13,7 @@
 <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
 
 
-<div id="structure_display" style="width: 100%; height: 600px;"></div>
+<div id="structure_display" style="width: 100%; height: 550px;"></div>
 
 <script>
     // Create the viewer
@@ -33,7 +33,7 @@
             viewer.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
             viewer.zoomTo();                                      /* set camera */
             viewer.render();                                      /* render scene */
-            viewer.zoom(1, 1200);                               /* slight zoom */
+            // viewer.zoom(1.2, 1000);                               /* slight zoom */
         },
         error: function(hdr, status, err) {
             console.error( "Failed to load PDB " + pdbUrl + ": " + err );

@@ -48,8 +48,7 @@
                                         <ul>
                                             {% for g5 in g4.atcchemicalsubstance_set.all %}
                                                 <li>
-                                                    {{ g5.id }} -<a href="#"
-                                                                    class="desc"> {{ g5.name }} </a>
+                                                    {{ g5.id }} -<p class="desc"> {{ g5.name }} </p>
                                                                 <button data-atc-code={{g5.id}} data-remote-url="{% url 'get-drug-atc-association' %}" title="Click to show network" class="network-button"></button>
 
                                                 </li>

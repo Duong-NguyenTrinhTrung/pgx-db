@@ -32,6 +32,7 @@
 </script>
 
 <script>
+
     $(document).ready(function () {
         $('#about-modal').modal('show');
 
@@ -39,11 +40,18 @@
 
     document.addEventListener("DOMContentLoaded", function () {
         var closeBtn = document.getElementById("closeToHome");
+        var urlOpen = "/";
         
         closeBtn.addEventListener("click", function () {
-            var urlOpen = "/";
             window.location.href = urlOpen;
         });
+
+        $(document).click(function(e) {
+            if (!$(e.target).closest('#modal-content').length) {
+                window.location.href = urlOpen;
+            }
+        });
     });
+
 </script>
 {% endblock %}
