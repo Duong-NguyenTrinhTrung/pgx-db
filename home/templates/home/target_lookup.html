@@ -200,7 +200,7 @@
                     <td style="max-width: 200px;">{{ item.protein_name }}</td>
                     <td>{{ item.geneID }}</td>
                     <td>{{ item.genename }}</td>
-                    <td><a href="{% url 'gene:gene' slug=item.geneID %}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
+                    <td><a href="{% url 'gene:get-gene-detail-data' item.geneID %}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
                     <td style="max-width: 200px;">
                     {% for drug in item.drug_data %}
                         {% if drug.atc_code %}
@@ -321,7 +321,7 @@
                                 <td>${item.protein_name}</td>
                                 <td>${item.geneID}</td>
                                 <td>${item.genename}</td>
-                                <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
+                                <td><a href="/gene/gene_detail/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
                                 <td style="max-width: 200px;">${drug_list.join('')}</td>
                             </tr>`;
                         });
@@ -357,7 +357,7 @@
                                 <td>${item.protein_name}</td>
                                 <td>${item.geneID}</td>
                                 <td>${item.genename}</td>
-                                <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
+                                <td><a href="/gene/gene_detail/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
                                 <td style="max-width: 200px;">${drug_list.join('')}</td>
                             </tr>`;
                         });
@@ -392,7 +392,7 @@
                                 <td style="max-width: 200px;">${item.protein_name}</td>
                                 <td>${item.geneID}</td>
                                 <td>${item.genename}</td>
-                                <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
+                                <td><a href="/gene/gene_detail/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
                                 <td style="max-width: 200px;">${drug_list.join('')}</td>
                             </tr>`;
                         });
