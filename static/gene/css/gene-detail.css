@@ -199,8 +199,10 @@ table.th.td {
     margin-left: 0;
 }
 
-td.align-left {
-    text-align: left;
+td.vep-cell {
+    text-align: center;
+    border-radius: 10px;
+    
 }
 
 /* Loading icon */
