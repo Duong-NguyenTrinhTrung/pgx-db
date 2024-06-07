@@ -33,11 +33,12 @@ import urllib.request as urlreq
 import urllib.request as urlreq
 from django.shortcuts import render
 from django.core.exceptions import ObjectDoesNotExist
-
-
+from django.db.models import (
+    Count,
+    Q,
+)
 
 warnings.filterwarnings('ignore')
-
 
 # this is for API call
 class GeneDetailBaseView(object):
@@ -613,15 +614,12 @@ def get_variant_annotation_and_vep(request, slug): #lower for one gene
                 marker_ID_data = Variant.objects.filter(Gene_ID=geneid).values_list(
                     "VariantMarker")
             objs = Gene.objects.filter(gene_id=geneid).values_list("primary_transcript", flat=True)
-            # print("-------- objs  " ,objs)
-            # print("len marker_ID_data " ,len(marker_ID_data))
             if objs:
                 pt = objs[0] #take the primary_transcript
-                # print(" -------- we go with the transcript")
                 for marker in marker_ID_data:
                     # Retrieve all VEP variants for each variant marker
                     vep_variants = VepVariant.objects.filter(
-                        Variant_marker=marker, Transcript_ID=pt).exclude(Protein_position__icontains='-').values_list(
+                        Q(Variant_marker=marker)&Q(Transcript_ID=pt)).exclude(Protein_position__icontains='-').values_list(
                         *list_necessary_columns)
                     for vep_variant in vep_variants:
                         data_subset = parse_marker_data(marker, vep_variant)
@@ -672,6 +670,18 @@ def get_variant_annotation_and_vep(request, slug): #lower for one gene
             print("len of table_with_protein_pos_int element ", len(table_with_protein_pos_int[0]))
     return JsonResponse(context, safe=False)
 
+# Function to remove duplicates in a list of dictionary
+def remove_duplicates(dict_list):
+    seen = set()
+    unique_list = []
+    for d in dict_list:
+        # Convert dictionary to a tuple of its items
+        t = tuple(d.items())
+        if t not in seen:
+            seen.add(t)
+            unique_list.append(d)
+    return unique_list
+
 def get_gene_detail_data(request, slug): #upper
     context = {}
     if slug is not None:
@@ -690,32 +700,37 @@ def get_gene_detail_data(request, slug): #upper
                 geneid = Gene.objects.filter(genename=slug).values_list("gene_id")[0][0]
                 marker_ID_data = list(set(Variant.objects.filter(Gene_ID=geneid).values_list(
                     "VariantMarker", flat=True)))
-            for marker in marker_ID_data:
-                vep_variants = VepVariant.objects.filter(
-                    Variant_marker=marker).exclude(Protein_position__icontains='-').values_list("Transcript_ID", "Consequence", "Protein_position", "Amino_acids", "Codons", "HighestAF"
-                    )
-                try:
-                    for vep_variant in vep_variants:
-                        coseq = vep_variant[1].split(",")
-                        consequences=[]
-                        if len(coseq) >= 1:
-                            for c in coseq:
-                                consequences.append(name_dic.get(c).title())
-                        temp = {
-                                "variant_marker": marker,
-                                "Transcript_ID": vep_variant[0],
-                                "geneID": geneid,
-                                "consequence": ", ".join(list(set(consequences))),
-                                "protein_position": vep_variant[2],
-                                "wtaa": vep_variant[3].split("/")[0], #wildtype AA
-                                "mtaa": vep_variant[3].split("/")[1], #mutant AA
-                                "codon": vep_variant[4],
-                                "HighestAF": str(vep_variant[5]),
-                                }
-                        variant_info_for_3D.append(temp)
-                        protein_with_variant_index_list.append(vep_variant[2])
-                except Exception as e:
-                    pass
+            objs = Gene.objects.filter(gene_id=geneid).values_list("primary_transcript", flat=True)
+            if objs:
+                pt = objs[0] #take the primary_transcript
+                for marker in marker_ID_data:
+                    vep_variants = VepVariant.objects.filter(
+                        Q(Variant_marker=marker)&Q(Transcript_ID=pt)).exclude(Protein_position__icontains='-').values_list("Transcript_ID", "Consequence", "Protein_position", "Amino_acids", "Codons", "HighestAF"
+                        )
+                    try:
+                        for vep_variant in vep_variants:
+                            coseq = vep_variant[1].split(",")
+                            consequences=[]
+                            if len(coseq) >= 1:
+                                for c in coseq:
+                                    consequences.append(name_dic.get(c).title())
+                            temp = {
+                                    "geneID": geneid,
+                                    "variant_marker": marker,
+                                    "consequence": ", ".join(list(set(consequences))),
+                                    "protein_position": vep_variant[2],
+                                    "wtaa": vep_variant[3].split("/")[0], #wildtype AA
+                                    "mtaa": vep_variant[3].split("/")[1], #mutant AA
+                                    "codon": vep_variant[4],
+                                    "HighestAF": str(vep_variant[5]),
+                                    }
+                            variant_info_for_3D.append(temp)
+                            protein_with_variant_index_list.append(vep_variant[2])
+                    except Exception as e:
+                        pass
+            print("before ", len(variant_info_for_3D))
+            variant_info_for_3D = remove_duplicates(variant_info_for_3D)
+            print("after ", len(variant_info_for_3D))
             variant_info_for_3D_view = sorted(variant_info_for_3D, key=lambda x: int(x['protein_position']))
             context['variant_info_for_3D_view'] = json.dumps(variant_info_for_3D_view)
             context['protein_with_variant_index_list'] = protein_with_variant_index_list
