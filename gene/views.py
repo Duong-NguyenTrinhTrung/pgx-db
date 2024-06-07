@@ -38,6 +38,8 @@ from django.core.exceptions import ObjectDoesNotExist
 
 warnings.filterwarnings('ignore')
 
+
+# this is for API call
 class GeneDetailBaseView(object):
     browser_columns = [
         "Variant_marker",  # MarkerID
@@ -158,13 +160,13 @@ class GeneDetailBaseView(object):
 
     def parse_marker_data(self, marker, vep_variant):
 
-        def is_primary_ts(ts):
-            # Check if any row in the Gene model has the specified 'ts' in the 'primary_transcript' field
-            exists = Gene.objects.filter(primary_transcript=ts).exists()
-            if exists:
-                return "YES"
-            else:
-                return "NO"
+        # def is_primary_ts(ts):
+        #     # Check if any row in the Gene model has the specified 'ts' in the 'primary_transcript' field
+        #     exists = Gene.objects.filter(primary_transcript=ts).exists()
+        #     if exists:
+        #         return "YES"
+        #     else:
+        #         return "NO"
 
         data_subset = {}
         data_subset["Variant_marker"] = marker[0]
@@ -224,7 +226,7 @@ class GeneDetailBaseView(object):
         data_subset["PhyloP30way_mammalian_rankscore"] = vep_variant[48]
         data_subset["AM_pathogenicity"] = vep_variant[49]
         data_subset["HighestAF"] = vep_variant[50]
-        data_subset["primary"] = is_primary_ts(vep_variant[0])
+        data_subset["primary"] = "YES"
 
         return data_subset
 
@@ -255,8 +257,7 @@ class GeneDetailBaseView(object):
                         *self.list_necessary_columns)
                     for vep_variant in vep_variants:
                         data_subset = self.parse_marker_data(marker, vep_variant)
-                        if data_subset["primary"]=="YES":
-                            table = table.append(data_subset, ignore_index=True)
+                        table = table.append(data_subset, ignore_index=True)
 
                 table.fillna('', inplace=True)
 
@@ -622,21 +623,19 @@ def get_variant_annotation_and_vep(request, slug): #lower for one gene
                     vep_variants = VepVariant.objects.filter(
                         Variant_marker=marker, Transcript_ID=pt).exclude(Protein_position__icontains='-').values_list(
                         *list_necessary_columns)
-                    print("marker ", marker, " len vep_variants", len(vep_variants))
                     for vep_variant in vep_variants:
                         data_subset = parse_marker_data(marker, vep_variant)
                         table = table.append(data_subset, ignore_index=True)
-            else:
-                # print(" ---------- there is no primary transcript")
-                for marker in marker_ID_data:
-                    # Retrieve all VEP variants for each variant marker
-                    vep_variants = VepVariant.objects.filter(
-                        Variant_marker=marker).exclude(Protein_position__icontains='-').values_list(
-                        *list_necessary_columns)
-                    print("marker ", marker, " len vep_variants", len(vep_variants))
-                    for vep_variant in vep_variants:
-                        data_subset = parse_marker_data(marker, vep_variant)
-                        table = table.append(data_subset, ignore_index=True)
+            # else:
+            #     # print(" ---------- there is no primary transcript")
+            #     for marker in marker_ID_data:
+            #         # Retrieve all VEP variants for each variant marker
+            #         vep_variants = VepVariant.objects.filter(
+            #             Variant_marker=marker).exclude(Protein_position__icontains='-').values_list(
+            #             *list_necessary_columns)
+            #         for vep_variant in vep_variants:
+            #             data_subset = parse_marker_data(marker, vep_variant)
+            #             table = table.append(data_subset, ignore_index=True)
 
             table.fillna('', inplace=True)
             # print("table type ", type(table))

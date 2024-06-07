@@ -258,7 +258,7 @@
                     <td>{{variant.geneID}}</td>
                     <td>{{variant.genename}}</td>
                     <td>{{variant.pt}}</td>
-                    <td><a href="/gene/{{variant.geneID}}?variant_marker={{variant.VariantMarker}}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
+                    <td><a href="/gene/gene_detail/{{variant.geneID}}?variant_marker={{variant.VariantMarker}}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -342,7 +342,7 @@
                             <td>${item.geneID}</td>
                             <td>${item.genename}</td>
                             <td>${item.pt}</td>
-                            <td><a href="/gene/${item.geneID}?variant_marker=${item.VariantMarker}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
+                            <td><a href="/gene/gene_detail/${item.geneID}?variant_marker=${item.VariantMarker}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
                         </tr>`;
                     });
                     $("#variant-result-tbody").html(html_data);
@@ -371,7 +371,7 @@
                             <td>${item.geneID}</td>
                             <td>${item.genename}</td>
                             <td>${item.pt}</td>
-                            <td><a href="/gene/${item.geneID}?variant_marker=${item.VariantMarker}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
+                            <td><a href="/gene/gene_detail/${item.geneID}?variant_marker=${item.VariantMarker}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
                         </tr>`;
                     });
                     $("#variant-result-tbody").html(html_data);
@@ -398,7 +398,7 @@
                             <td>${item.geneID}</td>
                             <td>${item.genename}</td>
                             <td>${item.pt}</td>
-                            <td><a href="/gene/${item.geneID}?variant_marker=${item.VariantMarker}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
+                            <td><a href="/gene/gene_detail/${item.geneID}?variant_marker=${item.VariantMarker}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
                         </tr>`;
                     });
                     $("#variant-result-tbody").html(html_data);

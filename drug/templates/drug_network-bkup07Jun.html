@@ -87,23 +87,23 @@
         </div>
 
         <div id="screenshot">
-            <div class="d-flex justify-content-center btmbar" id="threshold-slider-container">
-                <button type="button" class="btn btn-light d-flex btmbar zoom-in-btn"><i
-                        class="fas fa-search-plus zoom-in-icon"></i>&nbsp;Zoom In
+            <div class="d-flex justify-content-end btmbar" id="threshold-slider-container">
+                <button type="button" class="btn btn-light d-flex btmbar zoom-in-btn pgx_btn">
+                    <img class="zoom-in-icon" src="/static/d3/images/zoom-in-svgrepo-com.png" alt="Plus Icon"> Zoom In
                 </button>
-                <button type="button" class="btn btn-light d-flex btmbar col-xs-2 margin-left zoom-out-btn"><i
-                        class="fas fa-search-minus zoom-out-icon"></i>&nbsp;Zoom Out
+                <button type="button" class="btn btn-light d-flex btmbar col-xs-2 margin-left zoom-out-btn pgx_btn">
+                    <img class="zoom-out-icon" src="/static/d3/images/zoom-out-svgrepo-com.png" alt="Plus Icon"> Zoom Out
                 </button>
                 <!-- here i remove the d-flex  bootstrap class so that it can remove the slider  -->
                <!-- if you want to display the slider you should add that class also thanks -->
                 <label class=" btmbar" for="threshold-slider" style="display: none;">&nbsp;Threshold Value:</label>
                 <input class="btmbar" type="range" id="threshold-slider" min="1" max="" value="" step="1" style="display: none;">
                 <span class="btmbar" id="threshold-value" style="display: none;"></span>
-                <button type="button" id="exportButton" class="btn btn-light d-flex btmbar">Export</button>
-                <button type="button" id="redrawChart" class="btn btn-light d-flex btmbar">Redraw</button>
-                <button type="button" id="GetmoreData" class="btn btn-light d-flex btmbar">
+                <button type="button" id="exportButton" class="btn btn-light d-flex btmbar pgx_btn">Export</button>
+                <button type="button" id="redrawChart" class="btn btn-light d-flex btmbar pgx_btn">Redraw</button>
+                <button type="button" id="GetmoreData" class="btn btn-light d-flex btmbar pgx_get_more_btn">
                     Get more data
-                </button>
+           </button>
             </div>
             <div id="chart"></div>
             <div id="legendsMainDiv" class="center-vertical-container">

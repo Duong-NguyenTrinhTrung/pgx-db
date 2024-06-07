@@ -562,20 +562,23 @@
         const storedData = localStorage.getItem('jsonData');
         
         if (storedData) {
-            const data = JSON.parse(storedData);
-            console.log( data,'Data retrieved from localStorage:' );
-            if (data > 700){ 
+            let  data = JSON.parse(storedData);
+            
+            console.log("before" ,data )
+            console.log(  data,'Data retrieved from localStorage:' );
+            if (data > 300){ 
                 data = 1180
-                console.log("check" ,data )
-            }
+                console.log("after" ,data )
+            } 
+
             var iframe = document.getElementById('myIframe');
             iframe.style.height = data+'px'
 
             // Process your data heres
         } else {
             console.error('No data found in localStorage');
-        }
-    });
+        }
+    });
     // Function to show visualization
     function toggleDivVisibility(element, url) {
         var drugBankId = element.getAttribute('data-drugbank_id');
