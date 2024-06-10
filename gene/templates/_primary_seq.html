@@ -73,5 +73,175 @@
         </div>
     </div>
 </div>
+<script>
+    function showAAtooltip(event, p) {
+                var variant_info_for_3D_view = JSON.parse('{{ variant_info_for_3D_view|safe }}');
+                viewer.setStyle({}, { cartoon: { color: '#ced4da' } });
+                var colorSelect = document.getElementById("colorSelect");
+                colorSelect.value = "grey";
+                event.preventDefault();
+                // Remove highlight from any previously highlighted element
+                const previouslyHighlighted = document.querySelector('.highlighted');
+                if (previouslyHighlighted) {
+                    previouslyHighlighted.classList.remove('highlighted');
+                }
+                const spanElement = event.target;
+                spanElement.classList.add('highlighted');
+
+                const residueDiv = event.target.closest('.residue');
+                const tooltip = document.createElement('div');
+                tooltip.className = 'residue_tooltip';
+                tooltip.style.position = 'absolute';
+                tooltip.style.left = `calc(${event.clientX}px + 25px)`;
+                tooltip.style.top = `calc(${event.clientY}px + 25px)`;
+                var tooltip_text = "";
+                if (residueDiv) {
+                    for (var v of variant_info_for_3D_view) {
+                        if (v.protein_position == p) {
+                            tooltip_text += `Protein position: <span class="AA_residue_span">${v.protein_position}</span>,<br> Widetype amino acid: <span class="AA_residue_span">${v.wtaa}</span>,<br> Mutant amino acid: <span class="AA_residue_span">${v.mtaa}</span>,<br> Codon: <span class="AA_residue_span">${v.codon}</span>,<br> Variant_marker: <a href="#" onclick="showTableWithFilteredOnSelectedVariant('${v.variant_marker}'); return false;"><span>${v.variant_marker}</span></a><span style="color: grey; font-style: italic;"> (<-- Click for details)</span>,<br> Consequence: <span class="AA_residue_span">${v.consequence}</span><br> Frequency: <span class="AA_residue_span">${v.HighestAF}</span><br><br>`;
+                        }
+                    }
+                }
+
+                if (tooltip_text == "") {
+                    tooltip_text = `<span style="color: red;"> No variant occurs at position ${p}</span>`;
+                    viewer.render();
+                } else {
+                    viewer.addStyle({ resi: [p] }, { stick: { colorscheme: 'greenCarbon', radius: 1.4, opacity: 1.0 } });
+                    viewer.render();
+                }
+                tooltip.innerHTML = tooltip_text;
+                document.body.appendChild(tooltip);
+                // Function to remove the tooltip
+                function removeTooltip(event) {
+                    if (!tooltip.contains(event.target)) {
+                        tooltip.remove();
+                        document.removeEventListener('click', removeTooltip);
+                    }
+                }
+                // Add event listener to remove the tooltip when clicking outside
+                setTimeout(() => {
+                    document.addEventListener('click', removeTooltip);
+                }, 0); // Delay to avoid immediate removal when clicking the tooltip itself
+            }
+    function showTableWithFilteredOnSelectedVariant(variant_marker) {
+        console.log("in primary_sed:" + variant_marker);
+        console.log("in primary seq: " + globalOTable);
+        yadcf.exFilterColumn(globalOTable, [
+                            [0, [variant_marker]
+                            ]], true);
+                            var variant_maker_list = [];
+                    $("#structures_scrollable_body").find('tr').each(function () {
+                        variant_maker_list.push($(this).find('.variant').text());
+                    });
+                    variant_maker_list = [...new Set(variant_maker_list)];
+                    $.ajax(
+                        {
+                            url: "/plot-variants/?variant_maker_list=" + variant_maker_list.toString(),
+                            type: "GET",
+
+                            success: function (response) {
+                                draw_multiple_variant_plot(response.variant_maker_list_data);
+                            },
+                            error: function (response) {
+                                console.log(response)
+                            },
+                        }
+                    );
+                    // update plot when user change input of rows per display
+                    $('select[name="structures_scrollable_length"]').on('change', function () {
+                        setTimeout(function () {
+                            let variant_maker_list = [];
+                            $("#structures_scrollable_body").find('tr').each(function () {
+                                variant_maker_list.push($(this).find('.variant').text());
+                            });
+                            variant_maker_list = [...new Set(variant_maker_list)];
+                            $.ajax(
+                                {
+                                    url: "/plot-variants/?variant_maker_list=" + variant_maker_list.toString(),
+                                    type: "GET",
+
+                                    success: function (response) {
+                                        draw_multiple_variant_plot(response.variant_maker_list_data);
+                                    },
+                                    error: function (response) {
+                                        console.log(response)
+                                    },
+                                }
+                            );
+                        }, 500);
+                    });
+                    // update plot when user input data on input filter
+                    $('.yadcf-filter-wrapper').find('input').each(function () {
+                        $(this).on('change', function () {
+                            setTimeout(function () {
+                                let variant_maker_list = [];
+                                $("#structures_scrollable_body").find('tr').each(function () {
+                                    variant_maker_list.push($(this).find('.variant').text());
+                                });
+                                variant_maker_list = [...new Set(variant_maker_list)];
+                                $.ajax(
+                                    {
+                                        url: "/plot-variants/?variant_maker_list=" + variant_maker_list.toString(),
+                                        type: "GET",
+
+                                        success: function (response) {
+                                            draw_multiple_variant_plot(response.variant_maker_list_data);
+                                        },
+                                        error: function (response) {
+                                            console.log(response)
+                                        },
+                                    }
+                                );
+                            }, 500);
+                        });
+                    });
+                    // update plot when user select data on select filter
+                    $('.yadcf-filter-wrapper').find('select').each(function () {
+                        $(this).on('change', function () {
+                            setTimeout(function () {
+                                let variant_maker_list = [];
+                                $("#structures_scrollable_body").find('tr').each(function () {
+                                    variant_maker_list.push($(this).find('.variant').text());
+                                });
+                                variant_maker_list = [...new Set(variant_maker_list)];
+                                $.ajax(
+                                    {
+                                        url: "/plot-variants/?variant_maker_list=" + variant_maker_list.toString(),
+                                        type: "GET",
+
+                                        success: function (response) {
+                                            draw_multiple_variant_plot(response.variant_maker_list_data);
+                                        },
+                                        error: function (response) {
+                                            console.log(response)
+                                        },
+                                    }
+                                );
+                            }, 500);
+
+                        });
+                    });
+                    // handle event when "Show variant's associate statistics" link is clicked
+                    $('#structures_scrollable_body').on('click', '.variant_associate_statistics', function (e) {
+                    e.preventDefault();
+                    let variant_marker = $(this).data('variant-marker');
+                    let url = $(this).data('remote-url');
+                    $.ajax(
+                        {
+                            url: url,
+                            type: "GET",
+                            data: {
+                                'variant_marker': variant_marker,
+                            },
+                            success: function (response) {
+                                $("#genebass-variant-list").html(response)
+                                redraw_genebass_modal()
+                            }
+                        }
+                    )
+                }); // End handle event when "Show variant's associate statistics" link is clicked
+    }
+</script>
 
 
