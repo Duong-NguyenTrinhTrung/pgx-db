@@ -72,6 +72,25 @@
     .highlighted {
         border: 3px solid black;
     }
+    .spinner {
+        border: 16px solid #c0bdbd;
+        border-top: 16px solid #3498db;
+        border-radius: 50%;
+        width: 120px;
+        height: 120px;
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
 </style>
 {% endblock addon_css %}
 
@@ -146,6 +165,7 @@
 
         <!-- Variant annotation and VEP scores table  -->
         <div class="gene-table-container" style="margin-top: 40px;">
+            <div class="spinner" style="display: none; margin: auto;"></div>
             {% include '_buttons.html' %}
             <div id="structures_scrollable_table">
                 <table class="display compact text-nowrap" id="structures_scrollable">
@@ -261,8 +281,43 @@
 <script src="https://code.jquery.com/jquery-migrate-1.4.1.min.js"></script>
 <script>
 
+    
     $(document).ready(function () {
+        // function to apply filter on VEP table 
+        function applyFiltersOnVEPTable(oTable){
+            let column_filters = [];
+            // Syntax: createYADCFfilters(start_column, num_cols, filter_type, select_type = null, filter_default_label = "", filter_reset_button_text = false, filter_match_mode = null, column_data_type = null, width = null)
+            // Variant
+            column_filters = column_filters.concat(createYADCFfilters(0, 1, "multi_select", "select2", "Select", false, null, null, "100px"));
+            //Transcript
+            column_filters = column_filters.concat(createYADCFfilters(1, 1, "multi_select", "select2", "Select", false, null, null, "110px"));
+            //Canonical
+            column_filters = column_filters.concat(createYADCFfilters(2, 1, "select", null, "Select", "YES", null, null, "80px"));
+            //Sequence position
+            column_filters = column_filters.concat(createYADCFfilters(3, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
+            //Wildtype position
+            column_filters = column_filters.concat(createYADCFfilters(4, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
+            //Mutant position
+            column_filters = column_filters.concat(createYADCFfilters(5, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
+            //Codon
+            column_filters = column_filters.concat(createYADCFfilters(6, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
+            //Consequence
+            column_filters = column_filters.concat(createYADCFfilters(7, 1, "select", null, "Select", false, null, null, "100px"));
+            //AF
+            column_filters = column_filters.concat(createYADCFfilters(8, 1, "range_number", null, ["Min", "Max"], false, null, null));
+            //Mean VEP Score columns
+            column_filters = column_filters.concat(createYADCFfilters(9, 1, "range_number", null, ["Min", "Max"], false, null, null))
 
+            // update filters
+            yadcf.init(
+                oTable, column_filters, {
+                cumulative_filtering: false,
+                rowCallBack: function (row, data) {
+                    console.log("row");
+                }
+            }
+            ); 
+        }
         //render values in color ranges
         function renderVariantValuesInColorRanges(value) {
             const COLORS = [
@@ -300,21 +355,23 @@
             }
             return $('<td>').addClass('vep-cell').css('background-color', color).text(value);
         }
-
         // fetch VEP data to table 
         function fetchVEPDataToTable() {
+            $(".spinner").show();
+            $("#structures_scrollable_table").hide();
             $.ajax({
                 url: "{% url 'gene:get-variant-annotation-and-vep' geneID %}",
                 method: 'GET',
                 success: function (response) {
                     populateTable(response.array);
+                    $(".spinner").hide();
+                    $("#structures_scrollable_table").show();
                 },
                 error: function (xhr, status, error) {
                     console.error('Error fetching data:', error);
                 }
             });
         }
-
         // Function to populate the table with data
         function populateTable(dataArray) {
 
@@ -390,6 +447,7 @@
             let structures_scrollable = $("#structures_scrollable")
             structures_scrollable.show();
             let oTable1 = structures_scrollable.DataTable({
+                destroy: true,
                 deferRender: true,
                 scrollY: true,
                 scrollX: true,
@@ -429,38 +487,8 @@
                         });
                 }
             })
-            let column_filters = [];
-            // Syntax: createYADCFfilters(start_column, num_cols, filter_type, select_type = null, filter_default_label = "", filter_reset_button_text = false, filter_match_mode = null, column_data_type = null, width = null)
-            // Variant
-            column_filters = column_filters.concat(createYADCFfilters(0, 1, "multi_select", "select2", "Select", false, null, null, "100px"));
-            //Transcript
-            column_filters = column_filters.concat(createYADCFfilters(1, 1, "multi_select", "select2", "Select", false, null, null, "110px"));
-            //Canonical
-            column_filters = column_filters.concat(createYADCFfilters(2, 1, "select", null, "Select", "YES", null, null, "80px"));
-            //Sequence position
-            column_filters = column_filters.concat(createYADCFfilters(3, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
-            //Wildtype position
-            column_filters = column_filters.concat(createYADCFfilters(4, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
-            //Mutant position
-            column_filters = column_filters.concat(createYADCFfilters(5, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
-            //Codon
-            column_filters = column_filters.concat(createYADCFfilters(6, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
-            //Consequence
-            column_filters = column_filters.concat(createYADCFfilters(7, 1, "select", null, "Select", false, null, null, "100px"));
-            //AF
-            column_filters = column_filters.concat(createYADCFfilters(8, 1, "range_number", null, ["Min", "Max"], false, null, null));
-            //Mean VEP Score columns
-            column_filters = column_filters.concat(createYADCFfilters(9, 1, "range_number", null, ["Min", "Max"], false, null, null))
-
-            // update filters
-            yadcf.init(
-                oTable1, column_filters, {
-                cumulative_filtering: false,
-                rowCallBack: function (row, data) {
-                    console.log("row");
-                }
-            }
-            ); // end apply datatable features on table of variants and VEP scores initially
+            applyFiltersOnVEPTable(oTable1);
+            // end apply datatable features on table of variants and VEP scores initially
 
             // new url for filtering one variant
             var urlParams = new URLSearchParams(window.location.search);
@@ -617,7 +645,6 @@
             });
         });
         } // end of pupolate table
-
         // handle event when "Show variant's associate statistics" link is clicked
         $('#structures_scrollable_body').on('click', '.variant_associate_statistics', function (e) {
             e.preventDefault();
@@ -638,11 +665,171 @@
                 }
             )
         }); // End handle event when "Show variant's associate statistics" link is clicked
-
-
         fetchVEPDataToTable();
+        // Function to show table with a variant filter when a variant on tooltip is clicked
+        function showTableWithFilteredOnSelectedVariant(variant_marker) {
+            console.log("showTableWithFilteredOnSelectedVariant: " + variant_marker);
+            let structures_scrollable = $("#structures_scrollable")
+            structures_scrollable.show();
+            let oTable2 = structures_scrollable.DataTable({
+                deferRender: true,
+                scrollY: true,
+                scrollX: true,
+                scrollCollapse: true,
+                scroller: true,
+                paging: true,
+                bSortCellsTop: false, //prevent sort arrows going on bottom row
+                aaSorting: [],
+                autoWidth: true,
+                bInfo: true,
+                order: [[0, "asc"]],
+                pagingType: 'full_numbers',
+                lengthMenu: [
+                    [10, 15, 20, 25, 50],
+                    [10, 15, 20, 25, 50],
+                ],
+                drawCallback: function () {
+                    $('.paginate_button:not(.disabled)', this.api().table().container())
+                        .on('click', function () {
+                            var variant_maker_list = [];
+                            $("#structures_scrollable_body").find('tr').each(function () {
+                                variant_maker_list.push($(this).find('.variant').text());
+                            });
+                            variant_maker_list = [...new Set(variant_maker_list)];
+                            $.ajax(
+                                {
+                                    url: "/plot-variants/?variant_maker_list=" + variant_maker_list.toString(),
+                                    type: "GET",
+                                    success: function (response) {
+                                        draw_multiple_variant_plot(response.variant_maker_list_data);
+                                    },
+                                    error: function (response) {
+                                        console.log(response)
+                                    },
+                                }
+                            );
+                        });
+                }
+            })
+            applyFiltersOnVEPTable(oTable2)
 
+            yadcf.exFilterColumn(oTable2, [
+                    [0, [variant_marker]
+                    ]], true);
+                // get data currently seen in the table to make multiple violin plot 
+            var variant_maker_list = [];
+            $("#structures_scrollable_body").find('tr').each(function () {
+                variant_maker_list.push($(this).find('.variant').text());
+            });
+            variant_maker_list = [...new Set(variant_maker_list)];
+            $.ajax(
+                {
+                    url: "/plot-variants/?variant_maker_list=" + variant_maker_list.toString(),
+                    type: "GET",
 
+                    success: function (response) {
+                        draw_multiple_variant_plot(response.variant_maker_list_data);
+                    },
+                    error: function (response) {
+                        console.log(response)
+                    },
+                }
+            );
+            // update plot when user change input of rows per display
+            $('select[name="structures_scrollable_length"]').on('change', function () {
+                setTimeout(function () {
+                    let variant_maker_list = [];
+                    $("#structures_scrollable_body").find('tr').each(function () {
+                        variant_maker_list.push($(this).find('.variant').text());
+                    });
+                    variant_maker_list = [...new Set(variant_maker_list)];
+                    $.ajax(
+                        {
+                            url: "/plot-variants/?variant_maker_list=" + variant_maker_list.toString(),
+                            type: "GET",
+
+                            success: function (response) {
+                                draw_multiple_variant_plot(response.variant_maker_list_data);
+                            },
+                            error: function (response) {
+                                console.log(response)
+                            },
+                        }
+                    );
+                }, 500);
+            });
+            // update plot when user input data on input filter
+            $('.yadcf-filter-wrapper').find('input').each(function () {
+                $(this).on('change', function () {
+                    setTimeout(function () {
+                        let variant_maker_list = [];
+                        $("#structures_scrollable_body").find('tr').each(function () {
+                            variant_maker_list.push($(this).find('.variant').text());
+                        });
+                        variant_maker_list = [...new Set(variant_maker_list)];
+                        $.ajax(
+                            {
+                                url: "/plot-variants/?variant_maker_list=" + variant_maker_list.toString(),
+                                type: "GET",
+
+                                success: function (response) {
+                                    draw_multiple_variant_plot(response.variant_maker_list_data);
+                                },
+                                error: function (response) {
+                                    console.log(response)
+                                },
+                            }
+                        );
+                    }, 500);
+                });
+            });
+            // update plot when user select data on select filter
+            $('.yadcf-filter-wrapper').find('select').each(function () {
+                $(this).on('change', function () {
+                    setTimeout(function () {
+                        let variant_maker_list = [];
+                        $("#structures_scrollable_body").find('tr').each(function () {
+                            variant_maker_list.push($(this).find('.variant').text());
+                        });
+                        variant_maker_list = [...new Set(variant_maker_list)];
+                        $.ajax(
+                            {
+                                url: "/plot-variants/?variant_maker_list=" + variant_maker_list.toString(),
+                                type: "GET",
+
+                                success: function (response) {
+                                    draw_multiple_variant_plot(response.variant_maker_list_data);
+                                },
+                                error: function (response) {
+                                    console.log(response)
+                                },
+                            }
+                        );
+                    }, 500);
+
+                });
+            });
+            // handle event when "Show variant's associate statistics" link is clicked
+            $('#structures_scrollable_body').on('click', '.variant_associate_statistics', function (e) {
+            e.preventDefault();
+            let variant_marker = $(this).data('variant-marker');
+            let url = $(this).data('remote-url');
+            $.ajax(
+                {
+                    url: url,
+                    type: "GET",
+                    data: {
+                        'variant_marker': variant_marker,
+                    },
+                    success: function (response) {
+                        $("#genebass-variant-list").html(response)
+                        redraw_genebass_modal()
+                    }
+                }
+            )
+        }); // End handle event when "Show variant's associate statistics" link is clicked
+        } // end of showTableWithFilteredOnSelectedVariant
+    
     });
    
     function hideAllVepScoreColumns() {
@@ -655,7 +842,6 @@
         }
         table.column(10).visible(true);
     }
-
     function showAllVepScoreColumns() {
         var table = $('#structures_scrollable').DataTable();
         var start_col_index = 11
@@ -713,7 +899,7 @@
         }, 0);
     });
 
-    // Ham xu ly export modal genebass table
+    // Function to export modal genebass table
     var genebassVariantTableToExcel = (function () {
         var encabezado = '<html><head><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/><style> table, td {border:thin solid black} table {border-collapse:collapse}</style></head><body><table>';
 
@@ -1050,7 +1236,7 @@
         if (residueDiv) {
             for (var v of variant_info_for_3D_view) {
                 if (v.protein_position == p) {
-                    tooltip_text += `Protein position: <span class="AA_residue_span">${v.protein_position}</span>,<br> Widetype amino acid: <span class="AA_residue_span">${v.wtaa}</span>,<br> Mutant amino acid: <span class="AA_residue_span">${v.mtaa}</span>,<br> Codon: <span class="AA_residue_span">${v.codon}</span>,<br> Variant_marker: <a href="/gene/gene_detail/${v.geneID}?variant_marker=${v.variant_marker}"><span>${v.variant_marker}</span></a><span style="color: grey; font-style: italic;"> (<-- Click for details)</span>,<br> Consequence: <span class="AA_residue_span">${v.consequence}</span><br> Frequency: <span class="AA_residue_span">${v.HighestAF}</span><br><br>`;
+                    tooltip_text += `Protein position: <span class="AA_residue_span">${v.protein_position}</span>,<br> Widetype amino acid: <span class="AA_residue_span">${v.wtaa}</span>,<br> Mutant amino acid: <span class="AA_residue_span">${v.mtaa}</span>,<br> Codon: <span class="AA_residue_span">${v.codon}</span>,<br> Variant_marker: <a href="#" onclick="showTableWithFilteredOnSelectedVariant('${v.variant_marker}'); return false;"><span>${v.variant_marker}</span></a><span style="color: grey; font-style: italic;"> (<-- Click for details)</span>,<br> Consequence: <span class="AA_residue_span">${v.consequence}</span><br> Frequency: <span class="AA_residue_span">${v.HighestAF}</span><br><br>`;
                 }
             }
         }
@@ -1099,6 +1285,6 @@
             console.error('Error capturing the image:', error);
         });
     }
-</script>
+    </script>
 <script src="{% static 'home/js/d3.v7.min.js' %}"></script>
 {% endblock addon_js %}
