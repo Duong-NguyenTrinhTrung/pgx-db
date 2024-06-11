@@ -62,12 +62,12 @@
         </div>
 
         <div id="atc-intro">
-            <h3 style="margin-bottom: 5px;">ATC tree</h3>
+            <h3 style="margin-bottom: 5px;">ATC classification hierachy </h3>
         </div>
         <div id="atc-l1" style="margin-top: 15px;">
             <p style="margin-top: 0px; margin-bottom: 15px;">All ATC levels are browsable from 1st to 5th ATC level</p>
             {% for group in atc_groups %}
-                <p style="margin-top: 0px; margin-bottom: 4px;"><a href="{% url 'atc-detail-view' %}?group_id={{ group.id }}">{{ group.id }}: {{ group.name }}</a></p>
+                <p style="margin-top: 0px; margin-bottom: 4px;"><a style="color: #e36414" href="{% url 'atc-detail-view' %}?group_id={{ group.id }}">{{ group.id }}: {{ group.name }}</a></p>
             {% empty %}
                 <p>No data available</p>
             {% endfor %}
