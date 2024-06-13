@@ -91,8 +91,26 @@
         }
     }
     table.dataTable thead .sorting{
-        background-image:url("/static/home/images/sort-both.svg");
+        background-image:url("/static/home/images/sort-both10.png");
         background-size: 10px;
+    }
+    table.dataTable thead .sorting_asc {
+        background-image: url("/static/home/images/sort-asc.png");
+        background-size: 13px;
+    }
+    table.dataTable thead .sorting_desc {
+        background-image: url("/static/home/images/sort-desc.png");
+        background-size: 13px;
+    }
+
+    input#yadcf-filter--structures_scrollable-from-3, input#yadcf-filter--structures_scrollable-to-3 {
+        width: 50px;
+    }
+
+    #headers th .sorting {
+        padding-left: 5px;
+        padding-right: 5px;
+        background-color: violet;
     }
 </style>
 {% endblock addon_css %}
