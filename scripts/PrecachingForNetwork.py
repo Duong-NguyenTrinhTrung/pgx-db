@@ -66,7 +66,7 @@ createScriptToDownloadDataForPrecache(4, "/Users/ljw303/Duong_Data/Lab_Projects/
 def downloadAndSave(link_filename):
   with open(link_filename, "r") as f:
     lines = f.readlines()
-    for line in lines:
+    for line in lines[:10]:
       atc_code = line.split(";")[0]
       print(atc_code)
       if not os.path.exists("/Users/ljw303/Duong_Data/Lab_Projects/PharmacogenomicsDB/ProjectBK-20230513/static/json-drug-network/"+atc_code):
@@ -87,6 +87,7 @@ def downloadAndSave(link_filename):
               else:
                 if link_to_download.find("general_data") > 0:
                   filename = "/Users/ljw303/Duong_Data/Lab_Projects/PharmacogenomicsDB/ProjectBK-20230513/static/json-drug-network/"+atc_code+"/general_data.json"
+          print(content)
           with open(filename, "w") as file:
               file.write(content)
           print("Data has been successfully saved to ",filename, " length = ", len(content))

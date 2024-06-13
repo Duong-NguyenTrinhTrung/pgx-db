@@ -6,20 +6,23 @@ document.addEventListener('DOMContentLoaded', function() {
     // const learnMoreLink = document.getElementById('learn-more-link');
 
     // Show banner if consent is not given
-    if (!localStorage.getItem('cookiesAccepted')) {
+    if (localStorage.getItem('cookiesAccepted')===null) {
         banner.style.display = 'block';
+    }
+    else {
+        banner.style.display = localStorage.getItem('cookiesAccepted') === 'true' ? 'none' : 'block';
     }
 
     // Handle accept button click
     acceptBtn.addEventListener('click', function() {
-        localStorage.setItem('cookiesAccepted', 'true');
+        localStorage.setItem('cookiesAccepted', true);
         banner.style.display = 'none';
         enableCookies();
     });
 
     // Handle decline button click
     declineBtn.addEventListener('click', function() {
-        localStorage.setItem('cookiesAccepted', 'false');
+        localStorage.setItem('cookiesAccepted', false);
         banner.style.display = 'none';
         disableCookies();
     });
