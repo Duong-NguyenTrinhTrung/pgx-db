@@ -23,13 +23,6 @@ $(function () {
       json_proteinData = "/drugs_network/protein_data?drug_bank_ids=" + drug_bank_ids.join(',');
       json_interactionData = "/drugs_network/interaction_data?drug_bank_ids=" + drug_bank_ids.join(',');
   }
-  
-  if (drug_bank_id) {
-      json_GeneralFile = "/drug_network/" + drug_bank_id + "/general_data";
-      json_drugData = "/drug_network/" + drug_bank_id + "/drug_data";
-      json_proteinData = "/drug_network/" + drug_bank_id + "/protein_data";
-      json_interactionData = "/drug_network/" + drug_bank_id + "/interaction_data";
-  }
 
   var urlParams = new URLSearchParams(window.location.search);
   if (urlParams.has('atc_code')) {
@@ -41,7 +34,7 @@ $(function () {
       var json_interactionData = "/static/json-drug-network/" + atc_code + "/interaction_data.json";
     }
   }
-
+  
   function readJSONFileFromCache(file_path) {
     return $.getJSON(file_path , function( data ) {
       console.log("getJSON:"+ file_path);
@@ -49,8 +42,14 @@ $(function () {
     });
   }
   
-  // code to get the li of the network visualization
+  if (drug_bank_id) {
+      json_GeneralFile = "/drug_network/" + drug_bank_id + "/general_data";
+      json_drugData = "/drug_network/" + drug_bank_id + "/drug_data";
+      json_proteinData = "/drug_network/" + drug_bank_id + "/protein_data";
+      json_interactionData = "/drug_network/" + drug_bank_id + "/interaction_data";
+  }
   
+  // code to get the li of the network visualization
   document.addEventListener("DOMContentLoaded", function () {
     // Get all <li> elements within the <ul>
     var listItems = document.querySelectorAll(".nav-tabs li");
@@ -177,7 +176,6 @@ $(function () {
   
   var exportButton = document.getElementById("exportButton");
   exportButton.addEventListener("click", function () {
-    
     showExportOptions();
   });
   
@@ -246,7 +244,6 @@ $(function () {
   }
   
   function createExportOption(optionText) {
-    
     var optionButton = document.createElement("button");
     optionButton.textContent = optionText;
     optionButton.className = "pgx_btn1"; // add class here
@@ -319,7 +316,6 @@ $(function () {
         downloadCSV();
         break;
       case "Download XLS":
-        
         downloadXLS();
         break;
       case "View Data Table":
@@ -455,7 +451,7 @@ $(function () {
       if (xlinkHref) {
         //imgObj.src = "http://localhost:8000/" + xlinkHref;
         imgObj.src =
-        "https://pgx-db.org"  +
+          "https://pgx-db.org/" +
           xlinkHref;
       } else {
         loadedCount++;
@@ -624,7 +620,7 @@ $(function () {
       if (xlinkHref) {
         //imgObj.src = "http://localhost:8000/" + xlinkHref;
         imgObj.src =
-        "https://pgx-db.org/"  +
+          "https://pgx-db.org/" +
           xlinkHref;
       } else {
         loadedCount++;
@@ -697,12 +693,7 @@ $(function () {
   
   // Download XLS
   function downloadXLS() {
-    
-    var modal = document.getElementById("exportModal");
-    modal.style.display = "none"
-    $("#loading").show();
     var filteredLinks = getFilteredLinksXLSX();
- 
     //console.log(filteredLinks)
     // Load the XLSX
     var req = new XMLHttpRequest();
@@ -740,7 +731,6 @@ $(function () {
     };
   
     req.send();
-    $("#loading").hide();
   }
   
   function downloadXLS11() {
@@ -1674,9 +1664,10 @@ $(function () {
   let flag_tabclicked = false;
   let flag_processData = false;
   
-  let numberofnodes = 2;
-  let slicedata = 400;
+  let numberofnodes = 1;
+  let slicedata = 200;
   
+  console.log(slicedata, "slicedata");
   
   window.parent.postMessage({ data: slicedata }, "*");
   
@@ -2087,34 +2078,28 @@ $(function () {
         d3.select(this).style("cursor", "pointer");
       });
   
-
-  
-      
-      var tooltip2 = d3
-      .select("body")
-      .append("div")
-      .attr("class", "tooltip2")
-      .style("opacity", 0);
-    
     node
       .filter((d) => d.child_type === "disease_type")
       .on("mouseover", function (event, d) {
         d3.select(this).style("cursor", "pointer");
         tooltip2.transition().style("opacity", 0.9);
         tooltip2
-          .style("left", event.pageX + 20 + "px")
-          .style("top", event.pageY + 20 + "px")
-          .html(d.id); // Set HTML content before handling click event
+          .html(d.id)
+          .style("left", event.pageX + "px")
+          .style("top", event.pageY + "px");
       })
       .on("mouseout", function () {
         tooltip2.transition().style("opacity", 0);
       });
-    
-    tooltip2.on("click", function (event, d) {
-      // This function will execute when the tooltip is clicked
-      // Note: 'd' might not be defined here, you may need to handle this case
-      window.open(`https://clinicaltrials.gov/search?cond=${d.id}`, "_blank");
-    });
+  
+    // Attach click event to all nodes
+  
+    // Define a tooltip div with class "tooltip2"
+    var tooltip2 = d3
+      .select("body")
+      .append("div")
+      .attr("class", "tooltip2")
+      .style("opacity", 0);
   
     node
       .filter(function (d) {
@@ -3675,8 +3660,6 @@ let btn_count = 0;
         numberofnodes = numberofnodes + 200;
       }
     }
-    
-  console.log(slicedata, "slicedata");
     processData(numberofnodes, slicedata);
   });
   
