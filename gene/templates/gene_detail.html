@@ -846,7 +846,7 @@
         else {
             $('#variantPlots_content').html('');  // clear data
             // Extract categories and values
-            const categories = data.map(d => d.category);
+            const categories = data.map(d => d.category2);
             const values = data.map(d => d.values);
 
             // Create violin plot traces
