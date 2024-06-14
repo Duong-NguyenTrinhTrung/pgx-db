@@ -1,8 +1,25 @@
 {% load static %}
 {% csrf_token %}
 
+{% block addon_css %}
+    <style>
+        table.dataTable thead .sorting{
+            background-image:url("/static/home/images/sort-both10.png");
+            background-size: 10px;
+        }
+        table.dataTable thead .sorting_asc {
+            background-image: url("/static/home/images/sort-asc.png");
+            background-size: 13px;
+        }
+        table.dataTable thead .sorting_desc {
+            background-image: url("/static/home/images/sort-desc.png");
+            background-size: 13px;
+        }
+    </style>
+{% endblock %}
+
 <div role="tabpanel" class="tab-pane" id="tab_network_pgx">
-        <span id="read_more_pgx" style="display: none;" class="documentation"><a href="https://pgx-documentation.readthedocs.io/en/latest/atc_code.html#network-pharmacogenomics">Read More</a></span>
+        <span id="read_more_pgx" style="display: none;" class="documentation"><a href="https://pgx-documentation.readthedocs.io/en/latest/atc_code.html#network-pharmacogenomics" target="_blank">Read More</a></span>
         <p id="tab_network_pgx_message" style="color: red; text-align: center; font-size: 16px; display: none;">
             There is no pharmacogenomics data associated with drugs and genes (proteins) in this ATC code!
         </p>
