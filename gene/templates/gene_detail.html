@@ -110,7 +110,6 @@
     #headers th .sorting {
         padding-left: 5px;
         padding-right: 5px;
-        background-color: violet;
     }
 </style>
 {% endblock addon_css %}
@@ -405,14 +404,14 @@
                 // Canonical
                 row.append($('<td>').addClass('vep-cell').text('YES'));
                 // Sequence position
-                row.append($('<td>').addClass('vep-cell').text(value[5]));
+                row.append($('<td>').addClass('vep-cell sequence_position').text(value[5]));
                 // Wildtype and Mutant
                 if (value[6].length === 3) {
-                    row.append($('<td>').addClass('vep-cell').text(value[6].slice(0, 1)));  // Wildtype
-                    row.append($('<td>').addClass('vep-cell').text(value[6].slice(2, 3)));  // Mutant
+                    row.append($('<td>').addClass('vep-cell wt_aa').text(value[6].slice(0, 1)));  // Wildtype
+                    row.append($('<td>').addClass('vep-cell mt_aa').text(value[6].slice(2, 3)));  // Mutant
                 } else {
-                    row.append($('<td>').addClass('vep-cell').text(value[6]));  // Wildtype
-                    row.append($('<td>').addClass('vep-cell').text(value[6]));  // Mutant
+                    row.append($('<td>').addClass('vep-cell wt_aa').text(value[6]));  // Wildtype
+                    row.append($('<td>').addClass('vep-cell mt_aa').text(value[6]));  // Mutant
                 }
                 // Codons
                 row.append($('<td>').addClass('vep-cell').css('max-width', '100px').text(value[7]));
@@ -910,7 +909,6 @@
             // Plot
             Plotly.newPlot('variantPlots_content', traces, layout);
         }
-
     }
 
     function redraw_genebass_modal() {
