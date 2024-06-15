@@ -20,10 +20,13 @@ from .views import (
     get_statistics_by_atc_for_detecting_community_drug_disease, 
     get_statistics_by_atc_for_calculating_average_path_length_drug_disease,
     get_statistics_by_atc_for_calculating_average_path_length_drug_protein,
-    atc_comparison_autocomplete_view, get_adr_data, AdrByDrugView, get_adr_data_by_atc
+    atc_comparison_autocomplete_view, get_adr_data, AdrByDrugView, get_adr_data_by_atc, serve_json_file
 )
 
 urlpatterns = [
+    
+    path('serve_json_file/<path:file_string>/', serve_json_file, name='serve_json_file'),
+
     path('search_drugs', views.search_drugs, name='search_drugs'),
     path('atc_lookup', cache_page(3600*24*365)(views.atc_lookup), name='atc-lookup'),
     path('atc_anatomical_groups', views.AtcAnatomicalGroupListView.as_view(), name='atc-anatomical-groups'),
