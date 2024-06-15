@@ -74,19 +74,29 @@
     </div>
 </div>
 <script>
+    var resiList = [];
+    var positionClicked = [];
     function showAAtooltip(event, p) {
+        if (event.target.classList.contains("underline")) {
+            if (resiList.includes(p)) {
+                var indexRemove = resiList.indexOf(p);
+                resiList.splice(indexRemove, 1);
+            }
+            else{
+                resiList.push(p);
+            }
+        }
                 var variant_info_for_3D_view = JSON.parse('{{ variant_info_for_3D_view|safe }}');
                 viewer.setStyle({}, { cartoon: { color: '#ced4da' } });
                 var colorSelect = document.getElementById("colorSelect");
                 colorSelect.value = "grey";
                 event.preventDefault();
                 // Remove highlight from any previously highlighted element
-                const previouslyHighlighted = document.querySelector('.highlighted');
-                if (previouslyHighlighted) {
-                    previouslyHighlighted.classList.remove('highlighted');
-                }
-                const spanElement = event.target;
-                spanElement.classList.add('highlighted');
+                // const previouslyHighlighted = document.querySelector('.highlighted');
+                // if (previouslyHighlighted) {
+                //     previouslyHighlighted.classList.remove('highlighted');
+                // }
+                
 
                 const residueDiv = event.target.closest('.residue');
                 const tooltip = document.createElement('div');
@@ -107,17 +117,27 @@
                     tooltip_text = `<span style="color: red;"> No variant occurs at position ${p}</span>`;
                     viewer.render();
                 } else {
-                    viewer.addStyle({ resi: [p] }, { stick: { colorscheme: 'greenCarbon', radius: 1.4, opacity: 1.0 } });
+                    viewer.addStyle({ resi: resiList }, { stick: { colorscheme: 'greenCarbon', radius: 1.4, opacity: 1.0 } });
                     viewer.render();
                 }
                 tooltip.innerHTML = tooltip_text;
-                document.body.appendChild(tooltip);
+                if (!event.target.classList.contains("highlighted")) {
+                    document.body.appendChild(tooltip);
+                }
                 // Function to remove the tooltip
                 function removeTooltip(event) {
+                    // if (!event.target.classList.contains("highlighted")) {
+                    //     tooltip.remove();
+                    //     document.removeEventListener('click', removeTooltip);
+                    // }
                     if (!tooltip.contains(event.target)) {
                         tooltip.remove();
                         document.removeEventListener('click', removeTooltip);
                     }
+                }
+                if (event.target.classList.contains("underline")){
+                    const spanElement = event.target;
+                    spanElement.classList.toggle('highlighted');
                 }
                 // Add event listener to remove the tooltip when clicking outside
                 setTimeout(() => {

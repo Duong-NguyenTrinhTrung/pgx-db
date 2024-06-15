@@ -1097,6 +1097,7 @@
             if (match && match[1]) {
                 var param = match[1];
                 if (protein_with_variant_index_list.includes(param)) {
+                    anchor.classList.add('underline');
                     var span = residue.querySelector('span');
                     span.classList.add('underline');
                 }
