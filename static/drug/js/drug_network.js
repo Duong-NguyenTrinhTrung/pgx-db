@@ -35,10 +35,12 @@ $(function () {
   if (urlParams.has('atc_code')) {
     var atc_code = urlParams.get('atc_code');
     if (atc_code.length === 3 || atc_code.length === 4) {
-      var json_GeneralFile = "/static/json-drug-network/" + atc_code + "/general_data.json";
-      var json_drugData = "/static/json-drug-network/" + atc_code + "/drug_data.json";
-      var json_proteinData = "/static/json-drug-network/" + atc_code + "/protein_data.json";
-      var json_interactionData = "/static/json-drug-network/" + atc_code + "/interaction_data.json";
+      // path('serve_json_file/<path:file_string>/', serve_json_file, name='serve_json_file'),
+
+      var json_GeneralFile = "serve_json_file/" + atc_code + "/general_data.json";
+      var json_drugData = "serve_json_file/" + atc_code + "/drug_data.json";
+      var json_proteinData = "serve_json_file/" + atc_code + "/protein_data.json";
+      var json_interactionData = "serve_json_file/" + atc_code + "/interaction_data.json";
     }
   }
 

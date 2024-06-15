@@ -48,7 +48,29 @@ import networkx as nx
 from community import community_louvain
 import matplotlib.pyplot as plt
 import seaborn as sns
+import os
+from django.conf import settings
 app_name = 'drug'
+import logging
+logger = logging.getLogger(__name__)
+
+def serve_json_file(request, file_string):
+    try:
+        folder = file_string.split("/")[0]
+        filename = file_string.split("/")[1]
+        file_path = os.path.join(settings.BASE_DIR, 'Data/json-drug-network', folder, filename)
+        if os.path.exists(file_path):
+            with open(file_path, 'r') as file:
+                try:
+                    data = json.load(file)
+                    return JsonResponse(data, safe=False)
+                except json.JSONDecodeError:
+                    raise Http404("File is not a valid JSON")
+        else:
+            raise Http404("File not found")
+    except IndexError:
+        print("Invalid file path: %s", filename)
+        raise Http404("Invalid file path")
 
 class DiseaseAssociationByDrugView:
     def get_disease_association_by_drug(self, drug_id):

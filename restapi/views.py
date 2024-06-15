@@ -16,7 +16,7 @@ import pandas as pd
 class DrugToDiseaseAssociationRestApiView(DiseaseAssociationByDrugView, APIView,):
     allowed_methods = ['get']
     @swagger_auto_schema(
-            operation_description="operation_description",
+            operation_description="Retrieves a comprehensive list of disease association studies for a specified drug, identified by its DrugBank ID. The data returned includes disease name, disease class, clinical trial phase, reference link",
             operation_summary="Get a list of disease association studies of a drug given its drugbank ID",
     )
     def get(self, request, *args, **kwargs):
@@ -30,7 +30,7 @@ class DrugToDiseaseAssociationRestApiView(DiseaseAssociationByDrugView, APIView,
 class DrugToDrugAdrRestApiView(AdrByDrugView, APIView,):
     allowed_methods = ['get']
     @swagger_auto_schema(
-            operation_description="operation_description",
+            operation_description="Retrieves a comprehensive list of adverse drug reaction for a specified drug, identified by its DrugBank ID. The data returned includes name of reaction a.k.a side effect, side effect definition, frequency of side effect in surveyed population",
             operation_summary="Get adverse drug reaction for a drug given its drugbank ID",
     )
     def get(self, request, *args, **kwargs):
@@ -44,7 +44,7 @@ class DrugToDrugAdrRestApiView(AdrByDrugView, APIView,):
 class VariantToVepRestApiView(VEPFromVariantBaseView, APIView,):
     allowed_methods = ['get']
     @swagger_auto_schema(
-            operation_description="operation_description",
+            operation_description="Retrieves a list of variant effect prediction scores for a specified variant, identified by its identifier. The data returned includes 40 scores from different algorithms including AlphaMissense, pathogenicity, Polyphen2, SIFT",
             operation_summary="Get all VEP scores for a variant",
     )
 
@@ -59,8 +59,8 @@ class VariantToVepRestApiView(VEPFromVariantBaseView, APIView,):
 class GeneVariantRestApiView(GeneDetailBaseView,APIView,):
     allowed_methods = ['get']
     @swagger_auto_schema(
-            operation_description="operation_description",
-            operation_summary="Get a full annotation of all variants on a gene given its gene Enseml ID",
+            operation_description="Retrieves a list of variants occur in a specified variant, identified by its Enseml ID. The data returned includes transcript, consequence, cDNA position, CDS position, protein position, wildtype amino acid, mutant amino acid, respective codons, and impact",
+            operation_summary="Get basic annotations of all variants on a gene given its gene Enseml ID",
     )
 
     def get(self, request, *args, **kwargs):
