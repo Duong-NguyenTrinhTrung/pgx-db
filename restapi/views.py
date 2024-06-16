@@ -5,7 +5,7 @@ from drf_yasg import openapi
 from drf_yasg.inspectors import PaginatorInspector
 from gene.views import GeneDetailBaseView, DrugByGeneBaseView, GenebasedAssociationStatisticsView
 from restapi.serializers import GeneDetailSerializer, AtcDetailSerializer, AtcByLevelSerializer, TargetDrugSerializer, VariantSerializer, TargetSerializer
-from drug.views import TargetByAtcBaseView, DescriptionByAtcBaseView, AtcCodesByLevelBaseView, TargetsByDrugBaseView, AtcCodesByDrugView, PGxByAtcCodeView, \
+from drug.views import DrugByAtcBaseView, DescriptionByAtcBaseView, AtcCodesByLevelBaseView, TargetsByDrugBaseView, AtcCodesByDrugView, PGxByAtcCodeView, \
                         DrugTargetInteractionByAtcBaseView, DrugDiseaseAssociationByAtcBaseView, AdrByDrugView, DiseaseAssociationByDrugView
 from variant.views import VEPFromVariantBaseView
 from protein.views import BundleByTargetCodeView
@@ -16,7 +16,7 @@ import pandas as pd
 class DrugToDiseaseAssociationRestApiView(DiseaseAssociationByDrugView, APIView,):
     allowed_methods = ['get']
     @swagger_auto_schema(
-            operation_description="operation_description",
+            operation_description="Retrieves a comprehensive list of disease association studies for a specified drug, identified by its DrugBank ID. The data returned includes disease name, disease class, clinical trial phase, reference link",
             operation_summary="Get a list of disease association studies of a drug given its drugbank ID",
     )
     def get(self, request, *args, **kwargs):
@@ -30,7 +30,7 @@ class DrugToDiseaseAssociationRestApiView(DiseaseAssociationByDrugView, APIView,
 class DrugToDrugAdrRestApiView(AdrByDrugView, APIView,):
     allowed_methods = ['get']
     @swagger_auto_schema(
-            operation_description="operation_description",
+            operation_description="Retrieves a comprehensive list of adverse drug reaction for a specified drug, identified by its DrugBank ID. The data returned includes name of reaction a.k.a side effect, side effect definition, frequency of side effect in surveyed population",
             operation_summary="Get adverse drug reaction for a drug given its drugbank ID",
     )
     def get(self, request, *args, **kwargs):
@@ -44,16 +44,14 @@ class DrugToDrugAdrRestApiView(AdrByDrugView, APIView,):
 class VariantToVepRestApiView(VEPFromVariantBaseView, APIView,):
     allowed_methods = ['get']
     @swagger_auto_schema(
-            operation_description="operation_description",
+            operation_description="Retrieves a list of variant effect prediction scores for a specified variant, identified by its identifier. The data returned includes 40 scores from different algorithms including AlphaMissense, pathogenicity, Polyphen2, SIFT",
             operation_summary="Get all VEP scores for a variant",
     )
 
     def get(self, request, *args, **kwargs):
-        print("inside VariantToVepRestApiView")
         serializer = VariantSerializer(data=self.kwargs)
         if serializer.is_valid():
             data = self.get_vep_from_variant(serializer.validated_data.get('variant_marker'))
-            print(len(data))
             return Response(data)
         else:
             return Response(serializer.errors, status=400)
@@ -61,12 +59,11 @@ class VariantToVepRestApiView(VEPFromVariantBaseView, APIView,):
 class GeneVariantRestApiView(GeneDetailBaseView,APIView,):
     allowed_methods = ['get']
     @swagger_auto_schema(
-            operation_description="operation_description",
-            operation_summary="Get a full annotation of all variants on a gene given its gene Enseml ID",
+            operation_description="Retrieves a list of variants occur in a specified variant, identified by its Enseml ID. The data returned includes transcript, consequence, cDNA position, CDS position, protein position, wildtype amino acid, mutant amino acid, respective codons, and impact",
+            operation_summary="Get basic annotations of all variants on a gene given its gene Enseml ID",
     )
 
     def get(self, request, *args, **kwargs):
-        print("self.kwargs ", self.kwargs)
         serializer = GeneDetailSerializer(data=self.kwargs)
 
         if serializer.is_valid():
@@ -87,7 +84,6 @@ class GeneVariantRestApiView(GeneDetailBaseView,APIView,):
                 }
                 
                 returned_data.append(d)
-            print("self.kwargs : ", self.kwargs)
             return Response({'Basic information about variants of gene '+self.kwargs.get("gene_id"): returned_data})
         else:
             return Response(serializer.errors, status=400)
@@ -95,8 +91,8 @@ class GeneVariantRestApiView(GeneDetailBaseView,APIView,):
 class DrugByGeneRestApiView(DrugByGeneBaseView,APIView,):
     allowed_methods = ['get']
     @swagger_auto_schema(
-            operation_description="operation_description",
-            operation_summary="Get a list of all drugs that target a gene given its gene Ensembl ID or genename",
+            operation_description="Retrieve a list of drugs that target a protein, or is carried, transported, catalyzed by a protein  identified by its encoding gene. Gene Ensembl ID or genename are acceptable input. Returned data include drug name, DrugBank identifiers, actions, known actions and mode of actions (Target, Carrier, Transporter or Enzyme).",
+            operation_summary="Get a list of all drugs that interact with a protein given its encoding gene Ensembl ID or genename",
             manual_parameters=[openapi.Parameter('gene_id', openapi.IN_QUERY, description="gene_id", type=openapi.TYPE_STRING),
                                openapi.Parameter('genename', openapi.IN_QUERY, description="genename", type=openapi.TYPE_STRING)]
     )
@@ -116,16 +112,13 @@ class DrugByGeneRestApiView(DrugByGeneBaseView,APIView,):
                     return Response(serializer.errors, status=400)
                 
             table_data = data.get('list_of_targeting_drug', [])
-            print("table_data : ", table_data)
             if len(table_data)>0:
                 for index, row in table_data.iterrows():
-                    print("row : ", row, "type : ", type(row))
                     d={
                         "drug_bankID":row["drug_bankID"],
                         "actions":row["actions"],
                         "known_action":row["known_action"],
                         "interaction_type":row["interaction_type"],
-
                     }
                     returned_data.append(d)
                 return Response({"List of targeting drugs: ": returned_data})
@@ -148,10 +141,8 @@ class DrugByGeneRestApiView(DrugByGeneBaseView,APIView,):
 #         if serializer.is_valid():
 #             data = self.get_drug_by_gene_data(serializer.validated_data.get('gene_id'))
 #             table_data = data.get('list_of_targeting_drug', [])
-#             print("table_data : ", table_data)
 #             returned_data = []
 #             for index, row in table_data.iterrows():
-#                 print("row : ", row, "type : ", type(row))
 #                 d={
 #                     "drug_bankID":row["drug_bankID"],
 #                     "actions":row["actions"],
@@ -165,38 +156,35 @@ class DrugByGeneRestApiView(DrugByGeneBaseView,APIView,):
 #             return Response(serializer.errors, status=400)
 
 
-class TargetByAtcRestApiView(TargetByAtcBaseView,APIView,):
+class DrugsByAtcRestApiView(DrugByAtcBaseView,APIView,):
     allowed_methods = ['get']
     @swagger_auto_schema(
-            operation_description="operation_description",
-            operation_summary="Get a list of all targets belonging to an ATC code",
+            operation_description="Retrieve a list of drugs associated with a given ATC code. Returned data include drug names and their DrugBank identifiers",
+            operation_summary="Get a list of all drugs associated with a given ATC code",
     )
 
     def get(self, request, *args, **kwargs):
         serializer = AtcDetailSerializer(data=self.kwargs)
-        print("checkpoint 5 in TargetByAtcRestApiView, self.kwargs = ", self.kwargs)
-        print("checkpoint 5 in TargetByAtcRestApiView, serializer = ", serializer)
 
         if serializer.is_valid():
-            print("checkpoint 6 when serializer is valid in TargetByAtcRestApiView")
-            data = self.get_target_by_atc_code(serializer.validated_data.get('atc_code'))
-            table_data = data.get('list_of_targets', [])
+            data = self.get_drug_by_atc_code(serializer.validated_data.get('atc_code'))
+            list_of_drugs = data.get('list_of_drugs', [])
             returned_data = []
-            for index, row in table_data.iterrows():
+            for drug in list_of_drugs:
                 d={
-                    "DrugbankID":row["DrugbankID"],
+                    "Drug name": drug.get("drugname"),
+                    "DrugBank identifier": drug.get("DrugbankID"),
                 }
                 returned_data.append(d)
-            return Response({"List of targets: ": returned_data})
+            return Response({"List of drugs: ": returned_data})
         else:
-            print("checkpoint 7 when serializer is not valid in TargetByAtcRestApiView")
             return Response(serializer.errors, status=400)
 
 
 class DrugTargetInteractionByAtcRestApiView(DrugTargetInteractionByAtcBaseView,APIView,):
     allowed_method = ["get"]
     @swagger_auto_schema(
-            operation_description="operation_description",
+            operation_description="Retrieve a list of drug-protein interactions pairs where drugs associate with a given ATC code. Returned data include DrugBank identifiers, protein UniProt identifiers, actions, known actions and mode of actions",
             operation_summary="Get the list of drug-protein interations of a given ATC code",
     )
     
@@ -214,7 +202,7 @@ class DrugTargetInteractionByAtcRestApiView(DrugTargetInteractionByAtcBaseView,A
 class DrugDiseaseAssociationByAtcRestApiView(DrugDiseaseAssociationByAtcBaseView,APIView,):
     allowed_method = ["get"]
     @swagger_auto_schema(
-            operation_description="operation_description",
+            operation_description="Retrieve a list of drug-disease association studies where drugs associate with a given ATC code. Returned data include DrugBank identifiers, drug names, disease name, disease class, clinical trial phase of the association studies, external reference links, standard inchiKey.",
             operation_summary="Get the list of drug-disease associations of a given ATC code",
     )
     
@@ -232,8 +220,8 @@ class DrugDiseaseAssociationByAtcRestApiView(DrugDiseaseAssociationByAtcBaseView
 class AtcToDescriptionRestApiView(DescriptionByAtcBaseView,APIView,):
     allowed_method = ["get"]
     @swagger_auto_schema(
-            operation_description="operation_description",
-            operation_summary="Get the description of an ATC code",
+            operation_description="Retrieve a description of a given ATC code",
+            operation_summary="Get a description of a given ATC code",
     )
     def get(self, request, *args, **kwargs):
         serializer = AtcDetailSerializer(data=self.kwargs)
@@ -251,15 +239,15 @@ class AtcToDescriptionRestApiView(DescriptionByAtcBaseView,APIView,):
 class AtcCodesByLevelRestApiView(AtcCodesByLevelBaseView,APIView,):
     allowed_method = ["get"]
     @swagger_auto_schema(
-            operation_description="operation_description",
-            operation_summary="Get all ATC codes belonging to an ATC group (Enter 'A' for 'Anatomical', 'T' for 'Therapeutic', 'P' for 'Pharmacological', 'C' for 'Chemical', or 'CS' for 'Chemical substance')",
+            operation_description="Retrieve all ATC codes belonging to an ATC group. Please input 'A' for 'Anatomical', 'T' for 'Therapeutic', 'P' for 'Pharmacological', 'C' for 'Chemical', or 'CS' for 'Chemical substance'. Returned data include ",
+            operation_summary="Get all ATC codes belonging to an ATC group",
     )
 
     def get(self, request, *args, **kwargs):
         serializer = AtcByLevelSerializer(data=self.kwargs)
         if serializer.is_valid():
             fullname = {
-                        "c": 'Anatomical',
+                        "a": 'Anatomical',
                         "t": 'Therapeutic',
                         "p": 'Pharmacological',
                         "c": 'Chemical',
@@ -362,14 +350,10 @@ class GenebasedAssociationStatisticsRestApiView(GenebasedAssociationStatisticsVi
         serializer = VariantSerializer(data=self.kwargs)
         if serializer.is_valid():
             variant_marker = serializer.validated_data.get('variant_marker')
-            print("original vm ", variant_marker)
             variant_marker = variant_marker[:-1] if variant_marker[-1] == "/" else variant_marker
-            print("processed vm ", variant_marker)
             data = self.get_association_statistics_by_variant_marker(variant_marker)
             if not data:
                 return Response({"error" : f"{variant_marker} not found"}, status=404)
-            # print("data = ",data)
-            # print("variant_marker = ",self.kwargs)
             returned_data = []
             for index, row in data.get("association_statistics_data").iterrows():
                 temp = {

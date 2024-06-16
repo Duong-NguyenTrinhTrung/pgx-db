@@ -27,7 +27,6 @@ class VEPFromVariantBaseView:
     def get_vep_from_variant(self, slug):
         context = {}
         slug = slug[:-1] if slug[-1] == "/" else slug
-        print("processed vm ", slug)
         
         if slug is not None:
             if cache.get("vep_by_variant_marker_" + slug) is not None:
@@ -85,7 +84,6 @@ class VEPFromVariantBaseView:
                 context = dict()
                 cache.set("vep_by_variant_marker_" + slug, returned_data, 60 * 60)
             context['vep'] = returned_data
-            print("context : ", context)
         return context
     
 def get_variant_vep_scores_and_plot(request):
@@ -109,7 +107,12 @@ def get_variant_vep_scores_and_plot(request):
             gene = None
 
         transcript_ids = VepVariant.objects.filter(Variant_marker=variant_marker).values_list('Transcript_ID', flat=True)
-
+        temp = VepVariant.objects.filter(Variant_marker=variant_marker).values('Amino_acids', 'Protein_position').first()
+        # print("temp ", temp)
+        if temp["Amino_acids"].find("/")<0:
+            category2 = temp["Amino_acids"]+temp["Protein_position"]+temp["Amino_acids"]
+        else:
+            category2 = temp["Amino_acids"].split("/")[0]+temp["Protein_position"]+temp["Amino_acids"].split("/")[1]
         list_vep_scores = VepVariant.objects.filter(Variant_marker=variant_marker).values(
                         "BayesDel_addAF_rankscore",
                         "BayesDel_noAF_rankscore",
@@ -161,7 +164,7 @@ def get_variant_vep_scores_and_plot(request):
 
         # Remove NaN values
         list_vep_scores = list(filter(lambda value: not math.isnan(value), list_vep_scores))
-        variant_maker_list_data.append({"category":variant_marker, "values": list_vep_scores})
+        variant_maker_list_data.append({"category":variant_marker, "category2":category2, "values": list_vep_scores})
 
     return JsonResponse(
         {

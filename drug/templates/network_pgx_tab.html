@@ -1,8 +1,26 @@
 {% load static %}
 {% csrf_token %}
 
+{% block addon_css %}
+    <style>
+        table.dataTable thead .sorting{
+            background-image:url("/static/home/images/sort-both10.png");
+            background-size: 10px;
+        }
+        table.dataTable thead .sorting_asc {
+            background-image: url("/static/home/images/sort-asc.png");
+            background-size: 13px;
+        }
+        table.dataTable thead .sorting_desc {
+            background-image: url("/static/home/images/sort-desc.png");
+            background-size: 13px;
+        }
+    </style>
+{% endblock %}
+
 <div role="tabpanel" class="tab-pane" id="tab_network_pgx">
-        <p id="tab_network_pgx_message" style="color: #c1121f; font-style: italic; display: none;">
+        <span id="read_more_pgx" style="display: none;" class="documentation"><a href="https://pgx-documentation.readthedocs.io/en/latest/atc_code.html#network-pharmacogenomics" target="_blank">Read More</a></span>
+        <p id="tab_network_pgx_message" style="color: red; text-align: center; font-size: 16px; display: none;">
             There is no pharmacogenomics data associated with drugs and genes (proteins) in this ATC code!
         </p>
         <div class="row" id="pgx_data_display_area">
@@ -184,8 +202,8 @@
             order: [[0, "asc"]],
             pagingType: 'full_numbers',
             lengthMenu: [
-                [3, 5, 10, 20, 30],
-                [3, 5, 10, 20, 30],
+                [2, 3, 5, 10, 20, 30],
+                [2, 3, 5, 10, 20, 30],
             ],
         });
 
@@ -208,7 +226,7 @@
         //Alleles
         // column_filters = column_filters.concat(createYADCFfilters(7, 1, "select", null, "select", false, null, null, width = "70px"));
         //P_Value
-        // column_filters = column_filters.concat(createYADCFfilters(8, 1, "select", null, "select", false, null, null, width = "70px"));
+        column_filters = column_filters.concat(createYADCFfilters(8, 1, "select", null, "select", false, null, null, width = "70px"));
         //Biogeographical_Groups
         column_filters = column_filters.concat(createYADCFfilters(9, 1, "auto_complete", null, "", false, null, null, width = "70px"));
         //Study_Type
@@ -222,7 +240,7 @@
         //PD_PK_terms
         column_filters = column_filters.concat(createYADCFfilters(14, 1, "select", null, "select", false, null, null, width = "70px"));
         //Metabolizer_types
-        // column_filters = column_filters.concat(createYADCFfilters(15, 1, "select", null, "select", false, null, null, width = "70px"));
+        column_filters = column_filters.concat(createYADCFfilters(15, 1, "select", null, "select", false, null, null, width = "70px"));
         // update filters
         //Association (Sentence)
         // column_filters = column_filters.concat(createYADCFfilters(16, 1, "select", null, "select", false, null, null, width = "70px"));

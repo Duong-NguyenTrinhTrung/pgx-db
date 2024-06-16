@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 
-from restapi.views import GeneVariantRestApiView, DrugByGeneRestApiView, TargetByAtcRestApiView, AtcToDescriptionRestApiView, \
+from restapi.views import GeneVariantRestApiView, DrugByGeneRestApiView, DrugsByAtcRestApiView, AtcToDescriptionRestApiView, \
                             AtcCodesByLevelRestApiView, TargetsByDrugRestApiView, GenebasedAssociationStatisticsRestApiView, AtcCodesByDrugRestApiView, AtcToPgxRestApiView, \
                             DrugTargetInteractionByAtcRestApiView, VariantToVepRestApiView, TargetToBundleRestApiView, DrugDiseaseAssociationByAtcRestApiView, DrugToDrugAdrRestApiView, DrugToDiseaseAssociationRestApiView
 
@@ -28,7 +28,7 @@ urlpatterns = [
     
     re_path('variant/VEPscore/(?P<variant_marker>[a-zA-Z0-9_\-\/]+)', VariantToVepRestApiView.as_view(), name='variant-to-VEP-RestApiView'),
 
-    path('atc/target/<slug:atc_code>/', TargetByAtcRestApiView.as_view(), name='target-by-atc-RestApiView'),
+    path('atc/drug/<slug:atc_code>/', DrugsByAtcRestApiView.as_view(), name='drug-by-atc-RestApiView'),
     path('atc/interaction/<slug:atc_code>/', DrugTargetInteractionByAtcRestApiView.as_view(), name='drug-target-interaction-by-atc-RestApiView'),
     path('atc/association/<slug:atc_code>/', DrugDiseaseAssociationByAtcRestApiView.as_view(), name='drug-disease-association-by-atc-RestApiView'),
     path('atc/description/<slug:atc_code>/', AtcToDescriptionRestApiView.as_view(), name='atc-to-description-RestApiView'),

@@ -96,6 +96,7 @@ function createPieChart_Proteins() {
                 .duration(500)
                 .style("opacity", 0);
         });
+        
 }
 
 

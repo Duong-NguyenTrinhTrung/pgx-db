@@ -557,3 +557,15 @@ html.dark div.dt-button-collection {
   background-color: rgb(33, 37, 41);
   box-shadow: 3px 4px 10px 1px rgba(0, 0, 0, 0.8);
 }
+
+/* Select the sorting arrows by targeting the specific classes */
+.dataTables_wrapper .sorting:after,
+.dataTables_wrapper .sorting:before {
+    font-size: 20px; /* Increase the font size */
+}
+
+.dataTables_wrapper .sorting_asc:after,
+.dataTables_wrapper .sorting_desc:before {
+    font-size: 20px; /* Increase the font size */
+}
+

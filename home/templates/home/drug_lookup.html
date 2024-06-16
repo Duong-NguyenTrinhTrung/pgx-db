@@ -153,8 +153,8 @@
                 </tr>
                 <tr>
                     <td colspan="3" style="text-align: left; padding-left: 30px;">Examples: <a
-                            href="https://go.drugbank.com/drugs/DB00002" target='_blank' hreflang="en">DB00002</a>; 
-                            <a href="https://go.drugbank.com/drugs/DB00002" target='_blank' hreflang="en">Cetuximab</a>;
+                            href="{% url 'drug-lookup' %}?drugbank_id=DB00195" target='_blank' hreflang="en">DB00002</a>; 
+                            <a href="{% url 'drug-lookup' %}?drugbank_id=DB00195" target='_blank' hreflang="en">Cetuximab</a>;
                             ... </td>
                 </tr>
             </tbody>
@@ -163,7 +163,7 @@
 </div>
 
 <div id="drug-result">
-
+    <p id="search_result_examples" style="margin: 20px 0 20px; font-size: 20px; font-weight: bold;">Random drug examples</p>
     <table id="drug-result-table">
         <thead>
             <tr>
@@ -227,7 +227,7 @@
                     {% endif %}
                 </td>
 
-                    <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ drug.drug_bankID }}"  target="_blank" rel="noopener noreferrer">Link</a></td>
+                    <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ drug.drug_bankID }}"  target="_blank" rel="noopener noreferrer">Go to Drugbank</a></td>
                 </tr>
             {% endfor %}
 
@@ -271,6 +271,7 @@
             minLength: 3,
             select: function (event, ui) {
                 $('#search_drug').val(ui.item.value);
+                $("#submit_drug").click();
                 return false;
             },
             open: function (event, ui) {
@@ -295,7 +296,7 @@
                                 <td>${item.drug_type}</td>
                                 <td>${item.Clinical_status}</td>
                                 <td>Side effects</td>
-                                <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ item.drug_bankID }}"   target="_blank" rel="noopener noreferrer">Link</a></td>
+                                <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/{{ item.drug_bankID }}"   target="_blank" rel="noopener noreferrer">Go to Drugbank</a></td>
                             </tr>`;
                         });
                         
@@ -377,7 +378,7 @@
                                         <td>${item.drug_type}</td>
                                         <td>${item.Clinical_status}</td>
                                         <td>${adr_cell}</td>
-                                        <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/${item.drug_bankID}" target="_blank" rel="noopener noreferrer">Link</a></td>
+                                        <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/${item.drug_bankID}" target="_blank" rel="noopener noreferrer">Go to Drugbank</a></td>
                                       </tr>`;
                     });
                     $("#drug-result-tbody").html(html_data);
@@ -386,6 +387,8 @@
 
          }
         $("#submit_drug").click(function() {
+            document.getElementById("search_result_examples").innerHTML = "Result(s)";
+        
             $.ajax({
                 url: "{% url 'drug-lookup' %}?drug="+ $("#search_drug").val(),
                 success: function (data) {
@@ -455,7 +458,7 @@
                                         <td>${item.drug_type}</td>
                                         <td>${item.Clinical_status}</td>
                                         <td>${adr_cell}</td>
-                                        <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/${item.drug_bankID}" target="_blank" rel="noopener noreferrer">Link</a></td>
+                                        <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/${item.drug_bankID}" target="_blank" rel="noopener noreferrer">Go to Drugbank</a></td>
                                       </tr>`;
                     });
                     $("#drug-result-tbody").html(html_data);
@@ -464,6 +467,8 @@
         });
         
         $("#reset_drug").click(function() {
+            document.getElementById("search_result_examples").innerHTML = "Random drug examples";
+        
             $.ajax({
                     url: "{% url 'drug-lookup' %}?drug=default",
                     success: function (data) {
@@ -535,7 +540,7 @@
                                                 <td>${item.drug_type}</td>
                                                 <td>${item.Clinical_status}</td>
                                                 <td>${adr_cell}</td>
-                                                <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/${item.drug_bankID}" target="_blank" rel="noopener noreferrer">Link</a></td>
+                                                <td><a title="Go to Drugbank" href="https://go.drugbank.com/drugs/${item.drug_bankID}" target="_blank" rel="noopener noreferrer">Go to Drugbank</a></td>
                                             </tr>`;
                             });
                         $("#drug-result-tbody").html(html_data);

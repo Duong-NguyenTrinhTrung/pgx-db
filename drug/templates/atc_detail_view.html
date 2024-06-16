@@ -205,7 +205,18 @@
     #commonUniqueNodesTable tr{
         border-bottom: 1px solid #ccc; 
     }
-   
+
+    .documentation {
+        float: right;
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    .color1 { color: #f48c06; }
+    .color2 { color: #d00000; }
+    .color3 { color: #9d0208; }
+    .color4 { color: #6a040f; }
+    
 </style>
 
 {% endblock %}
@@ -226,6 +237,7 @@
               <li role="presentation"><a href="#tab_network_statistics" aria-controls="tab_network_statistics" role="tab" data-toggle="tab">Network statistics</a></li>
               <li role="presentation"><a href="#tab_network_comparison" onclick="network_comparison_tab_clicked()" aria-controls="tab_network_comparison" role="tab" data-toggle="tab">Network comparison</a></li>
               <li role="presentation"><a href="#tab_network_pgx" onclick="network_pgx_tab_clicked()" aria-controls="tab_network_pgx" role="tab" data-toggle="tab">Network pharmacogenomics</a></li>
+              <li role="presentation"><a href="#tab_network_adr" onclick="network_adr_tab_clicked()" aria-controls="tab_network_adr" role="tab" data-toggle="tab">Network adverse drug reaction</a></li>
             </ul>
           
             <!-- Tab panes -->
@@ -248,6 +260,7 @@
               {% include "network_statistics_tab.html" %}
               {% include "network_comparison_tab.html" %}
               {% include "network_pgx_tab.html" %}
+              {% include "network_adr_tab.html" %}
             </div>
           </div>
         
@@ -317,41 +330,46 @@
 {% block addon_js %}
 
 
-
 <script src="{% static 'home/js/d3.v7.min.js' %}"></script>
 <script src="{% static 'drug/js/target_table_statistics.js' %}"></script>
 <script src="{% static 'drug/js/atc_network_statistics.js' %}"></script>
 <script src="{% static 'drug/js/atc_network_comparison.js' %}"></script>
-<!-- <script src="{% static 'drug/js/drug_network.js' %}"></script> -->
 <script src="{% static 'home/js/datatables.min.js' %}"></script>
 <script src="{% static 'home/js/bootstrap2-toggle.min.js' %}"></script>
 <script src="{% static 'home/js/jquery.dataTables.yadcf.js' %}"></script>
 <script src="{% static 'home/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'drug/js/tableToExcel.js' %}"></script>
 
-<script>
-    function network_visual_tab_clicked(){
-        // alert("network visualization is clicked");
-        // draw_atc_level_network(button, response);
-    }
-</script>
 
 <script>
     // var isNetworkPGxTabClicked = false;
     
     function network_pgx_tab_clicked()
-    {
+    {   
+        var sp = document.getElementById("read_more_pgx");
         var p = document.getElementById('tab_network_pgx_message');
         var d = document.getElementById('pgx_data_display_area');
         p.style.display="none";
         console.log("hasPGxData: " + hasPGxData);
         if (!hasPGxData){
+            sp.style.display = "none";
             p.style.display="block";
             d.style.display="none";
 
         }else{
+            
+            sp.style.display="inline";
             p.style.display="none";
             d.style.display="block";
         }
+    }
+
+    function network_adr_tab_clicked()
+    {
+        // var atc_level_network_adr_text = document.getElementById("atc_level_network_adr_text");
+        // var atc_level_network_adr = document.getElementById("atc_level_network_adr");
+        // atc_level_network_adr_text.html="";
+        // atc_level_network_adr.html="";
     }
 
     function network_comparison_tab_clicked(){
@@ -539,14 +557,21 @@
         var drug_type_statistics_plot = document.createElement("div");
         drug_type_statistics_plot.setAttribute("id", "drug_type_statistics_plot");
     }
+
     document.addEventListener('DOMContentLoaded', (event) => {
         // Retrieve data from localStorage
         const storedData = localStorage.getItem('jsonData');
         
         if (storedData) {
-            const data = JSON.parse(storedData);
-            console.log( data,'Data retrieved from localStorage:' );
+            let  data = JSON.parse(storedData);
             
+            console.log("before" ,data )
+            console.log(  data,'Data retrieved from localStorage:' );
+            if (data > 300){ 
+                data = 1280
+                console.log("after" ,data )
+            } 
+
             var iframe = document.getElementById('myIframe');
             iframe.style.height = data+'px'
 
@@ -725,6 +750,7 @@
                             draw_atc_level_network(button, response);
                             showAtcLevelNetworkStatistics2(response.atc_code);
                             showPGxTable(response.atc_code);
+                            showAtcLevelNetworkADR(response.atc_code);
                         }
                     },
                     error: function (xhr, status, error) {
@@ -742,7 +768,7 @@
                     var row = associations[i];
                     drug_bank_ids.push(row.drug_bankID);
                 }
-                var atc_url = "{% url 'drugs-network' %}" + "?drug_bank_ids=" + drug_bank_ids.toString();
+                var atc_url = "{% url 'drugs-network' %}" + "?atc_code="+response.atc_code+"&drug_bank_ids=" + drug_bank_ids.toString();
                 toggleDivVisibility(button, atc_url)
             }
         }

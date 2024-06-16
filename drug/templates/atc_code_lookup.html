@@ -32,12 +32,12 @@
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3rd level: Therapeutic/pharmacological subgroup<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4th level: Chemical/therapeutic/pharmacological subgroup<br>
                         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;5th level: Chemical substance<br>
-                        Substances or combination of substances in the 5th level refer to a single indication. Drugs having more than one indication belong to more than one ATC code. <a href="{% url 'drug-lookup' %}?drugbank_id=DB00195">Betaxolol</a> for example has 3 ATC codes assigned.
+                        Substances or combination of substances in the 5th level refer to a single indication. Drugs having more than one indication belong to more than one ATC code. <a href="{% url 'drug-lookup' %}?drugbank_id=DB00218">Moxifloxacin</a> for example has 2 ATC codes (<a href="{% url 'atc-detail-view' %}?group_id=S&detail=S01AE07">S01AE07</a>, <a href="{% url 'atc-detail-view' %}?group_id=J&detail=J01MA14">J01MA14</a>) assigned .
                         <br>
                         </p>
                 </div>
                 <div id="sub-atc-intro-image">
-                    <img src="static/drug/image/atc2.png" alt="Atc code example" style="width: 70%; margin-left: 50px;">
+                    <img src="static/drug/image/atc4.png" alt="Atc code example" style="width: 70%; margin-left: 50px;">
                 </div>
             </div>
             <h3 style="margin-top: 10px;">Search</h3>
@@ -62,12 +62,12 @@
         </div>
 
         <div id="atc-intro">
-            <h3 style="margin-bottom: 5px;">ATC tree</h3>
+            <h3 style="margin-bottom: 5px;">ATC classification hierachy </h3>
         </div>
         <div id="atc-l1" style="margin-top: 15px;">
             <p style="margin-top: 0px; margin-bottom: 15px;">All ATC levels are browsable from 1st to 5th ATC level</p>
             {% for group in atc_groups %}
-                <p style="margin-top: 0px; margin-bottom: 4px;"><a href="{% url 'atc-detail-view' %}?group_id={{ group.id }}">{{ group.id }}: {{ group.name }}</a></p>
+                <p style="margin-top: 0px; margin-bottom: 4px;"><a style="color: #e36414" href="{% url 'atc-detail-view' %}?group_id={{ group.id }}">{{ group.id }}: {{ group.name }}</a></p>
             {% empty %}
                 <p>No data available</p>
             {% endfor %}
