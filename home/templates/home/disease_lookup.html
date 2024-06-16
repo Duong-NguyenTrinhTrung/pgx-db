@@ -23,6 +23,9 @@
         border-radius: 5px;
         min-width: 100%;
     }
+    /* #disease-result-table thead tr{
+        background-color: #04b970;
+    } */
 
     #disease-result-table th:first-child{
         border-top-left-radius: 5px;
@@ -39,7 +42,7 @@
     #disease-result-table th{
         height: 40px;
         text-align: left;
-        background-color: #dee2e6; 
+        /* background-color: #dee2e6;  */
         font-weight: bold;
         font-size: 14px;
     }
@@ -48,14 +51,14 @@
         padding: 0 7px;
     }
 
-    {% comment %} #disease-result-table tr:nth-child(even) {
-        background-color: #dee2e6 /* Color 1 for even rows */
+    #disease-result-table tr:nth-child(even) {
+        background-color: #04b970/* Color 1 for even rows */
     }
 
     #disease-result-table tr:nth-child(odd) {
         /* background-color: rgba(241, 124, 14, 0.2); */
         background-color: white; /* Color 2 for odd rows */
-    } {% endcomment %}
+    } 
 
 
 
@@ -64,7 +67,8 @@
    {
         display: block;
         width: 70%;
-        background-color: #dee2e6;
+        background-color: rgba(4, 185, 112, 0.8);
+        /* color: 7c469d; */
         padding: 10px;
         border-radius: 5px;
     }
@@ -122,7 +126,7 @@
 
 {% block content %}
 <div id="disease">
-    <p>Search by <i><span style="color:#3f88c5;">Disease name</span></i></p>
+    <p>Search by <i><span style="color:white;">Disease name</span></i></p>
     <form method="get" action="">
         <table class="table table-bordered table-gray table-fulltext-two-rows">
             <tbody>
@@ -145,7 +149,7 @@
                 </tr>
                 <tr>
                     <td colspan="3" style="text-align: left; padding-left: 30px;">Examples: <a
-                            href="https://clinicaltrials.gov/search?id=%22NCT03803787%22"  target="_blank" hreflang="en">Radiation Pneumonitis</a>; 
+                            href="{% url 'disease-lookup' %}?disease_info=Radiation%20Pneumonitis"  target="_blank" hreflang="en">Radiation Pneumonitis</a>; 
                             </td>
                 </tr>
             </tbody>
@@ -154,10 +158,10 @@
 </div>
 
 <div id="disease-result">
-
+    <p id="search_result_examples" style="margin: 20px 0 20px; font-size: 20px; font-weight: bold;">Random disease examples</p>
     <table id="disease-result-table">
         <thead>
-            <tr>
+            <tr style="background-color: rgba(4, 185, 112, 0.8);">
                 <th>Disease name</th>
                 <th>Disease class</th>
                 <th>Disease_UML_CUI</th>
@@ -172,7 +176,7 @@
         <tbody id="disease-result-tbody">
             {% for item in response_data %}
                 {% for drug in item.drugs %}
-                    <tr style="background-color: {% if forloop.parentloop.counter0|divisibleby:2 %}#f2f2f2{% else %}#ffffff{% endif %}">
+                    <tr style="background-color: {% if forloop.parentloop.counter0|divisibleby:2 %}white{% else %}#d8f3dc{% endif %}">
                         {% if forloop.first %}
                             <!-- Apply rowspan only for the first row -->
                             <td style="vertical-align: top;" rowspan="{{ item.drugs|length }}">{{ item.disease_name }}</td>
@@ -223,6 +227,8 @@
             minLength: 3,
             select: function (event, ui) {
                 $('#search_disease').val(ui.item.value);
+                $("#submit_disease").click();
+                
                 return false;
             },
             open: function (event, ui) {
@@ -248,7 +254,7 @@
                     {
                         console.log(i+ " data.response_data =  "+data.response_data[i]);
                         var goToNetworkURL;
-                        bgColor = i % 2 === 0 ? "#f2f2f2" : "#ffffff";
+                        bgColor = i % 2 === 0 ? "white" : "#95d5b2";
                         for (var j = 0; j < data.response_data[i].drugs.length; j++) {
                             if (data.response_data[i].drugs[j].atc_code === "None") {
                                 goToNetworkURL = "";
@@ -284,6 +290,10 @@
 
         // submit
         $("#submit_disease").click(function () {
+            // console.log("submit "+$("#search_result_examples").text());
+            // $("#search_result_examples").html("Result(s)");
+            document.getElementById("search_result_examples").innerHTML = "Result(s)";
+        
             var d = $("#search_disease").val();
             console.log("search_disease.val(): "+d);
             $.ajax({
@@ -296,7 +306,7 @@
                     {
                         console.log(i+ " data.response_data =  "+data.response_data[i]);
                         var goToNetworkURL;
-                        bgColor = i % 2 === 0 ? "#f2f2f2" : "#ffffff";
+                        bgColor = i % 2 === 0 ? "white" : "#95d5b2";
                         for (var j = 0; j < data.response_data[i].drugs.length; j++) {
                             if (data.response_data[i].drugs[j].atc_code === "None") {
                                 goToNetworkURL = "";
@@ -338,6 +348,10 @@
 
         // reset
         $("#reset_disease").click(function() {
+            // console.log("reset "+$("#search_result_examples").text());
+            // $("#search_result_examples").html("Random disease examples");
+            document.getElementById("search_result_examples").innerHTML = "Random disease examples";
+        
             $.ajax({
                     url: "{% url 'disease-lookup' %}?disease=default",
                     success: function (data) {
@@ -350,7 +364,7 @@
                         // for (var i = 0; i < 4; i++) 
                         {
                             // alert(i+" drug length = "+data.response_data[i].drugs.length);
-                            bgColor = i % 2 === 0 ? "#f2f2f2" : "#ffffff";
+                            bgColor = i % 2 === 0 ? "white" : "#d8f3dc";
                             // for (var j = 0; j < 4; j++) {
                             for (var j = 0; j < data.response_data[i].drugs.length; j++) {
                                 var goToNetworkURL;

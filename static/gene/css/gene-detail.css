@@ -50,13 +50,13 @@ table.dataTable tbody td {
 /*}*/
 
 table.dataTable.compact tbody th {
-    padding: 5px 10px 5px 0 !important;
+    padding: 5px 15px 5px 5px !important;
     /* width: 0px; */
 }
 
 table.dataTable.compact thead th,
 table.dataTable.compact thead td {
-    padding: 5px 10px 5px 0px;
+    padding: 5px 15px 5px 5px;
     /* width: 0px; */
 }
 
@@ -199,8 +199,10 @@ table.th.td {
     margin-left: 0;
 }
 
-td.align-left {
-    text-align: left;
+td.vep-cell {
+    text-align: center;
+    border-radius: 10px;
+    
 }
 
 /* Loading icon */

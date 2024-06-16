@@ -190,3 +190,11 @@ class AdverseDrugReaction(models.Model):
 class SideEffect(models.Model):
     side_effect_name = models.CharField(max_length=255, primary_key=True)
     side_effect_definition = models.TextField()
+
+
+class PreCachedDrugNetwork(models.Model):
+    atc_code = models.CharField(max_length=7)
+    drug_json_data = models.TextField(default="")
+    protein_json_data = models.TextField(default="")
+    general_json_data = models.TextField(default="")
+    interaction_json_data = models.TextField(default="")

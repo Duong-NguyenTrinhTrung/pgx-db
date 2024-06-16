@@ -1,0 +1,186 @@
+{% load static %}
+{% csrf_token %}
+
+
+{% block addon_css %}
+    <link rel="stylesheet" href="{% static 'drug/css/drug_network.css' %}">
+{% endblock %}
+
+<div id="atc-right-network">
+    <div id="loading">
+        <div class="spinner"></div>
+    </div>    
+   
+        <div id="overlay"></div>
+
+        <div id="dialog" style="display: none;">
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <h1 id="drug-name"></h1>
+                </div>
+                <div class="toolbar-right">
+                    <button id="close-button">✕</button>
+                </div>
+            </div>
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" data-tab="drug-image" href="#">Drug/biologics structure</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="drug-description" href="#">Description</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-tab="drug-structure" href="#">Other properties</a>
+                </li>
+
+            </ul>
+            <div class="tab-content">
+
+                <!-- Content for each tab will be added dynamically -->
+            </div>
+        </div>
+        <!--Child/Protein Nodes Dialog-->
+        <div id="dialog1" >
+            <div class="toolbar1">
+                <div class="toolbar-left">
+                    <h1 id="drug-name1"></h1>
+                </div>
+                <div class="toolbar-right">
+                    <button id="close-button1">✕</button>
+                </div>
+            </div>
+            <ul class="nav nav-tabs1">
+                <li class="nav-item1">
+                    <a class="nav-link1 active" data-tab="protein-image" href="#">Protein structure</a>
+                </li>
+                <li class="nav-item1">
+                    <a class="nav-link1" data-tab="protein-structure" href="#">Protein properties</a>
+                </li>
+
+            </ul>
+            <div class="tab-content1">
+
+                <!-- Content for each tab will be added dynamically -->
+            </div>
+        </div>
+
+        <!--Interaction/Links Nodes Dialog-->
+        <div id="dialog2" style="display: none;">
+            <div class="toolbar2">
+                <div class="toolbar-left">
+                    <h1 id="drug-name2"></h1>
+                </div>
+                <div class="toolbar-right">
+                    <button id="close-button2">✕</button>
+                </div>
+            </div>
+            <ul class="nav nav-tabs2">
+                <li class="nav-item2">
+                    <a class="nav-link2 active" data-tab="interaction-strcuture" href="#">Details</a>
+                </li>
+
+            </ul>
+            <div class="tab-content2">
+
+                <!-- Content for each tab will be added dynamically -->
+            </div>
+        </div>
+
+        <div id="screenshot">
+            <div class="d-flex justify-content-center btmbar" id="threshold-slider-container">
+                <button type="button" class="btn btn-light d-flex btmbar zoom-in-btn"><i
+                        class="fas fa-search-plus zoom-in-icon"></i>&nbsp;Zoom In
+                </button>
+                <button type="button" class="btn btn-light d-flex btmbar col-xs-2 margin-left zoom-out-btn"><i
+                        class="fas fa-search-minus zoom-out-icon"></i>&nbsp;Zoom Out
+                </button>
+                <!-- here i remove the d-flex  bootstrap class so that it can remove the slider  -->
+               <!-- if you want to display the slider you should add that class also thanks -->
+                <label class=" btmbar" for="threshold-slider" style="display: none;">&nbsp;Threshold Value:</label>
+                <input class="btmbar" type="range" id="threshold-slider" min="1" max="" value="" step="1" style="display: none;">
+                <span class="btmbar" id="threshold-value" style="display: none;"></span>
+                <button type="button" id="exportButton" class="btn btn-light d-flex btmbar">Export</button>
+                <button type="button" id="redrawChart" class="btn btn-light d-flex btmbar">Redraw</button>
+                <button type="button" id="GetmoreData" class="btn btn-light d-flex btmbar">
+                    Get more data
+                </button>
+            </div>
+            <div id="chart"></div>
+            <div id="legendsMainDiv" class="center-vertical-container">
+                <div id="all-legends">
+                    <div id="legend_drug_status">
+                        <h3>Clinical status</h3>
+                        <div id="legend_drug_status-content">
+                            <!-- Legend items will be populated dynamically -->
+                        </div>
+                    </div>
+                    <div id="legend">
+                        <h3> Interaction </h3>
+                        <div id="legend-content">
+                          <!-- Legend items will be populated dynamically -->
+                        </div>
+                    </div>
+                    <div id="legend_drug_type">
+                        <h3>Product type</h3>
+                        <div id="legend_drug_type-content">
+                            <!-- Legend items will be populated dynamically -->
+                        </div>
+                    </div>
+
+                    <div id="legend_protein_status">
+                        <h3>Protein super family</h3>
+                        <div id="legend_protein_status-content">
+                            <!-- Legend items will be populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- here is the disease legend started -->
+                    <div id="legend_disease_status">
+                        <h3 id="Disease_to_hide">Disease family</h3>
+                        <div id="legend_disease_status-content">
+                        <!-- Legend items will be populated dynamically -->
+                    </div>
+                    <div id="legend">
+                        <h3 id="trial_to_hide"> Clinical trial </h3>
+                        <div id="legend-content_disease">
+                            <!-- Legend items will be populated dynamically -->
+                        </div>
+                    </div>
+        
+                    <!-- endedd  -->
+
+
+                </div>
+            </div>
+        </div> <!--Screenshot div closing-->
+        
+
+
+         
+</div>
+
+
+
+<!--Network Chart End-->
+{% block addon_js %}
+    <script src="https://d3js.org/d3.v6.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+    <script src="{% static 'libs/pickr.min.js' %}"></script>
+    <script src="{% static 'libs/canvg.min.js' %}"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+  
+    <script>
+        // Get drug_bank_id for single drug network
+        var drug_bank_id = "{{ drug_bank_id }}";
+        // Get list of drug bank ids for multiple drug network
+        var drug_bank_ids = []
+        {% for drug_bank_id in drug_bank_ids %}
+            drug_bank_ids.push("{{ drug_bank_id }}")
+        {% endfor %}
+    </script>
+    <script src="{% static 'drug/js/drug_network.js' %}"></script>
+{% endblock %}

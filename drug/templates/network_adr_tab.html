@@ -1,0 +1,170 @@
+{% load static %}
+{% csrf_token %}
+
+<div role="tabpanel" class="tab-pane" id="tab_network_adr">
+    <!-- block for showing the atc level network adr -->
+    <div id='atc_level_network_adr' style="border: #b4b1b1 1px solid">
+        <div style="margin-top: 20px; margin-left: 20px;">
+            <p style="text-align: center; font-size: 16px;">
+                <span style="display: block; color: red ;" id="atc_level_network_adr_text"> </span>
+                <span style="display: none;" class="documentation" id="atc_level_network_adr_read_more"><a href="https://pgx-documentation.readthedocs.io/en/latest/atc_code.html#network-drug-adverse-reaction" target="_blank">Read More</a></span>
+                <span style="color: grey; font-style: italic;" id="atc_level_network_adr_subtext"> </span>
+            </p>
+        </div>
+        <div>
+            <!-- a button  -->
+            <button id="adr_download" onclick="downloadTableToExcel(this)" type="button" class="btn btn-primary exportBtn"
+            style="width: 120px; float: left; margin-left: 20px; margin-bottom: 20px; display: none; ">
+            Export to Excel
+            </button>
+        </div>
+        <div class="row" id="atc_level_network_adr_table" style="display: none;">
+            
+        </div>
+    </div>
+</div>
+
+
+{% block addon_js %}
+<script>
+    function showAtcLevelNetworkADR(atc_code) {
+        // text
+        var atc_level_network_adr_text = document.getElementById("atc_level_network_adr_text");
+        var atc_level_network_adr_read_more = document.getElementById("atc_level_network_adr_read_more");
+
+        var atc_level_network_adr_subtext = document.getElementById("atc_level_network_adr_subtext");
+        var adr_download = document.getElementById("adr_download");
+
+        if (atc_code != "no ATC code") {
+            showADR(atc_code);
+        } else {
+            atc_level_network_adr_text.innerHTML = "Drug adverse reaction of drug ";
+            // showOneDrugADR(drug_id);
+        }
+    }
+
+    function showADR(atc_code) {
+        var atc_level_network_adr_table = document.getElementById("atc_level_network_adr_table");
+        // clear the old content
+        atc_level_network_adr_table.innerHTML = "";
+
+        $.ajax(
+            {
+                url: "{% url 'get-adr-data-by-atc' %}?atc_code=" + atc_code,
+                type: "GET",
+                success: function (response) 
+                {
+                    if (response.length >0)
+                    {
+                        atc_level_network_adr_text.innerHTML = "Drug adverse reaction of drugs in the network of " + atc_code;
+                        atc_level_network_adr_subtext.innerHTML = "\n(Drug names are listed in alphabetical order;  Frequencies are listed in descending order)";
+                        adr_download.style.display = "block";
+                        atc_level_network_adr_read_more.style.display = "block";
+                        atc_level_network_adr_table.style.display = "block";
+
+                        var table = document.createElement("table");
+                        table.setAttribute("id", "adr_table_content");
+                        table.html="";
+                        table.style.width = "calc(100% - 60px)";
+                        table.style.margin = "0 20px 40px";
+                        table.setAttribute("border", "1");
+                        
+                        // Create table headers
+                        var thead = document.createElement("thead");
+                        thead.style.backgroundColor = "lightgrey";
+                        var headerRow = document.createElement("tr");
+                        
+                        var headers = ["Drugbank ID", "Drug name", "Side effect (SE)", "SE Definition", "Frequency<br>(in percentage)"];
+                        headers.forEach(function(headerText) {
+                            var th = document.createElement("th");
+                            th.innerHTML = headerText;
+                            th.style.textAlign = "center";
+                            headerRow.appendChild(th);
+                        });
+                        thead.appendChild(headerRow);
+                        table.appendChild(thead);
+                        
+                        // Create table body
+                        var tbody = document.createElement("tbody");
+                        var idx = 0;
+                        
+                        response.forEach(function(drug) 
+                        {
+                            var adr_data_length = drug.adr_data.length;
+                            if (adr_data_length>0){
+                                idx+=1;
+                            }
+                            
+                            drug.adr_data.forEach(function(adr, index) {
+                                console.log("idx ", idx, " ", adr.drug_id);
+                                var row = document.createElement("tr");
+                                if (idx % 2 === 0) {
+                                    row.style.backgroundColor = "lightgrey";
+                                }
+                                
+                                if (index === 0) {
+                                    var drugIdCell = document.createElement("td");
+                                    drugIdCell.appendChild(document.createTextNode(drug.drug_id));
+                                    drugIdCell.setAttribute("rowspan", adr_data_length);
+                                    drugIdCell.style.verticalAlign="top";
+                                    row.appendChild(drugIdCell);
+    
+                                    var drugNameCell = document.createElement("td");
+                                    drugNameCell.appendChild(document.createTextNode(drug.drug_name));
+                                    drugNameCell.setAttribute("rowspan", adr_data_length);
+                                    drugNameCell.style.verticalAlign="top";
+                                    row.appendChild(drugNameCell);
+                                }
+                                
+                                var sideEffectCell = document.createElement("td");
+                                sideEffectCell.appendChild(document.createTextNode(adr["Side effect"]));
+                                row.appendChild(sideEffectCell);
+                                
+                                var definitionCell = document.createElement("td");
+                                definitionCell.appendChild(document.createTextNode(adr.Definition));
+                                definitionCell.style.maxWidth = "500px";
+                                row.appendChild(definitionCell);
+                                
+                                var frequencyCell = document.createElement("td");
+                                var frequencyValue = adr["Frequency (in percentage)"];
+                                frequencyCell.appendChild(document.createTextNode(adr["Frequency (in percentage)"]));
+                                frequencyCell.style.textAlign = "center";
+                                if (frequencyValue <= 25) {
+                                    frequencyCell.className = "color1";
+                                } else if (frequencyValue <= 50) {
+                                    frequencyCell.className = "color2";
+                                } else if (frequencyValue <= 75) {
+                                    frequencyCell.className = "color3";
+                                } else {
+                                    frequencyCell.className = "color4";  // Corrected the logic to assign 'color4' class for values greater than 75
+                                }
+                                row.appendChild(frequencyCell);
+                                
+                                tbody.appendChild(row);
+                            });
+                        });
+                        table.appendChild(tbody);
+                        atc_level_network_adr_table.appendChild(table);
+                    }
+                    else
+                    {
+                        atc_level_network_adr_text.innerHTML = "There is no drug in this network of " + atc_code +" that has adverse reaction";
+                    }
+                },
+            error: function (xhr, status, error) {
+                console.log('AJAX Error:', error);
+            }
+        });
+    }
+
+    function downloadTableToExcel(element) {
+        let table = document.getElementById("adr_table_content"); // you can use document.getElementById('tableId') as well by providing id to the table tag
+        TableToExcel.convert(table, { // html code may contain multiple tables so here we are refering to 1st table tag
+            name: `ADR.xlsx`, // fileName you could use any name
+            sheet: {
+            name: 'Sheet 1' // sheetName
+            }
+        });
+    }
+</script>
+{% endblock %}

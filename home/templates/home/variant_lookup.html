@@ -232,7 +232,7 @@
                 </tr>
                 <tr>
                     <td colspan="3" style="text-align: left; padding-left: 30px;">Input format: <span style="color: #0582ca"><i>Chromosome_Coordinate_Reference/Alternative allele</i></span>. Examples: <a
-                            href="/gene/ENSG00000196396/" target='_blank' hreflang="en">20_50581449_C/G</a></td>
+                            href="{% url 'variant-lookup' %}?variant_marker=20_50581449_C/G" target='_blank' hreflang="en">20_50581449_C/G</a></td>
                 </tr>
                 
             </tbody>
@@ -241,6 +241,7 @@
 </div>
 
 <div id="variant-result" style="margin-top: 40px;">
+    <p id="search_result_examples" style="margin: 20px 0 20px; font-size: 20px; font-weight: bold;">Random variant examples</p>
     <table id="variant-result-table">
         <thead>
             <tr>
@@ -258,7 +259,7 @@
                     <td>{{variant.geneID}}</td>
                     <td>{{variant.genename}}</td>
                     <td>{{variant.pt}}</td>
-                    <td><a href="/gene/{{variant.geneID}}?variant_marker={{variant.VariantMarker}}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
+                    <td><a href="/gene/gene_detail/{{variant.geneID}}?variant_marker={{variant.VariantMarker}}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -284,9 +285,10 @@
                 });
             },
             autoFocus: true,
-            minLength: 5,
+            minLength: 3,
             select: function (event, ui) {
                 $('#search_variant').val(ui.item.value);
+                $("#submit_variant").click();
                 return false;
             },
             open: function (event, ui) {
@@ -341,7 +343,7 @@
                             <td>${item.geneID}</td>
                             <td>${item.genename}</td>
                             <td>${item.pt}</td>
-                            <td><a href="/gene/${item.geneID}?variant_marker=${item.VariantMarker}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
+                            <td><a href="/gene/gene_detail/${item.geneID}?variant_marker=${item.VariantMarker}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
                         </tr>`;
                     });
                     $("#variant-result-tbody").html(html_data);
@@ -353,6 +355,8 @@
         }
     
         function variant_search(){
+            document.getElementById("search_result_examples").innerHTML = "Result(s)";
+        
             var variant_id = $("#search_variant").val().split(" ")[0].trim();
             var method = "GET";
             var url= "{% url 'variant-lookup' %}?variant_id=" + variant_id;
@@ -370,7 +374,7 @@
                             <td>${item.geneID}</td>
                             <td>${item.genename}</td>
                             <td>${item.pt}</td>
-                            <td><a href="/gene/${item.geneID}?variant_marker=${item.VariantMarker}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
+                            <td><a href="/gene/gene_detail/${item.geneID}?variant_marker=${item.VariantMarker}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
                         </tr>`;
                     });
                     $("#variant-result-tbody").html(html_data);
@@ -382,6 +386,8 @@
         }
 
         function variant_reset(){
+            document.getElementById("search_result_examples").innerHTML = "Random variant examples";
+        
             var method = "GET";
             var url= "{% url 'variant-lookup' %}?variant_id=default";
             $.ajax({
@@ -397,7 +403,7 @@
                             <td>${item.geneID}</td>
                             <td>${item.genename}</td>
                             <td>${item.pt}</td>
-                            <td><a href="/gene/${item.geneID}?variant_marker=${item.VariantMarker}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
+                            <td><a href="/gene/gene_detail/${item.geneID}?variant_marker=${item.VariantMarker}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
                         </tr>`;
                     });
                     $("#variant-result-tbody").html(html_data);

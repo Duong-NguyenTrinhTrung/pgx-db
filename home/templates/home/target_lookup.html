@@ -24,6 +24,7 @@
 
     #target-result-table {
         border-radius: 5px;
+        width: 100%;
     }
 
     #target-result-table th:first-child{
@@ -34,6 +35,10 @@
     #target-result-table th:last-child {
         border-top-right-radius: 5px;
         border-bottom-right-radius: 5px;
+    }
+    /* :not(:last-child) */
+    #target-result-table tr td {
+        vertical-align: top;
     }
 
 
@@ -111,6 +116,8 @@
         /* text-align: center;  */
         vertical-align: middle;
         /* Vertically center the content within the td */
+        padding-top: 5px;
+        padding-bottom: 5px;
     }
 
     .autocomplete-outer{
@@ -162,10 +169,10 @@
                 </tr>
                 <tr>
                     <td colspan="3" style="text-align: left; padding-left: 30px;">Examples: <a
-                            href="/gene/ENSG00000138075/" target='_blank' hreflang="en">Q9H222</a>; 
-                            <a href="/gene/ENSG00000138075/" target='_blank' hreflang="en">ATP-binding cassette sub-family G member 5 (EC 7.6.2.-) (Sterolin-1)</a>;
-                            <a href="/gene/ENSG00000138075/" target='_blank' hreflang="en">ABCG5</a>;
-                            <a href="/gene/ENSG00000138075/" target='_blank' hreflang="en">ENSG00000138075</a>
+                            href="{% url 'target-lookup' %}?uniprot_id=Q9H222" target='_blank' hreflang="en">Q9H222</a>; 
+                            <a href="{% url 'target-lookup' %}?uniprot_id=Q9H222" target='_blank' hreflang="en">ATP-binding cassette sub-family G member 5 (EC 7.6.2.-) (Sterolin-1)</a>;
+                            <a href="{% url 'target-lookup' %}?uniprot_id=Q9H222" target='_blank' hreflang="en">ABCG5</a>;
+                            <a href="{% url 'target-lookup' %}?uniprot_id=Q9H222" target='_blank' hreflang="en">ENSG00000138075</a>
                             ; ... </td>
                 </tr>
             </tbody>
@@ -174,34 +181,35 @@
 </div>
 
 <div id="target-result">
-
+    <p id="search_result_examples" style="margin: 20px 0 20px; font-size: 20px; font-weight: bold;">Random target examples</p>
     <table id="target-result-table">
         <thead>
             <tr>
-                <th>UniProtID</th>
-                <th>Protein name</th>
-                <th>Gene ID</th>
-                <th style="text-wrap: nowrap;"">Gene symbol</th>
-                <th>Details</th>
-                <th style="width: 200px;">Interacting drugs </th>
+                <th style="text-align: left;">UniProtID</th>
+                <th style="max-width: 200px;">Protein name</th>
+                <th style="text-align: left;">Gene ID</th>
+                <th style="text-wrap: nowrap; text-align: left;">Gene symbol</th>
+                <th style="text-align: left;">Details</th>
+                <th style="max-width: 200px;">Interacting drugs </th>
             </tr>
         </thead>
         <tbody id="target-result-tbody">
             {% for item in items %}
                 <tr>
                     <td>{{ item.uniprot_ID }}</td>
-                    <td>{{ item.protein_name }}</td>
+                    <td style="max-width: 200px;">{{ item.protein_name }}</td>
                     <td>{{ item.geneID }}</td>
                     <td>{{ item.genename }}</td>
-                    <td><a href="{% url 'gene:gene' slug=item.geneID %}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
-                    <td>
+                    <td><a href="{% url 'gene:get-gene-detail-data' item.geneID %}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
+                    <td style="max-width: 200px;">
                     {% for drug in item.drug_data %}
                         {% if drug.atc_code %}
                             <i class="fa fa-pills fa-solid"></i> <a href="{% url 'atc-detail-view' %}?group_id={{drug.atc_code.0}}&detail={{drug.atc_code}}"
                                 >{{drug.drug_name}}</br>
                             </a>
                         {% else %}
-                            <i class="fa fa-pills fa-solid"></i> <a href="{% url 'atc-detail-view' %}?drug_id={{drug.drug_id}}"
+                            <!-- <i class="fa fa-pills fa-solid"></i> <a href="{% url 'get-drug-association' %}?drug_id={{drug.drug_id}}" -->
+                            <i class="fa fa-pills fa-solid"></i> <a href="{% url 'atc-detail-view' %}?group_id={{drug.atc_code.0}}&detail={{drug.atc_code}}"
                                 >{{drug.drug_name}}</br>
                             </a>
                         {% endif %}
@@ -222,6 +230,7 @@
     $(document).ready(function () {
         var autocompleteResults = $('#protein-autocomplete-results');
         $('#search_protein').autocomplete({
+            minLength: 3,
             source: function (request, response) {
                 $.ajax({
                     url: "{% url 'protein-autocomplete-view' %}",
@@ -235,9 +244,9 @@
                 });
             },
             autoFocus: true,
-            minLength: 3,
             select: function (event, ui) {
                 $('#search_protein').val(ui.item.value);
+                $("#submit_protein").click();
                 return false;
             },
             open: function (event, ui) {
@@ -249,39 +258,42 @@
         });
         // Hide autocomplete results when clicking outside of the input and results
         
-        $("#search_protein").on('keyup', function() {
-            $.ajax({
-                    url: "{% url 'target-lookup' %}?target="+ $(this).val(),
-                    success: function (data) {
-                        console.log(data.items);
-                        $("#target-result-tbody").html('');
-                        var html_data = '';
-                        data.items.forEach(item => {
-                            var drug_list = [];
-                            for (var j = 0; j<item.drug_data.length;j++) {
-                                if (item.drug_data[j].atc_code)
-                                {
-                                    drug_list.push(`<i class="fa fa-pills fa-solid"></i> <a href="{% url 'atc-detail-view' %}?group_id=${item.drug_data[j].atc_code.charAt(0)}&detail=${item.drug_data[j].atc_code}"> ${item.drug_data[j].drug_name}</a></br>`);
-                                }
-                                else
-                                {
-                                    drug_list.push(`<i class="fa fa-pills fa-solid"></i> <a href="{% url 'atc-detail-view' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
-                                }
-                            }
-                            html_data += `<tr>
-                                <td>${item.uniprot_ID}</td>
-                                <td>${item.protein_name}</td>
-                                <td>${item.geneID}</td>
-                                <td>${item.genename}</td>
-                                <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
-                                <td>${drug_list.join('')}</td>
-                            </tr>`;
-                        });
+        //  $("#search_protein").on('keyup', function() {
+        //     if ($(this).val().lenth >= 3){
+        //         $.ajax({
+        //             url: "{% url 'target-lookup' %}?target="+ $(this).val(),
+        //             success: function (data) {
+        //                 console.log(data.items);
+        //                 $("#target-result-tbody").html('');
+        //                 var html_data = '';
+        //                 data.items.forEach(item => {
+        //                     var drug_list = [];
+        //                     for (var j = 0; j<item.drug_data.length;j++) {
+        //                         if (item.drug_data[j].atc_code)
+        //                         {
+        //                             drug_list.push(`<i class="fa fa-pills fa-solid"></i> <a href="{% url 'atc-detail-view' %}?group_id=${item.drug_data[j].atc_code.charAt(0)}&detail=${item.drug_data[j].atc_code}"> ${item.drug_data[j].drug_name}</a></br>`);
+        //                         }
+        //                         else
+        //                         {
+        //                             drug_list.push(`<i class="fa fa-pills fa-solid"></i> <a href="{% url 'get-drug-association' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
+        //                         }
+        //                     }
+        //                     html_data += `<tr>
+        //                         <td>${item.uniprot_ID}</td>
+        //                         <td style="max-width: 200px;">${item.protein_name}</td>
+        //                         <td>${item.geneID}</td>
+        //                         <td>${item.genename}</td>
+        //                         <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
+        //                         <td style="max-width: 200px;">${drug_list.join('')}</td>
+        //                     </tr>`;
+        //                 });
                         
-                        $("#target-result-tbody").html(html_data);
-                    }
-                });
-        }); 
+        //                 $("#target-result-tbody").html(html_data);
+        //             }
+        //         });
+        //     }
+            
+        // }); 
 
         var urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('uniprot_id')) {
@@ -301,26 +313,31 @@
                                 }
                                 else
                                 {
-                                    drug_list.push(`<i class="fa fa-pills fa-solid"></i> <a href="{% url 'atc-detail-view' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
+                                    drug_list.push(`<i class="fa fa-pills fa-solid"></i> <a href="{% url 'get-drug-association' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
                                 }
                             }
                             html_data += `<tr>
-                                <td>${item.uniprot_ID}</td>
+                                <td style="max-width: 200px;">${item.uniprot_ID}</td>
                                 <td>${item.protein_name}</td>
                                 <td>${item.geneID}</td>
                                 <td>${item.genename}</td>
-                                <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
-                                <td>${drug_list.join('')}</td>
+                                <td><a href="/gene/gene_detail/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
+                                <td style="max-width: 200px;">${drug_list.join('')}</td>
                             </tr>`;
                         });
                         $("#target-result-tbody").html(html_data);
                     }
                 });
             }
+        
 
         $("#submit_protein").click(function() {
+            document.getElementById("search_result_examples").innerHTML = "Result(s)";
+        
+            var target = $("#search_protein").val();
+            var encodedTarget = encodeURIComponent(target);
             $.ajax({
-                    url: "{% url 'target-lookup' %}?target="+ $("#search_protein").val(),
+                    url: "{% url 'target-lookup' %}?target="+ encodedTarget,
                     success: function (data) {
                         // console.log(data.proteins);
                         $("#target-result-tbody").html('');
@@ -334,16 +351,16 @@
                                 }
                                 else
                                 {
-                                    drug_list.push(`<i class="fa fa-pills fa-solid"></i> <a href="{% url 'atc-detail-view' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
+                                    drug_list.push(`<i class="fa fa-pills fa-solid"></i> <a href="{% url 'get-drug-association' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
                                 }
                             }
                             html_data += `<tr>
-                                <td>${item.uniprot_ID}</td>
+                                <td style="max-width: 200px;">${item.uniprot_ID}</td>
                                 <td>${item.protein_name}</td>
                                 <td>${item.geneID}</td>
                                 <td>${item.genename}</td>
-                                <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
-                                <td>${drug_list.join('')}</td>
+                                <td><a href="/gene/gene_detail/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
+                                <td style="max-width: 200px;">${drug_list.join('')}</td>
                             </tr>`;
                         });
                         $("#target-result-tbody").html(html_data);
@@ -352,6 +369,8 @@
         });
         
         $("#reset_protein").click(function() {
+            document.getElementById("search_result_examples").innerHTML = "Random target examples";
+        
             $.ajax({
                     url: "{% url 'target-lookup' %}?target=default",
                     // method: "GET",
@@ -369,16 +388,16 @@
                                 }
                                 else
                                 {
-                                    drug_list.push(`<i class="fa fa-pills fa-solid"></i> <a href="{% url 'atc-detail-view' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
+                                    drug_list.push(`<i class="fa fa-pills fa-solid"></i> <a href="{% url 'get-drug-association' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
                                 }
                             }
                             html_data += `<tr>
                                 <td>${item.uniprot_ID}</td>
-                                <td>${item.protein_name}</td>
+                                <td style="max-width: 200px;">${item.protein_name}</td>
                                 <td>${item.geneID}</td>
                                 <td>${item.genename}</td>
-                                <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
-                                <td>${drug_list.join('')}</td>
+                                <td><a href="/gene/gene_detail/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
+                                <td style="max-width: 200px;">${drug_list.join('')}</td>
                             </tr>`;
                         });
                         $("#target-result-tbody").html(html_data);
