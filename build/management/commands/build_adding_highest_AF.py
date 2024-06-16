@@ -51,9 +51,7 @@ class Command(BaseCommand):
                     # print("transcript_id = ",transcript_id)
                     # Code to add values to the new field
                     try:
-                        obj = VepVariant.objects.get(
-                            Q(Variant_marker=variant_marker) & Q(Transcript_ID=transcript_id)
-                        )
+                        obj = VepVariant.objects.get(Q(Variant_marker=variant_marker) & Q(Transcript_ID=transcript_id))
                         if highest_af=="":
                             obj.HighestAF = np.nan
                         else:

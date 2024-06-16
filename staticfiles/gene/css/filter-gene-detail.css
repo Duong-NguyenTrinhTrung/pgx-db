@@ -1,0 +1,138 @@
+/* Container */
+.slider-container {
+width: 200px;
+margin: 20px 0 0;
+position: relative;
+}
+
+/* Limit labels */
+.slider-labels {
+padding: 3px;
+display: flex;
+justify-content: space-between;
+}
+
+/* Value tag */
+.slider-value {
+position: absolute;
+top: -10px;
+right: -60px;
+
+padding: 5px;
+width: 50px;
+
+border-radius: 3px;
+background-color:#FFE169;
+color: white;
+
+text-align: center;
+}
+
+.slider-value::after {
+content: '';
+width: 10px;
+height: 10px;
+
+position: absolute;
+top: 50%;
+left: -5px;
+transform: translateY(-50%) rotate(45deg); 
+
+background: #FFE169;
+border-radius: 1px;
+}
+
+/* Background (color is given in JS) */
+.slider {
+width: 100%;
+height: 10px;
+
+border-radius: 10px;
+/*box-shadow: inset 3px 3px 5px rgba(0, 0, 0, 0.3);*/
+
+outline: none;
+
+-webkit-appearance: none;
+}
+
+/* Thumb (Chrome) */
+.slider::-webkit-slider-thumb {
+-webkit-appearance: none;
+
+width: 20px;
+height: 20px;
+border-radius: 50%;
+background: white;
+box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+
+cursor: pointer;
+}
+
+/* Thumb (Firefox). Do NOT merge with previous */
+.slider::-moz-range-thumb {
+border: none;
+
+width: 20px;
+height: 20px;
+border-radius: 50%;
+background: white;
+box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+
+cursor: pointer;
+}
+
+.form-group {
+    width: 100%;
+}
+
+.form-group select {
+
+    border: 0 !important;  /*Removes border*/
+    -webkit-appearance: none;  /*Removes default chrome and safari style*/
+    -moz-appearance: none; /* Removes Default Firefox style*/
+    background: url('http://jonathanphz.tk/dropdown_arrow.png') no-repeat;  /*Adds background-image*/
+    background-position: 0px 5px;  /*Position of the background-image*/
+    width: 120px; /*Width of select dropdown to give space for arrow image*/
+    text-indent: 0.01px; /* Removes default arrow from firefox*/
+    text-overflow: "";  /*Removes default arrow from firefox*/
+    cursor: pointer;
+    /*My custom style for fonts*/
+
+    color: #1455a2;
+    padding-left: 30px;
+}
+
+.form-group label{
+    color: #337ab7;
+}
+  
+select.transcript-select-multiple,
+select.variant-select-multiple,
+select.consequence-select-multiple {
+    text-align: right;
+    padding-left: 20px;
+  }
+
+.input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.input-group label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.input-group input[type="range"] {
+    width: 200px;
+    margin-right: 10px;
+}
+
+.form-group .range-values {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 200px;
+}
+

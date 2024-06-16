@@ -66,7 +66,7 @@ class Command(BaseCommand):
             filepath = os.sep.join([self.gb_pgx_data_dir, filename])
             data = pd.read_csv(filepath, low_memory=False,
                                encoding="ISO-8859-1", sep=";")
-
+        
             for index, row in enumerate(data.iterrows()):
                 gene_id = data[index: index + 1]["gene_id"].values[0]
                 annotation = data[index: index + 1]["annotation"].values[0]

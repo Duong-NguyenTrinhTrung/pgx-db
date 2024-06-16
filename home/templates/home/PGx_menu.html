@@ -3,14 +3,13 @@
 <li class="dropdown gpcr {% if current_site == 'gpcr' %}highlight_menu{% endif %}" id="pgx_menu">
 
     <a tabindex="0" href="{% url 'home' %}" class="dropdown-toggle" data-toggle="dropdown" role="button" data-submenu aria-expanded="false" style="padding-left: 20px;">
-        PGx <span class="caret"></span>
+        PGxDB <span class="caret"></span>
     </a>
     <ul class="dropdown-menu" role="menu">
-        <li><a href="{% url 'about-pgx' %}">About PGx</a></li>
-        <li><a  href="/static/document/graphical_overview.pdf">Graphical overview</a></li>
+        <li><a href="{% url 'about-pgx' %}">About PGxDB</a></li>
         <li class="divider"></li>
         <li><a href="{% url 'questions-pgx' %}">Give feedback</a></li>
-        <li><a href="{% url 'contribute-pgx' %}">Contribute to PGx/ Scientific collaboration</a></li>
+        <li><a href="{% url 'contribute-pgx' %}">Contribute to PGxDB/ Scientific collaboration</a></li>
     </ul>
 </li>
 <script>
