@@ -40,7 +40,7 @@ from disease.models import DrugDiseaseStudy, Disease
 
 from .models import (
     Drug,
-    DrugAtcAssociation,
+    DrugAtcAssociation, PreCachedDrugNetwork
 )
 from .services import DrugNetworkGetDataService, DrugsNetworkGetDataService
 from time import perf_counter
@@ -54,23 +54,30 @@ app_name = 'drug'
 import logging
 logger = logging.getLogger(__name__)
 
-def serve_json_file(request, file_string):
-    try:
-        folder = file_string.split("/")[0]
-        filename = file_string.split("/")[1]
-        file_path = os.path.join(settings.BASE_DIR, 'Data/json-drug-network', folder, filename)
-        if os.path.exists(file_path):
-            with open(file_path, 'r') as file:
-                try:
-                    data = json.load(file)
-                    return JsonResponse(data, safe=False)
-                except json.JSONDecodeError:
-                    raise Http404("File is not a valid JSON")
-        else:
-            raise Http404("File not found")
-    except IndexError:
-        print("Invalid file path: %s", filename)
-        raise Http404("Invalid file path")
+def serve_drug_data_json_file(request):
+    atc_code = request.GET.get('atc_code')
+    data = PreCachedDrugNetwork.objects.get(atc_code=atc_code)
+    return JsonResponse({
+        "data":data.drug_json_data,
+    })
+def serve_protein_data_json_file(request):
+    atc_code = request.GET.get('atc_code')
+    data = PreCachedDrugNetwork.objects.get(atc_code=atc_code)
+    return JsonResponse({
+        "data":data.protein_json_data,
+    })
+def serve_interaction_data_json_file(request):
+    atc_code = request.GET.get('atc_code')
+    data = PreCachedDrugNetwork.objects.get(atc_code=atc_code)
+    return JsonResponse({
+        "data":data.interaction_json_data,
+    })
+def serve_general_data_json_file(request):
+    atc_code = request.GET.get('atc_code')
+    data = PreCachedDrugNetwork.objects.get(atc_code=atc_code)
+    return JsonResponse({
+        "data":data.general_json_data,
+    })
 
 class DiseaseAssociationByDrugView:
     def get_disease_association_by_drug(self, drug_id):
@@ -2119,28 +2126,32 @@ def get_atc_sub_levels(request):
     return JsonResponse({"atc_code": atc_code, "sub_atc_codes": temp}, safe=False)
 
 
-class TargetByAtcBaseView:
-    def get_target_by_atc_code(self, slug):
+class DrugByAtcBaseView:
+    def get_drug_by_atc_code(self, slug):
 
         context = {}
         if slug is not None:
-            if cache.get("target_by_atc_data_" + slug) is not None:
-                table = cache.get("target_by_atc_data_" + slug)
+            if cache.get("drugs_by_atc_data_" + slug) is not None:
+                table = cache.get("drugs_by_atc_data_" + slug)
             else:
-                table = pd.DataFrame()
+                list_of_drugs = []
                 data = {"chemical_substance": retrieving_chemical_substance(slug)}
                 for value in data.get('chemical_substance'):
                     chemical_substance_code = value.get("id")
-                    drugs = DrugAtcAssociation.objects.filter(
-                        atc_id=chemical_substance_code).values_list("drug_id")
-                    for drug in drugs:
-                        drug_df = pd.DataFrame([drug])
-                        table = table.append(drug_df, ignore_index=True)
-                table.columns = ["DrugbankID"]
-                table.fillna('', inplace=True)
+                    drug_ids = DrugAtcAssociation.objects.filter(
+                        atc_id=chemical_substance_code).values_list("drug_id", flat=True)
+                    for drug_id in drug_ids:
+                        items = Drug.objects.filter(drug_bankID=drug_id)
+                        if len(items)>0:
+                            drug = items.first()
+                            temp = {
+                                    "DrugbankID": drug.drug_bankID,
+                                    "drugname": drug.name,
+                                    }
+                            list_of_drugs.append(temp)
                 context = dict()
-                cache.set("target_by_atc_data_" + slug, table, 60 * 60)
-            context['list_of_targets'] = table
+                cache.set("drugs_by_atc_data_" + slug, list_of_drugs, 60 * 60)
+            context['list_of_drugs'] = list_of_drugs
         return context
     
 def retrieving_atc_description(atc_code):

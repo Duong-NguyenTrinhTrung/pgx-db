@@ -454,7 +454,7 @@
                 colorRangeColumns.forEach(index => {
                     row.append(renderVariantValuesInColorRanges(value[index]));
                 });
-
+                console.log("Number rows: " + row.length);
                 // Append the row to the table body
                 tbody.append(row);
             }); // end populate table

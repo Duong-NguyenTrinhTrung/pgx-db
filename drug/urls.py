@@ -20,12 +20,15 @@ from .views import (
     get_statistics_by_atc_for_detecting_community_drug_disease, 
     get_statistics_by_atc_for_calculating_average_path_length_drug_disease,
     get_statistics_by_atc_for_calculating_average_path_length_drug_protein,
-    atc_comparison_autocomplete_view, get_adr_data, AdrByDrugView, get_adr_data_by_atc, serve_json_file
+    atc_comparison_autocomplete_view, get_adr_data, AdrByDrugView, get_adr_data_by_atc, serve_drug_data_json_file, serve_protein_data_json_file, serve_interaction_data_json_file, serve_general_data_json_file
 )
 
 urlpatterns = [
     
-    path('serve_json_file/<path:file_string>/', serve_json_file, name='serve_json_file'),
+    path('serve_drug_data_json_file/', serve_drug_data_json_file, name='serve-drug-data-json-file'),
+    path('serve_protein_data_json_file/', serve_protein_data_json_file, name='serve-protein-data-json-file'),
+    path('serve_interaction_data_json_file/', serve_interaction_data_json_file, name='serve-interaction-data-json-file'),
+    path('serve_general_data_json_file/', serve_general_data_json_file, name='serve-general-data-json-file'),
 
     path('search_drugs', views.search_drugs, name='search_drugs'),
     path('atc_lookup', cache_page(3600*24*365)(views.atc_lookup), name='atc-lookup'),

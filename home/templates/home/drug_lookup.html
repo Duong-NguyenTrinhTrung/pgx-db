@@ -163,7 +163,7 @@
 </div>
 
 <div id="drug-result">
-
+    <p id="search_result_examples" style="margin: 20px 0 20px; font-size: 20px; font-weight: bold;">Random drug examples</p>
     <table id="drug-result-table">
         <thead>
             <tr>
@@ -387,6 +387,8 @@
 
          }
         $("#submit_drug").click(function() {
+            document.getElementById("search_result_examples").innerHTML = "Result(s)";
+        
             $.ajax({
                 url: "{% url 'drug-lookup' %}?drug="+ $("#search_drug").val(),
                 success: function (data) {
@@ -465,6 +467,8 @@
         });
         
         $("#reset_drug").click(function() {
+            document.getElementById("search_result_examples").innerHTML = "Random drug examples";
+        
             $.ajax({
                     url: "{% url 'drug-lookup' %}?drug=default",
                     success: function (data) {

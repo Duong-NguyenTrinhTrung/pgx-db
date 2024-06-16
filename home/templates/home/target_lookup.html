@@ -181,7 +181,7 @@
 </div>
 
 <div id="target-result">
-
+    <p id="search_result_examples" style="margin: 20px 0 20px; font-size: 20px; font-weight: bold;">Random target examples</p>
     <table id="target-result-table">
         <thead>
             <tr>
@@ -332,6 +332,8 @@
         
 
         $("#submit_protein").click(function() {
+            document.getElementById("search_result_examples").innerHTML = "Result(s)";
+        
             var target = $("#search_protein").val();
             var encodedTarget = encodeURIComponent(target);
             $.ajax({
@@ -367,6 +369,8 @@
         });
         
         $("#reset_protein").click(function() {
+            document.getElementById("search_result_examples").innerHTML = "Random target examples";
+        
             $.ajax({
                     url: "{% url 'target-lookup' %}?target=default",
                     // method: "GET",

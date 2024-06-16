@@ -50,7 +50,7 @@ table.dataTable tbody td {
 /*}*/
 
 table.dataTable.compact tbody th {
-    padding: 5px 10px 5px 0 !important;
+    padding: 5px 15px 5px 5px !important;
     /* width: 0px; */
 }
 
