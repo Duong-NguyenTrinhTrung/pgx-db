@@ -62,7 +62,7 @@ class Command(BaseCommand):
             filenames = [
                 fn
                 for fn in os.listdir(self.variantmarkerdata_data_dir)
-                if fn.endswith("variant_marker_data.csv")
+                if fn.startswith("variantmarker_data_part")
             ]
             print("checkpoint2")
             print(filenames)

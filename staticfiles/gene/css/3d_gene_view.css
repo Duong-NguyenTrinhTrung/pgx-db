@@ -1,0 +1,109 @@
+
+#gene_view_3D{
+    display: flex;
+    /* height: 850px; */
+    border: 1px solid red;
+    position: relative;
+}
+
+
+#gene-3d-chart{
+    /* margin: 5px 5px; */
+    box-sizing: border-box; 
+    /* border: 1px solid #337ab7; */
+
+    /* the plot for the 3d structure might bigger than the container, so set this */
+    /* overflow: hidden;  */
+    flex: 1; /* for the div without specifying the width, flex=1 --> extend the remaining width of the container */
+    position: relative;
+}
+
+.primary_seq {
+    word-wrap: break-word; /* Wrap long words */
+    /* white-space: normal; Allow line breaks */
+    /* line-height: 1;  */
+    font-size: 16px;
+}
+
+.amino_acid_chunk:last-child{
+  text-align: left;
+}
+
+.color-coded-text {
+    display: inline;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .color-coded-text.yellow {
+    color: green;
+  }
+  
+  .color-coded-text.red {
+    color: red;
+  }
+  
+  .color-coded-text.blue {
+    color: blue;
+  }
+  
+  .color-coded-text.green {
+    color: orange;
+  }
+
+  .text-area {
+    width: 100%;
+    /* height: 515px; */
+    overflow-y: hidden;
+    overflow-x: scroll;
+    padding-top: 5px;
+    margin: 5px 0 20px 0;
+    white-space: nowrap;
+    font-size: 16px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .text-area::-webkit-scrollbar {
+    width: 40px;
+  }
+
+  .text-area::-webkit-scrollbar-track {
+      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+      border-radius: 10px;
+  }
+
+  .text-area::-webkit-scrollbar-thumb {
+      border-radius: 10px;
+      -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+  }
+
+
+  #structure_3D {
+      border: 1px solid rgb(0, 0, 0, 0.2);
+      border-radius: 5px;
+  }
+
+  #filter_3d {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #filter_3d_row1, #filter_3d_row2 , #filter_3d_row3 {
+    display: flex;
+    gap: 30px;
+    margin-bottom: 20px;
+  }
+
+  
+
+  .three_dimension_struct_filter p{
+    margin: 0px;
+  }
+
+  .three_dimension_struct_filter select{
+    border-radius: 4px;
+    background-color: rgba(224, 225, 221, 0.3);
+  }
+  
+  

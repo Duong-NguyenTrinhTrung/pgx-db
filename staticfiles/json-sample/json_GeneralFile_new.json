@@ -1,0 +1,13 @@
+{"drugbank_id":"DB00014","drug_name":"Goserelin","interaction":"target","Protein":"P22888","drugtype":"Small Molecule","Drug_status":"Approved","Protein_Class":"GPCR","Disease_name":"Endometriosis","Disease_class":"Female Urogenital","Phase":4}
+{"drugbank_id":"DB00014","drug_name":"Goserelin","interaction":"target","Protein":"P30968","drugtype":"Small Molecule","Drug_status":"Approved","Protein_Class":"GPCR","Disease_name":"Endometriosis","Disease_class":"Female Urogenital","Phase":4}
+
+{"drugbank_id":"DB15327","drug_name":"Abivertinib","interaction":"target","Protein":"P00533","drugtype":"Small Molecule","Drug_status":"Investigational","Protein_Class":"Kinase","Disease_name":"Bronchioloalveolar Adenocarcinoma","Disease_class":"Neoplasms","Phase":3}
+{"drugbank_id":"DB15327","drug_name":"Abivertinib","interaction":"target","Protein":"P00533","drugtype":"Small Molecule","Drug_status":"Investigational","Protein_Class":"Kinase","Disease_name":"Lymphoma, Follicular","Disease_class":"Neoplasms","Phase":1}
+{"drugbank_id":"DB15327","drug_name":"Abivertinib","interaction":"target","Protein":"P00533","drugtype":"Small Molecule","Drug_status":"Investigational","Protein_Class":"Kinase","Disease_name":"Severe Acute Respiratory Syndrome","Disease_class":"Infections","Phase":2}
+
+{"drugbank_id":"DB15327","drug_name":"Abivertinib","interaction":"target","Protein":"Q06187","drugtype":"Small Molecule","Drug_status":"Investigational","Protein_Class":"Kinase","Disease_name":"Bronchioloalveolar Adenocarcinoma","Disease_class":"Neoplasms","Phase":3}
+{"drugbank_id":"DB15327","drug_name":"Abivertinib","interaction":"target","Protein":"Q06187","drugtype":"Small Molecule","Drug_status":"Investigational","Protein_Class":"Kinase","Disease_name":"Lymphoma, Follicular","Disease_class":"Neoplasms","Phase":1}
+{"drugbank_id":"DB15327","drug_name":"Abivertinib","interaction":"target","Protein":"Q06187","drugtype":"Small Molecule","Drug_status":"Investigational","Protein_Class":"Kinase","Disease_name":"Severe Acute Respiratory Syndrome","Disease_class":"Infections","Phase":2}
+
+{"drugbank_id":"DB15399","drug_name":"BMS-754807","interaction":"target","Protein":"P08069","drugtype":"Small Molecule","Drug_status":"Investigational","Protein_Class":"Kinase","Disease_name":"Malignant Neoplasm of Breast","Disease_class":"Neoplasms","Phase":2}
+{"drugbank_id":"DB15399","drug_name":"BMS-754807","interaction":"target","Protein":"P08069","drugtype":"Small Molecule","Drug_status":"Investigational","Protein_Class":"Kinase","Disease_name":"Neoplasms","Disease_class":"Neoplasms","Phase":1}
