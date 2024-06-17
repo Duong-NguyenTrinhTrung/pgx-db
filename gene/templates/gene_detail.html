@@ -120,11 +120,11 @@
     <!-- Left panel  -->
     <div class="col-md-2" style="background-color: rgba(224, 225, 221, 0.3); height: inherit;">
         <p style="text-align: left; font-size: 14px; display: block; margin-bottom: 10px;margin-top: 10px;"><strong>Gene
-                name:</strong> <span style="color: #B69121">{{ genename }}</span></p>
+                name:</strong> <a href="https://www.genecards.org/cgi-bin/carddisp.pl?gene={{ genename }}" target="_blank"><span>{{ genename }}</span></a></p>
         <p style="text-align: left; font-size: 14px; display: block; margin-bottom: 10px;"><strong>Ensembl Gene
-                ID:</strong> <span style="color: #B69121">{{ geneID }}</span></p>
+                ID:</strong> <a href="https://www.genecards.org/Search/Keyword?queryString={{ geneID }}" target="_blank"><span>{{ geneID }}</span></a></p>
         <p style="text-align: left; font-size: 14px; display: block; margin-bottom: 10px;"><strong>UniProt ID:</strong>
-            <span style="color: #B69121">{{ protein_name }}</span></p>
+            <a href="https://www.uniprot.org/uniprotkb/{{ protein_name }}/entry" target="_blank"><span>{{ protein_name }}</span></a></p>
     </div>
     <!-- Right panel  -->
     <div class="col-md-10">
