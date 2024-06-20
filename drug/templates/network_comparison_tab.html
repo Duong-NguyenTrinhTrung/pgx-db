@@ -246,8 +246,7 @@
                     var dataAll = response.both.distribution;
                     console.log("dataAtcCode "+dataAtcCode);
                     console.log("dataAtcComparison "+dataAtcComparison);
-                    createDistributionPlot(dataAtcCode, dataAll, "atc_code_box", `${compareText} <br><br>ATC code: <span style="color: #3498db">${atc_code}</span>`);
-                    createDistributionPlot(dataAtcComparison, dataAll, "atc_comparison_box", `${compareText} <br><br>ATC code: <span style="color: #3498db">${atc_comparison}</span>`);
+                    createDistributionPlot(dataAtcCode, dataAll, "atc_code_box", `${compareText} <br>`);
                 },
                 error: function (xhr, status, error) {
                     console.log('AJAX Error:', error);
@@ -260,20 +259,11 @@
                 url: `${urlCompare}?atc_code=${atc_code}&atc_comparison=${atc_comparison}`,
                 type: "GET",
                 success: function (response) {
-                    console.log(response);
                     var dataAtcCode = response.atc_code;
                     var dataAtcComparison = response.atc_comparison;
-                    if (dataAtcCode.classes.length){
-                        createDistributionPlotForCategoryData(dataAtcCode.classes, dataAtcCode.class_count, "atc_code_box", `${compareText} <br><br>ATC code: <span style="color: #3498db">${atc_code}</span>`)
-                    }
-                    else{
-                        $("#atc_code_box").html(`<h4 style="text-align: center; color: #3498db">${compareText} <br><br>ATC code: <span style="color: #3498db">${atc_code}</span></h4><br><br><br><h5 style="text-align: center;color: #d90429;">There is no such network!</h5>`);
-                    }
-                    if (dataAtcComparison.classes.length){
-                        createDistributionPlotForCategoryData(dataAtcComparison.classes, dataAtcComparison.class_count, "atc_comparison_box", `${compareText} <br><br>ATC code: <span style="color: #3498db">${atc_comparison}</span>`)
-                    }
-                    else{
-                        $("#atc_comparison_box").html(`<h4 style="text-align: center; color: #3498db">${compareText} <br><br>ATC code: <span style="color: #3498db">${atc_comparison}</span></h4><br><br><br><h5 style="text-align: center; color: #d90429;">There is no such network!</h5>`);
+                    if ((dataAtcCode.classes.length>0) && (dataAtcComparison.classes.length>0))
+                    {
+                        createDistributionPlotForCategoryData2(atc_code, dataAtcCode.classes, dataAtcCode.class_count, atc_comparison, dataAtcComparison.classes, dataAtcComparison.class_count, "atc_code_box", `${compareText} <br>`)
                     }
                 },
             error: function (xhr, status, error) {
