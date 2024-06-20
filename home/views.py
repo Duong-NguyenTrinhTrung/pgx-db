@@ -91,13 +91,13 @@ def variant_autocomplete_view(request):
     variants = Variant.objects.filter(
         Q(VariantMarker__icontains=query) | 
         Q(Gene_ID__gene_id__icontains=query) | 
-        Q(Gene_ID__genename__icontains=query)
+        Q(Gene_ID__genename__iexact=query)
     )
-    # if len(variants) > 0:
-    #     results = [variant.VariantMarker + " in gene "+ variant.Gene_ID.genename +" (" + variant.Gene_ID.gene_id +")" for variant in variants]
-    # return JsonResponse({'suggestions': results})
+    
     results = []
     if variants.exists():
+        if len(variants) > 15:
+            variants = variants[:15]
         results = [
             variant.VariantMarker + " in gene " + variant.Gene_ID.genename +
             " (" + variant.Gene_ID.gene_id + ")"
@@ -971,7 +971,7 @@ def disease_lookup(request):
         if disease != 'default':
             diseases = Disease.objects.filter(disease_name=disease)
         else:
-            diseases = Disease.objects.all()[:8]
+            diseases = Disease.objects.all()[:3]
         response_data = []
         for d in diseases:
                 temp=[]
@@ -995,7 +995,7 @@ def disease_lookup(request):
         return JsonResponse({'response_data': response_data})
         # return render(request, 'home/disease_lookup.html', context)
     else:
-        diseases = Disease.objects.all()[:8]
+        diseases = Disease.objects.all()[:3]
         response_data = []
         for d in diseases:
                 temp=[]

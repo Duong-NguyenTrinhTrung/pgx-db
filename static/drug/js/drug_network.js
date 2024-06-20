@@ -119,7 +119,7 @@ async function readDrugJSON() {
   const jsonFilePath = json_drugData; //url
   try {
     const jsonData = await readPrecachedJSONFromDatabase(jsonFilePath);
-    console.log("JSON Data:", jsonData);
+    // console.log("JSON Data:", jsonData);
 
     // Assuming your JSON data is an array of objects, adjust this code accordingly
     // drug_xlsxData = jsonData.map(item => item.fields);

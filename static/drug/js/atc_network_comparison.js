@@ -19,12 +19,11 @@ function getLimitedTicks(integerTicks, maxTicks = 10) {
     }
 }
 
-function createDistributionPlot(data, data_all, elementID, text)
-{
+function createDistributionPlot(data, data_all, elementID, text) {
     $("#result-compare-table").html("");
     // target the .viz container
-    const viz = d3.select('#'+elementID)
-    .html("");
+    const viz = d3.select('#' + elementID)
+        .html("");
     // have the visualizations share the same margin, width and height
     const margin = {
         top: 30,
@@ -34,30 +33,30 @@ function createDistributionPlot(data, data_all, elementID, text)
     };
     const width = 500 - (margin.left + margin.right);
     const height = 500 - (margin.top + margin.bottom);
-    
+
     // in a header include preliminary information about the project
     const header = viz.append('header').style('text-align', 'center');
     header
-    .append('h4')
-    .html(text);
+        .append('h4')
+        .html(text);
 
     // Adds an SVG element for the histogram and sets its class and viewBox
     const svgHistogram = viz
-    .append('svg')
-    .attr('class', 'histogram')
-    .attr('viewBox', `0 0 ${width + (margin.left + margin.right)} ${height + (margin.top + margin.bottom)}`);
+        .append('svg')
+        .attr('class', 'histogram')
+        .attr('viewBox', `0 0 ${width + (margin.left + margin.right)} ${height + (margin.top + margin.bottom)}`);
 
     //Sets up the group for the histogram, defines the x and y scales, and prepares the data for the histogram.
     const groupHistogram = svgHistogram
-    .append('g')
-    .attr('transform', `translate(${margin.left}  ${margin.top})`);
+        .append('g')
+        .attr('transform', `translate(${margin.left}  ${margin.top})`);
 
     // for the horizontal dimension the scale is defined for both the histogram and the density plot
     // ! the function is also used by the histogram function to determine the different bins
     const xScale = d3
-    .scaleLinear()
-    .domain([d3.min(data_all), d3.max(data_all)])
-    .range([0, width]);
+        .scaleLinear()
+        .domain([d3.min(data_all), d3.max(data_all)])
+        .range([0, width]);
 
     const maxValue = d3.max(data_all);
     const integerTicks = d3.range(0, maxValue + 1); // +1 to include the maxValue itself
@@ -65,8 +64,8 @@ function createDistributionPlot(data, data_all, elementID, text)
 
     // histogram used to create the bins from the input data
     const histogram = d3
-    .histogram()
-    .domain(xScale.domain());
+        .histogram()
+        .domain(xScale.domain());
 
     // multi dimensional array describing for each bin the start and end coordinate on the x axis (x0, x1) as well as the data points falling in the bin
     // the number of data points is given by the length of each array
@@ -75,83 +74,82 @@ function createDistributionPlot(data, data_all, elementID, text)
 
     // for the vertical dimension, the histogram uses the number of observations
     const yScaleHistogram = d3
-    .scaleLinear()
-    .domain([0, d3.max(dataHistogramAll, ({ length }) => length)])
-    .range([height, 0]);
+        .scaleLinear()
+        .domain([0, d3.max(dataHistogramAll, ({ length }) => length)])
+        .range([height, 0]);
 
     // draw the y axis before the visualization, to have the grid lines behind the histogram' rectangles
     const yAxisHistogram = d3
-    .axisLeft(yScaleHistogram)
-    .tickFormat(d3.format('d'))
-    .tickValues(d3.ticks(yScaleHistogram.domain()[0], yScaleHistogram.domain()[1], Math.ceil(yScaleHistogram.domain()[1])));
-;
+        .axisLeft(yScaleHistogram)
+        .tickFormat(d3.format('d'))
+        .tickValues(d3.ticks(yScaleHistogram.domain()[0], yScaleHistogram.domain()[1], Math.ceil(yScaleHistogram.domain()[1])));
+    ;
     // give a class to the axis to later identify and style the elements
     groupHistogram
-    .append('g')
-    .attr('class', 'axis y-axis')
-    .call(yAxisHistogram)
-    .attr('transform', `translate(0 20)`);
+        .append('g')
+        .attr('class', 'axis y-axis')
+        .call(yAxisHistogram)
+        .attr('transform', `translate(0 20)`);
 
     const binsHistogram = groupHistogram
-    .selectAll('g.bin')
-    .data(dataHistogram)
-    .enter()
-    .append('g')
-    .attr('class', 'bin')
-    // translate the bins horizontally according to where each bin ought to start
-    .attr('transform', ({ x0 }) => `translate(${xScale(x0)} 0)`);
+        .selectAll('g.bin')
+        .data(dataHistogram)
+        .enter()
+        .append('g')
+        .attr('class', 'bin')
+        // translate the bins horizontally according to where each bin ought to start
+        .attr('transform', ({ x0 }) => `translate(${xScale(x0)} 0)`);
 
     // in the group elements add a rectangle using the vertical scale
     binsHistogram
-    .append('rect')
-    .attr('x', 0)
-    .attr('y', d => yScaleHistogram(d.length)+20)
-    .attr('width', ({ x0, x1 }) => xScale(x1) - xScale(x0))
-    .attr('height', d => height - yScaleHistogram(d.length))
-    // .attr('fill', 'url(#gradient-histogram)')
-    .attr('fill', '#69b3a2') // Solid fill color for the bars
-    .attr('stroke', '#0c1620')
-    .attr('stroke-width', 1);
+        .append('rect')
+        .attr('x', 0)
+        .attr('y', d => yScaleHistogram(d.length) + 20)
+        .attr('width', ({ x0, x1 }) => xScale(x1) - xScale(x0))
+        .attr('height', d => height - yScaleHistogram(d.length))
+        // .attr('fill', 'url(#gradient-histogram)')
+        .attr('fill', '#69b3a2') // Solid fill color for the bars
+        .attr('stroke', '#0c1620')
+        .attr('stroke-width', 1);
 
     // at the top of the rectangles include a text describing the precise count
     binsHistogram
-    .append('text')
-    .attr('x', ({ x0, x1 }) => (xScale(x1) - xScale(x0)) / 2)
-    .attr('y', d => yScaleHistogram(d.length) - margin.top / 3 + 25)
-    // .attr('fill', 'url(#gradient-histogram)')
-    .attr('fill', 'grey')
-    .attr('text-anchor', 'middle')
-    .attr('font-weight', 'bold')
-    .attr('font-size', '1.1rem')
-    .text(d => d.length);
+        .append('text')
+        .attr('x', ({ x0, x1 }) => (xScale(x1) - xScale(x0)) / 2)
+        .attr('y', d => yScaleHistogram(d.length) - margin.top / 3 + 25)
+        // .attr('fill', 'url(#gradient-histogram)')
+        .attr('fill', 'grey')
+        .attr('text-anchor', 'middle')
+        .attr('font-weight', 'bold')
+        .attr('font-size', '1.1rem')
+        .text(d => d.length);
 
     const limitedIntegerTicks = getLimitedTicks(integerTicks);
 
     const xAxis = d3
-    .axisBottom(xScale)
-    .tickPadding(10)
-    .tickFormat(d3.format('d'))
-    .tickValues(limitedIntegerTicks);
+        .axisBottom(xScale)
+        .tickPadding(10)
+        .tickFormat(d3.format('d'))
+        .tickValues(limitedIntegerTicks);
     // .tickValues(d3.ticks(xScale.domain()[0], xScale.domain()[1], Math.ceil(xScale.domain()[1])));
 
     groupHistogram
-    .append('g')
-    .attr('class', 'axis x-axis')
-    .attr('transform', `translate(0 ${height+20})`)
-    .call(xAxis)
-    .attr('font-size', '10px');
+        .append('g')
+        .attr('class', 'axis x-axis')
+        .attr('transform', `translate(0 ${height + 20})`)
+        .call(xAxis)
+        .attr('font-size', '10px');
 }
 
-function createDistributionPlotForCategoryData(classes, class_count, elementID, text)
-{
+function createDistributionPlotForCategoryData(classes, class_count, elementID, text) {
     $("#result-compare-table").html("");
     const data = [];
-    for (var i=0; i<classes.length; i++){
+    for (var i = 0; i < classes.length; i++) {
         temp = {
-          name: classes[i],
-          value: class_count[i],
+            name: classes[i],
+            value: class_count[i],
         }
-        console.log("temp  = " + temp.name +" "+temp.value);
+        // console.log("temp  = " + temp.name +" "+temp.value);
         data.push(temp);
     }
 
@@ -160,86 +158,285 @@ function createDistributionPlotForCategoryData(classes, class_count, elementID, 
         right: 20,
         bottom: 20,
         left: 300, // add more white space on the left side of the visualization to display the names
-      };
-      
+    };
+
     const width = 800 - (margin.left + margin.right);
     const height = 350 - (margin.top + margin.bottom);
-    
+
     // target the .viz container
-    const viz = d3.select('#'+elementID).html("");
+    const viz = d3.select('#' + elementID).html("");
 
     // in a header include preliminary information about the project
     const header = viz.append('header').style('text-align', 'center').style("color", "#3498db");
     header.append('h4').html(text);
-    
+
     const svg = viz
-    .append('svg')
-    .attr('viewBox', `0 0 ${width + (margin.left + margin.right)} ${height + (margin.top + margin.bottom)}`)
-    .attr('width', width)
-    .attr('height', height);
-    
+        .append('svg')
+        .attr('viewBox', `0 0 ${width + (margin.left + margin.right)} ${height + (margin.top + margin.bottom)}`)
+        .attr('width', width)
+        .attr('height', height);
+
     const group = svg
-    .append('g')
-    .attr('transform', `translate(${margin.left} -${margin.top})`);
-    
+        .append('g')
+        .attr('transform', `translate(${margin.left} -${margin.top})`);
+
     // describe a quantitative scale for the x axis, for the racers' points
     const xScale = d3
-    .scaleLinear()
-    .domain([0, d3.max(data, ({ value }) => value)])
-    .range([0, width]);
+        .scaleLinear()
+        .domain([0, d3.max(data, ({ value }) => value)])
+        .range([0, width]);
 
     const maxValue = d3.max(data, ({ value }) => value);
     const integerTicks = d3.range(0, maxValue + 1); // +1 to include the maxValue itself
 
     const xAxis = d3.axisBottom(xScale)
-    .tickValues(integerTicks) // Use the generated array of integers for tick values
-    .tickFormat(d3.format('d')); // Ensure the format is set to integers
-    
+        .tickValues(integerTicks) // Use the generated array of integers for tick values
+        .tickFormat(d3.format('d')); // Ensure the format is set to integers
+
     // describe a qualitative scale for the y axis, for the racers' names
     const yScale = d3
-    .scaleBand()
-    .domain(data.map(({ name }) => name))
-    .range([0, height])
-    // padding allows to separate the shapes making use of the scale and the value returned by the yScale.bandwidth() function
-    // 0.2 means 20% is dedicated to white space around the band
-    .padding(0.2);
-    
+        .scaleBand()
+        .domain(data.map(({ name }) => name))
+        .range([0, height])
+        // padding allows to separate the shapes making use of the scale and the value returned by the yScale.bandwidth() function
+        // 0.2 means 20% is dedicated to white space around the band
+        .padding(0.2);
+
     const yAxis = d3
-    .axisLeft(yScale);
-    
+        .axisLeft(yScale);
+
     group
-    .append('g')
-    .attr('transform', `translate(0 ${height})`)
-    .call(xAxis)
-    .style('font-size', '17px');
-    
+        .append('g')
+        .attr('transform', `translate(0 ${height})`)
+        .call(xAxis)
+        .style('font-size', '17px');
+
     group
-    .append('g')
-    .call(yAxis)
-    .style('font-size', '19px');
-    
+        .append('g')
+        .call(yAxis)
+        .style('font-size', '19px');
+
     // include a group element for each data point, to nest connected elements
     const groups = group
-    .selectAll('g.group')
-    .data(data, ({ name }) => name)
-    .enter()
-    .append('g')
-    .attr('class', 'group')
-    // translate the group vertically according to the y scale
-    .attr('transform', ({ name }) => `translate(0 ${yScale(name)})`);
-    
+        .selectAll('g.group')
+        .data(data, ({ name }) => name)
+        .enter()
+        .append('g')
+        .attr('class', 'group')
+        // translate the group vertically according to the y scale
+        .attr('transform', ({ name }) => `translate(0 ${yScale(name)})`);
+
     // for each data point add a rectangle describing the points awarded to the respective racer
     groups
-    .append('rect')
-    .attr('x', 0)
-    .attr('y', 0)
-    .style("fill", "#d90429") // add more colors here
-    .attr('width', ({ value }) => xScale(value))
-    .attr('height', yScale.bandwidth());
+        .append('rect')
+        .attr('x', 0)
+        .attr('y', 0)
+        .style("fill", "#d90429") // add more colors here
+        .attr('width', ({ value }) => xScale(value))
+        .attr('height', yScale.bandwidth());
 }
 
-function compareNetworkSize(dataAtcCode, dataAtcComparison, elementID, text)
-{
+function toTitleCase(str) {
+    return str.toLowerCase().split(' ').map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+}
+
+// 2 bar plots sharing same axis
+function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1, atc_comparison, classes2, class_count2, elementID, text) {
+    $("#result-compare-table").html("");
+    var value1 = [];
+    var value2 = [];
+    var plottingBox = document.getElementById(elementID);
+    plottingBox.style.width = '100%';
+    // Find the intersection of the two arrays
+    const combinedArray = [...classes1, ...classes2];
+    const unionSet = new Set(combinedArray);
+
+    for (let value of unionSet) {
+        if (classes1.includes(value)) {
+            var index = classes1.indexOf(value);
+            value1.push({
+                grpName: toTitleCase(value),
+                grpValue: class_count1[index],
+            });
+        } else {
+            value1.push({
+                grpName: toTitleCase(value),
+                grpValue: 0,
+            });
+        }
+        if (classes2.includes(value)) {
+            var index = classes2.indexOf(value);
+            value2.push({
+                grpName: toTitleCase(value),
+                grpValue: class_count2[index],
+            });
+        } else {
+            value2.push({
+                grpName: toTitleCase(value),
+                grpValue: 0,
+            });
+        }
+    }
+
+    const groupData = [
+        // {
+        //     key: "AAAAA", values: value2
+        // },
+        {
+            key: atc_code, values: value1
+        },
+        {
+            key: atc_comparison, values: value2
+        },
+    ];
+
+    var margin = { top: 20, right: 20, bottom: 30, left: 40 };
+    var width = (plottingBox.clientWidth - margin.left - margin.right);
+    var height = 400 - margin.top - margin.bottom;
+
+    var x0 = d3.scaleBand()
+        .rangeRound([0, width], .5)
+        .paddingInner(0.1);
+
+    var x1 = d3.scaleBand();
+    var y = d3.scaleLinear().rangeRound([height, 0]);
+
+    var xAxis = d3.axisBottom().scale(x0)
+        .tickValues(groupData.map(d => d.key));
+
+
+    var yAxis = d3.axisLeft().scale(y);
+    const color = d3.scaleOrdinal(d3.schemeSet3);
+
+    const viz = d3.select('#' + elementID).html("");
+    const header = viz.append('header').style('text-align', 'center').style("color", "#3498db");
+    header.append('h4').html(text);
+
+    var svg = viz.append('svg')
+        .attr('width', width + margin.left + margin.right + 150)
+        .attr('height', height + margin.top + margin.bottom)
+        .append('g')
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+    var categories = groupData.map(function (d) { return d.key; });
+    var counts = groupData[0].values.map(function (d) { return d.grpName; });
+
+    x0.domain(categories);
+    x1.domain(counts).rangeRound([0, x0.bandwidth()]);
+    y.domain([0, d3.max(groupData, function (key) { return d3.max(key.values, function (d) { return d.grpValue; }); })]);
+
+    svg.append('g')
+        .attr('class', 'x axis')
+        .attr('transform', 'translate(0,' + height + ')')
+        .call(xAxis);
+
+    svg.selectAll('.x.axis text')
+        .style('font-size', '14px')
+        .style('fill', 'red');
+
+    svg.append('g')
+        .attr('class', 'y axis')
+        .style('opacity', '0')
+        .call(yAxis)
+        .append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', 6)
+        .attr('dy', '.71em')
+        .style('text-anchor', 'end')
+        .style('font-weight', 'bold')
+        .text('Value');
+
+    svg.select('.y').transition().duration(500).delay(1300).style('opacity', '1');
+
+    var slice = svg.selectAll('.slice')
+        .data(groupData)
+        .enter().append('g')
+        .attr('class', 'g')
+        .attr('id', function (d, i) {
+            console.log("data: " + d);
+            console.log("i: " + i);
+            return `atc-${i}`;
+        })
+        .attr('transform', function (d) { return 'translate(' + x0(d.key) + ',0)'; });
+
+    slice.selectAll('rect')
+        .data(function (d) { return d.values; })
+        .enter().append('rect')
+        .attr('width', x1.bandwidth())
+        .attr('x', function (d, i) { console.log("index: " + i); return x1(d.grpName); })
+        .attr('id', function (d, i) {
+            return `col-${i}`;
+        })
+        .style('fill', function (d) { return color(d.grpName) })
+        .attr('y', function (d) { return y(0); })
+        .attr('height', function (d) { return height - y(0); })
+        .on('mouseover', function (event, d) {
+            d3.select(this).style('fill', d3.color(color(d.grpName)).darker(1));
+
+            svg.append('text')
+                .attr('class', 'nw_comparison_tooltip')
+                .attr('x', parseInt(event.target.parentElement.getAttribute("id").replace("atc-", "")) * (parseInt(event.target.getAttribute("id").replace("col-", "")) + 1) * parseInt(event.target.getAttribute("width")) + d3.pointer(event)[0])   
+                .attr('x', parseInt(d3.pointer(event, this)[0]) + 10)   // Positioning the text
+                .attr('y', parseInt(d3.pointer(event, this)[1]) - 10)
+                .attr('dy', '.35em')
+                .attr('text-anchor', 'start')
+                .style('font-size', '12px')
+                .style('font-family', 'sans-serif')
+                .style('fill', 'black')
+                .style('background-color', 'white')
+                .style('pointer-events', 'none') // Ensure the tooltip does not interfere with mouse events
+                .text(d.grpValue);
+        })
+        .on('mouseout', function (event, d) {
+            d3.select(this).style('fill', d3.color(color(d.grpName)));
+            svg.selectAll('.nw_comparison_tooltip').remove();
+        })
+        .on('mousemove', function (event, d) {
+            d3.select('.nw_comparison_tooltip')
+                // .attr('x', parseInt(event.target.parentElement.getAttribute("id").replace("atc-",""))*(parseInt(event.target.getAttribute("id").replace("col-",""))+1)*parseInt(event.target.getAttribute("width")) + d3.pointer(event)[0]) // Positioning the text
+                .attr('x', function () {
+                    // console.log("mouse move: d3.pointer(event)[0] " + d3.pointer(event)[0]);
+                    // console.log('formulae: parseInt(event.target.parentElement.getAttribute("id").replace("atc-",""))*(parseInt(event.target.getAttribute("id").replace("col-",""))+1)*parseInt(event.target.getAttribute("width")) + d3.pointer(event)[0])');
+                    // console.log("calculated value for x: " + (parseInt(event.target.parentElement.getAttribute("id").replace("atc-", "")) * (parseInt(event.target.getAttribute("id").replace("col-", "")) + 1) * parseInt(event.target.getAttribute("width")) + parseInt(d3.pointer(event)[0])));
+                    // console.log("d3.pointer(event)[0]: " + d3.pointer(event)[0] + " width " + event.target.getAttribute("width") + " event.target.getAttribute(id) " + event.target.getAttribute("id"));
+                    return parseInt(d3.pointer(event, this )[0]) + 10;
+                }) // Positioning the text
+                .attr('y', parseInt(d3.pointer(event, this )[1]) - 10)
+        });
+
+    slice.selectAll('rect')
+        .transition()
+        .delay(function (d) { return Math.random() * 1000; })
+        .duration(1000)
+        .attr('y', function (d) { return y(d.grpValue); })
+        .attr('height', function (d) { return height - y(d.grpValue); });
+
+    // Legend
+    var legend = svg.selectAll('.legend')
+        .data(groupData[0].values.map(function (d) { return toTitleCase(d.grpName); }).reverse())
+        .enter().append('g')
+        .attr('class', 'legend')
+        .attr('transform', function (d, i) { return 'translate(' + (width + 50) + ',' + i * 20 + ')'; })  // Adjusted x position
+        .style('opacity', '0');
+
+    legend.append('rect')
+        .attr('x', 0)  // Adjusted x position to keep the rectangles aligned
+        .attr('width', 18)
+        .attr('height', 18)
+        .style('fill', function (d) { return color(d); });
+
+    legend.append('text')
+        .attr('x', -6)  // Adjusted x position to keep the text aligned
+        .attr('y', 9)
+        .attr('dy', '.35em')
+        .style('text-anchor', 'end')
+        .text(function (d) { return d; });
+    legend.transition().duration(500).delay(function (d, i) { return 1300 + 100 * i; }).style('opacity', '1');
+}
+
+function compareNetworkSize(dataAtcCode, dataAtcComparison, elementID, text) {
     $("#atc_code_box").html("");
     $("#atc_comparison_box").html("");
     $("#result-compare-table").css("width", "40%");
@@ -251,11 +448,10 @@ function compareNetworkSize(dataAtcCode, dataAtcComparison, elementID, text)
     htmlData += `<tr><td>No. of proteins</td><td>${dataAtcCode.no_of_proteins}</td><td>${dataAtcComparison.no_of_proteins}</td></tr>`;
     htmlData += `<tr><td>No. of drug-protein interactions</td><td>${dataAtcCode.NoOfDrugPoteinInteractions}</td><td>${dataAtcComparison.NoOfDrugPoteinInteractions}</td></tr>`;
     htmlData += `<tr><td>No. of drug-disease associations</td><td>${dataAtcCode.NoOfDrugDiseaseAssociationStudy}</td><td>${dataAtcComparison.NoOfDrugDiseaseAssociationStudy}</td></tr></tbody></table>`;
-    $("#"+elementID).html(htmlData);
+    $("#" + elementID).html(htmlData);
 }
 
-function measureCentralizationDrugDisease(data, elementID, text)
-{
+function measureCentralizationDrugDisease(data, elementID, text) {
     $("#result-compare-table").html("");
     $("#result-compare-area-text").html("");
 
@@ -264,13 +460,13 @@ function measureCentralizationDrugDisease(data, elementID, text)
     var degreeCentralityDiseaseData = data["degree_centrality_disease"];
     var betweennessCentralityDiseaseData = data["betweenness_centrality_disease"];
 
-    var e = $("#"+elementID);
+    var e = $("#" + elementID);
     e.html("");
     e.append(`<h4>${text}</h4><br>`);
-    var htmlTable=`<table><tbody><tr><td colspan="3" style="color: #d90429;font-weight: bold;">Centrality of drug nodes</td></tr>
+    var htmlTable = `<table><tbody><tr><td colspan="3" style="color: #d90429;font-weight: bold;">Centrality of drug nodes</td></tr>
     <tr style="color: #3498db; font-weight: bold;"><td>Drug name</td><td>&nbsp;&nbsp;Degree centrality</td><td>&nbsp;&nbsp;Betweeness centrality</td></tr>`;
     // Iterate through the data and build table rows
-    for(var i=0; i<degreeCentralityDrugData.length; i++){
+    for (var i = 0; i < degreeCentralityDrugData.length; i++) {
         var drugObject = degreeCentralityDrugData[i];
         var drugName = Object.keys(drugObject)[0];
         var degreeValue = drugObject[drugName];
@@ -282,7 +478,7 @@ function measureCentralizationDrugDisease(data, elementID, text)
 
     <tr style="color: #3498db; font-weight: bold;"><td>Disease name</td><td>&nbsp;&nbsp;Degree centrality</td><td>&nbsp;&nbsp;Betweeness centrality</td></tr>`;
     // Iterate through the data and build table rows
-    for(var i=0; i<degreeCentralityDiseaseData.length; i++){
+    for (var i = 0; i < degreeCentralityDiseaseData.length; i++) {
         var diseaseObject = degreeCentralityDiseaseData[i];
         var diseaseName = Object.keys(diseaseObject)[0];
         var degreeValue = diseaseObject[diseaseName];
@@ -294,8 +490,7 @@ function measureCentralizationDrugDisease(data, elementID, text)
     e.append(htmlTable);
 }
 
-function measureCentralizationDrugProtein(data, elementID, text)
-{
+function measureCentralizationDrugProtein(data, elementID, text) {
     $("#result-compare-table").html("");
     $("#result-compare-area-text").html("");
 
@@ -304,13 +499,13 @@ function measureCentralizationDrugProtein(data, elementID, text)
     var degreeCentralityGeneData = data["degree_centrality_gene"];
     var betweennessCentralityGeneData = data["betweenness_centrality_gene"];
 
-    var e = $("#"+elementID);
+    var e = $("#" + elementID);
     e.html("");
     e.append(`<h4>${text}</h4><br>`);
-    var htmlTable=`<table><tbody><tr><td colspan="3" style="color: #d90429;font-weight: bold;">Centrality of drug nodes</td></tr>
+    var htmlTable = `<table><tbody><tr><td colspan="3" style="color: #d90429;font-weight: bold;">Centrality of drug nodes</td></tr>
     <tr style="color: #3498db; font-weight: bold;"><td>Drug name</td><td>&nbsp;&nbsp;Degree centrality</td><td>&nbsp;&nbsp;Betweeness centrality</td></tr>`;
     // Iterate through the data and build table rows
-    for(var i=0; i<degreeCentralityDrugData.length; i++){
+    for (var i = 0; i < degreeCentralityDrugData.length; i++) {
         var drugObject = degreeCentralityDrugData[i];
         var drugName = Object.keys(drugObject)[0];
         var degreeValue = drugObject[drugName];
@@ -322,7 +517,7 @@ function measureCentralizationDrugProtein(data, elementID, text)
 
     <tr style="color: #3498db; font-weight: bold;"><td>Gene name</td><td>&nbsp;&nbsp;Degree centrality</td><td>&nbsp;&nbsp;Betweeness centrality</td></tr>`;
     // Iterate through the data and build table rows
-    for(var i=0; i<degreeCentralityGeneData.length; i++){
+    for (var i = 0; i < degreeCentralityGeneData.length; i++) {
         var geneObject = degreeCentralityGeneData[i];
         var geneName = Object.keys(geneObject)[0];
         var degreeValue = geneObject[geneName];
@@ -334,24 +529,23 @@ function measureCentralizationDrugProtein(data, elementID, text)
     e.append(htmlTable);
 }
 
-function detectingCommunityDrugDisease(data, elementID, text)
-{
+function detectingCommunityDrugDisease(data, elementID, text) {
     $("#result-compare-table").html("");
     $("#result-compare-area-text").html("");
 
     var partitionDrugData = data["partition_drug"];
     var partitionDiseaseData = data["partition_disease"];
 
-    console.log("partitionDrugData: "+partitionDrugData);
-    console.log("partitionDiseaseData: "+partitionDiseaseData);
+    console.log("partitionDrugData: " + partitionDrugData);
+    console.log("partitionDiseaseData: " + partitionDiseaseData);
 
-    var e = $("#"+elementID);
+    var e = $("#" + elementID);
     e.html("");
     e.append(`<h4>${text}</h4><br>`);
-    var htmlTable=`<table><tbody><tr><td colspan="2" style="color: #d90429;font-weight: bold;">Community of drug nodes</td></tr>
+    var htmlTable = `<table><tbody><tr><td colspan="2" style="color: #d90429;font-weight: bold;">Community of drug nodes</td></tr>
     <tr style="color: #3498db; font-weight: bold;"><td>Drug name</td><td>&nbsp;&nbsp;Community</td></tr>`;
     // Iterate through the data and build table rows
-    for(var i=0; i<partitionDrugData.length; i++){
+    for (var i = 0; i < partitionDrugData.length; i++) {
         var drugObject = partitionDrugData[i];
         var drugName = Object.keys(drugObject)[0];
         var communityValue = drugObject[drugName];
@@ -360,7 +554,7 @@ function detectingCommunityDrugDisease(data, elementID, text)
     htmlTable += `<tr></tr><tr><td colspan="2" style="color: #d90429; font-weight: bold;">Community of disease nodes</td></tr>
     <tr style="color: #3498db; font-weight: bold;"><td>Disease name</td><td>&nbsp;&nbsp;Community</td></tr>`;
     // Iterate through the data and build table rows
-    for(var i=0; i<partitionDiseaseData.length; i++){
+    for (var i = 0; i < partitionDiseaseData.length; i++) {
         var diseaseObject = partitionDiseaseData[i];
         var diseaseName = Object.keys(diseaseObject)[0];
         var communityValue = diseaseObject[diseaseName];
@@ -370,21 +564,20 @@ function detectingCommunityDrugDisease(data, elementID, text)
     e.append(htmlTable);
 }
 
-function detectingCommunityDrugProtein(data, elementID, text)
-{
+function detectingCommunityDrugProtein(data, elementID, text) {
     $("#result-compare-table").html("");
     $("#result-compare-area-text").html("");
 
     var partitionDrugData = data["partition_drug"];
     var partitionGeneData = data["partition_gene"];
 
-    var e = $("#"+elementID);
+    var e = $("#" + elementID);
     e.html("");
     e.append(`<h4>${text}</h4><br>`);
-    var htmlTable=`<table><tbody><tr><td colspan="2" style="color: #d90429;font-weight: bold;">Community of drug nodes</td></tr>
+    var htmlTable = `<table><tbody><tr><td colspan="2" style="color: #d90429;font-weight: bold;">Community of drug nodes</td></tr>
     <tr style="color: #3498db; font-weight: bold;"><td>Drug name</td><td>&nbsp;&nbsp;Community</td></tr>`;
     // Iterate through the data and build table rows
-    for(var i=0; i<partitionDrugData.length; i++){
+    for (var i = 0; i < partitionDrugData.length; i++) {
         var drugObject = partitionDrugData[i];
         var drugName = Object.keys(drugObject)[0];
         var communityValue = drugObject[drugName];
@@ -393,7 +586,7 @@ function detectingCommunityDrugProtein(data, elementID, text)
     htmlTable += `<tr></tr><tr><td colspan="2" style="color: #d90429; font-weight: bold;">Community of protein <i>(in genename)</i> nodes</td></tr>
     <tr style="color: #3498db; font-weight: bold;"><td>Gene name</td><td>&nbsp;&nbsp;Community</td></tr>`;
     // Iterate through the data and build table rows
-    for(var i=0; i<partitionGeneData.length; i++){
+    for (var i = 0; i < partitionGeneData.length; i++) {
         var geneObject = partitionGeneData[i];
         var geneName = Object.keys(geneObject)[0];
         var communityValue = geneObject[geneName];
@@ -404,50 +597,49 @@ function detectingCommunityDrugProtein(data, elementID, text)
 }
 
 
-function calculatePathLength(data, elementID, text){
+function calculatePathLength(data, elementID, text) {
     $("#result-compare-table").html("");
     $("#result-compare-area-text").html("");
 
     var no_of_components = data["no_of_components"];
     var component_detail = data["component_detail"];
 
-    var e = $("#"+elementID);
+    var e = $("#" + elementID);
     e.html("");
     e.append(`<h4>${text}</h4><br>`);
     e.append(`<p>Number of component: <span style="color:#d90429;font-weight: bold;">${no_of_components}</span></p><br>`);
 
-    var htmlTable=`<table><tbody><tr style="color: #3498db;font-weight: bold;"><td>Component</td><td>&nbsp;&nbsp;&nbsp;&nbsp;List of node(s)</td><td>&nbsp;&nbsp;&nbsp;&nbsp;Average path length</td></tr>`;
+    var htmlTable = `<table><tbody><tr style="color: #3498db;font-weight: bold;"><td>Component</td><td>&nbsp;&nbsp;&nbsp;&nbsp;List of node(s)</td><td>&nbsp;&nbsp;&nbsp;&nbsp;Average path length</td></tr>`;
 
     // Iterate through the data and build table rows
-    for(var i=0; i<component_detail.length; i++){
+    for (var i = 0; i < component_detail.length; i++) {
         var nodes = component_detail[i]["nodes"];
         var average_shortest_path_length = component_detail[i]["average_shortest_path_length"];
-        htmlTable += `<tr><td>${i+1}</td><td>&nbsp;&nbsp;&nbsp;&nbsp;${nodes.join('<br>')}</td><td>&nbsp;&nbsp;&nbsp;&nbsp;${average_shortest_path_length.toFixed(2)}</td></tr>`;
+        htmlTable += `<tr><td>${i + 1}</td><td>&nbsp;&nbsp;&nbsp;&nbsp;${nodes.join('<br>')}</td><td>&nbsp;&nbsp;&nbsp;&nbsp;${average_shortest_path_length.toFixed(2)}</td></tr>`;
     }
     htmlTable += `</tbody></table>`;
     e.append(htmlTable);
 }
 
 
-function convert(objects){
-    if (objects.length==0){
+function convert(objects) {
+    if (objects.length == 0) {
         return "None";
-    }else{
+    } else {
         return objects.join(", ");
     }
 }
-function commonAndUniqueNodes(data, text)
-{
+function commonAndUniqueNodes(data, text) {
     $("#atc_code_box").html("");
     $("#atc_comparison_box").html("");
     $("#result-compare-table").css("width", "40%");
     $("#result-compare-area-text").append(`<h4>${text}</h4>`);
     $("#result-compare-area-text").css("color", "#3498db");
     var common_drugs = convert(data.common_drugs);
-    var common_proteins = convert(data.common_proteins); 
-    var common_diseases = convert(data.common_diseases); 
-    
-    var unique_drug_atc_code = convert(data.unique_drug_atc_code); 
+    var common_proteins = convert(data.common_proteins);
+    var common_diseases = convert(data.common_diseases);
+
+    var unique_drug_atc_code = convert(data.unique_drug_atc_code);
     var unique_protein_atc_code = convert(data.unique_protein_atc_code);
     var unique_disease_atc_code = convert(data.unique_disease_atc_code);
     var unique_drug_atc_comparison = convert(data.unique_drug_atc_comparison);
