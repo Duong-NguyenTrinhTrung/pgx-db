@@ -125,33 +125,33 @@ def protein_view_ex(request):
     # Return the HTML and JavaScript code for the py3Dmol viewer
     return render(request, 'protein_3Dview_ex.html', {'viewer': v.js()})
 
-class ProteinBrowser(TemplateView):
+# class ProteinBrowser(TemplateView):
 
-    template_name = 'protein_browser.html'
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        browser_columns = ["uniprot_ID", "genename",
-                           "geneID", "protein_name"]
-        table = pd.DataFrame(columns=browser_columns)
-        protein_data = Protein.objects.all().values_list(
-            "uniprot_ID",
-            "genename",
-            "geneID",
-            "protein_name"
-        ).distinct()
-        for data in protein_data:
-            data_subset = {}
-            data_subset['uniprot_ID'] = data[0]
-            data_subset['genename'] = data[1]
-            data_subset['geneID'] = data[2]
-            data_subset['protein_name'] = data[3]
+#     template_name = 'protein_browser.html'
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         browser_columns = ["uniprot_ID", "genename",
+#                            "geneID", "protein_name"]
+#         table = pd.DataFrame(columns=browser_columns)
+#         protein_data = Protein.objects.all().values_list(
+#             "uniprot_ID",
+#             "genename",
+#             "geneID",
+#             "protein_name"
+#         ).distinct()
+#         for data in protein_data:
+#             data_subset = {}
+#             data_subset['uniprot_ID'] = data[0]
+#             data_subset['genename'] = data[1]
+#             data_subset['geneID'] = data[2]
+#             data_subset['protein_name'] = data[3]
 
-            table = table.append(data_subset, ignore_index=True)
+#             table = table.append(data_subset, ignore_index=True)
 
-        table.fillna('', inplace=True)
-        # context = dict()
-        context['Array'] = table.to_numpy()
-        return context
+#         table.fillna('', inplace=True)
+#         # context = dict()
+#         context['Array'] = table.to_numpy()
+#         return context
 
 #@cache_page(60 * 60 * 24 * 7)
 def get_protein_details(request, slug):

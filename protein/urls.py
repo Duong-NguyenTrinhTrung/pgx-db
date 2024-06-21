@@ -1,7 +1,7 @@
 # from django.conf.urls import url
 from django.urls import path, re_path
 from django.views.decorators.cache import cache_page
-from .views import ProteinBrowser
+# from .views import ProteinBrowser
 from . import views
 from django.conf.urls.static import static
 import os
@@ -10,8 +10,7 @@ from conf import settings
 
 urlpatterns = [
     #  url(r'^browser$', cache_page(3600*24*7)(views.LigandBrowser.as_view()), name='ligand_browser'),
-    path('protein',
-         (ProteinBrowser.as_view()), name='protein_browser'),
+    # path('protein',(ProteinBrowser.as_view()), name='protein_browser'),
     re_path(r'^protein/(?P<slug>[\w-]+)/$', views.get_protein_details, name='detail'),
     path('protein_view_ex', views.protein_view_ex, name='protein-view'),
 ]
