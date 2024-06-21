@@ -1,8 +1,8 @@
 function reset(){
     $("#result-compare-table").html("");
     $("#result-compare-area-text").html("");
-    $("#atc_code_box").html("");
-    $("#atc_comparison_box").html("");
+    // $("#atc_code_box").html("");
+    // $("#atc_comparison_box").html("");
     var plottingAtcCodeBox = document.getElementById("atc_code_box");
     plottingAtcCodeBox.style.width = '50%';
     var plottingAtcComparisonBox = document.getElementById("atc_comparison_box");
@@ -31,6 +31,7 @@ function getLimitedTicks(integerTicks, maxTicks = 10) {
 
 function createDistributionPlot(data, data_all, elementID, text) {
     reset();
+    
     // target the .viz container
     const viz = d3.select('#' + elementID)
         .html("");
@@ -293,7 +294,7 @@ function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1
         },
     ];
     var margin = { top: 20, right: 20, bottom: 30, left: 40 };
-    var width = (plottingBox1.clientWidth - margin.left - margin.right);
+    var width = (plottingBox1.clientWidth - margin.left - margin.right - 100);
     var height = 400 - margin.top - margin.bottom;
 
     var x0 = d3.scaleBand()
@@ -315,7 +316,7 @@ function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1
     header.append('h4').html(text);
 
     var svg = viz.append('svg')
-        .attr('width', width + margin.left + margin.right + 150)
+        .attr('width', width )
         .attr('height', height + margin.top + margin.bottom)
         .append('g')
         .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
@@ -413,7 +414,7 @@ function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1
         .data(groupData[0].values.map(function (d) { return toTitleCase(d.grpName); }).reverse())
         .enter().append('g')
         .attr('class', 'legend')
-        .attr('transform', function (d, i) { return 'translate(' + (width + 50) + ',' + i * 20 + ')'; })  // Adjusted x position
+        .attr('transform', function (d, i) { return 'translate(' + (width-70) + ',' + i * 20 + ')'; })  // Adjusted x position
         .style('opacity', '0');
 
     legend.append('rect')
@@ -433,6 +434,8 @@ function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1
 
 function compareNetworkSize(dataAtcCode, dataAtcComparison, elementID, text) {
     reset();
+    $("#atc_code_box").html("");
+    $("#atc_comparison_box").html("");
     $("#result-compare-table").css("width", "40%");
     $("#result-compare-area-text").html(`${text}`);
     $("#result-compare-area-text").css("color", "#3498db");

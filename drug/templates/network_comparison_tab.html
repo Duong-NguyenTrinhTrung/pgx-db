@@ -1,8 +1,6 @@
 {% load static %}
 {% csrf_token %}
 
-
-
 <div role="tabpanel" class="tab-pane" id="tab_network_comparison">
     <span class="documentation"><a href="https://pgx-documentation.readthedocs.io/en/latest/atc_code.html#network-comparison" target="_blank">Read More</a></span>
     <div style="display: flex; flex-direction: row; gap: 20px; margin-top: 15px;">
@@ -247,6 +245,7 @@
                     console.log("dataAtcCode "+dataAtcCode);
                     console.log("dataAtcComparison "+dataAtcComparison);
                     createDistributionPlot(dataAtcCode, dataAll, "atc_code_box", `${compareText} <br>`);
+                    createDistributionPlot(dataAtcComparison, dataAll, "atc_comparison_box", `${compareText} <br>`);
                 },
                 error: function (xhr, status, error) {
                     console.log('AJAX Error:', error);
@@ -263,7 +262,10 @@
                     var dataAtcComparison = response.atc_comparison;
                     if ((dataAtcCode.classes.length>0) && (dataAtcComparison.classes.length>0))
                     {
-                        createDistributionPlotForCategoryData2(atc_code, dataAtcCode.classes, dataAtcCode.class_count, atc_comparison, dataAtcComparison.classes, dataAtcComparison.class_count, "atc_code_box", `${compareText} <br>`)
+                        createDistributionPlotForCategoryData2(atc_code, dataAtcCode.classes, dataAtcCode.class_count, atc_comparison, dataAtcComparison.classes, dataAtcComparison.class_count, "atc_code_box", "atc_comparison_box", `${compareText} <br>`)
+                    }else{
+                        createDistributionPlotForCategoryData(dataAtcCode.classes, dataAtcCode.class_count, "atc_code_box", `${compareText} for <span style="color: #3498db">${atc_code}</span>`);
+                        createDistributionPlotForCategoryData(atc_comparison, dataAtcComparison.classes, dataAtcComparison.class_count, "atc_comparison_box", `${compareText} for <span style="color: #3498db">${atc_comparison}</span>`);
                     }
                 },
             error: function (xhr, status, error) {
