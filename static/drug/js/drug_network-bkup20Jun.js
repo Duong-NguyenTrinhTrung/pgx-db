@@ -15,17 +15,13 @@ $(function () {
 var json_GeneralFile = "/static/json-sample/json_GeneralFile.json";
 var json_drugData = "/static/json-sample/json_drugData.json";
 var json_proteinData = "/static/json-sample/json_proteinData.json";
-var json_interactionData = "/static/json-sample/json_interactionData.json";
+var json_interactionData = "/static/json-sample/json_interactionData.json"
 
 if (drug_bank_ids) {
-  json_GeneralFile =
-    "/drugs_network/general_data?drug_bank_ids=" + drug_bank_ids.join(",");
-  json_drugData =
-    "/drugs_network/drug_data?drug_bank_ids=" + drug_bank_ids.join(",");
-  json_proteinData =
-    "/drugs_network/protein_data?drug_bank_ids=" + drug_bank_ids.join(",");
-  json_interactionData =
-    "/drugs_network/interaction_data?drug_bank_ids=" + drug_bank_ids.join(",");
+  json_GeneralFile = "/drugs_network/general_data?drug_bank_ids=" + drug_bank_ids.join(',');
+  json_drugData = "/drugs_network/drug_data?drug_bank_ids=" + drug_bank_ids.join(',');
+  json_proteinData = "/drugs_network/protein_data?drug_bank_ids=" + drug_bank_ids.join(',');
+  json_interactionData = "/drugs_network/interaction_data?drug_bank_ids=" + drug_bank_ids.join(',');
 }
 
 if (drug_bank_id) {
@@ -36,16 +32,13 @@ if (drug_bank_id) {
 }
 
 var urlParams = new URLSearchParams(window.location.search);
-if (urlParams.has("atc_code")) {
-  var atc_code = urlParams.get("atc_code");
+if (urlParams.has('atc_code')) {
+  var atc_code = urlParams.get('atc_code');
   if (atc_code.length === 3 || atc_code.length === 4) {
-    var json_GeneralFile =
-      "/serve_general_data_json_file/?atc_code=" + atc_code;
+    var json_GeneralFile = "/serve_general_data_json_file/?atc_code=" + atc_code;
     var json_drugData = "/serve_drug_data_json_file/?atc_code=" + atc_code;
-    var json_proteinData =
-      "/serve_protein_data_json_file/?atc_code=" + atc_code;
-    var json_interactionData =
-      "/serve_interaction_data_json_file/?atc_code=" + atc_code;
+    var json_proteinData = "/serve_protein_data_json_file/?atc_code=" + atc_code;
+    var json_interactionData = "/serve_interaction_data_json_file/?atc_code=" + atc_code;
   }
 }
 
@@ -74,10 +67,11 @@ function readPrecachedJSONFromDatabase(url) {
       },
       error: function (error) {
         reject(error);
-      },
+      }
     });
   });
 }
+
 
 // code to get the li of the network visualization
 document.addEventListener("DOMContentLoaded", function () {
@@ -150,7 +144,7 @@ async function readDrugJSON() {
       drug_xlsxData = jsonData;
     }
     // readProteinJSON();
-    (async function () {
+    (async function() {
       await readProteinJSON();
     })();
   } catch (error) {
@@ -165,14 +159,15 @@ async function readProteinJSON() {
   try {
     protein_xlsxData = readPrecachedJSONFromDatabase(jsonFilePath);
     // readInteractionJSON();
-    (async function () {
+    (async function() {
       await readInteractionJSON();
     })();
   } catch (error) {
-    console.error("Error:", error);
+      console.error("Error:", error);
   }
   // protein_xlsxData = jsonData;
   //console.log("ProteinData", protein_xlsxData);
+
 
   // fetch(jsonFilePath)
   //   .then((response) => response.json())
@@ -190,13 +185,11 @@ async function readProteinJSON() {
 async function readInteractionJSON() {
   const jsonFilePath = json_interactionData;
   try {
-    const interaction_xlsxData = await readPrecachedJSONFromDatabase(
-      jsonFilePath
-    );
+    const interaction_xlsxData = await readPrecachedJSONFromDatabase(jsonFilePath);
     console.log("JSON Data:", interaction_xlsxData);
     processData(numberofnodes, slicedata);
   } catch (error) {
-    console.error("Error:", error);
+      console.error("Error:", error);
   }
   // fetch(jsonFilePath)
   //   .then((response) => response.json())
@@ -212,8 +205,8 @@ async function readInteractionJSON() {
 }
 
 window.onload = function () {
-  (async function () {
-    await readDrugJSON();
+    (async function() {
+      await readDrugJSON();
   })();
   // readDrugJSON();
   // processData(numberofnodes, slicedata);
@@ -242,6 +235,7 @@ function getDrugJsonData(drugBankId) {
 
 var exportButton = document.getElementById("exportButton");
 exportButton.addEventListener("click", function () {
+
   showExportOptions();
 });
 
@@ -310,6 +304,7 @@ function showExportOptions() {
 }
 
 function createExportOption(optionText) {
+
   var optionButton = document.createElement("button");
   optionButton.textContent = optionText;
   optionButton.className = "pgx_btn1"; // add class here
@@ -382,6 +377,7 @@ function handleExportOption(option) {
       downloadCSV();
       break;
     case "Download XLS":
+
       downloadXLS();
       break;
     case "View Data Table":
@@ -516,7 +512,9 @@ function svgToCanvas(svgData, callback) {
 
     if (xlinkHref) {
       //imgObj.src = "http://localhost:8000/" + xlinkHref;
-      imgObj.src = "https://pgx-db.org" + xlinkHref;
+      imgObj.src =
+        "https://pgx-db.org" +
+        xlinkHref;
     } else {
       loadedCount++;
     }
@@ -683,7 +681,9 @@ function downloadPDF() {
     // Use the href attribute for the image path
     if (xlinkHref) {
       //imgObj.src = "http://localhost:8000/" + xlinkHref;
-      imgObj.src = "https://pgx-db.org/" + xlinkHref;
+      imgObj.src =
+        "https://pgx-db.org/" +
+        xlinkHref;
     } else {
       loadedCount++;
     }
@@ -755,9 +755,10 @@ function getFilteredLinksXLSX() {
 
 // Download XLS
 function downloadXLS() {
+
   var modal = document.getElementById("exportModal");
-  // modal.style.display = "none";
-  // $("#loading").show();
+  modal.style.display = "none"
+  $("#loading").show();
   var filteredLinks = getFilteredLinksXLSX();
 
   //console.log(filteredLinks)
@@ -797,7 +798,7 @@ function downloadXLS() {
   };
 
   req.send();
-  // $("#loading").hide();
+  $("#loading").hide();
 }
 
 function downloadXLS11() {
@@ -1507,7 +1508,7 @@ function showDialog_Links(title, interactionTy) {
         row.drugbank_id === interaction_source &&
         row.uniprot_ID_id === interaction_target &&
         row.interaction_type.toLowerCase() ===
-          selectedInteractionName1.toLowerCase()
+        selectedInteractionName1.toLowerCase()
     );
 
     if (matchingRow) {
@@ -1733,6 +1734,7 @@ let flag_processData = false;
 
 let numberofnodes = 2;
 let slicedata = 400;
+
 
 window.parent.postMessage({ data: slicedata }, "*");
 
@@ -2144,57 +2146,34 @@ function createChart(links) {
       d3.select(this).style("cursor", "pointer");
     });
 
+
+
+
   var tooltip2 = d3
-
     .select("body")
-
     .append("div")
-
     .attr("class", "tooltip2")
-
     .style("opacity", 0);
 
   node
-
     .filter((d) => d.child_type === "disease_type")
-
     .on("mouseover", function (event, d) {
       d3.select(this).style("cursor", "pointer");
-
       tooltip2.transition().style("opacity", 0.9);
-
       tooltip2
-
         .style("left", event.pageX + 20 + "px")
-
-        .style("top", event.pageY + 20 + "px").html(`
-
-            <div>
-
-              ${d.id}<br>
-
-            
-
-              <a href="https://clinicaltrials.gov/search?cond=${d.id}" target="_blank">Click here to see disease clinical information</a>
-
-            </div>
-
-          `);
-
-      // Set HTML content with link before handling click event
+        .style("top", event.pageY + 20 + "px")
+        .html(d.id); // Set HTML content before handling click event
     })
-
-  
-
-  tooltip2
-
-    .on("mouseover", function () {
-      tooltip2.transition().style("opacity", 1);
-    })
-
     .on("mouseout", function () {
       tooltip2.transition().style("opacity", 0);
     });
+
+  tooltip2.on("click", function (event, d) {
+    // This function will execute when the tooltip is clicked
+    // Note: 'd' might not be defined here, you may need to handle this case
+    window.open(`https://clinicaltrials.gov/search?cond=${d.id}`, "_blank");
+  });
 
   node
     .filter(function (d) {
@@ -3546,8 +3525,8 @@ function updateAllFilters() {
       (l) =>
         !hiddenInteractions[l.type] &&
         !hiddenProteinClasses[
-          nodes.find((n) => n.id === l.target.id).Protein_Class &&
-            nodes.find((n) => n.id === l.target.id).DiseaseClass
+        nodes.find((n) => n.id === l.target.id).Protein_Class &&
+        nodes.find((n) => n.id === l.target.id).DiseaseClass
         ]
     );
 
@@ -3555,7 +3534,7 @@ function updateAllFilters() {
       (l) =>
         !hiddenInteractions[l.type] &&
         !hiddenDiseaseClasses[
-          nodes.find((n) => n.id === l.target.id).DiseaseClass
+        nodes.find((n) => n.id === l.target.id).DiseaseClass
         ]
     );
 

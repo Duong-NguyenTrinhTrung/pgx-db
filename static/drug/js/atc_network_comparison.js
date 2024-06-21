@@ -1,3 +1,13 @@
+function reset(){
+    $("#result-compare-table").html("");
+    $("#result-compare-area-text").html("");
+    $("#atc_code_box").html("");
+    $("#atc_comparison_box").html("");
+    var plottingAtcCodeBox = document.getElementById("atc_code_box");
+    plottingAtcCodeBox.style.width = '50%';
+    var plottingAtcComparisonBox = document.getElementById("atc_comparison_box");
+    plottingAtcComparisonBox.style.width = '50%';
+}
 
 function getLimitedTicks(integerTicks, maxTicks = 10) {
     const tickCount = integerTicks.length;
@@ -20,7 +30,7 @@ function getLimitedTicks(integerTicks, maxTicks = 10) {
 }
 
 function createDistributionPlot(data, data_all, elementID, text) {
-    $("#result-compare-table").html("");
+    reset();
     // target the .viz container
     const viz = d3.select('#' + elementID)
         .html("");
@@ -142,31 +152,26 @@ function createDistributionPlot(data, data_all, elementID, text) {
 }
 
 function createDistributionPlotForCategoryData(classes, class_count, elementID, text) {
-    $("#result-compare-table").html("");
+    reset();
     const data = [];
     for (var i = 0; i < classes.length; i++) {
         temp = {
             name: classes[i],
             value: class_count[i],
         }
-        // console.log("temp  = " + temp.name +" "+temp.value);
         data.push(temp);
     }
-
     const margin = {
         top: 20,
         right: 20,
         bottom: 20,
-        left: 300, // add more white space on the left side of the visualization to display the names
+        left: 300, 
     };
 
     const width = 800 - (margin.left + margin.right);
     const height = 350 - (margin.top + margin.bottom);
 
-    // target the .viz container
     const viz = d3.select('#' + elementID).html("");
-
-    // in a header include preliminary information about the project
     const header = viz.append('header').style('text-align', 'center').style("color", "#3498db");
     header.append('h4').html(text);
 
@@ -180,7 +185,6 @@ function createDistributionPlotForCategoryData(classes, class_count, elementID, 
         .append('g')
         .attr('transform', `translate(${margin.left} -${margin.top})`);
 
-    // describe a quantitative scale for the x axis, for the racers' points
     const xScale = d3
         .scaleLinear()
         .domain([0, d3.max(data, ({ value }) => value)])
@@ -243,13 +247,14 @@ function toTitleCase(str) {
 }
 
 // 2 bar plots sharing same axis
-function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1, atc_comparison, classes2, class_count2, elementID, text) {
-    $("#result-compare-table").html("");
+function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1, atc_comparison, classes2, class_count2, elementID1, elementID2, text) {
+    reset();
     var value1 = [];
     var value2 = [];
-    var plottingBox = document.getElementById(elementID);
-    plottingBox.style.width = '100%';
-    // Find the intersection of the two arrays
+    var plottingBox1 = document.getElementById(elementID1);
+    plottingBox1.style.width = '100%';
+    var plottingBox2 = document.getElementById(elementID2);
+    plottingBox2.style.width = '0';
     const combinedArray = [...classes1, ...classes2];
     const unionSet = new Set(combinedArray);
 
@@ -279,11 +284,7 @@ function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1
             });
         }
     }
-
     const groupData = [
-        // {
-        //     key: "AAAAA", values: value2
-        // },
         {
             key: atc_code, values: value1
         },
@@ -291,9 +292,8 @@ function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1
             key: atc_comparison, values: value2
         },
     ];
-
     var margin = { top: 20, right: 20, bottom: 30, left: 40 };
-    var width = (plottingBox.clientWidth - margin.left - margin.right);
+    var width = (plottingBox1.clientWidth - margin.left - margin.right);
     var height = 400 - margin.top - margin.bottom;
 
     var x0 = d3.scaleBand()
@@ -310,7 +310,7 @@ function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1
     var yAxis = d3.axisLeft().scale(y);
     const color = d3.scaleOrdinal(d3.schemeSet3);
 
-    const viz = d3.select('#' + elementID).html("");
+    const viz = d3.select('#' + elementID1).html("");
     const header = viz.append('header').style('text-align', 'center').style("color", "#3498db");
     header.append('h4').html(text);
 
@@ -395,12 +395,7 @@ function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1
         })
         .on('mousemove', function (event, d) {
             d3.select('.nw_comparison_tooltip')
-                // .attr('x', parseInt(event.target.parentElement.getAttribute("id").replace("atc-",""))*(parseInt(event.target.getAttribute("id").replace("col-",""))+1)*parseInt(event.target.getAttribute("width")) + d3.pointer(event)[0]) // Positioning the text
                 .attr('x', function () {
-                    // console.log("mouse move: d3.pointer(event)[0] " + d3.pointer(event)[0]);
-                    // console.log('formulae: parseInt(event.target.parentElement.getAttribute("id").replace("atc-",""))*(parseInt(event.target.getAttribute("id").replace("col-",""))+1)*parseInt(event.target.getAttribute("width")) + d3.pointer(event)[0])');
-                    // console.log("calculated value for x: " + (parseInt(event.target.parentElement.getAttribute("id").replace("atc-", "")) * (parseInt(event.target.getAttribute("id").replace("col-", "")) + 1) * parseInt(event.target.getAttribute("width")) + parseInt(d3.pointer(event)[0])));
-                    // console.log("d3.pointer(event)[0]: " + d3.pointer(event)[0] + " width " + event.target.getAttribute("width") + " event.target.getAttribute(id) " + event.target.getAttribute("id"));
                     return parseInt(d3.pointer(event, this )[0]) + 10;
                 }) // Positioning the text
                 .attr('y', parseInt(d3.pointer(event, this )[1]) - 10)
@@ -437,8 +432,7 @@ function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1
 }
 
 function compareNetworkSize(dataAtcCode, dataAtcComparison, elementID, text) {
-    $("#atc_code_box").html("");
-    $("#atc_comparison_box").html("");
+    reset();
     $("#result-compare-table").css("width", "40%");
     $("#result-compare-area-text").html(`${text}`);
     $("#result-compare-area-text").css("color", "#3498db");
@@ -452,8 +446,7 @@ function compareNetworkSize(dataAtcCode, dataAtcComparison, elementID, text) {
 }
 
 function measureCentralizationDrugDisease(data, elementID, text) {
-    $("#result-compare-table").html("");
-    $("#result-compare-area-text").html("");
+    reset();
 
     var degreeCentralityDrugData = data["degree_centrality_drug"];
     var betweennessCentralityDrugData = data["betweenness_centrality_drug"];
@@ -491,8 +484,7 @@ function measureCentralizationDrugDisease(data, elementID, text) {
 }
 
 function measureCentralizationDrugProtein(data, elementID, text) {
-    $("#result-compare-table").html("");
-    $("#result-compare-area-text").html("");
+    reset();
 
     var degreeCentralityDrugData = data["degree_centrality_drug"];
     var betweennessCentralityDrugData = data["betweenness_centrality_drug"];
@@ -530,8 +522,7 @@ function measureCentralizationDrugProtein(data, elementID, text) {
 }
 
 function detectingCommunityDrugDisease(data, elementID, text) {
-    $("#result-compare-table").html("");
-    $("#result-compare-area-text").html("");
+    reset();
 
     var partitionDrugData = data["partition_drug"];
     var partitionDiseaseData = data["partition_disease"];
@@ -565,8 +556,7 @@ function detectingCommunityDrugDisease(data, elementID, text) {
 }
 
 function detectingCommunityDrugProtein(data, elementID, text) {
-    $("#result-compare-table").html("");
-    $("#result-compare-area-text").html("");
+    reset();
 
     var partitionDrugData = data["partition_drug"];
     var partitionGeneData = data["partition_gene"];
@@ -597,13 +587,11 @@ function detectingCommunityDrugProtein(data, elementID, text) {
 }
 
 
-function calculatePathLength(data, elementID, text) {
-    $("#result-compare-table").html("");
-    $("#result-compare-area-text").html("");
 
+function calculatePathLength(data, elementID, text) {
+    reset();
     var no_of_components = data["no_of_components"];
     var component_detail = data["component_detail"];
-
     var e = $("#" + elementID);
     e.html("");
     e.append(`<h4>${text}</h4><br>`);
@@ -630,8 +618,7 @@ function convert(objects) {
     }
 }
 function commonAndUniqueNodes(data, text) {
-    $("#atc_code_box").html("");
-    $("#atc_comparison_box").html("");
+    reset();
     $("#result-compare-table").css("width", "40%");
     $("#result-compare-area-text").append(`<h4>${text}</h4>`);
     $("#result-compare-area-text").css("color", "#3498db");
