@@ -14,7 +14,7 @@ django-crispy-forms==1.14.0
 crispy-bootstrap5==0.6
 django-allauth==0.50.0
 pandas==1.5.3
-numpy>=1.21.0
+numpy==1.26.4
 py3Dmol==2.0.1.post1
 XlsxWriter==3.1.0
 xlrd==2.0.1
