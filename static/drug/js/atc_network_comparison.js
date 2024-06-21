@@ -247,7 +247,6 @@ function toTitleCase(str) {
     }).join(' ');
 }
 
-// 2 bar plots sharing same axis
 function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1, atc_comparison, classes2, class_count2, elementID1, elementID2, text) {
     reset();
     var value1 = [];
@@ -293,8 +292,8 @@ function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1
             key: atc_comparison, values: value2
         },
     ];
-    var margin = { top: 20, right: 20, bottom: 30, left: 40 };
-    var width = (plottingBox1.clientWidth - margin.left - margin.right - 100);
+    var margin = { top: 20, right: 150, bottom: 30, left: 40 };
+    var width = (plottingBox1.clientWidth - margin.left - margin.right);
     var height = 400 - margin.top - margin.bottom;
 
     var x0 = d3.scaleBand()
@@ -414,7 +413,7 @@ function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1
         .data(groupData[0].values.map(function (d) { return toTitleCase(d.grpName); }).reverse())
         .enter().append('g')
         .attr('class', 'legend')
-        .attr('transform', function (d, i) { return 'translate(' + (width-70) + ',' + i * 20 + ')'; })  // Adjusted x position
+        .attr('transform', function (d, i) { return 'translate(' + (width  - 70) + ',' + i * 20 + ')'; })  // Adjusted x position
         .style('opacity', '0');
 
     legend.append('rect')
@@ -431,6 +430,7 @@ function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1
         .text(function (d) { return d; });
     legend.transition().duration(500).delay(function (d, i) { return 1300 + 100 * i; }).style('opacity', '1');
 }
+
 
 function compareNetworkSize(dataAtcCode, dataAtcComparison, elementID, text) {
     reset();
