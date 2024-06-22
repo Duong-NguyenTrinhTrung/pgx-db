@@ -83,11 +83,12 @@
                     success: function (data) {
                         //alert(data.suggestions);
                         if (data.suggestions.length==0){
-                            alert("Please enter a valid ATC code!");
+                            $('#atc_comparison').css("border", "1px solid red");
                             $("#btn-network-compare").attr("disabled", "true");
                             $("#btn-network-compare").addClass("btn-disabled");
                         }
                         else {
+                            $('#atc_comparison').css("border", "unset");
                             $("#btn-network-compare").removeAttr("disabled");
                             $("#btn-network-compare").removeClass("btn-disabled");
                             response(data.suggestions);
@@ -156,6 +157,7 @@
         var urlCompare;
         var compareTask;
         var compareText;
+        var relation;
         if (atc_comparison!="" & isValidATC(atc_comparison)){
                 if(compare_type == "no-selection") {
                     alert("Please select a comparison type!");
@@ -185,12 +187,14 @@
                 else if(compare_type == "compare_moa_distribution") {
                     urlCompare = "{% url 'get-statistics-by-atc-code-for-MOA-comparison' %}";
                     compareTask= "distributionPlotCategory";
-                    compareText = "DRUG-PROTEIN Mode of action distribution";
+                    compareText = "DRUG-PROTEIN interactions <br> Modes of action distribution";
+                    relation = "interactions";
                 }
                 else if(compare_type == "see_clinical_trial_phase_distribution") {
                     urlCompare = "{% url 'get-statistics-by-atc-for-clinical-trial-phase-comparison' %}";
                     compareTask= "distributionPlotCategory";
-                    compareText = "DRUG-DISEASE clinical trial phase distribution";
+                    compareText = "DRUG-DISEASE association studies <br> Clinical trial phase distribution";
+                    relation = "associations";
                 }
                 else if(compare_type == "calculate_path_length_DD") {
                     urlCompare = "{% url 'get-statistics-by-atc-for-calculating-average-path-length-drug-disease' %}";
@@ -262,10 +266,10 @@
                     var dataAtcComparison = response.atc_comparison;
                     if ((dataAtcCode.classes.length>0) && (dataAtcComparison.classes.length>0))
                     {
-                        createDistributionPlotForCategoryData2(atc_code, dataAtcCode.classes, dataAtcCode.class_count, atc_comparison, dataAtcComparison.classes, dataAtcComparison.class_count, "atc_code_box", "atc_comparison_box", `${compareText} <br>`)
+                        createDistributionPlotForCategoryData2(atc_code, dataAtcCode.classes, dataAtcCode.class_count, atc_comparison, dataAtcComparison.classes, dataAtcComparison.class_count, "atc_code_box", "atc_comparison_box", `${compareText} <br>`, relation)
                     }else{
-                        createDistributionPlotForCategoryData(dataAtcCode.classes, dataAtcCode.class_count, "atc_code_box", `${compareText} for <span style="color: #3498db">${atc_code}</span>`);
-                        createDistributionPlotForCategoryData(atc_comparison, dataAtcComparison.classes, dataAtcComparison.class_count, "atc_comparison_box", `${compareText} for <span style="color: #3498db">${atc_comparison}</span>`);
+                        createDistributionPlotForCategoryData(dataAtcCode.classes, dataAtcCode.class_count, "atc_code_box", `${compareText} for <span style="color: #3498db">${atc_code}</span>`, relation);
+                        createDistributionPlotForCategoryData(dataAtcComparison.classes, dataAtcComparison.class_count, "atc_comparison_box", `${compareText} for <span style="color: #3498db">${atc_comparison}</span>`, relation);
                     }
                 },
             error: function (xhr, status, error) {

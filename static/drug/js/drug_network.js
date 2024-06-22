@@ -38,7 +38,7 @@ if (drug_bank_id) {
 var urlParams = new URLSearchParams(window.location.search);
 if (urlParams.has("atc_code")) {
   var atc_code = urlParams.get("atc_code");
-  if (atc_code.length === 3 || atc_code.length === 4) {
+  if (atc_code.length === 3 || atc_code.length === 4) { //query precached data in database
     var json_GeneralFile =
       "/serve_general_data_json_file/?atc_code=" + atc_code;
     var json_drugData = "/serve_drug_data_json_file/?atc_code=" + atc_code;
@@ -47,6 +47,16 @@ if (urlParams.has("atc_code")) {
     var json_interactionData =
       "/serve_interaction_data_json_file/?atc_code=" + atc_code;
   }
+  else {
+    json_GeneralFile =
+    "/drugs_network/general_data?drug_bank_ids=" + drug_bank_ids.join(",");
+    json_drugData =
+      "/drugs_network/drug_data?drug_bank_ids=" + drug_bank_ids.join(",");
+    json_proteinData =
+      "/drugs_network/protein_data?drug_bank_ids=" + drug_bank_ids.join(",");
+    json_interactionData =
+      "/drugs_network/interaction_data?drug_bank_ids=" + drug_bank_ids.join(",");
+    }
 }
 
 // function readPrecachedJSONFromDatabase(url) {
@@ -1743,7 +1753,23 @@ function processData(numberofnodes, slicedata) {
   fetch(jsonFilePath)
     .then((response) => response.json())
     .then((data) => {
-      var data = JSON.parse(data.data);
+      // if (typeof data === "string") {
+      //   try {
+      //     var data = JSON.parse(data.data);
+      //   }
+      //   catch {
+      //     data = data.data;
+      //   }
+      // }
+      // else {
+      //   data = data.data;
+      // }
+      try {
+        var data = JSON.parse(data.data);
+      }
+      catch {
+        data = data.data;
+      }
       console.log(data, "here is the data ");
 
       const uniqueProteinClasses = [

@@ -208,7 +208,7 @@ def get_adr_data(request):
 
 
 def atc_comparison_autocomplete_view(request):
-    query = request.GET.get('query', '')
+    query = request.GET.get('query', '').upper()
     results = []
     if len(query)==3:
         try:
@@ -312,7 +312,7 @@ def get_drugs_general_data(request):
         data = DrugsNetworkGetDataService(drug_bank_ids=drug_bank_ids).get_general_data() # with s
         cache.set("drugs_general_data_" + "_".join(drug_bank_ids), data, 60 * 60)
 
-    return JsonResponse(data, safe=False)
+    return JsonResponse({"data": data}, safe=False)
 
 # Retrieve data for one drug
 def get_drug_data(request, drug_bank_id):
@@ -1362,12 +1362,14 @@ def get_statistics_by_atc_code_for_MOA_comparison(request):
     else:
         data1 = get_statistics_by_atc_for_ONE_atc_code_for_MOA_comparison(atc_code)
         data2 = get_statistics_by_atc_for_ONE_atc_code_for_MOA_comparison(atc_comparison)
-        max1 = max(list(data1.get("class_count")))
-        max2 = max(list(data2.get("class_count")))
+        print("atc_code ",atc_code, " data1 ", data1)
+        print("atc_comparison ",atc_comparison, " data2 ", data2)
+        # max1 = max(list(data1.get("class_count")))
+        # max2 = max(list(data2.get("class_count")))
         response_data = {
             "atc_code": data1, 
             "atc_comparison": data2,
-            "max_count": max(max1, max2) 
+            # "max_count": max(max1, max2) 
         }
         cache.set("get_data_for_comparing_moa_distribution_"+atc_code+"_"+atc_comparison, response_data, 60*60)
     return JsonResponse(response_data)
