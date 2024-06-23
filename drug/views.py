@@ -251,7 +251,12 @@ def atc_comparison_autocomplete_view(request):
                         pass
                     
     results = list(set(results))
-    results = sorted(results, key=lambda x: x.split()[0])
+    print("results before sorted ", results)
+    # results = sorted(results, key=lambda x: x.split()[0])
+    # results = sorted(results, key=lambda x: len(x.split()[0]))
+    results = sorted(results, key=lambda x: (len(x.split()[0]), x.split()[0]))
+
+    print("results after sorted ", results)
     return JsonResponse({'suggestions': results})
 
 def get_drug_network(request):

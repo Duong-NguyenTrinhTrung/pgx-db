@@ -281,8 +281,6 @@ function createDistributionPlotForCategoryData(classes, class_count, elementID, 
         }
 }
 
-
-
 function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1, atc_comparison, classes2, class_count2, elementID1, elementID2, text, relation) {
     reset();
     var value1 = [];

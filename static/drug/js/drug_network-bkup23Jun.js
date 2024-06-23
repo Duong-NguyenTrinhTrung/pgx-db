@@ -7,7 +7,7 @@ $(function () {
 //Pass jsonFiles Here
 
 // var json_GeneralFile = "json/json_GeneralFile.json";
-// var json_GeneralFile = "json/data.json";
+// var json_GeneralFile = "json/json5.json";
 // var json_drugData = "json/json_drugData.json";
 // var json_proteinData = "json/json_proteinData.json";
 // var json_interactionData = "json/json_interactionData.json";
@@ -38,7 +38,7 @@ if (drug_bank_id) {
 var urlParams = new URLSearchParams(window.location.search);
 if (urlParams.has("atc_code")) {
   var atc_code = urlParams.get("atc_code");
-  if (atc_code.length === 3 || atc_code.length === 4) {
+  if (atc_code.length === 3 || atc_code.length === 4) { //query precached data in database
     var json_GeneralFile =
       "/serve_general_data_json_file/?atc_code=" + atc_code;
     var json_drugData = "/serve_drug_data_json_file/?atc_code=" + atc_code;
@@ -48,26 +48,16 @@ if (urlParams.has("atc_code")) {
       "/serve_interaction_data_json_file/?atc_code=" + atc_code;
   }
   else {
-
     json_GeneralFile =
-
     "/drugs_network/general_data?drug_bank_ids=" + drug_bank_ids.join(",");
-
     json_drugData =
-
       "/drugs_network/drug_data?drug_bank_ids=" + drug_bank_ids.join(",");
-
     json_proteinData =
-
       "/drugs_network/protein_data?drug_bank_ids=" + drug_bank_ids.join(",");
-
     json_interactionData =
-
       "/drugs_network/interaction_data?drug_bank_ids=" + drug_bank_ids.join(",");
-
     }
 }
-
 
 // function readPrecachedJSONFromDatabase(url) {
 //     var data;
@@ -125,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 $("#loading").show();
 
-let drug_xlsxData;  
+let drug_xlsxData;
 let protein_xlsxData;
 let interaction_xlsxData;
 var drugStatusNameForDialog = "";
@@ -267,10 +257,7 @@ exportButton.addEventListener("click", function () {
 
 let more_details = document.getElementById("more_details");
 more_details.addEventListener("click", function () {
-  window.open(
-    "https://pgx-documentation.readthedocs.io/en/latest/atc_code.html#network-visualization",
-    "_blank"
-  );
+  window.open("https://www.google.com", "_blank");
 });
 
 window.addEventListener("click", function (event) {
@@ -432,7 +419,8 @@ function getFilteredSvgContent(svgElement) {
 
   // Remove hidden parent nodes
   d3ClonedSvg
-    .selectAll(".node-parent").filter(function () {
+    .selectAll(".node-parent")
+    .filter(function () {
       return (
         this.style.visibility === "hidden" || this.style.display === "none"
       );
@@ -705,7 +693,7 @@ function downloadPDF() {
     // Use the href attribute for the image path
     if (xlinkHref) {
       //imgObj.src = "http://localhost:8000/" + xlinkHref;
-      imgObj.src = "https://pgx-db.org" + xlinkHref;
+      imgObj.src = "https://pgx-db.org/" + xlinkHref;
     } else {
       loadedCount++;
     }
@@ -778,7 +766,8 @@ function getFilteredLinksXLSX() {
 // Download XLS
 function downloadXLS() {
   var modal = document.getElementById("exportModal");
-
+  // modal.style.display = "none";
+  // $("#loading").show();
   var filteredLinks = getFilteredLinksXLSX();
 
   //console.log(filteredLinks)
@@ -818,6 +807,7 @@ function downloadXLS() {
   };
 
   req.send();
+  // $("#loading").hide();
 }
 
 function downloadXLS11() {
@@ -1763,7 +1753,7 @@ function processData(numberofnodes, slicedata) {
   fetch(jsonFilePath)
     .then((response) => response.json())
     .then((data) => {
-      // var data = JSON.parse(data.data);
+    
       try {
         var data = JSON.parse(data.data);
       }
@@ -1955,7 +1945,8 @@ function processData(numberofnodes, slicedata) {
       console.error("Error reading the JSON file:", error);
     });
 
-   }
+  // d3.select("#loading").style("height", "800px");
+}
 
 // Read the data from the Excel file
 
@@ -2161,6 +2152,7 @@ function createChart(links) {
   node
     .filter((node) => node.child_type === "disease_type")
     .on("click", function (event, d) {
+      window.open(`https://clinicaltrials.gov/search?cond=${d.id}`, "_blank");
       showDialog(d.id, d.id);
     })
     // Attach cursor style change on mouseover to all nodes
@@ -2176,7 +2168,7 @@ function createChart(links) {
 
     .attr("class", "tooltip2")
 
-    .style("display", "none");
+    .style("opacity", 0);
 
   node
 
@@ -2184,35 +2176,41 @@ function createChart(links) {
 
     .on("mouseover", function (event, d) {
       d3.select(this).style("cursor", "pointer");
-      tooltip2.transition()
-      .style("display", "block");
+
+      tooltip2.transition().style("opacity", 0.9);
+
       tooltip2
+
         .style("left", event.pageX + 20 + "px")
+
         .style("top", event.pageY + 20 + "px").html(`
+
             <div>
+
               ${d.id}<br>
-               <a href="https://clinicaltrials.gov/search?cond=${d.id}" target="_blank">Click here to see disease clinical information</a>
+
+            
+
+              <a href="https://clinicaltrials.gov/search?cond=${d.id}" target="_blank">Click here to see disease clinical information</a>
+
             </div>
+
           `);
 
       // Set HTML content with link before handling click event
-    });
+    })
+
+  
 
   tooltip2
 
     .on("mouseover", function () {
-      tooltip2.transition()
-      .style("display", "block");;
+      tooltip2.transition().style("opacity", 1);
     })
 
     .on("mouseout", function () {
-      tooltip2.transition()
-      .style("display", "none");
+      tooltip2.transition().style("opacity", 0);
     });
-
-
-
-
 
   node
     .filter(function (d) {
@@ -2336,6 +2334,27 @@ function createChart(links) {
       .on("drag", dragged)
       .on("end", dragEnded);
   }
+  // // Button click handlers
+  // d3.select(".zoom-in-btn").on("click", function () {
+  //     svg.transition().duration(750).call(zoom.scaleBy, 1.2);
+  // });
+
+  // d3.select(".zoom-out-btn").on("click", function () {
+  //     svg.transition().duration(750).call(zoom.scaleBy, 0.8);
+  // });
+
+  // // Preserve the transform on button click
+  // d3.select(".zoom-in-btn").on("click", function () {
+  //     var t = currentTransform.scale(1.2);
+  //     svg.transition().duration(750).call(zoom.transform, t);
+  // });
+
+  // d3.select(".zoom-out-btn").on("click", function () {
+  //     var t = currentTransform.scale(0.8);
+  //     svg.transition().duration(750).call(zoom.transform, t);
+  // });
+
+  //console.log("Chart created.");
   // Finish updating chart
   $("#loading").hide();
   //$("#loading").hide();
@@ -2355,115 +2374,6 @@ function createChart(links) {
 
     localStorage.setItem("jsonData", height);
   });
- 
-  let False_node = [];
-  let true_node = []
-
-  // update of the links and the nodes there  aamir2
-  console.log(link , node , 'herea rea the links and the nodes ')
-  node.filter(function(templink) {
-    // Filter links with a value greater than 5
-    if(templink.hidden === true){
-      console.log(templink , 'faksldjasl')
-    if(!true_node.includes(templink.Protein_Class) ){
-
-      true_node.push(templink.Protein_Class)
-
-    }
-     
-  }else{
-    if(!False_node.includes(templink.Protein_Class )){
-
-      False_node.push(templink.Protein_Class)
-    }
-  }
-
-  if(templink.hidden === true){
-    if(!true_node.includes(templink.DiseaseClass) ){
-
-      true_node.push(templink.DiseaseClass)
-
-    }
-     
-  }else{
-    
-    if(!False_node.includes(templink.DiseaseClass )){
-
-      False_node.push(templink.DiseaseClass)
-    }
-  }
-
-  if(templink.hidden === true){
-  if(!true_node.includes(templink.Drug_type) ){
-
-    true_node.push(templink.Drug_type)
-
-  }
-   
-}else{
-  if(!False_node.includes(templink.Drug_type )){
-
-    False_node.push(templink.Drug_type)
-  }
-}
-
-if(templink.hidden === true){
-  if(!true_node.includes(templink.Drug_status) ){
-
-    true_node.push(templink.Drug_status)
-
-  }
-   
-}else{
-  if(!False_node.includes(templink.Drug_status )){
-
-    False_node.push(templink.Drug_status)
-  }
-}
-
-
-
-  })
-  link.filter(function(templink) {
-    // Filter links with a value greater than 5
- 
-    if(templink.hidden === true){
-    if(!true_node.includes(templink.type )){
-
-      true_node.push(templink.type)
-    }
-     
-  }else{
-    if(!False_node.includes(templink.type )){
-
-      False_node.push(templink.type)
-    }
-  }
-  
-  })
-  function removeDivContainingSpanText(texts) {
-    texts.forEach(text => {
-        // Select all span elements
-        const spans = document.querySelectorAll('span');
-        
-        spans.forEach(span => {
-            if (span.textContent.includes(text)) {
-                // Remove the parent div of the span
-                const parentDiv = span.closest('div');
-                if (parentDiv) {
-                    parentDiv.remove();
-                }
-            }
-        });
-    });
-}
-console.log(true_node , 'true_node')
-function removeElements(array1, array2) {
-  return array1.filter(element => !array2.includes(element));
-}
-  let remove_element = removeElements(true_node ,False_node  )
-removeDivContainingSpanText(remove_element);
-
 }
 
 // Update the chart visibility based on the threshold value
@@ -2911,7 +2821,7 @@ function createProteinsLegend() {
 
   links.forEach(function (link) {
     var proteinClass11 = link.target.Protein_Class; // No need to convert to lowercase
-    
+    //console.log(proteinClass11);
 
     if (
       proteins.includes(proteinClass11) &&
@@ -2920,8 +2830,6 @@ function createProteinsLegend() {
       createLegendItem(proteinClass11, proteinColorMap[proteinClass11]);
       uniqueProteins.add(proteinClass11);
     }
-
-
   });
   /*
   proteins.forEach(function(protein) {
@@ -3558,7 +3466,6 @@ function updateAllFilters() {
     .selectAll("circle, text , path")
     .style("visibility", function (d) {
       if (d.hidden) {
-      
         // if hidden by slider filter
         return "hidden";
       }
@@ -3635,8 +3542,6 @@ function updateAllFilters() {
 
   // parent nodes
   d3.selectAll(".node-parent").style("visibility", function (d) {
-
-
     if (d.hidden) {
       // if hidden by slider filter
       return "hidden";
@@ -3652,8 +3557,6 @@ function updateAllFilters() {
         }
       }
     });
-
-
 
     var anyVisibleChildren = relatedLinks.some(
       (l) =>
@@ -3695,7 +3598,6 @@ function updateAllFilters() {
   });
 
   // hey
-
 }
 
 // Pull nodes towards the center
@@ -3872,7 +3774,6 @@ d3.select("#GetmoreData").on("click", function () {
 
   console.log(slicedata, "slicedata");
   processData(numberofnodes, slicedata);
-  
 });
 
 document.getElementById("ManagePreviousState").style.display = "none";
@@ -3914,17 +3815,11 @@ d3.select("#ManagePreviousState").on("click", function () {
 
 function clearGraph() {
   const svg = d3.select("#chart");
-  svg.selectAll("*").remove();  
+  svg.selectAll("*").remove();
   nodes = [];
   links = [];
 }
 
-$(document).ready(function() {
-  $(document).click(function(e) {
-      // Check if the click did not originate from within any element with class 'tooltip2'
-      if (!$(e.target).closest('.tooltip2').length) {
-          // Hide all elements with class 'tooltip2'
-          $('.tooltip2').hide();
-      }
-  });
-});
+document
+  .getElementById("all-legends")
+  .on("click", menu.style("display", "none"));
