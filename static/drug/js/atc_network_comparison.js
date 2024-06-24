@@ -146,8 +146,7 @@ function createHistogramPlot(data, elementID, text){
     .attr('width', ({ x0, x1 }) => xScale(x1) - xScale(x0))
     .attr('height', d => height - yScaleHistogram(d.length))
     .attr('fill', 'url(#gradient-histogram)')
-    // .attr('stroke', 'white')
-    // .attr('stroke-width', 2);
+    
 
     // at the top of the rectangles include a text describing the precise count
     binsHistogram

@@ -57,27 +57,23 @@ logger = logging.getLogger(__name__)
 def serve_drug_data_json_file(request):
     atc_code = request.GET.get('atc_code')
     data = PreCachedDrugNetwork.objects.get(atc_code=atc_code)
-    return JsonResponse({
-        "data":data.drug_json_data,
-    })
+    return JsonResponse(json.loads(data.drug_json_data), safe=False)
+
 def serve_protein_data_json_file(request):
     atc_code = request.GET.get('atc_code')
     data = PreCachedDrugNetwork.objects.get(atc_code=atc_code)
-    return JsonResponse({
-        "data":data.protein_json_data,
-    })
+    return JsonResponse(json.loads(data.protein_json_data), safe=False)
 def serve_interaction_data_json_file(request):
     atc_code = request.GET.get('atc_code')
     data = PreCachedDrugNetwork.objects.get(atc_code=atc_code)
-    return JsonResponse({
-        "data":data.interaction_json_data,
-    })
+    return JsonResponse(json.loads(data.interaction_json_data), safe=False)
 def serve_general_data_json_file(request):
     atc_code = request.GET.get('atc_code')
     data = PreCachedDrugNetwork.objects.get(atc_code=atc_code)
-    return JsonResponse({
-        "data":data.general_json_data,
-    })
+    print(type(json.loads(data.general_json_data)))
+    print(type(json.loads(data.general_json_data)))
+    # print(json.loads(data.general_json_data))
+    return JsonResponse({'data': json.loads(data.general_json_data)})
 
 class DiseaseAssociationByDrugView:
     def get_disease_association_by_drug(self, drug_id):
