@@ -168,6 +168,13 @@ async function readDrugJSON() {
       }
     } else {
       drug_xlsxData = jsonData;
+        // pre-cached
+      if (typeof drug_xlsxData.data == 'string'){
+        if (typeof JSON.parse(drug_xlsxData.data) == 'string') {
+          drug_xlsxData = JSON.parse(JSON.parse(drug_xlsxData.data))
+        }
+      }
+    
     }
     // readProteinJSON();
     (async function () {
@@ -183,7 +190,7 @@ async function readProteinJSON() {
   // protein_xlsxData = readPrecachedJSONFromDatabase(json_proteinData);
   // readInteractionJSON();
   try {
-    protein_xlsxData = readPrecachedJSONFromDatabase(jsonFilePath);
+    protein_xlsxData = await readPrecachedJSONFromDatabase(jsonFilePath);
     // readInteractionJSON();
     (async function () {
       await readInteractionJSON();
@@ -210,7 +217,7 @@ async function readProteinJSON() {
 async function readInteractionJSON() {
   const jsonFilePath = json_interactionData;
   try {
-    const interaction_xlsxData = await readPrecachedJSONFromDatabase(
+    interaction_xlsxData = await readPrecachedJSONFromDatabase(
       jsonFilePath
     );
     console.log("JSON Data:", interaction_xlsxData);
@@ -265,13 +272,13 @@ exportButton.addEventListener("click", function () {
   showExportOptions();
 });
 
-let more_details = document.getElementById("more_details");
-more_details.addEventListener("click", function () {
-  window.open(
-    "https://pgx-documentation.readthedocs.io/en/latest/atc_code.html#network-visualization",
-    "_blank"
-  );
-});
+// let more_details = document.getElementById("more_details");
+// more_details.addEventListener("click", function () {
+//   window.open(
+//     "https://pgx-documentation.readthedocs.io/en/latest/atc_code.html#network-visualization",
+//     "_blank"
+//   );
+// });
 
 window.addEventListener("click", function (event) {
   var modal = document.getElementById("exportModal");
@@ -977,7 +984,10 @@ function showDialog(title, parentNodeName) {
     };
     //console.log("data Drug Type of", typeof drug_xlsxData);
     //  var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
+    
     const matchingRow = findObjectByName(drug_xlsxData, drugNameValue);
+    
+    
     //console.log("Matching Row Drug ImageTab", matchingRow);
 
     if (matchingRow) {
