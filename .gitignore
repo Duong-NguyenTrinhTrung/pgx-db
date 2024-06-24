@@ -55,6 +55,7 @@ GraphNeuralNetwork/
 
 static/gene/pdb
 static/json-drug-network
+static/json-sample
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
