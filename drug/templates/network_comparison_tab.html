@@ -245,11 +245,17 @@
                     console.log(response);
                     var dataAtcCode = response.atc_code.distribution;
                     var dataAtcComparison = response.atc_comparison.distribution;
-                    var dataAll = response.both.distribution;
-                    console.log("dataAtcCode "+dataAtcCode);
-                    console.log("dataAtcComparison "+dataAtcComparison);
-                    createDistributionPlot(dataAtcCode, dataAll, "atc_code_box", `${compareText} <br>`);
-                    createDistributionPlot(dataAtcComparison, dataAll, "atc_comparison_box", `${compareText} <br>`);
+                    // if ((dataAtcCode.length>0) && (dataAtcComparison.length>0))
+                    // {
+                    //     var dataAll = response.both.distribution;
+                    //     createDistributionPlot2(dataAtcCode, dataAtcComparison, atc_code, atc_comparison, "atc_code_box", "atc_comparison_box", `${compareText}<br>`); //2 plots sharing a-xis
+                    // }else{
+                    //     createDistributionPlot(dataAtcCode, "atc_code_box", `${compareText} for <span style="color: #3498db">${atc_code}</span><br>`);
+                    //     createDistributionPlot(dataAtcComparison, "atc_comparison_box", `${compareText} for <span style="color: #3498db">${atc_comparison}</span><br>`);
+                    //     }
+                    
+                    createHistogramPlot(dataAtcCode, "atc_code_box", `${compareText} for <span style="color: #3498db">${atc_code}</span><br>`);
+                    createHistogramPlot(dataAtcComparison, "atc_comparison_box", `${compareText} for <span style="color: #3498db">${atc_comparison}</span><br>`);
                 },
                 error: function (xhr, status, error) {
                     console.log('AJAX Error:', error);

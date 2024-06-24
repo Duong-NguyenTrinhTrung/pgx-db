@@ -29,128 +29,504 @@ function getLimitedTicks(integerTicks, maxTicks = 10) {
     }
 }
 
-function createDistributionPlot(data, data_all, elementID, text) {
+function createHistogramPlot(data, elementID, text){
     reset();
-    
     // target the .viz container
-    const viz = d3.select('#' + elementID)
-        .html("");
+    const viz = d3.select('#'+elementID).html("");
+
+    // in a header include preliminary information about the project
+    const header = viz.append('header');
+    header
+    .append('h4')
+    .style('text-align', 'center')
+    .html(text);
+
     // have the visualizations share the same margin, width and height
     const margin = {
-        top: 30,
-        right: 20,
-        bottom: 50,
-        left: 20,
+    top: 30,
+    right: 20,
+    bottom: 60,
+    left: 50,
     };
     const width = 500 - (margin.left + margin.right);
     const height = 500 - (margin.top + margin.bottom);
 
-    // in a header include preliminary information about the project
-    const header = viz.append('header').style('text-align', 'center');
-    header
-        .append('h4')
-        .html(text);
-
-    // Adds an SVG element for the histogram and sets its class and viewBox
+    // HISTOGRAM
     const svgHistogram = viz
-        .append('svg')
-        .attr('class', 'histogram')
-        .attr('viewBox', `0 0 ${width + (margin.left + margin.right)} ${height + (margin.top + margin.bottom)}`);
+    .append('svg')
+    .attr('class', 'histogram')
+    .attr('viewBox', `0 0 ${width + (margin.left + margin.right)} ${height + (margin.top + margin.bottom)}`);
 
-    //Sets up the group for the histogram, defines the x and y scales, and prepares the data for the histogram.
+    // linear gradient described for the entire visualization
+    // the idea is to have lighter colors toward the top of the svg
+    const linearGradient = svgHistogram
+    .append('defs')
+    .append('linearGradient')
+    .attr('id', 'gradient-histogram')
+    .attr('gradientUnits', 'userSpaceOnUse')
+    .attr('x1', 0)
+    .attr('x2', 0)
+    .attr('y1', 0)
+    .attr('y2', height);
+
+    linearGradient
+    .append('stop')
+    .attr('stop-color', '#3f37c9')
+    .attr('offset', 0);
+
+    linearGradient
+    .append('stop')
+    .attr('stop-color', '#4cc9f0')
+    .attr('offset', 1);
+
     const groupHistogram = svgHistogram
-        .append('g')
-        .attr('transform', `translate(${margin.left}  ${margin.top})`);
+    .append('g')
+    .attr('transform', `translate(${margin.left} ${margin.top})`);
 
     // for the horizontal dimension the scale is defined for both the histogram and the density plot
     // ! the function is also used by the histogram function to determine the different bins
     const xScale = d3
-        .scaleLinear()
-        .domain([d3.min(data_all), d3.max(data_all)])
-        .range([0, width]);
-
-    const maxValue = d3.max(data_all);
-    const integerTicks = d3.range(0, maxValue + 1); // +1 to include the maxValue itself
-
+    .scaleLinear()
+    .domain([Math.floor(d3.min(data)), Math.ceil(d3.max(data))])
+    .range([0, width]);
 
     // histogram used to create the bins from the input data
     const histogram = d3
-        .histogram()
-        .domain(xScale.domain());
+    .histogram()
+    .domain(xScale.domain());
 
     // multi dimensional array describing for each bin the start and end coordinate on the x axis (x0, x1) as well as the data points falling in the bin
     // the number of data points is given by the length of each array
     const dataHistogram = histogram(data);
-    const dataHistogramAll = histogram(data_all);
 
     // for the vertical dimension, the histogram uses the number of observations
     const yScaleHistogram = d3
-        .scaleLinear()
-        .domain([0, d3.max(dataHistogramAll, ({ length }) => length)])
-        .range([height, 0]);
+    .scaleLinear()
+    .domain([0, d3.max(dataHistogram, ({ length }) => length)])
+    .range([height, 0]);
 
     // draw the y axis before the visualization, to have the grid lines behind the histogram' rectangles
     const yAxisHistogram = d3
-        .axisLeft(yScaleHistogram)
-        .tickFormat(d3.format('d'))
-        .tickValues(d3.ticks(yScaleHistogram.domain()[0], yScaleHistogram.domain()[1], Math.ceil(yScaleHistogram.domain()[1])));
-    ;
+    .axisLeft(yScaleHistogram);
+
     // give a class to the axis to later identify and style the elements
     groupHistogram
-        .append('g')
-        .attr('class', 'axis y-axis')
-        .call(yAxisHistogram)
-        .attr('transform', `translate(0 20)`);
+    .append('g')
+    .attr('class', 'axis y-axis')
+    .call(yAxisHistogram);
 
+    // Add y-axis label
+    groupHistogram
+        .append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', -margin.left + 10)
+        .attr('x', -height / 2)
+        .attr('dy', '1em')
+        .attr('font-size', '12px')
+        .attr('fill', 'currentColor')
+        .attr('text-anchor', 'middle')
+        .text('Count');
+
+    // HISTOGRAM ELEMENTS
+    // add one group for each bin
     const binsHistogram = groupHistogram
-        .selectAll('g.bin')
-        .data(dataHistogram)
-        .enter()
-        .append('g')
-        .attr('class', 'bin')
-        // translate the bins horizontally according to where each bin ought to start
-        .attr('transform', ({ x0 }) => `translate(${xScale(x0)} 0)`);
+    .selectAll('g.bin')
+    .data(dataHistogram)
+    .enter()
+    .append('g')
+    .attr('class', 'bin')
+    // translate the bins horizontally according to where each bin ought to start
+    .attr('transform', ({ x0 }) => `translate(${xScale(x0)} 0)`);
 
     // in the group elements add a rectangle using the vertical scale
     binsHistogram
-        .append('rect')
-        .attr('x', 0)
-        .attr('y', d => yScaleHistogram(d.length) + 20)
-        .attr('width', ({ x0, x1 }) => xScale(x1) - xScale(x0))
-        .attr('height', d => height - yScaleHistogram(d.length))
-        // .attr('fill', 'url(#gradient-histogram)')
-        .attr('fill', '#69b3a2') // Solid fill color for the bars
-        .attr('stroke', '#0c1620')
-        .attr('stroke-width', 1);
+    .append('rect')
+    .attr('x', 0)
+    .attr('y', d => yScaleHistogram(d.length))
+    .attr('width', ({ x0, x1 }) => xScale(x1) - xScale(x0))
+    .attr('height', d => height - yScaleHistogram(d.length))
+    .attr('fill', 'url(#gradient-histogram)')
+    // .attr('stroke', 'white')
+    // .attr('stroke-width', 2);
 
     // at the top of the rectangles include a text describing the precise count
     binsHistogram
-        .append('text')
-        .attr('x', ({ x0, x1 }) => (xScale(x1) - xScale(x0)) / 2)
-        .attr('y', d => yScaleHistogram(d.length) - margin.top / 3 + 25)
-        // .attr('fill', 'url(#gradient-histogram)')
-        .attr('fill', 'grey')
-        .attr('text-anchor', 'middle')
-        .attr('font-weight', 'bold')
-        .attr('font-size', '1.1rem')
-        .text(d => d.length);
+    .append('text')
+    .attr('x', ({ x0, x1 }) => (xScale(x1) - xScale(x0)) / 2)
+    .attr('y', d => yScaleHistogram(d.length) - margin.top / 3)
+    .attr('fill', 'url(#gradient-histogram)')
+    .attr('text-anchor', 'middle')
+    .attr('font-weight', 'bold')
+    .attr('font-size', '1.1rem')
+    .text(d => d.length);
 
-    const limitedIntegerTicks = getLimitedTicks(integerTicks);
-
+    // draw the y axis on top of the rectangles
     const xAxis = d3
-        .axisBottom(xScale)
-        .tickPadding(10)
-        .tickFormat(d3.format('d'))
-        .tickValues(limitedIntegerTicks);
-    // .tickValues(d3.ticks(xScale.domain()[0], xScale.domain()[1], Math.ceil(xScale.domain()[1])));
+    .axisBottom(xScale)
+    .tickPadding(10);
 
     groupHistogram
-        .append('g')
-        .attr('class', 'axis x-axis')
-        .attr('transform', `translate(0 ${height + 20})`)
-        .call(xAxis)
-        .attr('font-size', '10px');
+    .append('g')
+    .attr('class', 'axis x-axis')
+    .attr('transform', `translate(0 ${height})`)
+    .call(xAxis);
+
+    // style the axes of both visualizations
+    // remove all line elements
+    d3
+    .selectAll('.axis')
+    .selectAll('line')
+    .remove();
+
+    // for the horizontal axis, increase the size of the labels and include a label beneath the values
+    d3
+    .selectAll('.x-axis')
+    .append('text')
+    .attr('x', width / 2)
+    .attr('y', margin.bottom-5)
+    .attr('font-size', '12px')
+    .attr('fill', 'currentColor')
+    .text('Degree of connection');
+
+    // for the vertical dimension, add the axes, but hide the content it in favor of grid lines
+    d3
+    .selectAll('.y-axis')
+    .selectAll('path')
+    .remove();
+    d3
+    .selectAll('.y-axis')
+    .selectAll('text')
+    .remove();
+
+    d3
+    .selectAll('.y-axis')
+    .selectAll('g.tick')
+    .append('path')
+    .attr('d', `M 0 0 h ${width}`)
+    .attr('stroke', 'currentColor')
+    .attr('stroke-width', 1)
+    .attr('opacity', 0.25);
 }
+function createDistributionPlot(data, elementID, text) {
+    reset();
+    if (data.length>0){
+        const viz = d3.select('#' + elementID)
+            .html("");
+        const margin = {
+            top: 30,
+            right: 20,
+            bottom: 50,
+            left: 20,
+        };
+        const width = 500 - (margin.left + margin.right);
+        const height = 500 - (margin.top + margin.bottom);
+    
+        const header = viz.append('header').style('text-align', 'center');
+        header
+            .append('h4')
+            .html(text);
+    
+        const svgHistogram = viz
+            .append('svg')
+            .attr('class', 'histogram')
+            .attr('viewBox', `0 0 ${width + (margin.left + margin.right)} ${height + (margin.top + margin.bottom)}`);
+    
+        const groupHistogram = svgHistogram
+            .append('g')
+            .attr('transform', `translate(${margin.left+10}  ${margin.top})`);
+    
+        const xScale = d3
+            .scaleLinear()
+            .domain([d3.min(data), d3.max(data)])
+            .range([0, width]);
+    
+        const maxValue = d3.max(data);
+        const integerTicks = d3.range(1, maxValue + 1); 
+    
+        const histogram = d3
+            .histogram()
+            .domain(xScale.domain());
+    
+        const dataHistogram = histogram(data);
+        const dataHistogramAll = histogram(data);
+    
+        const yScaleHistogram = d3
+            .scaleLinear()
+            .domain([0, d3.max(dataHistogramAll, ({ length }) => length)])
+            .range([height, 0]);
+    
+        const yAxisHistogram = d3
+            .axisLeft(yScaleHistogram)
+            .tickFormat(d3.format('d'))
+            .tickValues(d3.ticks(yScaleHistogram.domain()[0], yScaleHistogram.domain()[1], Math.ceil(yScaleHistogram.domain()[1])));
+        ;
+        groupHistogram
+            .append('g')
+            .attr('class', 'axis y-axis')
+            .call(yAxisHistogram)
+            .attr('transform', `translate(0 20)`);
+    
+        const binsHistogram = groupHistogram
+            .selectAll('g.bin')
+            .data(dataHistogram)
+            .enter()
+            .append('g')
+            .attr('class', 'bin')
+            .attr('transform', ({ x0 }) => `translate(${xScale(x0)} 0)`);
+    
+        binsHistogram
+            .append('rect')
+            .attr('x', 0)
+            .attr('y', d => yScaleHistogram(d.length) + 20)
+            .attr('width', ({ x0, x1 }) => xScale(x1) - xScale(x0))
+            .attr('height', d => height - yScaleHistogram(d.length))
+            .attr('fill', '#4cc9f0') 
+            .attr('stroke', 'white')
+            .attr('stroke-width', 1);
+    
+        binsHistogram
+            .append('text')
+            .attr('x', ({ x0, x1 }) => (xScale(x1) - xScale(x0)) / 2)
+            .attr('y', d => yScaleHistogram(d.length) - margin.top / 3 + 25)
+            .attr('fill', 'grey')
+            .attr('text-anchor', 'middle')
+            .attr('font-weight', 'bold')
+            .attr('font-size', '1.1rem')
+            .text(d => d.length);
+    
+        const limitedIntegerTicks = getLimitedTicks(integerTicks);
+    
+        const xAxis = d3
+            .axisBottom(xScale)
+            .tickPadding(10)
+            .tickFormat(d3.format('d'))
+            .tickValues(limitedIntegerTicks);
+    
+        const xAxisGroup = groupHistogram
+            .append('g')
+            .attr('class', 'axis x-axis')
+            .attr('transform', `translate(0 ${height + 20})`)
+            .call(xAxis)
+            .attr('font-size', '10px');
+
+        // Rotate x-tick labels if they have more than 2 digits
+        xAxisGroup.selectAll("text")
+            .attr("transform", function() {
+                return this.innerHTML.length > 2 ? "rotate(-45)" : "rotate(0)";
+            })
+            .style("text-anchor", function() {
+                return this.innerHTML.length > 2 ? "end" : "middle";
+            })
+            .attr("dx", function() {
+                return this.innerHTML.length > 2 ? "-0.8em" : "0";
+            })
+            .attr("dy", function() {
+                return this.innerHTML.length > 2 ? "0.15em" : "0.71em";
+            });
+        
+
+    }else{
+        const viz = d3.select('#' + elementID)
+            .html("");
+        const header = viz.append('header').style('text-align', 'center');
+        header
+            .append('h4').html(text)
+            .append('h5')
+            .style('color', 'red')
+            .html("No connections");
+        }
+}
+
+// 2 plots sharing a-xis
+// function createDistributionPlot2(dataAtcCode, dataAtcComparison, atc_code, atc_comparison, elementID1, elementID2, text) {
+//     reset();
+//     var plottingBox1 = document.getElementById(elementID1);
+//     plottingBox1.style.width = '100%';
+//     var plottingBox2 = document.getElementById(elementID2);
+//     plottingBox2.style.width = '0';
+//     var value1 = [];
+//     var value2 = [];
+
+//     const viz = d3.select('#' + elementID1)
+//         .html("");
+//     const margin = {
+//         top: 30,
+//         right: 20,
+//         bottom: 50,
+//         left: 20,
+//     };
+//     const width = 500 - (margin.left + margin.right);
+//     const height = 500 - (margin.top + margin.bottom);
+
+//     const header = viz.append('header').style('text-align', 'center');
+//     header
+//         .append('h4')
+//         .html(text);
+
+//     const svgHistogram = viz
+//         .append('svg')
+//         .attr('class', 'histogram')
+//         .attr('viewBox', `0 0 ${width + (margin.left + margin.right)} ${height + (margin.top + margin.bottom)}`);
+
+//     const groupHistogram = svgHistogram
+//         .append('g')
+//         .attr('transform', `translate(${margin.left}  ${margin.top})`);
+
+//     const xScale = d3
+//         .scaleLinear()
+//         .domain([d3.min(dataAtcCode.concat(dataAtcComparison)), d3.max(dataAtcCode.concat(dataAtcComparison))])
+//         .range([0, width]);
+
+//     // const maxValue = d3.max(data_all);
+//     // const integerTicks = d3.range(0, maxValue + 1); 
+
+//     const histogram = d3
+//         .histogram()
+//         .domain(xScale.domain())
+//         .thresholds(xScale.ticks(20));
+    
+//     const dataHistogramAtcCode = histogram(dataAtcCode);
+//     const dataHistogramAtcComparison = histogram(dataAtcComparison);
+
+
+//     const yScaleHistogram = d3
+//         .scaleLinear()
+//         .domain([0, d3.max(dataHistogramAtcCode.concat(dataHistogramAtcComparison), ({ length }) => length)])
+//         .range([height, 0]);
+
+//     const yAxisHistogram = d3
+//         .axisLeft(yScaleHistogram)
+//         .tickFormat(d3.format('d'))
+//         .tickValues(d3.ticks(yScaleHistogram.domain()[0], yScaleHistogram.domain()[1], Math.ceil(yScaleHistogram.domain()[1])));
+    
+//     groupHistogram
+//         .append('g')
+//         .attr('class', 'axis y-axis')
+//         .call(yAxisHistogram)
+//         .attr('transform', `translate(0 0)`);
+
+//     const binsAtcCode = groupHistogram
+//         .selectAll('g.bin.atc_code')
+//         .data(dataHistogramAtcCode)
+//         .enter()
+//         .append('g')
+//         .attr('class', 'bin atc_code')
+//         .attr('transform', ({ x0 }) => `translate(${xScale(x0)} 0)`);
+    
+//         binsAtcCode
+//         .append('rect')
+//         .attr('x', 0)
+//         .attr('y', d => yScaleHistogram(d.length))
+//         .attr('width', ({ x0, x1 }) => xScale(x1) - xScale(x0))
+//         .attr('height', d => height - yScaleHistogram(d.length))
+//         .attr('fill', '#4cc9f0')
+//         .attr('stroke', 'white')
+//         .attr('stroke-width', 1);
+
+//     binsAtcCode
+//         .append('text')
+//         .attr('x', ({ x0, x1 }) => (xScale(x1) - xScale(x0)) / 2)
+//         .attr('y', d => yScaleHistogram(d.length) - 5)
+//         .attr('fill', 'grey')
+//         .attr('text-anchor', 'middle')
+//         .attr('font-weight', 'bold')
+//         .attr('font-size', '1.1rem')
+//         .text(d => d.length);
+
+//         const binsAtcComparison = groupHistogram
+//         .selectAll('g.bin.atc_comparison')
+//         .data(dataHistogramAtcComparison)
+//         .enter()
+//         .append('g')
+//         .attr('class', 'bin atc_comparison')
+//         .attr('transform', ({ x0 }) => `translate(${xScale(x0)} 0)`);
+
+//     binsAtcComparison
+//         .append('rect')
+//         .attr('x', 0)
+//         .attr('y', d => yScaleHistogram(d.length))
+//         .attr('width', ({ x0, x1 }) => xScale(x1) - xScale(x0))
+//         .attr('height', d => height - yScaleHistogram(d.length))
+//         .attr('fill', '#f72585')
+//         .attr('stroke', 'white')
+//         .attr('stroke-width', 1);
+
+//     binsAtcComparison
+//         .append('text')
+//         .attr('x', ({ x0, x1 }) => (xScale(x1) - xScale(x0)) / 2)
+//         .attr('y', d => yScaleHistogram(d.length) - 5)
+//         .attr('fill', 'grey')
+//         .attr('text-anchor', 'middle')
+//         .attr('font-weight', 'bold')
+//         .attr('font-size', '1.1rem')
+//         .text(d => d.length);
+    
+//     const maxValue = Math.max(d3.max(dataAtcCode), d3.max(dataAtcComparison));
+//     const integerTicks = d3.range(0, maxValue + 1);
+//     const limitedIntegerTicks = getLimitedTicks(integerTicks);
+
+//     const xAxis = d3
+//         .axisBottom(xScale)
+//         .tickPadding(10)
+//         .tickFormat(d3.format('d'))
+//         .tickValues(limitedIntegerTicks);
+
+//     const xAxisGroup =groupHistogram
+//         .append('g')
+//         .attr('class', 'axis x-axis')
+//         .attr('transform', `translate(0 ${height})`)
+//         .call(xAxis)
+//         .attr('font-size', '10px');
+
+//     // Rotate x-tick labels if they have more than 2 digits
+//     xAxisGroup.selectAll("text")
+//     .attr("transform", function () {
+//         return this.innerHTML.length > 2 ? "rotate(-45)" : "rotate(0)";
+//     })
+//     .style("text-anchor", function () {
+//         return this.innerHTML.length > 2 ? "end" : "middle";
+//     })
+//     .attr("dx", function () {
+//         return this.innerHTML.length > 2 ? "-0.8em" : "0";
+//     })
+//     .attr("dy", function () {
+//         return this.innerHTML.length > 2 ? "0.15em" : "0.71em";
+//     });
+
+//     // Add legend
+//     const legend = svgHistogram.append('g')
+//     .attr('class', 'legend')
+//     .attr('transform', `translate(${margin.left}, ${margin.top - 20})`);
+
+//     legend.append('rect')
+//         .attr('x', 0)
+//         .attr('y', 0)
+//         .attr('width', 18)
+//         .attr('height', 18)
+//         .style('fill', '#4cc9f0');
+
+//     legend.append('text')
+//         .attr('x', 24)
+//         .attr('y', 9)
+//         .attr('dy', '.35em')
+//         .style('text-anchor', 'start')
+//         .text(atc_code);
+
+//     legend.append('rect')
+//         .attr('x', 0)
+//         .attr('y', 20)
+//         .attr('width', 18)
+//         .attr('height', 18)
+//         .style('fill', '#f72585');
+
+//     legend.append('text')
+//         .attr('x', 24)
+//         .attr('y', 29)
+//         .attr('dy', '.35em')
+//         .style('text-anchor', 'start')
+//         .text(atc_comparison);
+    
+// }
 
 function toTitleCase(str) {
     return str.toLowerCase().split(' ').map(word => {
