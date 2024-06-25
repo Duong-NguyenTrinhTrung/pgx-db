@@ -1,382 +1,527 @@
+
+
 // Define 14 and 7 color scheme 
 const color14s = d3.range(14).map(d => d3.interpolateRainbow(d / 14));
 const color7s = d3.range(7).map(d => d3.interpolateRainbow(d / 7));
+const formatValue = d3.format(",");
+
 // Protein PieChart Function
-function createPieChart_Proteins() {
-    // Sample data
-    const data = [
-        { category: "Adhesion ", value: 14 },
-        { category: "Enzyme", value: 854 },
-        { category: "Epigenetic regulator", value: 37 },
-        { category: "GPCR", value: 163 },
-        { category: "Ion channel", value: 160 },
-        { category: "Kinase", value: 348 },
-        { category: "Membrane receptor", value: 67 },
-        { category: "Nuclear receptor", value: 59 },
-        { category: "Secreted protein ", value: 85 },
-        { category: "Structural protein ", value: 25 },
-        { category: "Surface antigen ", value: 20 },
-        { category: "Transcription factor ", value: 7 },
-        { category: "Transporter ", value: 172 },
-        { category: "Unknown ", value: 967 }
-    ];
+function createPieChart_Proteins(){
+    const pieData = [
+        { name: "Adhesion ", value: 14, color: "#9b2226" },
+        { name: "Enzyme", value: 854, color: "#ae2012" },
+        { name: "Epigenetic regulator", value: 37, color: "#bb3e03"  },
+        { name: "GPCR", value: 163, color: "#ee9b00"  },
+        { name: "Ion channel", value: 160, color: "#ca6702"  },
+        { name: "Kinase", value: 348, color: "#e9d8a6"  },
+        { name: "Membrane receptor", value: 67, color: "#94d2bd"  },
+        { name: "Nuclear receptor", value: 59, color: "#0a9396"  },
+        { name: "Secreted protein ", value: 85, color: "#005f73"  },
+        { name: "Structural protein ", value: 25, color: "#001219"  },
+        { name: "Surface antigen ", value: 20, color: "#ffd6ff"  },
+        { name: "Transcription factor ", value: 7, color: "#e7c6ff"  },
+        { name: "Transporter ", value: 172, color: "#c8b6ff"  },
+        { name: "Unknown ", value: 967, color: "#3a86ff"  }
+      ];
+      bakeDonut(pieData);
+      
+      function bakeDonut(d) {
+        let activeSegment;
 
-    const container = document.getElementById("chart-container1");
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
-    const size = Math.min(containerWidth, containerHeight);
-    const radius = size / 2;
+        // Select the container element
+        const container = document.getElementById('chart-container1');
+        const size = Math.max(container.clientWidth, container.clientHeight);
+        console.log("size "+size);
+        const radius = size/2 -20;
+        const thickness = 35;
 
-    const svg = d3.select("#pie-chart-proteins")
-        .attr("width", "100%") // Set the SVG width to 100%
-        .attr("height", "100%") // Set the SVG height to 100%
-        .attr("viewBox", `0 0 ${size} ${size}`) // Use viewBox to control the aspect ratio, ensure the SVG scales properly within the container
+        const data = d.sort((a, b) => b['value'] - a['value']),
+                // colorArray = data.map(k => k.color),
+                color = d3.scaleOrdinal(color14s);
+                // .range(colorArray);
+      
+        // const max = d3.max(data, (maxData) => maxData.value );
+        const chosen = 854;
 
-    // Creates a pie generator function using D3, which will convert the data into angles for the pie chart.
-    const pie = d3.pie()
-        .value(d => d.value);
+        const svg = d3.select('#pie-chart-proteins')
+        .attr('viewBox', `0 0 ${size} ${size}`)
+        .attr('width', size)
+        .attr('height', size)
+      
+        const g = svg.append('g')
+        .attr("transform", `translate(${size / 2},${size / 2})`);
 
-    // Defines an arc generator to draw the slices of the pie chart, with specified inner and outer radius
-    const arc = d3.arc()
-        .innerRadius(radius - 40)
-        .outerRadius(radius - 10);
-
-    // color is a function
-    const color = d3.scaleOrdinal(color14s);
-
-    //Appends a g (group) element to the SVG and centers it, which will contain the pie chart.
-    const g = svg.append("g")
-        .attr("transform", `translate(${size / 2},${size / 2})`); // Center the chart
-
-    // Selects all elements with class arc, binds the pie data to them, enters the data join, appends g elements 
-    // for each data point, and assigns the class arc.
-    const arcs = g.selectAll(".arc")
+        const arc = d3.arc()
+        .innerRadius(radius - thickness)
+        .outerRadius(radius);
+      
+        const arcHover = d3.arc()
+        .innerRadius(radius - thickness -3)
+        .outerRadius(radius + 6);
+      
+        const pie = d3.pie()
+        .value(function(pieData) { return pieData.value; })
+        .sort(null);
+      
+      
+        const path = g.selectAll('path')
+        .attr('class', 'data-path')
         .data(pie(data))
         .enter()
-        .append("g")
-        .attr("class", "arc");
-
-    const tooltip = d3.select("#chart-container1")
-        .append("div")
-        .attr("class", "tooltip1")
-        .style("opacity", 0); //opacity of 0 (hidden)
-
-    //Appends path elements to each g element in arcs, representing slices of the pie chart.
-    arcs.append("path")
-        //Sets the 'd' attribute of each path using the arc function defined earlier. This attribute defines the shape of the pie slices.
-        .attr("d", arc)
-        .style("fill", d => color(d.data.category))
-        .on("mouseover", function (event, d) {
-            // Slightly increase the outerRadius of the specific slice on mouseover
-            const newArc = d3.arc()
-                .innerRadius(radius -35)
-                .outerRadius(radius - 5); // Adjust the value as needed
-
-            d3.select(this)
-                .transition()
-                .duration(200)
-                .attr("d", newArc);
-
-            const tooltipText = `${d.data.category}: ${d.data.value}`;
-            tooltip.transition()
-                .duration(200)
-                .style("opacity", 0.9);
-            tooltip.html(tooltipText)
-                .style("left", (container.offsetLeft+ size/2 -28) + "px")
-                .style("top", (container.offsetTop + size/2) + "px");
+        .append('g')
+        .attr('class', 'data-group')
+        .each(function(pathData, i) {
+          const group = d3.select(this)
+      
+          group.append('text')
+            .text(`${formatValue(pathData.data.value)}`)
+            .attr('class', 'data-text data-text__value')
+            .attr('text-anchor', 'middle')
+            .attr('dy', '1rem')
+      
+          group.append('text')
+            .text(`${pathData.data.name}`)
+            .attr('class', 'data-text data-text__name')
+            .attr('text-anchor', 'middle')
+            .attr('dy', '3.5rem')
+      
+          // Set default active segment
+          if (pathData.value === chosen) {
+            const textVal = d3.select(this).select('.data-text__value')
+            .classed('data-text--show', true);
+      
+            const textName = d3.select(this).select('.data-text__name')
+            .classed('data-text--show', true);
+          }
+      
         })
-        .on("mouseout", function () {
-            // Restore the original arc when mouseout
-            d3.select(this)
-                .transition()
-                .duration(200)
-                .attr("d", arc);
-
-            tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
+        .append('path')
+        .attr('d', arc)
+        .attr('fill', (fillData, i) => color(fillData.data.name))
+        .attr('class', 'data-path')
+        .on('mouseover', function() {
+          const _thisPath = this,
+                parentNode = _thisPath.parentNode;
+      
+          if (_thisPath !== activeSegment) {
+      
+            activeSegment = _thisPath;
+      
+            const dataTexts = d3.selectAll('.data-text')
+            .classed('data-text--show', false);
+      
+            const paths = d3.selectAll('.data-path')
+            .transition()
+            .duration(250)
+            .attr('d', arc);
+      
+            d3.select(_thisPath)
+              .transition()
+              .duration(250)
+              .attr('d', arcHover);
+      
+            const thisDataValue = d3.select(parentNode).select('.data-text__value')
+            .classed('data-text--show', true);
+            const thisDataText = d3.select(parentNode).select('.data-text__name')
+            .classed('data-text--show', true);
+          }
+        })
+        .each(function(v, i) {
+          if (v.value === chosen) {
+            const chosenArc = d3.select(this)
+            .attr('d', arcHover);
+            activeSegment = this;
+          }
+          this._current = i;
         });
-        
+      }
 }
-
 
 // Drug PieChart Function
 function createPieChart_Drugs() {
     const data = [
-        { category: "Nutraceutical", value: 30 },
-        { category: "Preclinical", value: 2975 },
-        { category: "Investigational", value: 906 },
-        { category: "Approved", value: 2277 },
-        { category: "Vet-approved", value: 36 },
-        { category: "Illicit", value: 35 }
+        { name: "Nutraceutical", value: 30 , color: "#18FFFF"},
+        { name: "Preclinical", value: 2975 , color: '#0288D1'},
+        { name: "Investigational", value: 906 , color: '#BF360C'},
+        { name: "Approved", value: 2277 , color: '#F4511E'},
+        { name: "Vet-approved", value: 36, color: '#F9A825' },
+        { name: "Illicit", value: 35 , color: "#2a9d8f"}
     ];
+    bakeDonut(data);
+    // "chart-container2"
+    // #pie-chart-drugs
+    function bakeDonut(d) {
+        let activeSegment;
 
-    const container = document.getElementById("chart-container2");
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
-    const size = Math.min(containerWidth, containerHeight);
-    const radius = size / 2;
+        // Select the container element
+        const container = document.getElementById('chart-container2');
+        const size = Math.max(container.clientWidth, container.clientHeight);
+        console.log("size "+size);
+        const radius = size/2 -20;
+        const thickness = 35;
 
-    const svg = d3.select("#pie-chart-drugs")
-        .attr("width", "100%") // Set the SVG width to 100%
-        .attr("height", "100%") // Set the SVG height to 100%
-        .attr("viewBox", `0 0 ${size} ${size}`) // Use viewBox to control the aspect ratio
+        const data = d.sort((a, b) => b['value'] - a['value']),
+                colorArray = data.map(k => k.color),
+                color = d3.scaleOrdinal()
+                .range(colorArray);
+      
+        const max = d3.max(data, (maxData) => maxData.value );
+        // const chosen = 854;
 
-    const pie = d3.pie()
-        .value(d => d.value);
+        const svg = d3.select('#pie-chart-drugs')
+        .attr('viewBox', `0 0 ${size} ${size}`)
+        .attr('width', size)
+        .attr('height', size)
+      
+        const g = svg.append('g')
+        .attr("transform", `translate(${size / 2},${size / 2})`);
 
-    const arc = d3.arc()
-        .innerRadius(radius - 40)
-        .outerRadius(radius - 10);
-
-    // const color = d3.scaleOrdinal(d3.schemeAccent);
-    const color = d3.scaleOrdinal(color7s);
-
-    const g = svg.append("g")
-        .attr("transform", `translate(${size / 2},${size / 2})`); // Center the chart
-
-    const arcs = g.selectAll(".arc")
+        const arc = d3.arc()
+        .innerRadius(radius - thickness)
+        .outerRadius(radius);
+      
+        const arcHover = d3.arc()
+        .innerRadius(radius - thickness -3)
+        .outerRadius(radius + 6);
+      
+        const pie = d3.pie()
+        .value(function(data) { return data.value; })
+        .sort(null);
+      
+      
+        const path = g.selectAll('path')
+        .attr('class', 'data-path')
         .data(pie(data))
         .enter()
-        .append("g")
-        .attr("class", "arc");
-
-    const tooltip = d3.select("#chart-container2")
-        .append("div")
-        .attr("class", "tooltip1")
-        .style("opacity", 0);
-
-    arcs.append("path")
-        .attr("d", arc)
-        .style("fill", d => color(d.data.category))
-        .on("mouseover", function (event, d) {
-            // Slightly increase the outerRadius of the specific slice on mouseover
-            const newArc = d3.arc()
-                .innerRadius(radius - 35)
-                .outerRadius(radius - 5); // Adjust the value as needed
-
-            d3.select(this)
-                .transition()
-                .duration(200)
-                .attr("d", newArc);
-
-            const tooltipText = `${d.data.category}: ${d.data.value}`;
-            tooltip.transition()
-                .duration(200)
-                .style("opacity", 0.9);
-            tooltip.html(tooltipText)
-                .style("left", (container.offsetLeft+ size/2 -28) + "px")
-                .style("top", (container.offsetTop + size/2) + "px");
+        .append('g')
+        .attr('class', 'data-group')
+        .each(function(pathData, i) {
+          const group = d3.select(this)
+      
+          group.append('text')
+            .text(`${formatValue(pathData.data.value)}`)
+            .attr('class', 'data-text data-text__value')
+            .attr('text-anchor', 'middle')
+            .attr('dy', '1rem')
+      
+          group.append('text')
+            .text(`${pathData.data.name}`)
+            .attr('class', 'data-text data-text__name')
+            .attr('text-anchor', 'middle')
+            .attr('dy', '3.5rem')
+      
+          // Set default active segment
+          if (pathData.value === max) {
+            const textVal = d3.select(this).select('.data-text__value')
+            .classed('data-text--show', true);
+      
+            const textName = d3.select(this).select('.data-text__name')
+            .classed('data-text--show', true);
+          }
+      
         })
-        .on("mouseout", function () {
-            // Restore the original arc when mouseout
-            d3.select(this)
-                .transition()
-                .duration(200)
-                .attr("d", arc);
-
-            tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
+        .append('path')
+        .attr('d', arc)
+        .attr('fill', (fillData, i) => color(fillData.data.name))
+        .attr('class', 'data-path')
+        .on('mouseover', function() {
+          const _thisPath = this,
+                parentNode = _thisPath.parentNode;
+      
+          if (_thisPath !== activeSegment) {
+      
+            activeSegment = _thisPath;
+      
+            const dataTexts = d3.selectAll('.data-text')
+            .classed('data-text--show', false);
+      
+            const paths = d3.selectAll('.data-path')
+            .transition()
+            .duration(250)
+            .attr('d', arc);
+      
+            d3.select(_thisPath)
+              .transition()
+              .duration(250)
+              .attr('d', arcHover);
+      
+            const thisDataValue = d3.select(parentNode).select('.data-text__value')
+            .classed('data-text--show', true);
+            const thisDataText = d3.select(parentNode).select('.data-text__name')
+            .classed('data-text--show', true);
+          }
+        })
+        .each(function(v, i) {
+          if (v.value === max) {
+            const chosenArc = d3.select(this)
+            .attr('d', arcHover);
+            activeSegment = this;
+          }
+          this._current = i;
         });
+      }
 }
 
 
-// ATC code level 1 PieChart Function
 function createPieChart_ATClevel1() {
     const data = [
-        { category: "Alimentary tract and metabolism", value: 422 },
-        { category: "Blood and blood forming organs", value: 142 },
-        { category: "Cardiovascular system", value: 533 },
-        { category: "Dermatologicals", value: 220 },
-        { category: "Genito urinary system and sex hormones", value: 327 },
-        { category: "Systemic hormonal prep, excl sex hormones", value: 65 },
-        { category: "General antiinfectives for systemic use", value: 380 },
-        { category: "Antineoplastic and immunomodulating agents", value: 306 },
-        { category: "Musculo-skeletal system", value: 167 },
-        { category: "Nervous system", value: 445 },
-        { category: "Antiparasitic products, insecticides and repellants", value: 65 },
-        { category: "Respiratory system", value: 286 },
-        { category: "Sensory organs", value: 226 },
-        { category: "Various", value: 92 }
+        { name: "Alimentary tract and metabolism", value: 422 },
+        { name: "Blood and blood forming organs", value: 142 },
+        { name: "Cardiovascular system", value: 533 },
+        { name: "Dermatologicals", value: 220 },
+        { name: "Genito urinary system and sex hormones", value: 327 },
+        { name: "Systemic hormonal prep, excl sex hormones", value: 65 },
+        { name: "General antiinfectives for systemic use", value: 380 },
+        { name: "Antineoplastic and immunomodulating agents", value: 306 },
+        { name: "Musculo-skeletal system", value: 167 },
+        { name: "Nervous system", value: 445 },
+        { name: "Antiparasitic products, insecticides and repellants", value: 65 },
+        { name: "Respiratory system", value: 286 },
+        { name: "Sensory organs", value: 226 },
+        { name: "Various", value: 92 }
     ];
+    //"#pie-chart-ATC"
+    // #chart-container3
+    bakeDonut(data);
+    function bakeDonut(d) {
+        let activeSegment;
 
-    const container = document.getElementById("chart-container3");
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
-    const size = Math.min(containerWidth, containerHeight);
-    const radius = size / 2;
+        // Select the container element
+        const container = document.getElementById('chart-container3');
+        const size = Math.max(container.clientWidth, container.clientHeight);
+        console.log("size "+size);
+        const radius = size/2 -20;
+        const thickness = 35;
 
-    const svg = d3.select("#pie-chart-ATC")
-        .attr("width", "100%") // Set the SVG width to 100%
-        .attr("height", "100%") // Set the SVG height to 100%
-        .attr("viewBox", `0 0 ${size} ${size}`) // Use viewBox to control the aspect ratio
+        const data = d.sort((a, b) => b['value'] - a['value']),
+                // colorArray = data.map(k => k.color),
+                color = d3.scaleOrdinal(color14s);
+      
+        const max = d3.max(data, (maxData) => maxData.value );
+        // const chosen = 854;
 
-    const pie = d3.pie()
-        .value(d => d.value);
+        const svg = d3.select('#pie-chart-ATC')
+        .attr('viewBox', `0 0 ${size} ${size}`)
+        .attr('width', size)
+        .attr('height', size)
+      
+        const g = svg.append('g')
+        .attr("transform", `translate(${size / 2},${size / 2})`);
 
-    const arc = d3.arc()
-        .innerRadius(radius -40)
-        .outerRadius(radius - 10);
-
-    const color = d3.scaleOrdinal(color14s);
-
-    const g = svg.append("g")
-        .attr("transform", `translate(${size / 2},${size / 2})`); // Center the chart
-
-    const arcs = g.selectAll(".arc")
+        const arc = d3.arc()
+        .innerRadius(radius - thickness)
+        .outerRadius(radius);
+      
+        const arcHover = d3.arc()
+        .innerRadius(radius - thickness -3)
+        .outerRadius(radius + 6);
+      
+        const pie = d3.pie()
+        .value(function(data) { return data.value; })
+        .sort(null);
+      
+      
+        const path = g.selectAll('path')
+        .attr('class', 'data-path')
         .data(pie(data))
         .enter()
-        .append("g")
-        .attr("class", "arc");
-
-    const tooltip = d3.select("#chart-container3")
-        .append("div")
-        .attr("class", "tooltip1")
-        .style("opacity", 0);
-
-    arcs.append("path")
-        .attr("d", arc)
-        .style("fill", d => color(d.data.category))
-    .on("mouseover", function (event, d) {
-            // Slightly increase the outerRadius of the specific slice on mouseover
-            const newArc = d3.arc()
-                .innerRadius(radius -35)
-                .outerRadius(radius - 5); // Adjust the value as needed
-
-            d3.select(this)
-                .transition()
-                .duration(200)
-                .attr("d", newArc);
-
-            const tooltipText = `${d.data.category}: ${d.data.value}`;
-            tooltip.transition()
-                .duration(200)
-                .style("opacity", 0.9);
-            tooltip.html(tooltipText)
-                .style("left", (container.offsetLeft+ size/2 -28) + "px")
-                .style("top", (container.offsetTop + size/2) + "px");
+        .append('g')
+        .attr('class', 'data-group')
+        .each(function(pathData, i) {
+          const group = d3.select(this)
+      
+          group.append('text')
+            .text(`${formatValue(pathData.data.value)}`)
+            .attr('class', 'data-text data-text__value')
+            .attr('text-anchor', 'middle')
+            .attr('dy', '1rem')
+      
+          group.append('text')
+            .text(`${pathData.data.name}`)
+            .attr('class', 'data-text data-text__name')
+            .attr('text-anchor', 'middle')
+            .attr('dy', '3.5rem')
+      
+          // Set default active segment
+          if (pathData.value === max) {
+            const textVal = d3.select(this).select('.data-text__value')
+            .classed('data-text--show', true);
+      
+            const textName = d3.select(this).select('.data-text__name')
+            .classed('data-text--show', true);
+          }
+      
         })
-        .on("mouseout", function () {
-            // Restore the original arc when mouseout
-            d3.select(this)
-                .transition()
-                .duration(200)
-                .attr("d", arc);
-
-            tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
+        .append('path')
+        .attr('d', arc)
+        .attr('fill', (fillData, i) => color(fillData.data.name))
+        .attr('class', 'data-path')
+        .on('mouseover', function() {
+          const _thisPath = this,
+                parentNode = _thisPath.parentNode;
+      
+          if (_thisPath !== activeSegment) {
+      
+            activeSegment = _thisPath;
+      
+            const dataTexts = d3.selectAll('.data-text')
+            .classed('data-text--show', false);
+      
+            const paths = d3.selectAll('.data-path')
+            .transition()
+            .duration(250)
+            .attr('d', arc);
+      
+            d3.select(_thisPath)
+              .transition()
+              .duration(250)
+              .attr('d', arcHover);
+      
+            const thisDataValue = d3.select(parentNode).select('.data-text__value')
+            .classed('data-text--show', true);
+            const thisDataText = d3.select(parentNode).select('.data-text__name')
+            .classed('data-text--show', true);
+          }
+        })
+        .each(function(v, i) {
+          if (v.value === max) {
+            const chosenArc = d3.select(this)
+            .attr('d', arcHover);
+            activeSegment = this;
+          }
+          this._current = i;
         });
+      }
+    
+
+    
 }
 
 function createPieChart_Mutations() {
     // Main categories data
     const data = [
-        { category: "Target", value: 14030 },
-        { category: "Enzyme", value: 5278 },
-        { category: "Transporter", value: 3205 },
-        { category: "Carrier", value: 822 },
+        { name: "Target", value: 14030 , color: '#BF360C'},
+        { name: "Enzyme", value: 5278 , color: '#18FFFF'},
+        { name: "Transporter", value: 3205 , color: '#0288D1'},
+        { name: "Carrier", value: 822, color: '#F9A825' },
     ];
 
-    // Subcategories data for "Target"
-    const subcategories = [
-        { category: "Enzyme", value: 3661 },
-        { category: "Unknown", value: 3602 },
-        { category: "GPCR", value: 2450 },
-        { category: "Kinase", value: 1583 },
-        { category: "Ion channel", value: 937 },
-        { category: "Nuclear receptor", value: 867 },
-        { category: "Transporter", value: 429 },
-        { category: "Epigenetic regulator", value: 115 }
-    ];
+    // pie-chart-mutations
+    bakeDonut(data);
+    // "chart-container2"
+    // #pie-chart-drugs
+    function bakeDonut(d) {
+        let activeSegment;
 
-    const container = document.getElementById("chart-container4");
-    const containerWidth = container.clientWidth;
-    const containerHeight = container.clientHeight;
-    const size = Math.min(containerWidth, containerHeight);
-    const radius = size / 2;
+        // Select the container element
+        const container = document.getElementById('chart-container4');
+        const size = Math.max(container.clientWidth, container.clientHeight);
+        console.log("size "+size);
+        const radius = size/2 -20;
+        const thickness = 35;
 
-    const svg = d3.select("#pie-chart-mutations")
-        .attr("width", "100%")
-        .attr("height", "100%")
-        .attr("viewBox", `0 0 ${size} ${size}`);
+        const data = d.sort((a, b) => b['value'] - a['value']),
+                colorArray = data.map(k => k.color),
+                color = d3.scaleOrdinal()
+                .range(colorArray);
+      
+        const max = d3.max(data, (maxData) => maxData.value );
+        // const chosen = 854;
 
-    const pie = d3.pie()
-        .value(d => d.value);
-
-    const arc = d3.arc()
-        .innerRadius(radius -40)
-        .outerRadius(radius - 10);
-
-    const nestedArc = d3.arc()
-        .innerRadius(radius - 10)
-        .outerRadius(radius);
-
-    // const color = d3.scaleOrdinal(d3.schemeCategory10);
-    const color = d3.scaleOrdinal(color14s);
-    const subcategoryColor = d3.scaleOrdinal([
-        "#1e81b0", "#e28743", "#76b5c5", "#21130d", "#873e23", "#063970", "#eab676", "#154c79"
-    ]);
-
-    const g = svg.append("g")
+        const svg = d3.select('#pie-chart-mutations')
+        .attr('viewBox', `0 0 ${size} ${size}`)
+        .attr('width', size)
+        .attr('height', size)
+      
+        const g = svg.append('g')
         .attr("transform", `translate(${size / 2},${size / 2})`);
 
-    const arcs = g.selectAll(".arc")
+        const arc = d3.arc()
+        .innerRadius(radius - thickness)
+        .outerRadius(radius);
+      
+        const arcHover = d3.arc()
+        .innerRadius(radius - thickness -3)
+        .outerRadius(radius + 6);
+      
+        const pie = d3.pie()
+        .value(function(data) { return data.value; })
+        .sort(null);
+      
+      
+        const path = g.selectAll('path')
+        .attr('class', 'data-path')
         .data(pie(data))
         .enter()
-        .append("g")
-        .attr("class", "arc");
-
-    const tooltip = d3.select("#chart-container4")
-        .append("div")
-        .attr("class", "tooltip1")
-        .style("opacity", 0)
-        .style("text-align", "left");
-
-    arcs.append("path")
-        .attr("d", arc)
-        .style("fill", d => color(d.data.category))
-        .on("mouseover", function (event, d) {
-            const [x, y] = d3.pointer(event, svg.node());
-
-            if (d.data.category === "Target") {
-                const nestedPie = d3.pie()
-                    .value(d => d.value)
-                    .startAngle(d.startAngle)
-                    .endAngle(d.endAngle)(subcategories);
-
-                g.selectAll(".nested-arc")
-                    .data(nestedPie)
-                    .enter()
-                    .append("path")
-                    .attr("class", "nested-arc")
-                    .attr("d", nestedArc)
-                    .style("fill", (d, i) => subcategoryColor(d.data.category));
-
-                let tooltipHtml = "Target - 14030 :<br>";
-                subcategories.forEach(sub => {
-                    tooltipHtml += `<span style='color: ${subcategoryColor(sub.category)}; font-size:8px;'>●</span> ${sub.category} (${sub.value})<br>`;
-                });
-
-                tooltip.html(tooltipHtml)
-                    .style("opacity", 1)
-                    // .style("left", `${x + 10}px`)
-                    // .style("top", `${y + 10}px`);
-                    .style("left", `${x + 10}px`)
-                    .style("top", `${y - 200}px`);
-            } else {
-                const tooltipText = `${d.data.category}: ${d.data.value}`;
-                tooltip.html(tooltipText)
-                    .style("opacity", 0.9)
-                    .style("left", `${x + 10}px`)
-                    .style("top", `${y + 10}px`);
-            }
+        .append('g')
+        .attr('class', 'data-group')
+        .each(function(pathData, i) {
+          const group = d3.select(this)
+      
+          group.append('text')
+            .text(`${formatValue(pathData.data.value)}`)
+            .attr('class', 'data-text data-text__value')
+            .attr('text-anchor', 'middle')
+            .attr('dy', '1rem')
+      
+          group.append('text')
+            .text(`${pathData.data.name}`)
+            .attr('class', 'data-text data-text__name')
+            .attr('text-anchor', 'middle')
+            .attr('dy', '3.5rem')
+      
+          // Set default active segment
+          if (pathData.value === max) {
+            const textVal = d3.select(this).select('.data-text__value')
+            .classed('data-text--show', true);
+      
+            const textName = d3.select(this).select('.data-text__name')
+            .classed('data-text--show', true);
+          }
+      
         })
-        .on("mouseout", function () {
-            g.selectAll(".nested-arc").remove();
-            tooltip.style("opacity", 0);
+        .append('path')
+        .attr('d', arc)
+        .attr('fill', (fillData, i) => color(fillData.data.name))
+        .attr('class', 'data-path')
+        .on('mouseover', function() {
+          const _thisPath = this,
+                parentNode = _thisPath.parentNode;
+      
+          if (_thisPath !== activeSegment) {
+      
+            activeSegment = _thisPath;
+      
+            const dataTexts = d3.selectAll('.data-text')
+            .classed('data-text--show', false);
+      
+            const paths = d3.selectAll('.data-path')
+            .transition()
+            .duration(250)
+            .attr('d', arc);
+      
+            d3.select(_thisPath)
+              .transition()
+              .duration(250)
+              .attr('d', arcHover);
+      
+            const thisDataValue = d3.select(parentNode).select('.data-text__value')
+            .classed('data-text--show', true);
+            const thisDataText = d3.select(parentNode).select('.data-text__name')
+            .classed('data-text--show', true);
+          }
+        })
+        .each(function(v, i) {
+          if (v.value === max) {
+            const chosenArc = d3.select(this)
+            .attr('d', arcHover);
+            activeSegment = this;
+          }
+          this._current = i;
         });
+      }
+
+    
 }
 
 // Call the createPieChart function to generate the chart
