@@ -361,6 +361,47 @@ a.external_link:link, a.external_link:visited, a.external_link:hover, a.external
   color: #333333;
   margin-bottom: 0;
 }
-/* .pie-div{
-  margin-top: -1%;
-} */
+
+.data-path {
+  &:hover {
+    cursor: pointer;
+  }
+}
+.data-text {
+  transition: transform .2s ease-in-out;
+  fill: #000;
+}
+
+.data-text__value {
+  font-size: 50px;
+  transform: translateY(-14px);
+  opacity: 0;
+}
+
+.data-text__name {
+  font-size: 14px;
+  transform: translateY(14px);
+  opacity: 0;
+}
+
+.data-text--show {
+  transform: translateY(0);
+  animation: fadeGraphTextIn .5s forwards;
+}
+
+.data-text:hover {
+  user-select: none;
+}
+
+.legend-text {
+  fill: #000;
+}
+@keyframes fadeGraphTextIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+

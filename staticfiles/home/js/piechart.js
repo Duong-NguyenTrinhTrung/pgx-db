@@ -379,7 +379,8 @@ function createPieChart_Mutations() {
 }
 
 // Call the createPieChart function to generate the chart
-createPieChart_Proteins();
+// createPieChart_Proteins();
+
 createPieChart_Drugs();
 createPieChart_ATClevel1();
 createPieChart_Mutations();

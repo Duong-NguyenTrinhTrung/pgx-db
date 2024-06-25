@@ -88,21 +88,20 @@
 
         <div id="screenshot">
             <!--Screennshot div closing-->
-          
-            <div class="btmbar-container">
-              <button type="button" class="btmbar zoom-in-btn pgx_btn"> Zoom In </button>
-              <button type="button" class="btmbar col-xs-2 margin-left zoom-out-btn pgx_btn"> Zoom Out </button>
-            
-              <label class="btmbar" for="threshold-slider" style="display: none;">&nbsp;Threshold Value:</label>
-              <input class="btmbar" type="range" id="threshold-slider" min="1" max="" value="" step="1" style="display: none;">
-              <span class="btmbar" id="threshold-value" style="display: none;"></span>
-              
-              <button type="button" id="exportButton" class="btmbar pgx_btn">Export</button>
-              <button type="button" id="redrawChart" class="btmbar pgx_btn">Redraw</button>
-              <button  id="ManagePreviousState" class="btmbar pgx_btn" >Previous State</button>
-              <button type="button" id="GetmoreData" class="btmbar pgx_btn" style="text-decoration-line: underline; "> Get more data </button>
-              
-              <!-- <button type="button" id="more_details" style="float: right; margin-right: 10px; font-weight: bold; color: #337ab7;" class="documentation"> Read more </button> -->
+            <div  style="display: flex; justify-content: space-between;">
+              <div class="btmbar-container">
+                <button type="button" class="btmbar zoom-in-btn pgx_btn"> Zoom In </button>
+                <button type="button" class="btmbar col-xs-2 margin-left zoom-out-btn pgx_btn"> Zoom Out </button>
+                
+                <label class="btmbar" for="threshold-slider" style="display: none;">&nbsp;Threshold Value:</label>
+                <input class="btmbar" type="range" id="threshold-slider" min="1" max="" value="" step="1" style="display: none;">
+                <span class="btmbar" id="threshold-value" style="display: none;"></span>
+                
+                <button type="button" id="exportButton" class="btmbar pgx_btn">Export</button>
+                <button type="button" id="redrawChart" class="btmbar pgx_btn">Redraw</button>
+                <button  id="ManagePreviousState" class="btmbar pgx_btn" >Previous State</button>
+                <button type="button" id="GetmoreData" class="btmbar pgx_btn" style="text-decoration-line: underline; "> Get more data </button>
+              </div>
               <span class="documentation"><a href="https://pgx-documentation.readthedocs.io/en/latest/atc_code.html#network-visualization" target="_blank">Read More</a></span>
             </div>
             <div id="chart"></div>
