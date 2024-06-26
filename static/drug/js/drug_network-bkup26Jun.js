@@ -48,16 +48,26 @@ if (urlParams.has("atc_code")) {
       "/serve_interaction_data_json_file/?atc_code=" + atc_code;
   }
   else {
+
     json_GeneralFile =
-      "/drugs_network/general_data?drug_bank_ids=" + drug_bank_ids.join(",");
+
+    "/drugs_network/general_data?drug_bank_ids=" + drug_bank_ids.join(",");
+
     json_drugData =
+
       "/drugs_network/drug_data?drug_bank_ids=" + drug_bank_ids.join(",");
+
     json_proteinData =
+
       "/drugs_network/protein_data?drug_bank_ids=" + drug_bank_ids.join(",");
+
     json_interactionData =
+
       "/drugs_network/interaction_data?drug_bank_ids=" + drug_bank_ids.join(",");
-  }
+
+    }
 }
+
 
 // function readPrecachedJSONFromDatabase(url) {
 //     var data;
@@ -115,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 $("#loading").show();
 
-let drug_xlsxData;
+let drug_xlsxData;  
 let protein_xlsxData;
 let interaction_xlsxData;
 var drugStatusNameForDialog = "";
@@ -158,6 +168,13 @@ async function readDrugJSON() {
       }
     } else {
       drug_xlsxData = jsonData;
+        // pre-cached
+      if (typeof drug_xlsxData.data == 'string'){
+        if (typeof JSON.parse(drug_xlsxData.data) == 'string') {
+          drug_xlsxData = JSON.parse(JSON.parse(drug_xlsxData.data))
+        }
+      }
+    
     }
     // readProteinJSON();
     (async function () {
@@ -200,7 +217,7 @@ async function readProteinJSON() {
 async function readInteractionJSON() {
   const jsonFilePath = json_interactionData;
   try {
-    const interaction_xlsxData = await readPrecachedJSONFromDatabase(
+    interaction_xlsxData = await readPrecachedJSONFromDatabase(
       jsonFilePath
     );
     console.log("JSON Data:", interaction_xlsxData);
@@ -459,8 +476,6 @@ function printChart() {
 // Download PNG
 // Download PNG
 function downloadPNG() {
-
-  $("#loading").show();
   var svgElement = document.querySelector("#chart svg");
 
   // Reset transformations by cloning the SVG element and removing any transformations
@@ -505,13 +520,8 @@ function downloadPNG() {
       a.href = finalCanvas.toDataURL("image/png");
       a.download = "chart.png";
       a.click();
-
     });
-    $("#loading").hide();
   });
-
-
-
 }
 
 function svgToCanvas(svgData, callback) {
@@ -569,8 +579,6 @@ function svgToCanvas(svgData, callback) {
 // Download JPEG
 
 function downloadJPEG() {
-
-  $("#loading").show();
   var svgElement = document.querySelector("#chart svg");
   var svgData = getFilteredSvgContent(svgElement);
   svgData = addWhiteBackground(svgData);
@@ -611,10 +619,7 @@ function downloadJPEG() {
       a.download = "chart.jpeg";
       a.click();
     });
-    $("#loading").hide();
   });
-
-
 }
 
 function downloadJPEG1() {
@@ -707,7 +712,7 @@ function downloadPDF() {
     // Use the href attribute for the image path
     if (xlinkHref) {
       //imgObj.src = "http://localhost:8000/" + xlinkHref;
-      imgObj.src = "https://pgx-db.org/" + xlinkHref;
+      imgObj.src = "https://pgx-db.org" + xlinkHref;
     } else {
       loadedCount++;
     }
@@ -779,8 +784,6 @@ function getFilteredLinksXLSX() {
 
 // Download XLS
 function downloadXLS() {
-
-  $("#loading").show();
   var modal = document.getElementById("exportModal");
 
   var filteredLinks = getFilteredLinksXLSX();
@@ -819,11 +822,9 @@ function downloadXLS() {
 
     // Download the new XLSX file
     XLSX.writeFile(newWb, "filtered_data.xlsx");
-    $("#loading").hide();
   };
 
   req.send();
-
 }
 
 function downloadXLS11() {
@@ -983,7 +984,10 @@ function showDialog(title, parentNodeName) {
     };
     //console.log("data Drug Type of", typeof drug_xlsxData);
     //  var matchingRow = drug_xlsxData.find((row) => row.name === drugNameValue);
+    
     const matchingRow = findObjectByName(drug_xlsxData, drugNameValue);
+    
+    
     //console.log("Matching Row Drug ImageTab", matchingRow);
 
     if (matchingRow) {
@@ -1533,7 +1537,7 @@ function showDialog_Links(title, interactionTy) {
         row.drugbank_id === interaction_source &&
         row.uniprot_ID_id === interaction_target &&
         row.interaction_type.toLowerCase() ===
-        selectedInteractionName1.toLowerCase()
+          selectedInteractionName1.toLowerCase()
     );
 
     if (matchingRow) {
@@ -1762,23 +1766,6 @@ let slicedata = 400;
 
 window.parent.postMessage({ data: slicedata }, "*");
 
-
-function stopSimulationIfSettled() {
-  if (true) { // Adjust this threshold value if needed
-    // simulation.stop();
-    nodes.forEach(node => {
-      node.fx = node.x;
-      node.fy = node.y;
-    });
-    console.log('Simulation stopped and nodes fixed.');
-  } else {
-    // Continue checking after a short delay
-    setTimeout(stopSimulationIfSettled, 100); // Check every 100ms
-  }
-}
-
-
-
 function processData(numberofnodes, slicedata) {
   const jsonFilePath = json_GeneralFile; // JSON file path
 
@@ -1978,7 +1965,7 @@ function processData(numberofnodes, slicedata) {
       console.error("Error reading the JSON file:", error);
     });
 
-}
+   }
 
 // Read the data from the Excel file
 
@@ -2066,55 +2053,28 @@ function createChart(links) {
     var distanceBetweenNodes = 60;
   }
 
-  // simulation = d3
-  //   .forceSimulation(nodes)
-  //   .force(
-  //     "link",
-  //     d3
-  //       .forceLink(links)
-  //       .id(function (d) {
-  //         return d.id;
-  //       })
-  //       .distance(distanceBetweenNodes)
-  //   )
-  //   .force("charge", d3.forceManyBody().strength(-150))
-  //   // Adding centering forces for X and Y coordinates
-  //   .force("x", d3.forceX(svgWidth / 2))
-  //   .force("y", d3.forceY(svgHeight / 2)).on("end", () => {
-  //  // Fix the nodes' positions when the simulation ends
-  // nodes.forEach(node => {
-  //   node.fx = node.x;
-  //   node.fy = node.y;
-  // });
-
-
-  simulation = d3.forceSimulation(nodes)
+  simulation = d3
+    .forceSimulation(nodes)
     .force(
       "link",
-      d3.forceLink(links)
-        .id(d => d.id)
+      d3
+        .forceLink(links)
+        .id(function (d) {
+          return d.id;
+        })
         .distance(distanceBetweenNodes)
     )
-    .force("charge", d3.forceManyBody().strength(-150))
-    .force("center", d3.forceCenter(svgWidth / 2, (svgHeight - 180) / 2))
-    .on("tick", () => {
-      // Logic for rendering or updating nodes and links on each tick
-    })
-    .on("end", () => {
-      // Fix the nodes' positions when the simulation ends
-      nodes.forEach(node => {
+    .force("charge", d3.forceManyBody().strength(chargeStrength))
+    // Adding centering forces for X and Y coordinates
+    .force("x", d3.forceX(svgWidth / 2).strength(0.1))
+    .force("y", d3.forceY(svgHeight / 2).strength(0.1))
+
+    .on("end", function () {
+      nodes.forEach(function (node) {
         node.fx = node.x;
         node.fy = node.y;
       });
     });
-
-  // Function to check if the simulation is settled and stop it
-
-  // // Start the checking process after a delay to allow initial forces to act
-  setTimeout(stopSimulationIfSettled, 4000);
-
-
-
 
   link = svg
     .selectAll(".link")
@@ -2235,7 +2195,7 @@ function createChart(links) {
     .on("mouseover", function (event, d) {
       d3.select(this).style("cursor", "pointer");
       tooltip2.transition()
-        .style("display", "block");
+      .style("display", "block");
       tooltip2
         .style("left", event.pageX + 20 + "px")
         .style("top", event.pageY + 20 + "px").html(`
@@ -2252,12 +2212,12 @@ function createChart(links) {
 
     .on("mouseover", function () {
       tooltip2.transition()
-        .style("display", "block");;
+      .style("display", "block");;
     })
 
     .on("mouseout", function () {
       tooltip2.transition()
-        .style("display", "none");
+      .style("display", "none");
     });
 
 
@@ -2340,7 +2300,6 @@ function createChart(links) {
         Math.min(svgWidth, d.x)
       )},${Math.max(0, Math.min(svgHeight, d.y))})`;
     });
-
   });
 
   // new code of dragable
@@ -2406,111 +2365,114 @@ function createChart(links) {
 
     localStorage.setItem("jsonData", height);
   });
-
+ 
   let False_node = [];
   let true_node = []
 
   // update of the links and the nodes there  aamir2
-  node.filter(function (templink) {
+  console.log(link , node , 'herea rea the links and the nodes ')
+  node.filter(function(templink) {
     // Filter links with a value greater than 5
-    if (templink.hidden === true) {
-      if (!true_node.includes(templink.Protein_Class)) {
+    if(templink.hidden === true){
+      console.log(templink , 'faksldjasl')
+    if(!true_node.includes(templink.Protein_Class) ){
 
-        true_node.push(templink.Protein_Class)
+      true_node.push(templink.Protein_Class)
 
-      }
-
-    } else {
-      if (!False_node.includes(templink.Protein_Class)) {
-
-        False_node.push(templink.Protein_Class)
-      }
     }
+     
+  }else{
+    if(!False_node.includes(templink.Protein_Class )){
 
-    if (templink.hidden === true) {
-      if (!true_node.includes(templink.DiseaseClass)) {
-
-        true_node.push(templink.DiseaseClass)
-
-      }
-
-    } else {
-
-      if (!False_node.includes(templink.DiseaseClass)) {
-
-        False_node.push(templink.DiseaseClass)
-      }
+      False_node.push(templink.Protein_Class)
     }
+  }
 
-    if (templink.hidden === true) {
-      if (!true_node.includes(templink.Drug_type)) {
+  if(templink.hidden === true){
+    if(!true_node.includes(templink.DiseaseClass) ){
 
-        true_node.push(templink.Drug_type)
+      true_node.push(templink.DiseaseClass)
 
-      }
-
-    } else {
-      if (!False_node.includes(templink.Drug_type)) {
-
-        False_node.push(templink.Drug_type)
-      }
     }
+     
+  }else{
+    
+    if(!False_node.includes(templink.DiseaseClass )){
 
-    if (templink.hidden === true) {
-      if (!true_node.includes(templink.Drug_status)) {
-
-        true_node.push(templink.Drug_status)
-
-      }
-
-    } else {
-      if (!False_node.includes(templink.Drug_status)) {
-
-        False_node.push(templink.Drug_status)
-      }
+      False_node.push(templink.DiseaseClass)
     }
+  }
+
+  if(templink.hidden === true){
+  if(!true_node.includes(templink.Drug_type) ){
+
+    true_node.push(templink.Drug_type)
+
+  }
+   
+}else{
+  if(!False_node.includes(templink.Drug_type )){
+
+    False_node.push(templink.Drug_type)
+  }
+}
+
+if(templink.hidden === true){
+  if(!true_node.includes(templink.Drug_status) ){
+
+    true_node.push(templink.Drug_status)
+
+  }
+   
+}else{
+  if(!False_node.includes(templink.Drug_status )){
+
+    False_node.push(templink.Drug_status)
+  }
+}
 
 
 
   })
-  link.filter(function (templink) {
+  link.filter(function(templink) {
     // Filter links with a value greater than 5
+ 
+    if(templink.hidden === true){
+    if(!true_node.includes(templink.type )){
 
-    if (templink.hidden === true) {
-      if (!true_node.includes(templink.type)) {
-
-        true_node.push(templink.type)
-      }
-
-    } else {
-      if (!False_node.includes(templink.type)) {
-
-        False_node.push(templink.type)
-      }
+      true_node.push(templink.type)
     }
+     
+  }else{
+    if(!False_node.includes(templink.type )){
 
+      False_node.push(templink.type)
+    }
+  }
+  
   })
   function removeDivContainingSpanText(texts) {
     texts.forEach(text => {
-      // Select all span elements
-      const spans = document.querySelectorAll('span');
-
-      spans.forEach(span => {
-        if (span.textContent.includes(text)) {
-          // Remove the parent div of the span
-          const parentDiv = span.closest('div');
-          if (parentDiv) {
-            parentDiv.remove();
-          }
-        }
-      });
+        // Select all span elements
+        const spans = document.querySelectorAll('span');
+        
+        spans.forEach(span => {
+            if (span.textContent.includes(text)) {
+                // Remove the parent div of the span
+                const parentDiv = span.closest('div');
+                if (parentDiv) {
+                    parentDiv.remove();
+                }
+            }
+        });
     });
-  }
-  function removeElements(array1, array2) {
-    return array1.filter(element => !array2.includes(element));
-  }
-  let remove_element = removeElements(true_node, False_node)
-  removeDivContainingSpanText(remove_element);
+}
+console.log(true_node , 'true_node')
+function removeElements(array1, array2) {
+  return array1.filter(element => !array2.includes(element));
+}
+  let remove_element = removeElements(true_node ,False_node  )
+removeDivContainingSpanText(remove_element);
 
 }
 
@@ -2612,40 +2574,12 @@ function redrawChart(originalLinks) {
         node.fy = node.y;
       });
     });
-    setTimeout(stopSimulationIfSettled, 4000);
 
     //console.log("Simulation after restart: ", simulation);
   } else {
     console.log("Simulation is not defined");
   }
 }
-
-
-function redrawChart2(originalLinks) {
-
-  // Restart the simulation
-
-
-  if (simulation.alpha() < 0.01) {
-    // Manually restart the simulation
-    simulation.alpha(1).restart();
-
-    nodes.forEach(function (d) {
-      d.fx = null;
-      d.fy = null;
-    });
-  } else {
-    simulation.alpha(1).restart();
-
-    nodes.forEach(function (d) {
-      d.fx = null;
-      d.fy = null;
-    });
-
-  };
-}
-
-
 
 // Get color based on interaction type
 // Get color based on interaction type
@@ -2987,7 +2921,7 @@ function createProteinsLegend() {
 
   links.forEach(function (link) {
     var proteinClass11 = link.target.Protein_Class; // No need to convert to lowercase
-
+    
 
     if (
       proteins.includes(proteinClass11) &&
@@ -3634,7 +3568,7 @@ function updateAllFilters() {
     .selectAll("circle, text , path")
     .style("visibility", function (d) {
       if (d.hidden) {
-
+      
         // if hidden by slider filter
         return "hidden";
       }
@@ -3735,8 +3669,8 @@ function updateAllFilters() {
       (l) =>
         !hiddenInteractions[l.type] &&
         !hiddenProteinClasses[
-        nodes.find((n) => n.id === l.target.id).Protein_Class &&
-        nodes.find((n) => n.id === l.target.id).DiseaseClass
+          nodes.find((n) => n.id === l.target.id).Protein_Class &&
+            nodes.find((n) => n.id === l.target.id).DiseaseClass
         ]
     );
 
@@ -3744,7 +3678,7 @@ function updateAllFilters() {
       (l) =>
         !hiddenInteractions[l.type] &&
         !hiddenDiseaseClasses[
-        nodes.find((n) => n.id === l.target.id).DiseaseClass
+          nodes.find((n) => n.id === l.target.id).DiseaseClass
         ]
     );
 
@@ -3948,7 +3882,7 @@ d3.select("#GetmoreData").on("click", function () {
 
   console.log(slicedata, "slicedata");
   processData(numberofnodes, slicedata);
-
+  
 });
 
 document.getElementById("ManagePreviousState").style.display = "none";
@@ -3990,17 +3924,17 @@ d3.select("#ManagePreviousState").on("click", function () {
 
 function clearGraph() {
   const svg = d3.select("#chart");
-  svg.selectAll("*").remove();
+  svg.selectAll("*").remove();  
   nodes = [];
   links = [];
 }
 
-$(document).ready(function () {
-  $(document).click(function (e) {
-    // Check if the click did not originate from within any element with class 'tooltip2'
-    if (!$(e.target).closest('.tooltip2').length) {
-      // Hide all elements with class 'tooltip2'
-      $('.tooltip2').hide();
-    }
+$(document).ready(function() {
+  $(document).click(function(e) {
+      // Check if the click did not originate from within any element with class 'tooltip2'
+      if (!$(e.target).closest('.tooltip2').length) {
+          // Hide all elements with class 'tooltip2'
+          $('.tooltip2').hide();
+      }
   });
 });
