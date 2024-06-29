@@ -2,24 +2,30 @@
 {% csrf_token %}
 
 <div role="tabpanel" class="tab-pane" id="tab_network_comparison">
-    <span class="documentation"><a href="https://pgx-documentation.readthedocs.io/en/latest/atc_code.html#network-comparison" target="_blank">Read More</a></span>
+    <span class="documentation"><a
+            href="https://pgx-documentation.readthedocs.io/en/latest/atc_code.html#network-comparison"
+            target="_blank">Read More</a></span>
     <div style="display: flex; flex-direction: row; gap: 20px; margin-top: 15px;">
         <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
             <label for="atc_comparison" style="font-size: 16px; color: rgb(51, 122, 183); font-weight: bold;">Input an
                 ATC code for network comparison</label>
-            <input type="text" id="atc_comparison" class="form-text form-type-textfield form-control optional ui-autocomplete-input" autocomplete="on" placeholder="ATC code" style="width: 100%;">
+            <input type="text" id="atc_comparison"
+                class="form-text form-type-textfield form-control optional ui-autocomplete-input" autocomplete="on"
+                placeholder="ATC code" style="width: 100%;">
             <div class="autocomplete-outer">
-                <div id="atc-comparison-autocomplete-results" >
+                <div id="atc-comparison-autocomplete-results">
                 </div>
             </div>
             <button id="btn-network-compare" type="button" style="width: 200px; border-radius: 5px;"
                 class="btn-primary">Compare</button>
         </div>
         <div>
-            <select id="compare-type" multiple class="form-control input-lg" size="13">
+            <select id="compare-type" multiple class="form-control input-lg" size="16">
                 <option value="no-selection" selected="selected">Select an option</option>
                 <!-- <option value="align_network">&nbsp;&nbsp;&nbsp;&nbsp;- Align network</option> -->
                 <option value="compare_network_size">&nbsp;&nbsp;&nbsp;&nbsp;- Compare Network size</option>
+                <option value="compare_network_ADR">&nbsp;&nbsp;&nbsp;&nbsp;- Compare Network Adverse Drug Reactions
+                </option>
                 <option value="compare_association_distritution">&nbsp;&nbsp;&nbsp;&nbsp;- Compare Degree distritution
                     (Drug-Disease network)</option>
                 <option value="compare_degree_distritution">&nbsp;&nbsp;&nbsp;&nbsp;- Compare Degree distritution
@@ -52,7 +58,7 @@
         </div>
     </div>
     <div id="result-compare-area" style="margin-top: 30px; display: flex; flex-direction: column; align-items: center;">
-        <div id="result-compare-area-text"></div>
+        <h4 id="result-compare-area-text"></h4>
         <table id="result-compare-table">
         </table>
         <div id="result-compare-box" style="display: flex; margin-top: 20px; width: 100%;">
@@ -69,64 +75,68 @@
 
 <script>
     //$(document).ready(function () {
-        //alert("We are sure to be here");
-        // autocomplete 
-        var autocompleteResults = $('#atc-comparison-autocomplete-results');
-        $('#atc_comparison').autocomplete({
-            source: function (request, response) {
-                $.ajax({
-                    url: "{% url 'atc-comparison-autocomplete-view' %}",
-                    data: {
-                        query: request.term
-                    },
-                    dataType: 'json',
-                    success: function (data) {
-                        //alert(data.suggestions);
-                        if (data.suggestions.length==0){
-                            $('#atc_comparison').css("border", "1px solid red");
-                            $("#btn-network-compare").attr("disabled", "true");
-                            $("#btn-network-compare").addClass("btn-disabled");
-                        }
-                        else {
-                            $('#atc_comparison').css("border", "unset");
-                            $("#btn-network-compare").removeAttr("disabled");
-                            $("#btn-network-compare").removeClass("btn-disabled");
-                            response(data.suggestions);
-                        }
-                        
+    //alert("We are sure to be here");
+    // autocomplete 
+    var autocompleteResults = $('#atc-comparison-autocomplete-results');
+    $('#atc_comparison').autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                url: "{% url 'atc-comparison-autocomplete-view' %}",
+                data: {
+                    query: request.term
+                },
+                dataType: 'json',
+                success: function (data) {
+                    //alert(data.suggestions);
+                    if (data.suggestions.length == 0) {
+                        $('#atc_comparison').css("border", "1px solid red");
+                        $("#btn-network-compare").attr("disabled", "true");
+                        $("#btn-network-compare").addClass("btn-disabled");
                     }
-                });
-            },
-            autoFocus: true,
-            minLength: 3,
-            select: function (event, ui) {
-                $('#atc_comparison').val(ui.item.value);
-                return false;
-            },
-            open: function (event, ui) {
-                autocompleteResults.show(); 
-            },
-            close: function (event, ui) {
-                autocompleteResults.hide(); 
-            }
-        });
+                    else {
+                        $('#atc_comparison').css("border", "unset");
+                        $("#btn-network-compare").removeAttr("disabled");
+                        $("#btn-network-compare").removeClass("btn-disabled");
+                        response(data.suggestions);
+                    }
+
+                }
+            });
+        },
+        autoFocus: true,
+        minLength: 3,
+        select: function (event, ui) {
+            $('#atc_comparison').val(ui.item.value);
+            return false;
+        },
+        open: function (event, ui) {
+            autocompleteResults.show();
+        },
+        close: function (event, ui) {
+            autocompleteResults.hide();
+        }
+    });
     //});
 
 </script>
 
 <script>
-    function isValidATC(atc_comparison){
+    function isValidATC(atc_comparison) {
         return true;
     }
-    $("#compare-type").on('change', function() {
+    $("#compare-type").on('change', function () {
         var compare_type = $(this).val();
-        
+
         if (compare_type != "no-selection") {
             $("#selectionExplanation").show();
 
             if (compare_type == "compare_network_size") {
                 $("#optionExplanation").html("Comparing 2 networks on number of nodes (drug, protein, disease), drug-protein interactions, and drug-disease association studies. This allows to see if one is larger or more complex than the other.");
-            } else if (compare_type == "compare_degree_distritution") {
+            } else if (compare_type == "compare_network_ADR") 
+            {
+                $("#optionExplanation").html("Comparing 2 networks on number of side effects, their frequencies of drugs within the network. This allows to see if one adverse drug reaction profile is larger or more complex than the other.");
+            }
+            else if (compare_type == "compare_degree_distritution") {
                 $("#optionExplanation").html("Comparing 2 networks on distribution of degree of drug-protein interaction nodes . This helps to understand the connectivity patterns.");
             } else if (compare_type == "compare_association_distritution") {
                 $("#optionExplanation").html("Comparing 2 networks on distribution of degree of drug-disease association nodes. This helps to understand the connectivity patterns.");
@@ -138,154 +148,161 @@
                 $("#optionExplanation").html("Measure the degree of centralization in each network to identify highly connected drug or disease nodes. This checks if one network has a more centralized structure than the other.");
             } else if (compare_type == "measure_centralization_dp") {
                 $("#optionExplanation").html("Measure the degree of centralization in each network to identify highly connected drug or protein nodes. This checks if one network has a more centralized structure than the other.");
-            }else if (compare_type == "calculate_path_length_DD") {
+            } else if (compare_type == "calculate_path_length_DD") {
                 $("#optionExplanation").html("Calculate the average shortest path length between drug or disease nodes in each network. This compares the efficiency of information transfer within the networks.");
-            }else if (compare_type == "calculate_path_length_DP") {
+            } else if (compare_type == "calculate_path_length_DP") {
                 $("#optionExplanation").html("Calculate the average shortest path length between drug or protein nodes in each network. This compares the efficiency of information transfer within the networks.");
-            }else if (compare_type == "detect_community_dd" || compare_type == "detect_community_dp") {
+            } else if (compare_type == "detect_community_dd" || compare_type == "detect_community_dp") {
                 $("#optionExplanation").html("Apply community detection algorithms to identify clusters or modules within each network. This compares the community structures to understand functional modules.");
-            }else if (compare_type == "see_common_and_unique_elements") {
+            } else if (compare_type == "see_common_and_unique_elements") {
                 $("#optionExplanation").html("Identify the common drugs, proteins, and diseases shared between the two networks. This highlights unique elements in each network to understand their specific characteristics.");
             }
             $("#optionExplanation").css("font-style", "italic").css("font-size", "12px");
         }
     });
 
-    $("#btn-network-compare").click(function() {
+    $("#btn-network-compare").click(function () {
         var compare_type = $("#compare-type").val();
         var atc_comparison = $("#atc_comparison").val().split(" ")[0];
         var urlCompare;
         var compareTask;
         var compareText;
         var relation;
-        if (atc_comparison!="" & isValidATC(atc_comparison)){
-                if(compare_type == "no-selection") {
-                    alert("Please select a comparison type!");
-                }
-                else if(compare_type == "align_network") {
-                    urlCompare = "{% url 'get-statistics-by-atc-for-network-size-comparison' %}";
-                    compareTask= "alignNetwork";
-                    $("#optionExplanation").html("abc");
-                }
-                else if(compare_type == "compare_network_size") { //not yet
-                    urlCompare = "{% url 'get-statistics-by-atc-for-network-size-comparison' %}";
-                    compareTask= "compareNetworkSize";
-                    compareText = "Network size"
-                    $("#optionExplanation").html("compare_network_size");
-                }
-                else if(compare_type == "compare_degree_distritution") {
-                    urlCompare = "{% url 'get-data-for-comparing-network-degree-distribution' %}";
-                    compareTask= "distributionPlot";
-                    compareText = "Degree distribution of DRUG-PROTEIN network ";
-                    $("#optionExplanation").html("compare_degree_distritution");
-                }
-                else if(compare_type == "compare_association_distritution") {
-                    urlCompare = "{% url 'get-data-for-comparing-network-associate-distribution' %}";
-                    compareTask= "distributionPlot";
-                    compareText = "Degree distribution of DRUG-DISEASE network ";
-                }
-                else if(compare_type == "compare_moa_distribution") {
-                    urlCompare = "{% url 'get-statistics-by-atc-code-for-MOA-comparison' %}";
-                    compareTask= "distributionPlotCategory";
-                    compareText = "DRUG-PROTEIN interactions <br> Modes of action distribution";
-                    relation = "interactions";
-                }
-                else if(compare_type == "see_clinical_trial_phase_distribution") {
-                    urlCompare = "{% url 'get-statistics-by-atc-for-clinical-trial-phase-comparison' %}";
-                    compareTask= "distributionPlotCategory";
-                    compareText = "DRUG-DISEASE association studies <br> Clinical trial phase distribution";
-                    relation = "associations";
-                }
-                else if(compare_type == "calculate_path_length_DD") {
-                    urlCompare = "{% url 'get-statistics-by-atc-for-calculating-average-path-length-drug-disease' %}";
-                    compareTask= "calculatePathLengthDD";
-                    compareText = "Calculate path length of DRUG-DISEASE network";
-                }
-                else if(compare_type == "calculate_path_length_DP") {
-                    urlCompare = "{% url 'get-statistics-by-atc-for-calculating-average-path-length-drug-protein' %}";
-                    compareTask= "calculatePathLengthDP";
-                    compareText = "Calculate path length of DRUG-PROTEIN network";
-                }
-                else if(compare_type == "measure_centralization_dd") {
-                    urlCompare = "{% url 'get-statistics-by-atc-for-measure-centralization-drug-disease' %}";
-                    compareTask= "measureCentralizationDD";
-                    compareText = "Centrality measurement of DRUG-DISEASE network";
-                }
-                else if(compare_type == "measure_centralization_dp") {
-                    urlCompare = "{% url 'get-statistics-by-atc-for-measure-centralization-drug-protein' %}";
-                    compareTask= "measureCentralizationDP";
-                    compareText = "Centrality measurement of DRUG-PROTEIN network";
-                }
-                else if(compare_type == "detect_community_dd") {
-                    urlCompare = "{% url 'get-statistics-by-atc-for-detecting-community-drug-disease' %}";
-                    compareTask= "detectCommunityDD";
-                    compareText = "Community of DRUG-DISEASE network";
-                }
-                else if(compare_type == "detect_community_dp") {
-                    urlCompare = "{% url 'get-statistics-by-atc-for-detecting-community-drug-protein' %}";
-                    compareTask= "detectCommunityDP";
-                    compareText = "Community of DRUG-PROTEIN network";
-                }
-                else if(compare_type == "see_common_and_unique_elements") {
-                    urlCompare = "{% url 'get-data-for-comparing-common-and-unique-network-element' %}";
-                    compareTask= "commonUniqueElement";
-                    compareText = "Common and Unique network elements";
-                }
-        }else{
+        if (atc_comparison != "" & isValidATC(atc_comparison)) {
+            if (compare_type == "no-selection") {
+                alert("Please select a comparison type!");
+            }
+            else if (compare_type == "align_network") {
+                urlCompare = "{% url 'get-statistics-by-atc-for-network-size-comparison' %}";
+                compareTask = "alignNetwork";
+                $("#optionExplanation").html("abc");
+            }
+            else if (compare_type == "compare_network_size") { 
+                urlCompare = "{% url 'get-statistics-by-atc-for-network-size-comparison' %}";
+                compareTask = "compareNetworkSize";
+                compareText = "Network size"
+                $("#optionExplanation").html("Comparing 2 networks on number of nodes (drug, protein, disease), drug-protein interactions, and drug-disease association studies. This allows to see if one is larger or more complex than the other.");
+            }
+            else if (compare_type == "compare_network_ADR") { 
+                urlCompare = "{% url 'get-data-by-atc-for-network-ADR-comparison' %}";
+                compareTask = "compareNetworkADR";
+                compareText = "Network Adverse Drug Reaction"
+                $("#optionExplanation").html("Comparing 2 networks on number of side effects, their frequencies of drugs within the network. This allows to see if one adverse drug reaction profile is larger or more complex than the other.");
+            }
+            else if (compare_type == "compare_degree_distritution") {
+                urlCompare = "{% url 'get-data-for-comparing-network-degree-distribution' %}";
+                compareTask = "distributionPlot";
+                compareText = "Degree distribution of DRUG-PROTEIN network ";
+                relation = "nodes";
+                $("#optionExplanation").html("Comparing 2 networks on distribution of degree of drug-protein interaction nodes . This helps to understand the connectivity patterns.");
+            }
+            else if (compare_type == "compare_association_distritution") {
+                urlCompare = "{% url 'get-data-for-comparing-network-associate-distribution' %}";
+                compareTask = "distributionPlot";
+                relation = "nodes";
+                compareText = "Degree distribution of DRUG-DISEASE network ";
+                $("#optionExplanation").html("Comparing 2 networks on distribution of degree of drug-disease association nodes. This helps to understand the connectivity patterns.");
+            }
+            else if (compare_type == "compare_moa_distribution") {
+                urlCompare = "{% url 'get-statistics-by-atc-code-for-MOA-comparison' %}";
+                compareTask = "distributionPlotCategory";
+                compareText = "DRUG-PROTEIN interactions <br> Modes of action distribution";
+                relation = "interactions";
+                $("#optionExplanation").html("Examine the distribution of modes of action (target, transporter, enzyme) for drugs in both networks. This helps to identify if one network has a predominant mode of action.");
+            }
+            else if (compare_type == "see_clinical_trial_phase_distribution") {
+                urlCompare = "{% url 'get-statistics-by-atc-for-clinical-trial-phase-comparison' %}";
+                compareTask = "distributionPlotCategory";
+                compareText = "DRUG-DISEASE association studies <br> Clinical trial phase distribution";
+                relation = "associations";
+                $("#optionExplanation").html("Analyze the distribution of clinical trial phases for drug-disease associations in each network. This helps to understand the focus of clinical studies.");
+            }
+            else if (compare_type == "calculate_path_length_DD") {
+                urlCompare = "{% url 'get-statistics-by-atc-for-calculating-average-path-length-drug-disease' %}";
+                compareTask = "calculatePathLengthDD";
+                compareText = "Calculate path length of DRUG-DISEASE network";
+                $("#optionExplanation").html("Calculate the average shortest path length between drug or disease nodes in each network. This compares the efficiency of information transfer within the networks.");
+            }
+            else if (compare_type == "calculate_path_length_DP") {
+                urlCompare = "{% url 'get-statistics-by-atc-for-calculating-average-path-length-drug-protein' %}";
+                compareTask = "calculatePathLengthDP";
+                compareText = "Calculate path length of DRUG-PROTEIN network";
+                $("#optionExplanation").html("Calculate the average shortest path length between drug or protein nodes in each network. This compares the efficiency of information transfer within the networks.");
+            }
+            else if (compare_type == "measure_centralization_dd") {
+                urlCompare = "{% url 'get-statistics-by-atc-for-measure-centralization-drug-disease' %}";
+                compareTask = "measureCentralizationDD";
+                compareText = "Centrality measurement of DRUG-DISEASE network";
+                $("#optionExplanation").html("Measure the degree of centralization in each network to identify highly connected drug or disease nodes. This checks if one network has a more centralized structure than the other.");
+            }
+            else if (compare_type == "measure_centralization_dp") {
+                urlCompare = "{% url 'get-statistics-by-atc-for-measure-centralization-drug-protein' %}";
+                compareTask = "measureCentralizationDP";
+                compareText = "Centrality measurement of DRUG-PROTEIN network";
+                $("#optionExplanation").html("Measure the degree of centralization in each network to identify highly connected drug or protein nodes. This checks if one network has a more centralized structure than the other.");
+            }
+            else if (compare_type == "detect_community_dd") {
+                urlCompare = "{% url 'get-statistics-by-atc-for-detecting-community-drug-disease' %}";
+                compareTask = "detectCommunityDD";
+                compareText = "Community of DRUG-DISEASE network";
+                $("#optionExplanation").html("Apply community detection algorithms to identify clusters or modules within each network. This compares the community structures to understand functional modules.");
+            }
+            else if (compare_type == "detect_community_dp") {
+                urlCompare = "{% url 'get-statistics-by-atc-for-detecting-community-drug-protein' %}";
+                compareTask = "detectCommunityDP";
+                compareText = "Community of DRUG-PROTEIN network";
+                $("#optionExplanation").html("Apply community detection algorithms to identify clusters or modules within each network. This compares the community structures to understand functional modules.");
+            }
+            else if (compare_type == "see_common_and_unique_elements") {
+                urlCompare = "{% url 'get-data-for-comparing-common-and-unique-network-element' %}";
+                compareTask = "commonUniqueElement";
+                compareText = "Common and Unique network elements";
+                $("#optionExplanation").html("Identify the common drugs, proteins, and diseases shared between the two networks. This highlights unique elements in each network to understand their specific characteristics.");
+            }
+        } else {
             alert("Please enter a valid ATC code!");
         }
         var atc_code = $("#tabs_network").attr("data-atc-code");
-            
-        if (compareTask == "distributionPlot")
-        {
-            $.ajax( {
+
+        if (compareTask == "distributionPlot") {
+            $.ajax({
                 url: `${urlCompare}?atc_code=${atc_code}&atc_comparison=${atc_comparison}`,
                 type: "GET",
                 success: function (response) {
-                    console.log(response);
-                    var dataAtcCode = response.atc_code.distribution;
-                    var dataAtcComparison = response.atc_comparison.distribution;
-                    // if ((dataAtcCode.length>0) && (dataAtcComparison.length>0))
-                    // {
-                    //     var dataAll = response.both.distribution;
-                    //     createDistributionPlot2(dataAtcCode, dataAtcComparison, atc_code, atc_comparison, "atc_code_box", "atc_comparison_box", `${compareText}<br>`); //2 plots sharing a-xis
-                    // }else{
-                    //     createDistributionPlot(dataAtcCode, "atc_code_box", `${compareText} for <span style="color: #3498db">${atc_code}</span><br>`);
-                    //     createDistributionPlot(dataAtcComparison, "atc_comparison_box", `${compareText} for <span style="color: #3498db">${atc_comparison}</span><br>`);
-                    //     }
-                    
-                    createHistogramPlot(dataAtcCode, "atc_code_box", `${compareText} for <span style="color: #3498db">${atc_code}</span><br>`);
-                    createHistogramPlot(dataAtcComparison, "atc_comparison_box", `${compareText} for <span style="color: #3498db">${atc_comparison}</span><br>`);
+                    var dataAtcCode_classes = response.atc_code_classes;
+                    var dataAtcCode_class_count = response.atc_code_class_count;
+                    var dataAtcComparison_classes = response.atc_comparison_classes;
+                    var dataAtcComparison_class_count = response.atc_comparison_class_count;
+                    var max_class = Math.max(dataAtcCode_classes.length, dataAtcComparison_classes.length);
+                    createDistributionPlotForCategoryData1(dataAtcCode_classes, dataAtcCode_class_count, max_class, "atc_code_box", `${compareText} for <span style="color: #3498db">${atc_code}</span><br>`, relation, 'rgb(190, 186, 218)')
+                    createDistributionPlotForCategoryData1(dataAtcComparison_classes, dataAtcComparison_class_count, max_class, "atc_comparison_box", `${compareText} for <span style="color: #3498db">${atc_comparison}</span><br>`, relation, 'rgb(251, 128, 114)')
                 },
                 error: function (xhr, status, error) {
                     console.log('AJAX Error:', error);
                 }
             });
         }
-        else if (compareTask == "distributionPlotCategory")
-        {
-            $.ajax( {
+        else if (compareTask == "distributionPlotCategory") {
+            $.ajax({
                 url: `${urlCompare}?atc_code=${atc_code}&atc_comparison=${atc_comparison}`,
                 type: "GET",
                 success: function (response) {
                     var dataAtcCode = response.atc_code;
                     var dataAtcComparison = response.atc_comparison;
-                    if ((dataAtcCode.classes.length>0) && (dataAtcComparison.classes.length>0))
-                    {
+                    if ((dataAtcCode.classes.length > 0) && (dataAtcComparison.classes.length > 0)) {
                         createDistributionPlotForCategoryData2(atc_code, dataAtcCode.classes, dataAtcCode.class_count, atc_comparison, dataAtcComparison.classes, dataAtcComparison.class_count, "atc_code_box", "atc_comparison_box", `${compareText} <br>`, relation)
-                    }else{
+                    } else {
                         createDistributionPlotForCategoryData(dataAtcCode.classes, dataAtcCode.class_count, "atc_code_box", `${compareText} for <span style="color: #3498db">${atc_code}</span>`, relation);
                         createDistributionPlotForCategoryData(dataAtcComparison.classes, dataAtcComparison.class_count, "atc_comparison_box", `${compareText} for <span style="color: #3498db">${atc_comparison}</span>`, relation);
                     }
                 },
-            error: function (xhr, status, error) {
-                console.log('AJAX Error:', error);
-            }
+                error: function (xhr, status, error) {
+                    console.log('AJAX Error:', error);
+                }
             });
         }
-        else if (compareTask == "compareNetworkSize")
-        {
-            $.ajax( {
+        else if (compareTask == "compareNetworkSize") {
+            $.ajax({
                 url: `${urlCompare}?atc_code=${atc_code}&atc_comparison=${atc_comparison}`,
                 type: "GET",
                 success: function (response) {
@@ -294,14 +311,30 @@
                     var dataAtcComparison = response.atc_comparison;
                     compareNetworkSize(dataAtcCode, dataAtcComparison, "result-compare-table", `${compareText}`)
                 },
-            error: function (xhr, status, error) {
-                console.log('AJAX Error:', error);
-            }
+                error: function (xhr, status, error) {
+                    console.log('AJAX Error:', error);
+                }
             });
         }
-        else if (compareTask == "measureCentralizationDD")
-        {
-            $.ajax( {
+        else if (compareTask == "compareNetworkADR") {
+            $.ajax({
+                url: `${urlCompare}?atc_code=${atc_code}&atc_comparison=${atc_comparison}`,
+                type: "GET",
+                success: function (response) {
+                    var dataAtcCode = response.response_data.atc_code;
+                    var dataAtcComparison = response.response_data.atc_comparison;
+                    console.log("in compareNetworkADR dataAtcCode "+dataAtcCode);
+                    console.log("in compareNetworkADR dataAtcComparison "+dataAtcComparison);
+                    compareADR(dataAtcCode, "atc_code_box", `${compareText} for <span style="color: #3498db">${atc_code}</span>`)
+                    compareADR(dataAtcComparison, "atc_comparison_box", `${compareText} for <span style="color: #3498db">${atc_comparison}</span>`)
+                },
+                error: function (xhr, status, error) {
+                    console.log('AJAX Error:', error);
+                }
+            });
+        }
+        else if (compareTask == "measureCentralizationDD") {
+            $.ajax({
                 url: `${urlCompare}?atc_code=${atc_code}&atc_comparison=${atc_comparison}`,
                 type: "GET",
                 success: function (response) {
@@ -311,14 +344,13 @@
                     measureCentralizationDrugDisease(dataAtcCode, "atc_code_box", `${compareText} for <span style="color: #3498db">${atc_code}</span>`)
                     measureCentralizationDrugDisease(dataAtcComparison, "atc_comparison_box", `${compareText} for <span style="color: #3498db">${atc_comparison}</span>`)
                 },
-            error: function (xhr, status, error) {
-                console.log('AJAX Error:', error);
-            }
+                error: function (xhr, status, error) {
+                    console.log('AJAX Error:', error);
+                }
             });
         }
-        else if (compareTask == "measureCentralizationDP")
-        {
-            $.ajax( {
+        else if (compareTask == "measureCentralizationDP") {
+            $.ajax({
                 url: `${urlCompare}?atc_code=${atc_code}&atc_comparison=${atc_comparison}`,
                 type: "GET",
                 success: function (response) {
@@ -328,14 +360,13 @@
                     measureCentralizationDrugProtein(dataAtcCode, "atc_code_box", `${compareText} for <span style="color: #3498db">${atc_code}</span>`)
                     measureCentralizationDrugProtein(dataAtcComparison, "atc_comparison_box", `${compareText} for <span style="color: #3498db">${atc_comparison}</span>`)
                 },
-            error: function (xhr, status, error) {
-                console.log('AJAX Error:', error);
-            }
+                error: function (xhr, status, error) {
+                    console.log('AJAX Error:', error);
+                }
             });
         }
-        else if (compareTask == "detectCommunityDD")
-        {
-            $.ajax( {
+        else if (compareTask == "detectCommunityDD") {
+            $.ajax({
                 url: `${urlCompare}?atc_code=${atc_code}&atc_comparison=${atc_comparison}`,
                 type: "GET",
                 success: function (response) {
@@ -345,14 +376,13 @@
                     detectingCommunityDrugDisease(dataAtcCode, "atc_code_box", `${compareText} for <span style="color: #3498db">${atc_code}</span>`);
                     detectingCommunityDrugDisease(dataAtcComparison, "atc_comparison_box", `${compareText} for <span style="color: #3498db">${atc_comparison}</span>`);
                 },
-            error: function (xhr, status, error) {
-                console.log('AJAX Error:', error);
-            }
+                error: function (xhr, status, error) {
+                    console.log('AJAX Error:', error);
+                }
             });
         }
-        else if (compareTask == "detectCommunityDP")
-        {
-            $.ajax( {
+        else if (compareTask == "detectCommunityDP") {
+            $.ajax({
                 url: `${urlCompare}?atc_code=${atc_code}&atc_comparison=${atc_comparison}`,
                 type: "GET",
                 success: function (response) {
@@ -367,9 +397,8 @@
                 }
             });
         }
-        else if (compareTask == "calculatePathLengthDD")
-        {
-            $.ajax( {
+        else if (compareTask == "calculatePathLengthDD") {
+            $.ajax({
                 url: `${urlCompare}?atc_code=${atc_code}&atc_comparison=${atc_comparison}`,
                 type: "GET",
                 success: function (response) {
@@ -379,14 +408,13 @@
                     calculatePathLength(dataAtcCode, "atc_code_box", `${compareText} for <span style="color: #3498db">${atc_code}</span>`);
                     calculatePathLength(dataAtcComparison, "atc_comparison_box", `${compareText} for <span style="color: #3498db">${atc_comparison}</span>`);
                 },
-            error: function (xhr, status, error) {
-                console.log('AJAX Error:', error);
-            }
+                error: function (xhr, status, error) {
+                    console.log('AJAX Error:', error);
+                }
             });
         }
-        else if (compareTask == "calculatePathLengthDP")
-        {
-            $.ajax( {
+        else if (compareTask == "calculatePathLengthDP") {
+            $.ajax({
                 url: `${urlCompare}?atc_code=${atc_code}&atc_comparison=${atc_comparison}`,
                 type: "GET",
                 success: function (response) {
@@ -396,24 +424,23 @@
                     calculatePathLength(dataAtcCode, "atc_code_box", `${compareText} for <span style="color: #3498db">${atc_code}</span>`);
                     calculatePathLength(dataAtcComparison, "atc_comparison_box", `${compareText} for <span style="color: #3498db">${atc_comparison}</span>`);
                 },
-            error: function (xhr, status, error) {
-                console.log('AJAX Error:', error);
-            }
+                error: function (xhr, status, error) {
+                    console.log('AJAX Error:', error);
+                }
             });
         }
-        else if (compareTask == "commonUniqueElement")
-        {
-            $.ajax( {
+        else if (compareTask == "commonUniqueElement") {
+            $.ajax({
                 url: `${urlCompare}?atc_code=${atc_code}&atc_comparison=${atc_comparison}`,
                 type: "GET",
                 success: function (response) {
                     console.log(response);
                     var data = response;
-                    commonAndUniqueNodes(data,`${compareText} for <span style="color: #3498db">${atc_code}</span> and <span style="color: #3498db">${atc_comparison}</span>`);
+                    commonAndUniqueNodes(data, `${compareText} for <span style="color: #3498db">${atc_code}</span> and <span style="color: #3498db">${atc_comparison}</span>`);
                 },
-            error: function (xhr, status, error) {
-                console.log('AJAX Error:', error);
-            }
+                error: function (xhr, status, error) {
+                    console.log('AJAX Error:', error);
+                }
             });
         }
     })

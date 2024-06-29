@@ -202,6 +202,19 @@ def get_adr_data(request):
         }
     return JsonResponse({'adr_data': adr})
 
+def get_data_by_atc_for_network_ADR_comparison(request):
+    atc_code = request.GET.get("atc_code")
+    atc_comparison = request.GET.get("atc_comparison") #compare
+    if cache.get("get_data_by_atc_for_network_ADR_comparison_"+atc_code+"_"+atc_comparison):
+        response_data = cache.get("get_data_by_atc_for_network_ADR_comparison_"+atc_code+"_"+atc_comparison)
+    else:
+        atc_code_data = _get_adr_data_by_atc(atc_code)
+        atc_comparison_data = _get_adr_data_by_atc(atc_comparison)
+    response_data ={
+        "atc_code": atc_code_data,
+        "atc_comparison": atc_comparison_data,
+        }
+    return JsonResponse({"response_data": response_data})
 
 def atc_comparison_autocomplete_view(request):
     query = request.GET.get('query', '').upper()
@@ -247,12 +260,12 @@ def atc_comparison_autocomplete_view(request):
                         pass
                     
     results = list(set(results))
-    print("results before sorted ", results)
+    # print("results before sorted ", results)
     # results = sorted(results, key=lambda x: x.split()[0])
     # results = sorted(results, key=lambda x: len(x.split()[0]))
     results = sorted(results, key=lambda x: (len(x.split()[0]), x.split()[0]))
 
-    print("results after sorted ", results)
+    # print("results after sorted ", results)
     return JsonResponse({'suggestions': results})
 
 def get_drug_network(request):
@@ -1679,11 +1692,10 @@ def get_data_for_comparing_network_associate_distribution(request):
         response_data = cache.get("get_data_for_comparing_network_association_distribution_"+atc_code+"_"+atc_comparison)
     else:
         response_data = {
-            "atc_code":get_data_for_ONE_atc_code_for_comparing_network_association_distribution(atc_code), 
-            "atc_comparison":get_data_for_ONE_atc_code_for_comparing_network_association_distribution(atc_comparison), 
-            "both": {
-                "distribution": get_data_for_ONE_atc_code_for_comparing_network_association_distribution(atc_code).get("distribution") + get_data_for_ONE_atc_code_for_comparing_network_association_distribution(atc_comparison).get("distribution"), 
-            }
+            "atc_code_classes":get_data_for_ONE_atc_code_for_comparing_network_association_distribution(atc_code).get("classes"), 
+            "atc_comparison_classes":get_data_for_ONE_atc_code_for_comparing_network_association_distribution(atc_comparison).get("classes"), 
+            "atc_code_class_count":get_data_for_ONE_atc_code_for_comparing_network_association_distribution(atc_code).get("class_count"), 
+            "atc_comparison_class_count":get_data_for_ONE_atc_code_for_comparing_network_association_distribution(atc_comparison).get("class_count"), 
         }
         cache.set("get_data_for_comparing_network_association_distribution_"+atc_code+"_"+atc_comparison, response_data, 60*60)
     return JsonResponse(response_data)
@@ -1698,8 +1710,15 @@ def get_data_for_ONE_atc_code_for_comparing_network_association_distribution(atc
     for drug in drug_objs:
         associations = DrugDiseaseStudy.objects.filter(drug_bankID=drug).values_list("disease_name", flat=True)
         distribution.append(len(list(associations)))
+    
+    # Count each value
+    distribution = Counter(distribution)
+    # Sort the keys of the counter
+    distribution = dict(sorted(distribution.items()))
+    
     response_data = {
-        "distribution": distribution, 
+        "classes": list(distribution.keys()), 
+        "class_count": list(distribution.values()), 
     }
     return response_data
 
@@ -1710,11 +1729,13 @@ def get_data_for_comparing_network_degree_distribution(request):
         response_data = cache.get("get_data_for_comparing_network_degree_distribution_"+atc_code+"_"+atc_comparison)
     else:
         response_data = {
-            "atc_code":get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_code), 
-            "atc_comparison":get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_comparison), 
-            "both": {
-                "distribution": get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_code).get("distribution") + get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_comparison).get("distribution"), 
-            }
+            "atc_code_classes":get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_code).get("classes"), 
+            "atc_code_class_count":get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_code).get("class_count"), 
+            "atc_comparison_classes":get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_comparison).get("classes"), 
+            "atc_comparison_class_count":get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_comparison).get("class_count"), 
+            # "both": {
+            #     "distribution": get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_code).get("distribution") + get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_comparison).get("distribution"), 
+            # }
         }
         cache.set("get_data_for_comparing_network_degree_distribution_"+atc_code+"_"+atc_comparison, response_data, 60*60)
     return JsonResponse(response_data)
@@ -1724,14 +1745,19 @@ def get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_code
     chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
     drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
     undup_drugs = list(set(drugs))
+    
     drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
     distribution = []
     for drug in drug_objs:
         interactions = Interaction.objects.filter(drug_bankID=drug).values_list("uniprot_ID", flat=True)
         distribution.append(len(list(interactions)))
+    distribution = Counter(distribution)
+    distribution = dict(sorted(distribution.items()))
     response_data = {
-        "distribution": distribution, 
+        "classes": list(distribution.keys()), 
+        "class_count": list(distribution.values()), 
     }
+    print(atc_code , " undup_drugs ", undup_drugs, " response_data ", response_data)
     return response_data
 
 def get_data_for_comparing_common_and_unique_network_element(request):

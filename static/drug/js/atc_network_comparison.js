@@ -3,10 +3,10 @@ function reset(){
     $("#result-compare-area-text").html("");
     // $("#atc_code_box").html("");
     // $("#atc_comparison_box").html("");
-    var plottingAtcCodeBox = document.getElementById("atc_code_box");
-    plottingAtcCodeBox.style.width = '50%';
-    var plottingAtcComparisonBox = document.getElementById("atc_comparison_box");
-    plottingAtcComparisonBox.style.width = '50%';
+    var contentAtcCodeBox = document.getElementById("atc_code_box");
+    contentAtcCodeBox.style.width = '50%';
+    var contentAtcComparisonBox = document.getElementById("atc_comparison_box");
+    contentAtcComparisonBox.style.width = '50%';
 }
 
 function getLimitedTicks(integerTicks, maxTicks = 10) {
@@ -31,6 +31,7 @@ function getLimitedTicks(integerTicks, maxTicks = 10) {
 
 function createHistogramPlot(data, elementID, text){
     reset();
+    
     // target the .viz container
     const viz = d3.select('#'+elementID).html("");
 
@@ -85,10 +86,18 @@ function createHistogramPlot(data, elementID, text){
 
     // for the horizontal dimension the scale is defined for both the histogram and the density plot
     // ! the function is also used by the histogram function to determine the different bins
-    const xScale = d3
-    .scaleLinear()
-    .domain([Math.floor(d3.min(data)), Math.ceil(d3.max(data))])
-    .range([0, width]);
+    var xScale;
+    if (data.length>1){
+        xScale = d3
+        .scaleLinear()
+        .domain([Math.floor(d3.min(data)), Math.ceil(d3.max(data))])
+        .range([0, width]);
+    }else{
+        xScale = d3
+        .scaleLinear()
+        .domain([Math.floor(d3.min(data)), Math.ceil(d3.max(data))+1])
+        .range([0, width]);
+    }
 
     // histogram used to create the bins from the input data
     const histogram = d3
@@ -159,25 +168,27 @@ function createHistogramPlot(data, elementID, text){
     .attr('font-size', '1.1rem')
     .text(d => d.length);
 
-    // draw the y axis on top of the rectangles
+    const integerTicks = d3.range(1, Math.ceil(d3.max(data)) + 1); 
+    const limitedIntegerTicks = getLimitedTicks(integerTicks);
+    console.log(elementID +" data "+data +" integerTicks " + integerTicks + " limitedIntegerTicks " + limitedIntegerTicks);
+    
     const xAxis = d3
-    .axisBottom(xScale)
-    .tickPadding(10);
-
+        .axisBottom(xScale)
+        .tickPadding(10)
+        .tickFormat(d3.format('d'))
+        .tickValues(limitedIntegerTicks);
+    
     groupHistogram
     .append('g')
     .attr('class', 'axis x-axis')
     .attr('transform', `translate(0 ${height})`)
     .call(xAxis);
 
-    // style the axes of both visualizations
-    // remove all line elements
     d3
     .selectAll('.axis')
     .selectAll('line')
     .remove();
 
-    // for the horizontal axis, increase the size of the labels and include a label beneath the values
     d3
     .selectAll('.x-axis')
     .append('text')
@@ -206,6 +217,9 @@ function createHistogramPlot(data, elementID, text){
     .attr('stroke-width', 1)
     .attr('opacity', 0.25);
 }
+
+
+
 function createDistributionPlot(data, elementID, text) {
     reset();
     if (data.length>0){
@@ -336,197 +350,6 @@ function createDistributionPlot(data, elementID, text) {
         }
 }
 
-// 2 plots sharing a-xis
-// function createDistributionPlot2(dataAtcCode, dataAtcComparison, atc_code, atc_comparison, elementID1, elementID2, text) {
-//     reset();
-//     var plottingBox1 = document.getElementById(elementID1);
-//     plottingBox1.style.width = '100%';
-//     var plottingBox2 = document.getElementById(elementID2);
-//     plottingBox2.style.width = '0';
-//     var value1 = [];
-//     var value2 = [];
-
-//     const viz = d3.select('#' + elementID1)
-//         .html("");
-//     const margin = {
-//         top: 30,
-//         right: 20,
-//         bottom: 50,
-//         left: 20,
-//     };
-//     const width = 500 - (margin.left + margin.right);
-//     const height = 500 - (margin.top + margin.bottom);
-
-//     const header = viz.append('header').style('text-align', 'center');
-//     header
-//         .append('h4')
-//         .html(text);
-
-//     const svgHistogram = viz
-//         .append('svg')
-//         .attr('class', 'histogram')
-//         .attr('viewBox', `0 0 ${width + (margin.left + margin.right)} ${height + (margin.top + margin.bottom)}`);
-
-//     const groupHistogram = svgHistogram
-//         .append('g')
-//         .attr('transform', `translate(${margin.left}  ${margin.top})`);
-
-//     const xScale = d3
-//         .scaleLinear()
-//         .domain([d3.min(dataAtcCode.concat(dataAtcComparison)), d3.max(dataAtcCode.concat(dataAtcComparison))])
-//         .range([0, width]);
-
-//     // const maxValue = d3.max(data_all);
-//     // const integerTicks = d3.range(0, maxValue + 1); 
-
-//     const histogram = d3
-//         .histogram()
-//         .domain(xScale.domain())
-//         .thresholds(xScale.ticks(20));
-    
-//     const dataHistogramAtcCode = histogram(dataAtcCode);
-//     const dataHistogramAtcComparison = histogram(dataAtcComparison);
-
-
-//     const yScaleHistogram = d3
-//         .scaleLinear()
-//         .domain([0, d3.max(dataHistogramAtcCode.concat(dataHistogramAtcComparison), ({ length }) => length)])
-//         .range([height, 0]);
-
-//     const yAxisHistogram = d3
-//         .axisLeft(yScaleHistogram)
-//         .tickFormat(d3.format('d'))
-//         .tickValues(d3.ticks(yScaleHistogram.domain()[0], yScaleHistogram.domain()[1], Math.ceil(yScaleHistogram.domain()[1])));
-    
-//     groupHistogram
-//         .append('g')
-//         .attr('class', 'axis y-axis')
-//         .call(yAxisHistogram)
-//         .attr('transform', `translate(0 0)`);
-
-//     const binsAtcCode = groupHistogram
-//         .selectAll('g.bin.atc_code')
-//         .data(dataHistogramAtcCode)
-//         .enter()
-//         .append('g')
-//         .attr('class', 'bin atc_code')
-//         .attr('transform', ({ x0 }) => `translate(${xScale(x0)} 0)`);
-    
-//         binsAtcCode
-//         .append('rect')
-//         .attr('x', 0)
-//         .attr('y', d => yScaleHistogram(d.length))
-//         .attr('width', ({ x0, x1 }) => xScale(x1) - xScale(x0))
-//         .attr('height', d => height - yScaleHistogram(d.length))
-//         .attr('fill', '#4cc9f0')
-//         .attr('stroke', 'white')
-//         .attr('stroke-width', 1);
-
-//     binsAtcCode
-//         .append('text')
-//         .attr('x', ({ x0, x1 }) => (xScale(x1) - xScale(x0)) / 2)
-//         .attr('y', d => yScaleHistogram(d.length) - 5)
-//         .attr('fill', 'grey')
-//         .attr('text-anchor', 'middle')
-//         .attr('font-weight', 'bold')
-//         .attr('font-size', '1.1rem')
-//         .text(d => d.length);
-
-//         const binsAtcComparison = groupHistogram
-//         .selectAll('g.bin.atc_comparison')
-//         .data(dataHistogramAtcComparison)
-//         .enter()
-//         .append('g')
-//         .attr('class', 'bin atc_comparison')
-//         .attr('transform', ({ x0 }) => `translate(${xScale(x0)} 0)`);
-
-//     binsAtcComparison
-//         .append('rect')
-//         .attr('x', 0)
-//         .attr('y', d => yScaleHistogram(d.length))
-//         .attr('width', ({ x0, x1 }) => xScale(x1) - xScale(x0))
-//         .attr('height', d => height - yScaleHistogram(d.length))
-//         .attr('fill', '#f72585')
-//         .attr('stroke', 'white')
-//         .attr('stroke-width', 1);
-
-//     binsAtcComparison
-//         .append('text')
-//         .attr('x', ({ x0, x1 }) => (xScale(x1) - xScale(x0)) / 2)
-//         .attr('y', d => yScaleHistogram(d.length) - 5)
-//         .attr('fill', 'grey')
-//         .attr('text-anchor', 'middle')
-//         .attr('font-weight', 'bold')
-//         .attr('font-size', '1.1rem')
-//         .text(d => d.length);
-    
-//     const maxValue = Math.max(d3.max(dataAtcCode), d3.max(dataAtcComparison));
-//     const integerTicks = d3.range(0, maxValue + 1);
-//     const limitedIntegerTicks = getLimitedTicks(integerTicks);
-
-//     const xAxis = d3
-//         .axisBottom(xScale)
-//         .tickPadding(10)
-//         .tickFormat(d3.format('d'))
-//         .tickValues(limitedIntegerTicks);
-
-//     const xAxisGroup =groupHistogram
-//         .append('g')
-//         .attr('class', 'axis x-axis')
-//         .attr('transform', `translate(0 ${height})`)
-//         .call(xAxis)
-//         .attr('font-size', '10px');
-
-//     // Rotate x-tick labels if they have more than 2 digits
-//     xAxisGroup.selectAll("text")
-//     .attr("transform", function () {
-//         return this.innerHTML.length > 2 ? "rotate(-45)" : "rotate(0)";
-//     })
-//     .style("text-anchor", function () {
-//         return this.innerHTML.length > 2 ? "end" : "middle";
-//     })
-//     .attr("dx", function () {
-//         return this.innerHTML.length > 2 ? "-0.8em" : "0";
-//     })
-//     .attr("dy", function () {
-//         return this.innerHTML.length > 2 ? "0.15em" : "0.71em";
-//     });
-
-//     // Add legend
-//     const legend = svgHistogram.append('g')
-//     .attr('class', 'legend')
-//     .attr('transform', `translate(${margin.left}, ${margin.top - 20})`);
-
-//     legend.append('rect')
-//         .attr('x', 0)
-//         .attr('y', 0)
-//         .attr('width', 18)
-//         .attr('height', 18)
-//         .style('fill', '#4cc9f0');
-
-//     legend.append('text')
-//         .attr('x', 24)
-//         .attr('y', 9)
-//         .attr('dy', '.35em')
-//         .style('text-anchor', 'start')
-//         .text(atc_code);
-
-//     legend.append('rect')
-//         .attr('x', 0)
-//         .attr('y', 20)
-//         .attr('width', 18)
-//         .attr('height', 18)
-//         .style('fill', '#f72585');
-
-//     legend.append('text')
-//         .attr('x', 24)
-//         .attr('y', 29)
-//         .attr('dy', '.35em')
-//         .style('text-anchor', 'start')
-//         .text(atc_comparison);
-    
-// }
-
 function toTitleCase(str) {
     return str.toLowerCase().split(' ').map(word => {
         return word.charAt(0).toUpperCase() + word.slice(1);
@@ -656,6 +479,218 @@ function createDistributionPlotForCategoryData(classes, class_count, elementID, 
         }
 }
 
+// function createDistributionPlotForCategoryData1(classes, class_count, elementID, text, relation) {
+//     reset();
+//     if (classes.length > 0) {
+//         const data = [];
+//         for (var i = 0; i < classes.length; i++) {
+//             temp = {
+//                 name: "Degree = " + classes[i],
+//                 value: class_count[i],
+//             }
+//             data.push(temp);
+//         }
+//         const margin = {
+//             top: 20,
+//             right: 20,
+//             bottom: 20,
+//             left: 300, 
+//         };
+//         const rectHeight = 30;
+//         const width = 800 - (margin.left + margin.right);
+//         const height = rectHeight * classes.length + (margin.top + margin.bottom);
+
+//         const viz = d3.select('#' + elementID).html("");
+//         const header = viz.append('header').style('text-align', 'center').style("color", "#3498db");
+//         header.append('h4').html(text);
+
+//         const svg = viz
+//             .append('svg')
+//             .attr('viewBox', `0 0 ${width + (margin.left + margin.right)} ${height + (margin.top + margin.bottom)}`)
+//             .attr('width', width)
+//             .attr('height', height);
+
+//         const group = svg
+//             .append('g')
+//             .attr('transform', `translate(${margin.left} ${margin.top})`);
+
+//         const xScale = d3
+//             .scaleLinear()
+//             .domain([0, d3.max(data, ({ value }) => value)])
+//             .range([0, width]);
+
+//         const maxValue = d3.max(data, ({ value }) => value);
+//         const tickCount = Math.min(maxValue, 10); // Ensure we have at most 10 ticks
+//         const integerTicks = d3.ticks(0, maxValue, tickCount); // Generate up to 10 ticks
+
+//         const xAxis = d3.axisBottom(xScale)
+//             .tickValues(integerTicks) // Use the generated array of integers for tick values
+//             .tickFormat(d3.format('d')); // Ensure the format is set to integers
+
+//         const yScale = d3
+//             .scaleBand()
+//             .domain(data.map(({ name }) => name))
+//             .range([0, height])
+//             .padding(0.2);
+
+//         const yAxis = d3.axisLeft(yScale);
+
+//         group
+//             .append('g')
+//             .attr('transform', `translate(0 ${rectHeight * data.length})`)
+//             .call(xAxis)
+//             .style('font-size', '20px');
+
+//         group
+//             .append('g')
+//             .call(yAxis)
+//             .style('font-size', '20px');
+
+//         // Add x-axis label
+//         svg.append('text')
+//             .attr('class', 'x-axis-label')
+//             .attr('text-anchor', 'middle')
+//             .attr('x', width / 2 + margin.left)
+//             .attr('y', height + margin.bottom + 40) // Adjust the value as necessary for spacing
+//             .style('font-size', '20px')
+//             .text('No. of ' + relation); // Replace with your actual label
+
+//         const groups = group
+//             .selectAll('g.group')
+//             .data(data, ({ name }) => name)
+//             .enter()
+//             .append('g')
+//             .attr('class', 'group')
+//             // translate the group vertically according to the y scale
+//             .attr('transform', ({ name }) => `translate(0 ${yScale(name)})`);
+
+//         // for each data point add a rectangle describing the points awarded to the respective racer
+//         groups
+//             .append('rect')
+//             .attr('x', 0)
+//             .attr('y', 0)
+//             .style("fill", 'rgb(251, 128, 114)') // only one color
+//             .attr('width', ({ value }) => xScale(value))
+//             .attr('height', yScale.bandwidth());
+//     } else {
+//         console.log(text + " no plot");
+//         const viz = d3.select('#' + elementID).html("");
+//         const header = viz.append('header').style('text-align', 'center').style("color", "#3498db");
+//         header.append('h4').html(text).append('h5').html("There is no " + relation).style("color", "red");
+//     }
+// }
+
+
+function createDistributionPlotForCategoryData1(classes, class_count, max_class, elementID, text, relation, color) {
+    reset();
+    if (classes.length>0)
+    {
+        const data = [];
+        for (var i = 0; i < classes.length; i++) {
+            temp = {
+                name: "Degree = "+classes[i],
+                value: class_count[i],
+            }
+            data.push(temp);
+        }
+        const margin = {
+            top: 20,
+            right: 20,
+            bottom: 20,
+            left: 300, 
+        };
+        var height;
+        const width = 800 - (margin.left + margin.right);
+        height = 30 * max_class + (margin.top + margin.bottom);
+
+        const viz = d3.select('#' + elementID).html("");
+        const header = viz.append('header').style('text-align', 'center').style("color", "#3498db");
+        header.append('h4').html(text);
+
+        viz.append('div').attr('id', elementID+"_newDiv") ;
+
+        const svg = d3.select('#'+elementID+"_newDiv")
+            .append('svg')
+            .attr('viewBox', `0 0 ${width + (margin.left + margin.right)} ${height + (margin.top + margin.bottom)}`)
+            .attr('width', width)
+            .attr('height', height);
+
+        const group = svg
+            .append('g')
+            .attr('transform', `translate(${margin.left} -${margin.top})`);
+
+        const xScale = d3
+            .scaleLinear()
+            .domain([0, d3.max(data, ({ value }) => value)])
+            .range([0, width]);
+
+        const maxValue = d3.max(data, ({ value }) => value);
+        const tickCount = Math.min(maxValue, 10); // Ensure we have at most 10 ticks
+        const integerTicks = d3.ticks(0, maxValue, tickCount); // Generate up to 10 ticks
+
+        const xAxis = d3.axisBottom(xScale)
+            .tickValues(integerTicks) // Use the generated array of integers for tick values
+            .tickFormat(d3.format('d')); // Ensure the format is set to integers
+
+        // describe a qualitative scale for the y axis, for the racers' names
+        const yScale = d3
+            .scaleBand()
+            .domain(data.map(({ name }) => name))
+            .range([0, height])
+            // padding allows to separate the shapes making use of the scale and the value returned by the yScale.bandwidth() function
+            // 0.2 means 20% is dedicated to white space around the band
+            .padding(0.2);
+
+        const yAxis = d3
+            .axisLeft(yScale);
+
+        group
+            .append('g')
+            .attr('transform', `translate(0 ${height})`)
+            .call(xAxis)
+            .style('font-size', '20px');
+
+        group
+            .append('g')
+            .call(yAxis)
+            .style('font-size', '20px');
+
+        // Add x-axis label
+        svg.append('text')
+        .attr('class', 'x-axis-label')
+        .attr('text-anchor', 'middle')
+        .attr('x', width / 2 + margin.left)
+        .attr('y', height + margin.top + 10) // Adjust the value as necessary for spacing
+        .style('font-size', '20px')
+        .text('No. of '+relation); // Replace with your actual label
+
+        const groups = group
+            .selectAll('g.group')
+            .data(data, ({ name }) => name)
+            .enter()
+            .append('g')
+            .attr('class', 'group')
+            // translate the group vertically according to the y scale
+            .attr('transform', ({ name }) => `translate(0 ${yScale(name)})`);
+
+        // for each data point add a rectangle describing the points awarded to the respective racer
+        groups
+            .append('rect')
+            .attr('x', 0)
+            .attr('y', 0)
+            // .style("fill", d3.scaleOrdinal(d3.schemeSet3)) // add more colors here
+            .style("fill", color) // only one color
+            .attr('width', ({ value }) => xScale(value))
+            .attr('height', yScale.bandwidth());
+    }else{
+            console.log(text + " no plot");
+            const viz = d3.select('#' + elementID).html("");
+            const header = viz.append('header').style('text-align', 'center').style("color", "#3498db");
+            header.append('h4').html(text).append('h5').html("There is no "+relation).style("color", "red");
+        }
+}
+
+//2 plots sharing axis
 function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1, atc_comparison, classes2, class_count2, elementID1, elementID2, text, relation) {
     reset();
     var value1 = [];
@@ -978,7 +1013,7 @@ function detectingCommunityDrugDisease(data, elementID, text) {
 
 function detectingCommunityDrugProtein(data, elementID, text) {
     reset();
-
+    
     var partitionDrugData = data["partition_drug"];
     var partitionGeneData = data["partition_gene"];
 
@@ -1011,6 +1046,7 @@ function detectingCommunityDrugProtein(data, elementID, text) {
 
 function calculatePathLength(data, elementID, text) {
     reset();
+    
     var no_of_components = data["no_of_components"];
     var component_detail = data["component_detail"];
     var e = $("#" + elementID);
@@ -1040,6 +1076,8 @@ function convert(objects) {
 }
 function commonAndUniqueNodes(data, text) {
     reset();
+    $("#atc_code_box").html("");
+    $("#atc_comparison_box").html("");
     $("#result-compare-table").css("width", "40%");
     $("#result-compare-area-text").append(`<h4>${text}</h4>`);
     $("#result-compare-area-text").css("color", "#3498db");
@@ -1065,3 +1103,101 @@ function commonAndUniqueNodes(data, text) {
     $("#result-compare-table").html(htmlData);
 }
 
+function compareADR(data, elementID, text) {
+    reset();
+    var atc_level_network_adr_table = $("#" + elementID);
+    atc_level_network_adr_table.html("");
+    atc_level_network_adr_table.append(`<h4 style="text-align:center;">${text}</h4><br>`);
+    
+    if (data.length >0)
+        {
+            var table = document.createElement("table");
+            table.setAttribute("id", "adr_table_content");
+            table.html="";
+            table.style.width = "calc(100% - 60px)";
+            table.style.margin = "0 20px 40px";
+            table.setAttribute("border", "1");
+            
+            var thead = document.createElement("thead");
+            thead.style.backgroundColor = "lightgrey";
+            var headerRow = document.createElement("tr");
+            
+            var headers = ["Drugbank ID", "Drug name", "Side effect (SE)", "SE Definition", "Frequency<br>(in percentage)"];
+            headers.forEach(function(headerText) {
+                var th = document.createElement("th");
+                th.innerHTML = headerText;
+                th.style.textAlign = "center";
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            
+            var tbody = document.createElement("tbody");
+            var idx = 0;
+            
+            data.forEach(function(drug) 
+            {
+                var adr_data_length = drug.adr_data.length;
+                if (adr_data_length>0){
+                    idx+=1;
+                }
+                
+                drug.adr_data.forEach(function(adr, index) {
+                    console.log("idx ", idx, " ", adr.drug_id);
+                    var row = document.createElement("tr");
+                    if (idx % 2 === 0) {
+                        row.style.backgroundColor = "lightgrey";
+                    }
+                    
+                    if (index === 0) {
+                        var drugIdCell = document.createElement("td");
+                        drugIdCell.appendChild(document.createTextNode(drug.drug_id));
+                        drugIdCell.setAttribute("rowspan", adr_data_length);
+                        drugIdCell.style.verticalAlign="top";
+                        row.appendChild(drugIdCell);
+
+                        var drugNameCell = document.createElement("td");
+                        drugNameCell.appendChild(document.createTextNode(drug.drug_name));
+                        drugNameCell.setAttribute("rowspan", adr_data_length);
+                        drugNameCell.style.verticalAlign="top";
+                        row.appendChild(drugNameCell);
+                    }
+                    
+                    var sideEffectCell = document.createElement("td");
+                    sideEffectCell.appendChild(document.createTextNode(adr["Side effect"]));
+                    row.appendChild(sideEffectCell);
+                    
+                    var definitionCell = document.createElement("td");
+                    definitionCell.appendChild(document.createTextNode(adr.Definition));
+                    definitionCell.style.maxWidth = "500px";
+                    row.appendChild(definitionCell);
+                    
+                    var frequencyCell = document.createElement("td");
+                    var frequencyValue = adr["Frequency (in percentage)"];
+                    frequencyCell.appendChild(document.createTextNode(adr["Frequency (in percentage)"]));
+                    frequencyCell.style.textAlign = "center";
+                    if (frequencyValue <= 25) {
+                        frequencyCell.className = "color1";
+                    } else if (frequencyValue <= 50) {
+                        frequencyCell.className = "color2";
+                    } else if (frequencyValue <= 75) {
+                        frequencyCell.className = "color3";
+                    } else {
+                        frequencyCell.className = "color4";  // Corrected the logic to assign 'color4' class for values greater than 75
+                    }
+                    row.appendChild(frequencyCell);
+                    
+                    tbody.appendChild(row);
+                    });
+                });
+                    table.appendChild(tbody);
+                    atc_level_network_adr_table.append(table);
+                }
+        else
+        {
+            var text = $("<p></p>").html("There is no drug in this network that has adverse reaction");
+            text.css("color", "red").css("textAlign", "center");
+            atc_level_network_adr_table.append(text);
+
+        }
+}
