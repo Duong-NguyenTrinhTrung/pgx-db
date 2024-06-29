@@ -479,108 +479,6 @@ function createDistributionPlotForCategoryData(classes, class_count, elementID, 
         }
 }
 
-// function createDistributionPlotForCategoryData1(classes, class_count, elementID, text, relation) {
-//     reset();
-//     if (classes.length > 0) {
-//         const data = [];
-//         for (var i = 0; i < classes.length; i++) {
-//             temp = {
-//                 name: "Degree = " + classes[i],
-//                 value: class_count[i],
-//             }
-//             data.push(temp);
-//         }
-//         const margin = {
-//             top: 20,
-//             right: 20,
-//             bottom: 20,
-//             left: 300, 
-//         };
-//         const rectHeight = 30;
-//         const width = 800 - (margin.left + margin.right);
-//         const height = rectHeight * classes.length + (margin.top + margin.bottom);
-
-//         const viz = d3.select('#' + elementID).html("");
-//         const header = viz.append('header').style('text-align', 'center').style("color", "#3498db");
-//         header.append('h4').html(text);
-
-//         const svg = viz
-//             .append('svg')
-//             .attr('viewBox', `0 0 ${width + (margin.left + margin.right)} ${height + (margin.top + margin.bottom)}`)
-//             .attr('width', width)
-//             .attr('height', height);
-
-//         const group = svg
-//             .append('g')
-//             .attr('transform', `translate(${margin.left} ${margin.top})`);
-
-//         const xScale = d3
-//             .scaleLinear()
-//             .domain([0, d3.max(data, ({ value }) => value)])
-//             .range([0, width]);
-
-//         const maxValue = d3.max(data, ({ value }) => value);
-//         const tickCount = Math.min(maxValue, 10); // Ensure we have at most 10 ticks
-//         const integerTicks = d3.ticks(0, maxValue, tickCount); // Generate up to 10 ticks
-
-//         const xAxis = d3.axisBottom(xScale)
-//             .tickValues(integerTicks) // Use the generated array of integers for tick values
-//             .tickFormat(d3.format('d')); // Ensure the format is set to integers
-
-//         const yScale = d3
-//             .scaleBand()
-//             .domain(data.map(({ name }) => name))
-//             .range([0, height])
-//             .padding(0.2);
-
-//         const yAxis = d3.axisLeft(yScale);
-
-//         group
-//             .append('g')
-//             .attr('transform', `translate(0 ${rectHeight * data.length})`)
-//             .call(xAxis)
-//             .style('font-size', '20px');
-
-//         group
-//             .append('g')
-//             .call(yAxis)
-//             .style('font-size', '20px');
-
-//         // Add x-axis label
-//         svg.append('text')
-//             .attr('class', 'x-axis-label')
-//             .attr('text-anchor', 'middle')
-//             .attr('x', width / 2 + margin.left)
-//             .attr('y', height + margin.bottom + 40) // Adjust the value as necessary for spacing
-//             .style('font-size', '20px')
-//             .text('No. of ' + relation); // Replace with your actual label
-
-//         const groups = group
-//             .selectAll('g.group')
-//             .data(data, ({ name }) => name)
-//             .enter()
-//             .append('g')
-//             .attr('class', 'group')
-//             // translate the group vertically according to the y scale
-//             .attr('transform', ({ name }) => `translate(0 ${yScale(name)})`);
-
-//         // for each data point add a rectangle describing the points awarded to the respective racer
-//         groups
-//             .append('rect')
-//             .attr('x', 0)
-//             .attr('y', 0)
-//             .style("fill", 'rgb(251, 128, 114)') // only one color
-//             .attr('width', ({ value }) => xScale(value))
-//             .attr('height', yScale.bandwidth());
-//     } else {
-//         console.log(text + " no plot");
-//         const viz = d3.select('#' + elementID).html("");
-//         const header = viz.append('header').style('text-align', 'center').style("color", "#3498db");
-//         header.append('h4').html(text).append('h5').html("There is no " + relation).style("color", "red");
-//     }
-// }
-
-
 function createDistributionPlotForCategoryData1(classes, class_count, max_class, elementID, text, relation, color) {
     reset();
     if (classes.length>0)
@@ -653,15 +551,15 @@ function createDistributionPlotForCategoryData1(classes, class_count, max_class,
         group
             .append('g')
             .call(yAxis)
-            .style('font-size', '20px');
+            .style('font-size', '25px');
 
         // Add x-axis label
         svg.append('text')
         .attr('class', 'x-axis-label')
         .attr('text-anchor', 'middle')
         .attr('x', width / 2 + margin.left)
-        .attr('y', height + margin.top + 10) // Adjust the value as necessary for spacing
-        .style('font-size', '20px')
+        .attr('y', height + margin.top + 20) // Adjust the value as necessary for spacing
+        .style('font-size', '25px')
         .text('No. of '+relation); // Replace with your actual label
 
         const groups = group
@@ -689,6 +587,7 @@ function createDistributionPlotForCategoryData1(classes, class_count, max_class,
             header.append('h4').html(text).append('h5').html("There is no "+relation).style("color", "red");
         }
 }
+
 
 //2 plots sharing axis
 function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1, atc_comparison, classes2, class_count2, elementID1, elementID2, text, relation) {
