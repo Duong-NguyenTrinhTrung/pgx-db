@@ -70,9 +70,6 @@ def serve_interaction_data_json_file(request):
 def serve_general_data_json_file(request):
     atc_code = request.GET.get('atc_code')
     data = PreCachedDrugNetwork.objects.get(atc_code=atc_code)
-    print(type(json.loads(data.general_json_data)))
-    print(type(json.loads(data.general_json_data)))
-    # print(json.loads(data.general_json_data))
     return JsonResponse({'data': json.loads(data.general_json_data)})
 
 class DiseaseAssociationByDrugView:
@@ -260,12 +257,8 @@ def atc_comparison_autocomplete_view(request):
                         pass
                     
     results = list(set(results))
-    # print("results before sorted ", results)
-    # results = sorted(results, key=lambda x: x.split()[0])
-    # results = sorted(results, key=lambda x: len(x.split()[0]))
     results = sorted(results, key=lambda x: (len(x.split()[0]), x.split()[0]))
 
-    # print("results after sorted ", results)
     return JsonResponse({'suggestions': results})
 
 def get_drug_network(request):
@@ -908,16 +901,11 @@ def atc_search_view(request):
             if query_option == 'containing':
                 # Search "name" field in all models
                 results += list(AtcAnatomicalGroup.objects.filter(Q(id__icontains=inp)|Q(name__icontains=inp)).values('id', 'name'))
-                print("results  AtcAnatomicalGroup contains: ", len(results), results)
                 results += list(AtcTherapeuticGroup.objects.filter(Q(id__icontains=inp)|Q(name__icontains=inp)).values('id', 'name'))
-                print("results  AtcTherapeuticGroup contains: ", len(results), results)
                 results += list(
                     AtcPharmacologicalGroup.objects.filter(Q(id__icontains=inp)|Q(name__icontains=inp)).values('id', 'name'))
-                print("results  AtcPharmacologicalGroup contains: ", len(results), results)
                 results += list(AtcChemicalGroup.objects.filter(Q(id__icontains=inp)|Q(name__icontains=inp)).values('id', 'name'))
-                print("results  AtcChemicalGroup contains: ", len(results), results)
                 results += list(AtcChemicalSubstance.objects.filter(Q(id__icontains=inp)|Q(name__icontains=inp)).values('id', 'name'))
-                print("results AtcChemicalSubstancecontains: ", len(results), results)
             elif query_option == 'startingwith':
                 # Search "id" field in all models
                 results += list(AtcAnatomicalGroup.objects.filter(Q(id__istartswith=inp)|Q(name__istartswith=inp)).values('id', 'name'))
@@ -943,24 +931,54 @@ def get_drug_atc_association(request):
         chemicalSubstanceCodesFiltered = [c for c in allChemicalSubstanceCodes if c.startswith(atc_code)]
         drugs = DrugAtcAssociation.objects.filter(atc_id__in=chemicalSubstanceCodesFiltered).select_related('drug_id').values_list("drug_id", flat=True)
         undup_drugs = list(set(drugs))
-        associations = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
+        name_ordered_drugs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
         total_interaction = 0
+        total_association_study = 0
+        total_association_study_phase34 = 0
         interacted_protein = []
-        associations_list = [
-            {"drug_bankID": assoc.drug_bankID, "name": assoc.name, "description": assoc.description, "target_list": [ {"genename": item.uniprot_ID.genename, "gene_id": item.uniprot_ID.geneID, "uniProt_ID": item.uniprot_ID.uniprot_ID, "moa": item.interaction_type,  "count_drug": len(Interaction.objects.filter(uniprot_ID=item.uniprot_ID))} for item in Interaction.objects.filter(drug_bankID=assoc)]}
-            for assoc in associations]
+        associated_disease = []
+        associated_disease_phase34 = []
+        associations_list = \
+            [
+                {
+                    "drug_bankID": drug.drug_bankID, 
+                    "name": drug.name, 
+                    "description": drug.description, 
+
+                    "target_list": [ {"genename": interaction.uniprot_ID.genename, "gene_id": interaction.uniprot_ID.geneID, "uniProt_ID": interaction.uniprot_ID.uniprot_ID, "moa": interaction.interaction_type} for interaction in Interaction.objects.filter(drug_bankID=drug)],
+
+                    "disease_list": [{"disease_name":item.disease_name.disease_name} for item in DrugDiseaseStudy.objects.filter(drug_bankID=drug)],
+                    "disease_list_phase34": [{"disease_name":item.disease_name.disease_name} for item in DrugDiseaseStudy.objects.filter(drug_bankID=drug, clinical_trial__in=["3", "4"])],
+                }
+                for drug in name_ordered_drugs
+            ]
         for association in associations_list:
             total_interaction+=len(association.get("target_list"))
             for target in association.get("target_list"):
                 interacted_protein.append(target.get("uniProt_ID"))
+
+            total_association_study+=len(association.get("disease_list"))
+            for disease in association.get("disease_list"):
+                associated_disease.append(disease.get("disease_name"))
+
+            total_association_study_phase34+=len(association.get("disease_list_phase34"))
+            for disease in association.get("disease_list_phase34"):
+                associated_disease_phase34.append(disease.get("disease_name"))
+
         interacted_protein = list(set(interacted_protein))
+        associated_disease = list(set(associated_disease))
+        associated_disease_phase34 = list(set(associated_disease_phase34))
 
         # Create a JSON response with the data
         response_data = {
-            "associations": associations_list,
+            "associations": associations_list, # name should be relations, not associations
             "atc_code": atc_code,
             "total_interaction": total_interaction,
-            "no_of_interacted_protein":len(interacted_protein),
+            "no_of_interacted_protein": len(interacted_protein),
+            "total_association_study": total_association_study,
+            "no_of_associated_disease": len(associated_disease),
+            "no_of_associated_disease_phase34": len(associated_disease_phase34),
+            "total_association_study_phase34": total_association_study_phase34,
         }
         # Check the length of atc_code and set the cache with an appropriate timeout
         if len(atc_code) <= 5:
@@ -1376,8 +1394,6 @@ def get_statistics_by_atc_code_for_MOA_comparison(request):
     else:
         data1 = get_statistics_by_atc_for_ONE_atc_code_for_MOA_comparison(atc_code)
         data2 = get_statistics_by_atc_for_ONE_atc_code_for_MOA_comparison(atc_comparison)
-        print("atc_code ",atc_code, " data1 ", data1)
-        print("atc_comparison ",atc_comparison, " data2 ", data2)
         # max1 = max(list(data1.get("class_count")))
         # max2 = max(list(data2.get("class_count")))
         response_data = {
@@ -1710,6 +1726,7 @@ def get_data_for_ONE_atc_code_for_comparing_network_association_distribution(atc
     for drug in drug_objs:
         associations = DrugDiseaseStudy.objects.filter(drug_bankID=drug).values_list("disease_name", flat=True)
         distribution.append(len(list(associations)))
+        print("comparing_network_association_distribution, atc code ", atc_code, " ", drug, " len asso ", len(list(associations)))
     
     # Count each value
     distribution = Counter(distribution)
@@ -1757,7 +1774,6 @@ def get_data_for_ONE_atc_code_for_comparing_network_degree_distribution(atc_code
         "classes": list(distribution.keys()), 
         "class_count": list(distribution.values()), 
     }
-    print(atc_code , " undup_drugs ", undup_drugs, " response_data ", response_data)
     return response_data
 
 def get_data_for_comparing_common_and_unique_network_element(request):
