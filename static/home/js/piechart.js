@@ -83,7 +83,7 @@ function createPieChart_Proteins(){
             .text(`${pathData.data.name}`)
             .attr('class', 'data-text data-text__name')
             .attr('text-anchor', 'middle')
-            .attr('dy', '3.5rem')
+            .attr('dy', '3.0rem')
       
           // Set default active segment
           if (pathData.value === chosen) {
@@ -208,7 +208,7 @@ function createPieChart_Drugs() {
             .text(`${pathData.data.name}`)
             .attr('class', 'data-text data-text__name')
             .attr('text-anchor', 'middle')
-            .attr('dy', '3.5rem')
+            .attr('dy', '3.0rem')
       
           // Set default active segment
           if (pathData.value === max) {
@@ -265,17 +265,17 @@ function createPieChart_Drugs() {
 
 function createPieChart_ATClevel1() {
     const data = [
-        { name: "Alimentary tract and metabolism", value: 422 },
-        { name: "Blood and blood forming organs", value: 142 },
+        { name: "Alimentary tract and \nmetabolism", value: 422 },
+        { name: "Blood and blood forming\n organs", value: 142 },
         { name: "Cardiovascular system", value: 533 },
         { name: "Dermatologicals", value: 220 },
-        { name: "Genito urinary system and sex hormones", value: 327 },
-        { name: "Systemic hormonal prep, excl sex hormones", value: 65 },
-        { name: "General antiinfectives for systemic use", value: 380 },
-        { name: "Antineoplastic and immunomodulating agents", value: 306 },
+        { name: "Genito urinary system and\n sex hormones", value: 327 },
+        { name: "Systemic hormonal prep, \nexcl sex hormones", value: 65 },
+        { name: "General antiinfectives for\n systemic use", value: 380 },
+        { name: "Antineoplastic and \nimmunomodulating \nagents", value: 306 },
         { name: "Musculo-skeletal system", value: 167 },
         { name: "Nervous system", value: 445 },
-        { name: "Antiparasitic products, insecticides and repellants", value: 65 },
+        { name: "Antiparasitic products, \ninsecticides & repellants", value: 65 },
         { name: "Respiratory system", value: 286 },
         { name: "Sensory organs", value: 226 },
         { name: "Various", value: 92 }
@@ -329,6 +329,7 @@ function createPieChart_ATClevel1() {
         .attr('class', 'data-group')
         .each(function(pathData, i) {
           const group = d3.select(this)
+          const lines = pathData.data.name.split("\n")
       
           group.append('text')
             .text(`${formatValue(pathData.data.value)}`)
@@ -336,11 +337,18 @@ function createPieChart_ATClevel1() {
             .attr('text-anchor', 'middle')
             .attr('dy', '1rem')
       
-          group.append('text')
-            .text(`${pathData.data.name}`)
+          const text = group.append('text')
+            // .text(`${pathData.data.name}`)
             .attr('class', 'data-text data-text__name')
             .attr('text-anchor', 'middle')
-            .attr('dy', '3.5rem')
+            .attr('dy', '3.0rem')
+        
+          lines.forEach((line, index) => {
+                text.append('tspan')
+                    .text(line)
+                    .attr('x', 0)
+                    .attr('dy', index === 0 ? '3.0rem' : '2rem'); // Adjust line spacing as needed
+            });
       
           // Set default active segment
           if (pathData.value === max) {
@@ -468,7 +476,7 @@ function createPieChart_Mutations() {
             .text(`${pathData.data.name}`)
             .attr('class', 'data-text data-text__name')
             .attr('text-anchor', 'middle')
-            .attr('dy', '3.5rem')
+            .attr('dy', '3.0rem')
       
           // Set default active segment
           if (pathData.value === max) {

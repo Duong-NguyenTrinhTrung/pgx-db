@@ -23,9 +23,6 @@
         border-radius: 5px;
         min-width: 100%;
     }
-    /* #disease-result-table thead tr{
-        background-color: #04b970;
-    } */
 
     #disease-result-table th:first-child{
         border-top-left-radius: 5px;
@@ -37,12 +34,9 @@
         border-bottom-right-radius: 5px;
     }
 
-
-
     #disease-result-table th{
         height: 40px;
         text-align: left;
-        /* background-color: #dee2e6;  */
         font-weight: bold;
         font-size: 14px;
     }
@@ -56,7 +50,6 @@
     }
 
     #disease-result-table tr:nth-child(odd) {
-        /* background-color: rgba(241, 124, 14, 0.2); */
         background-color: white; /* Color 2 for odd rows */
     } 
 
@@ -102,9 +95,7 @@
     }
 
     td {
-        /* text-align: center;  */
         vertical-align: middle;
-        /* Vertically center the content within the td */
     }
 
     .autocomplete-outer{
@@ -126,14 +117,15 @@
 
 {% block content %}
 <div id="disease">
-    <p>Search by <i><span style="color:white;">Disease name</span></i></p>
+    <p>Search by <i><span style="color:white;">Disease name</span></i>, <span style="color:white;">Disease class</span></i>, associated <i><span style="color:white;">Drug name</span></i> or <i><span style="color:white;">ATC code</span></i>
+    <br><i>(Multiple inputs are allowed. Please use semi colons to separate the inputs)</i></p>
     <form method="get" action="">
         <table class="table table-bordered table-gray table-fulltext-two-rows">
             <tbody>
                 <tr>
                     <td>
                         <div style="position: relative;">
-                            <input id="search_disease" placeholder="Disease name"
+                            <input id="search_disease" 
                                 class="form-text form-type-textfield form-control optional ui-autocomplete-input" style="width:100%;" size="70%"
                                 autocomplete="on" />
                             <div class="autocomplete-outer">
@@ -183,7 +175,7 @@
                             <td style="vertical-align: top;" rowspan="{{ item.drugs|length }}">{{ item.disease_class }}</td>
                             <td style="text-align: center; vertical-align: top;" rowspan="{{ item.drugs|length }}">{{ item.disease_UML_CUI }}</td>
                         {% endif %}
-                        <td>{{ drug.drugname }} (<i>id: {{ drug.drug_bankID }}</i>)</td>
+                        <td>{{ drug.drugname }} <a href="https://go.drugbank.com/drugs/{{ drug.drug_bankID }}" target="_blank"><i>(id: {{ drug.drug_bankID }}</i>)</a></td>
                         <td>{{ drug.atc_code }}</td>
                         <td style="text-align: center;">{{ drug.clinical_trial }}</td>
                         <td><a href="{{ drug.link }}" target="_blank">Ref</a></td>
@@ -206,6 +198,7 @@
 {% block addon_js %}
 
 <script>
+    var prev = [];
     $(document).ready(function () {
         // autocomplete 
         var autocompleteResults = $('#disease-autocomplete-results');
@@ -219,16 +212,23 @@
                     dataType: 'json',
                     success: function (data) {
                         response(data.suggestions);
-                        console.log(data.suggestions);
+                        // console.log(data.suggestions);
                     }
                 });
             },
             autoFocus: true,
             minLength: 3,
             select: function (event, ui) {
-                $('#search_disease').val(ui.item.value);
-                $("#submit_disease").click();
-                
+                var current = $('#search_disease').val();
+                if (!current.includes(";")){ //fresh terms
+                    prev=[];
+                }
+                $('#search_disease').val(prev.join("")+ui.item.value);
+                if (!prev.includes(ui.item.value+";"))
+                {
+                    prev.push(ui.item.value+";");
+                }
+                $("#submit_disease").click();                       
                 return false;
             },
             open: function (event, ui) {
@@ -252,7 +252,7 @@
                     var bgColor;
                     for (var i = 0; i < data.response_data.length; i++) 
                     {
-                        console.log(i+ " data.response_data =  "+data.response_data[i]);
+                        // console.log(i+ " data.response_data =  "+data.response_data[i]);
                         var goToNetworkURL;
                         bgColor = i % 2 === 0 ? "white" : "#95d5b2";
                         for (var j = 0; j < data.response_data[i].drugs.length; j++) {
@@ -267,7 +267,7 @@
                                             <td style="vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_name}</td>
                                             <td style="vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_class}</td>
                                             <td style="text-align: center; vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_UML_CUI}</td>
-                                            <td>${data.response_data[i].drugs[j].drugname} (<i>id: ${data.response_data[i].drugs[j].drug_bankID}</i>)</td>
+                                            <td>${data.response_data[i].drugs[j].drugname} <a href="https://go.drugbank.com/drugs/${data.response_data[i].drugs[j].drug_bankID}" target="_blank">(<i>id: ${data.response_data[i].drugs[j].drug_bankID}</i>)</a></td>
                                             <td>${data.response_data[i].drugs[j].atc_code}</td>
                                             <td style="text-align: center;">${data.response_data[i].drugs[j].clinical_trial}</td>
                                             <td><a href="${data.response_data[i].drugs[j].link}" target="_blank">Ref</a></td>
@@ -275,7 +275,7 @@
                                         }
                             else{
                                 html_data += `<tr style="background-color:${bgColor};">
-                                            <td>${data.response_data[i].drugs[j].drugname} (<i>id: ${data.response_data[i].drugs[j].drug_bankID}</i>)</td>
+                                            <td>${data.response_data[i].drugs[j].drugname} <a href="https://go.drugbank.com/drugs/${data.response_data[i].drugs[j].drug_bankID}" target="_blank">(<i>id: ${data.response_data[i].drugs[j].drug_bankID}</i>)</a></td>
                                             <td>${data.response_data[i].drugs[j].atc_code}</td>
                                             <td style="text-align: center;">${data.response_data[i].drugs[j].clinical_trial}</td>
                                             <td><a href="${data.response_data[i].drugs[j].link}" target="_blank">Ref</a></td>
@@ -288,14 +288,14 @@
             });
         }
 
+        function add_selected_term(term){
+
+        }
         // submit
         $("#submit_disease").click(function () {
-            // console.log("submit "+$("#search_result_examples").text());
-            // $("#search_result_examples").html("Result(s)");
             document.getElementById("search_result_examples").innerHTML = "Result(s)";
-        
             var d = $("#search_disease").val();
-            console.log("search_disease.val(): "+d);
+            // console.log("search_disease.val(): "+d);
             $.ajax({
                 url: "{% url 'disease-lookup' %}?disease=" + $("#search_disease").val(),
                 success: function (data) {
@@ -319,7 +319,7 @@
                                             <td style="vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_name}</td>
                                             <td style="vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_class}</td>
                                             <td style="text-align: center; vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_UML_CUI}</td>
-                                            <td>${data.response_data[i].drugs[j].drugname} (<i>id: ${data.response_data[i].drugs[j].drug_bankID}</i>)</td>
+                                            <td>${data.response_data[i].drugs[j].drugname} <a href="https://go.drugbank.com/drugs/${data.response_data[i].drugs[j].drug_bankID}" target="_blank">(<i>id: ${data.response_data[i].drugs[j].drug_bankID}</i>)</a></td>
                                             <td>${data.response_data[i].drugs[j].atc_code}</td>
                                             <td style="text-align: center;">${data.response_data[i].drugs[j].clinical_trial}</td>
                                             <td><a href="${data.response_data[i].drugs[j].link}" target="_blank">Ref</a></td>
@@ -327,7 +327,7 @@
                                         }
                             else{
                                 html_data += `<tr style="background-color:${bgColor};">
-                                            <td>${data.response_data[i].drugs[j].drugname} (<i>id: ${data.response_data[i].drugs[j].drug_bankID}</i>)</td>
+                                            <td>${data.response_data[i].drugs[j].drugname} <a href="https://go.drugbank.com/drugs/${data.response_data[i].drugs[j].drug_bankID}" target="_blank">(<i>id: ${data.response_data[i].drugs[j].drug_bankID}</i>)</a></td>
                                             <td>${data.response_data[i].drugs[j].atc_code}</td>
                                             <td style="text-align: center;">${data.response_data[i].drugs[j].clinical_trial}</td>
                                             <td><a href="${data.response_data[i].drugs[j].link}" target="_blank">Ref</a></td>
@@ -348,24 +348,19 @@
 
         // reset
         $("#reset_disease").click(function() {
-            // console.log("reset "+$("#search_result_examples").text());
-            // $("#search_result_examples").html("Random disease examples");
+            prev = [];
+            document.getElementById("search_disease").value = "";
             document.getElementById("search_result_examples").innerHTML = "Random disease examples";
         
             $.ajax({
                     url: "{% url 'disease-lookup' %}?disease=default",
                     success: function (data) {
-                        // alert("data "+data);
-                        // alert("reset success response, length = "+ data.response_data.length);
                         $("#disease-result-tbody").html('');
                         var html_data = '';
                         var bgColor;
                         for (var i = 0; i < data.response_data.length; i++) 
-                        // for (var i = 0; i < 4; i++) 
                         {
-                            // alert(i+" drug length = "+data.response_data[i].drugs.length);
                             bgColor = i % 2 === 0 ? "white" : "#d8f3dc";
-                            // for (var j = 0; j < 4; j++) {
                             for (var j = 0; j < data.response_data[i].drugs.length; j++) {
                                 var goToNetworkURL;
                                 if (data.response_data[i].drugs[j].atc_code === "None") {
@@ -374,14 +369,13 @@
                                 else {
                                     goToNetworkURL = `<a href="{% url 'atc-detail-view' %}?group_id=${data.response_data[i].drugs[j].atc_code.charAt(0)}&detail=${data.response_data[i].drugs[j].atc_code}">Go to network</a>`;
                                 }
-                                // console.log(goToNetworkURL);
                                 if (j==0){
 
                                     html_data += `<tr style="background-color:${bgColor};">
                                                 <td style="vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_name}</td>
                                                 <td  style="vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_class}</td>
                                                 <td style="text-align: center; vertical-align: top;" rowspan="${data.response_data[i].drugs.length}">${data.response_data[i].disease_UML_CUI}</td>
-                                                <td>${data.response_data[i].drugs[j].drugname} (<i>id: ${data.response_data[i].drugs[j].drug_bankID}</i>)</td>
+                                                <td>${data.response_data[i].drugs[j].drugname} <a href="https://go.drugbank.com/drugs/${data.response_data[i].drugs[j].drug_bankID}" target="_blank">(<i>id: ${data.response_data[i].drugs[j].drug_bankID}</i>)</a></td>
                                                 <td>${data.response_data[i].drugs[j].atc_code}</td>
                                                 <td style="text-align: center;">${data.response_data[i].drugs[j].clinical_trial}</td>
                                                 <td><a href="${data.response_data[i].drugs[j].link}" target="_blank">Ref</a></td>
@@ -389,7 +383,7 @@
                                             }
                                 else{
                                     html_data += `<tr style="background-color:${bgColor};">
-                                                <td>${data.response_data[i].drugs[j].drugname} (<i>id: ${data.response_data[i].drugs[j].drug_bankID}</i>)</td>
+                                                <td>${data.response_data[i].drugs[j].drugname} <a href="https://go.drugbank.com/drugs/${data.response_data[i].drugs[j].drug_bankID}" target="_blank">(<i>id: ${data.response_data[i].drugs[j].drug_bankID}</i>)</a></td>
                                                 <td>${data.response_data[i].drugs[j].atc_code}</td>
                                                 <td style="text-align: center;">${data.response_data[i].drugs[j].clinical_trial}</td>
                                                 <td><a href="${data.response_data[i].drugs[j].link}" target="_blank">Ref</a></td>

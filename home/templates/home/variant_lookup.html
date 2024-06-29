@@ -287,8 +287,14 @@
             autoFocus: true,
             minLength: 3,
             select: function (event, ui) {
-                $('#search_variant').val(ui.item.value);
-                $("#submit_variant").click();
+                if (ui.item.value.includes("Show all results")) {
+                    $('#search_variant').val(this.val());
+                    // 
+                } 
+                else {
+                    $('#search_variant').val(ui.item.value);
+                    $("#submit_variant").click();
+                }
                 return false;
             },
             open: function (event, ui) {
@@ -353,7 +359,35 @@
                 }
             });
         }
-    
+        function variant_search_all() {
+         
+            var variant_id = $("#search_variant").val().split(" ")[0].trim();
+            var method = "GET";
+            var url= "{% url 'variant-lookup' %}?variant_id=" + variant_id;
+
+            $.ajax({
+                url: url,
+                method: method,
+                
+                success: function(data){
+                    $("#variant-result-tbody").html("");
+                    var html_data = "";
+                    data.variants.forEach(item => {
+                        html_data+=`<tr>
+                            <td>${item.VariantMarker}</td>
+                            <td>${item.geneID}</td>
+                            <td>${item.genename}</td>
+                            <td>${item.pt}</td>
+                            <td><a href="/gene/gene_detail/${item.geneID}?variant_marker=${item.VariantMarker}" target="_blank" rel="noopener noreferrer"><i>See variant effect scores and associations</i></a></td>
+                        </tr>`;
+                    });
+                    $("#variant-result-tbody").html(html_data);
+                },
+                error: function(error){
+                    console.error("Error:", error);
+                }
+            });
+        }
         function variant_search(){
             document.getElementById("search_result_examples").innerHTML = "Result(s)";
         

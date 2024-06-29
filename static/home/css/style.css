@@ -374,15 +374,22 @@ a.external_link:link, a.external_link:visited, a.external_link:hover, a.external
 
 .data-text__value {
   font-size: 50px;
-  transform: translateY(-14px);
+  /* move up  */
+  transform: translateY(-14px); 
   opacity: 0;
 }
 
 .data-text__name {
   font-size: 14px;
+  /* move down  */
   transform: translateY(14px);
   opacity: 0;
 }
+/* .data-text__longname {
+  font-size: 14px;
+  transform: translateY(14px);
+  opacity: 0; 
+}*/
 
 .data-text--show {
   transform: translateY(0);

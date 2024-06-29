@@ -20,7 +20,7 @@ from .views import (
     get_statistics_by_atc_for_detecting_community_drug_disease, 
     get_statistics_by_atc_for_calculating_average_path_length_drug_disease,
     get_statistics_by_atc_for_calculating_average_path_length_drug_protein,
-    atc_comparison_autocomplete_view, get_adr_data, AdrByDrugView, get_adr_data_by_atc, serve_drug_data_json_file, serve_protein_data_json_file, serve_interaction_data_json_file, serve_general_data_json_file
+    atc_comparison_autocomplete_view, get_adr_data, AdrByDrugView, get_adr_data_by_atc, serve_drug_data_json_file, serve_protein_data_json_file, serve_interaction_data_json_file, serve_general_data_json_file, get_data_by_atc_for_network_ADR_comparison
 )
 
 urlpatterns = [
@@ -77,6 +77,7 @@ urlpatterns = [
     path('get_data_for_comparing_network_degree_distribution/', views.get_data_for_comparing_network_degree_distribution, name='get-data-for-comparing-network-degree-distribution'),
     path('get_data_for_comparing_network_associate_distribution/', views.get_data_for_comparing_network_associate_distribution, name='get-data-for-comparing-network-associate-distribution'),
     path('get_statistics_by_atc_for_network_size_comparison/', views.get_statistics_by_atc_for_network_size_comparison, name='get-statistics-by-atc-for-network-size-comparison'),
+    path('get_data_by_atc_for_network_ADR_comparison/', views.get_data_by_atc_for_network_ADR_comparison, name='get-data-by-atc-for-network-ADR-comparison'),
     path('get_statistics_by_atc_for_clinical_trial_phase_comparison/', views.get_statistics_by_atc_for_clinical_trial_phase_comparison, name='get-statistics-by-atc-for-clinical-trial-phase-comparison'),
     path('get_statistics_by_atc_code_for_MOA_comparison/', views.get_statistics_by_atc_code_for_MOA_comparison, name='get-statistics-by-atc-code-for-MOA-comparison'),
     path('get_statistics_by_atc_for_measure_centralization_drug_disease/', views.get_statistics_by_atc_for_measure_centralization_drug_disease, name='get-statistics-by-atc-for-measure-centralization-drug-disease'),

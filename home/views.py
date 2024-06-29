@@ -96,6 +96,7 @@ def variant_autocomplete_view(request):
     
     results = []
     if variants.exists():
+        number_variants = len(variants)
         if len(variants) > 15:
             variants = variants[:15]
         results = [
@@ -103,6 +104,8 @@ def variant_autocomplete_view(request):
             " (" + variant.Gene_ID.gene_id + ")"
             for variant in variants
         ]
+        if number_variants > 15:
+            results.append(f"Show all results ({number_variants})")
     return JsonResponse({'suggestions': results})
 
 def drug_autocomplete_view(request):
@@ -364,6 +367,36 @@ def get_atc_code(drug_bankID):
         return None
 
 def variant_lookup(request):
+    context = {}
+    variant_id = request.GET.get('variant_id')
+    if variant_id:
+        if variant_id != 'default':
+            objects = Variant.objects.filter(VariantMarker=variant_id)
+        else:
+            objects = Variant.objects.all()[:20]
+        variants = []
+        for item in objects:
+            variants.append({
+                "VariantMarker": item.VariantMarker,
+                'genename': item.Gene_ID.genename,
+                'geneID': item.Gene_ID.gene_id,
+                'pt': item.Gene_ID.primary_transcript, # primary transcript
+            })
+        return JsonResponse({'variants': variants})
+    else:
+        objects = Variant.objects.all()[:20]
+        variants = []
+        for item in objects:
+            variants.append({
+                "VariantMarker": item.VariantMarker,
+                'genename': item.Gene_ID.genename,
+                'geneID': item.Gene_ID.gene_id,
+                'pt': item.Gene_ID.primary_transcript, # primary transcript
+            })
+        return render(request, 'home/variant_lookup.html', {'variants': variants})
+        # return render(request, 'home/Drugs_Indications_Targets.html', {'variants': variants})
+
+def variant_search(request):
     context = {}
     variant_id = request.GET.get('variant_id')
     if variant_id:
@@ -965,15 +998,25 @@ def contribute_to_pgx(request):
     return render(request, 'home/contribute_to_pgx.html', context)
 
 def disease_lookup(request):
-    disease = request.GET.get('disease')
+    input = request.GET.get('disease')
+    # print("-----disease_lookup disease ", input)
     context = {}
-    if disease:
-        if disease != 'default':
-            diseases = Disease.objects.filter(disease_name=disease)
-        else:
-            diseases = Disease.objects.all()[:3]
+    if input:
+        
+        if input != 'default':
+            results = []
+            terms = input.split(";")
+            for term in terms:
+                # from autocomplete selection, we only have disease name
+                diseases = Disease.objects.filter(Q(disease_name=term))
+                if len(diseases) > 0:
+                    for disease in diseases:
+                        results.append(disease)
+        else: # this is for reset 
+            results = Disease.objects.all()[:6]
         response_data = []
-        for d in diseases:
+        for d in results:
+                # print(d, " type ", type(d) )
                 temp=[]
                 drugs = DrugDiseaseStudy.objects.filter(disease_name__disease_name=d.disease_name).values_list('drug_bankID', 'clinical_trial', 'link')
                 for item in drugs:
@@ -990,12 +1033,9 @@ def disease_lookup(request):
                     'disease_UML_CUI': d.disease_UML_CUI,
                     "drugs": temp,
                 })
-            
-        # context["response_data"] = response_data
         return JsonResponse({'response_data': response_data})
-        # return render(request, 'home/disease_lookup.html', context)
     else:
-        diseases = Disease.objects.all()[:3]
+        diseases = Disease.objects.all()[:6]
         response_data = []
         for d in diseases:
                 temp=[]
@@ -1051,12 +1091,33 @@ def disease_statistics(request):
 
     return render(request, 'home/disease_statistics.html', context)
 
-
 def disease_autocomplete_view(request):
     query = request.GET.get('query', '')
-    diseases = Disease.objects.filter(Q(disease_name__icontains=query))
+    input = query.split(";")[-1]
+    print("input ", input)
+    results = []
+    # First: assume input is disease name
+    diseases = Disease.objects.filter(Q(disease_name__icontains=input)|Q(disease_class__icontains=input))
     if len(diseases) > 0:
-        results = [disease.disease_name  for disease in diseases]
-    else:
-        results = []
+        for disease in diseases:
+            results.append(disease.disease_name)
+    # print("disease related search , result = ", diseases)
+
+    # Second: assume input is drug name
+    diseases = DrugDiseaseStudy.objects.filter(drug_bankID__name__icontains=input)
+    # print("drug related search , result = ", diseases)
+    if len(diseases) > 0:
+        for disease in diseases:
+            results.append(disease.disease_name.disease_name)
+
+    # Third: assume input is ATC code
+    drugs = DrugAtcAssociation.objects.filter(atc_id__id__istartswith=input).values_list('drug_id', flat=True)
+
+    for drug in drugs:
+        diseases = DrugDiseaseStudy.objects.filter(drug_bankID__drug_bankID=drug)
+        if len(diseases) > 0:
+            for disease in diseases:
+                results.append(disease.disease_name.disease_name)
+    # print("atc related search, result = ", results)
+
     return JsonResponse({'suggestions': results})
