@@ -91,10 +91,24 @@
         background-color: #43bccd;
     }
 
+    a.phase1{
+        color: #ffa5ab ;
+    }
+    a.phase2{
+        color: #da627d;
+    }
+    a.phase3{
+        color: #a53860;
+    }
+    a.phase4{
+        color: #450920;
+    }
+
     .text.target {
         background: #ff99c8;
         color: white;
     }
+
 
     .text.transporter {
         background: #662e9b;
@@ -226,7 +240,7 @@
 {% autoescape off %}
 <div class="grid-container">
     {% include 'atc_detail/left_navigation.html' %}
-    <div id="atc_right" class="col-8">
+    <div id="atc_right" class="col-9">
         <!-- block for showing the drug table -->
         <div id='drug-table'>
         </div>
@@ -614,12 +628,12 @@
         right_panel_text.style.fontWeight = "bold";
         var right_panel_text_guide = document.createElement("span");
         right_panel_text_guide.style.fontSize = "14px";
-
+        
         var associations = response.associations;
         var drug_bank_ids = [];
         // Check if the 'associations' key exists in the JSON response
         if (associations.length > 0) {
-            var tableHtml = '<table id="associated_drug_tbl" ><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID</th><th style="white-space: nowrap;">Drug name</th><th style="white-space: nowrap; text-align: center;">No. of </br>interacting proteins</th><th style="white-space: nowrap;">List of interacting proteins</br><i>(Show in gene names)</i> &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th><th>Short description of drug</th></tr></thead><tbody>';
+            var tableHtml = '<table id="associated_drug_tbl" ><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID</th><th style="white-space: nowrap;">Drug name</th><th>Short description of drug</th><th style="white-space: nowrap; text-align: center;">No. of </br>interacting <br>proteins</th><th style="white-space: nowrap;text-align: center;">List of interacting proteins</br><i style="font-style: italic; font-weight: 400; color: rgb(51, 122, 183);">(Shown in alphabetically sorted gene names)</i></th><th style="text-align: center;">No. of association studies</th><th style="text-align: center;">List of diseases in studies<br><i style="font-style: italic; font-weight: 400; color:rgb(51, 122, 183)">(Darker colors mean greater clinical trials, which range from 1 to 4. Click to each will open its disease detail page)</i></th></tr></thead><tbody>';
 
             for (var i = 0; i < associations.length; i++) {
                 var row = associations[i];
@@ -637,7 +651,22 @@
                     else if (row.target_list[j].moa == "carrier") {
                         className = "carrier";
                     }
-                    targetLinks.push(`<a style="color: white;" class="uniProt_ID ${className}" onclick="showData(this, '${row.target_list[j].uniProt_ID}')" target="_blank" data-href="/gene/${row.target_list[j].gene_id}"> ${row.target_list[j].genename}</a>`);
+                    targetLinks.push(`<a style="color: white;" class="uniProt_ID ${className}" target="_blank" href="/gene/gene_detail/${row.target_list[j].gene_id}"> ${row.target_list[j].genename}</a>`);
+                }
+                //
+                var diseaseLinks = [];
+                for (var j = 0; j < row.disease_list.length; j++) {
+                    var phase_class = "phase1"
+                    if (row.disease_list[j].phase == "2") {
+                        phase_class = "phase2";
+                    }
+                    else if (row.disease_list[j].phase == "3") {
+                        phase_class = "phase3";
+                    }
+                    else if (row.disease_list[j].phase == "4") {
+                        phase_class = "phase4";
+                    }
+                    diseaseLinks.push(`<a class="${phase_class}" target="_blank" href="/disease_lookup/?disease_info=${row.disease_list[j].disease_name}"> ${row.disease_list[j].disease_name}</a>`);
                 }
                 tableHtml += `
                 <tr style="white-space: nowrap;">
@@ -650,9 +679,11 @@
                         </a> <a href="https://go.drugbank.com/drugs/${row.drug_bankID}" style="font-size:14px; color:grey; text-decoration: underline;" target="_blank";>[Ref]</a>
                     </td>
                     <td style="vertical-align: top;" >${row.name}</td>
-                    <td style="vertical-align: top; text-align: center;">${row.target_list.length}</td>
-                    <td style="white-space: normal;">${targetLinks}</td>
                     <td class="long-content" style="vertical-align: top;">${row.description}</td>
+                    <td style="vertical-align: top; text-align: center;">${row.target_list.length}</td>
+                    <td style="white-space: normal;">${targetLinks.join("; ")}</td>
+                    <td style="vertical-align: top;">${row.disease_list.length}</td>
+                    <td class="long-content" style="vertical-align: top;">${diseaseLinks.join("; ")}</td>
                 </tr>
                 `
             }
@@ -702,12 +733,12 @@
             right_panel.appendChild(right_panel_text);
             if (associations.length > 1) {
                 right_panel_text_guide.innerHTML = `</br> <i>** In the 1st column, click on each Drugbank ID to show the individual network for that specific drug or click <a onclick="toggleDivVisibility(this, '${atc_url}')">here</a> to switch back to the ATC level network of </i> ${response.atc_code}
-                </br> <i>** In the 4th column, on each gene name, <u>click</u> to roll to the view of target-drug; <u>double click</u> to open the gene detail page; </i>
-                </br> <i>*** Also in the 4th column, on each gene name, its color indicates type of interaction, as <span class="text target"/> target </span>, <span class="text transporter"/> transporter </span>, <span class="text carrier"/> carrier </span>, and <span class="text enzyme"/> enzyme </span>`;
+                </br> <i>*** In the 5th column, on each gene name, its color indicates type of interaction, as <span class="text target"/> target </span>, <span class="text transporter"/> transporter </span>, <span class="text carrier"/> carrier </span>, and <span class="text enzyme"/> enzyme </span>. <u>Click</u> to each will open its gene detail page;`;
             }
             else {
-                right_panel_text_guide.innerHTML = `</br> <i>** In the 4th column, on each gene name, <u>click</u> to roll to the view of target-drug; <u>double click</u> to open the gene detail page; </i> 
-                </br> <i>*** Also in the 4th column, on each gene name, its color indicates type of interaction, as <span class="text target"/> target </span>, <span class="text transporter"/> transporter </span>, <span class="text carrier"/> carrier </span>, and <span class="text enzyme"/> enzyme </span>`;
+                right_panel_text_guide.innerHTML = `</br> <i>*** In the 5th column, on each gene name, its color indicates type of interaction, as <span class="text target"/> target </span>, <span class="text transporter"/> transporter </span>, <span class="text carrier"/> carrier </span>, and <span class="text enzyme"/> enzyme </span>. <u>Click</u> to each will open its gene detail page;`
+                // </br> <i>*** In the 7th column, disease names are listed in gradient colors. Darker colors mean greater clinical trials, which range from 1 to 4. <u>Click</u> to each will open its disease detail page;` 
+                
             }
             right_panel.appendChild(right_panel_text_guide);
             right_panel.appendChild(right_panel_content);

@@ -116,7 +116,7 @@ li.atc_checkbox:checked {
 }
 #atc_right_table{
     width: 98%;
-    max-height: 250px;
+    max-height: 350px;
     overflow-y: auto;
     margin-bottom: 20px;
     table-layout: fixed;
@@ -148,7 +148,7 @@ li.atc_checkbox:checked {
     white-space: normal; /* Allow text to wrap to the next line */
     overflow: hidden; /* Hide overflowing content */
     text-overflow: ellipsis; /* Show ellipsis (...) for truncated text */
-    width: 100%; /* Allow the cell to expand as needed */
+    width: 25%; /* Allow the cell to expand as needed */
   }
   
   /* Provide a horizontal scrollbar for the third column */

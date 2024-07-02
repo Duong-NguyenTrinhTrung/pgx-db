@@ -356,15 +356,8 @@ def get_drug_protein_data(request, drug_bank_id):
         drug = Drug.objects.get(drug_bankID=drug_bank_id)
     except Drug.DoesNotExist:
         raise Http404("Drug does not exist")
-
     data = DrugNetworkGetDataService(drug=drug).get_protein_data()
-
     return JsonResponse(data, safe=False)
-
-
-
-
-
 
 # Retrieve data for many drugs
 def get_drugs_data(request):
@@ -921,6 +914,17 @@ def atc_search_view(request):
         return render(request, 'atc_search_result.html', context)
     return render(request, 'atc_search_result.html', {"results": results})
 
+#helper function
+def process_list_dict(d, unique_key, sorting_key, reverse):
+    temp = []
+    seen = set()
+    for item in d:
+        if item.get(unique_key) not in seen:
+            seen.add(item.get(unique_key))
+            temp.append(item)
+    # Now sort the list
+    temp = sorted(temp, key=lambda x: x[sorting_key], reverse=reverse)
+    return temp
 
 def get_drug_atc_association(request):
     atc_code = request.GET.get("atc_code")
@@ -945,10 +949,11 @@ def get_drug_atc_association(request):
                     "name": drug.name, 
                     "description": drug.description, 
 
-                    "target_list": [ {"genename": interaction.uniprot_ID.genename, "gene_id": interaction.uniprot_ID.geneID, "uniProt_ID": interaction.uniprot_ID.uniprot_ID, "moa": interaction.interaction_type} for interaction in Interaction.objects.filter(drug_bankID=drug)],
+                    "target_list": process_list_dict([{"genename": interaction.uniprot_ID.genename, "gene_id": interaction.uniprot_ID.geneID, "uniProt_ID": interaction.uniprot_ID.uniprot_ID, "moa": interaction.interaction_type} for interaction in Interaction.objects.filter(drug_bankID=drug)], "genename", "genename", False),
 
-                    "disease_list": [{"disease_name":item.disease_name.disease_name} for item in DrugDiseaseStudy.objects.filter(drug_bankID=drug)],
-                    "disease_list_phase34": [{"disease_name":item.disease_name.disease_name} for item in DrugDiseaseStudy.objects.filter(drug_bankID=drug, clinical_trial__in=["3", "4"])],
+                    "disease_list": process_list_dict([{"disease_name":item.disease_name.disease_name, "phase": item.clinical_trial} for item in DrugDiseaseStudy.objects.filter(drug_bankID=drug)], 'disease_name', 'phase', True),
+
+                    "disease_list_phase34": process_list_dict([{"disease_name": item.disease_name.disease_name, "phase": item.clinical_trial} for item in DrugDiseaseStudy.objects.filter(drug_bankID=drug, clinical_trial__in=["3", "4"])], 'disease_name', 'phase', True),
                 }
                 for drug in name_ordered_drugs
             ]

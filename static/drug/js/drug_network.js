@@ -57,22 +57,15 @@ if (urlParams.has("atc_code")) {
     json_interactionData =
       "/drugs_network/interaction_data?drug_bank_ids=" + drug_bank_ids.join(",");
   }
+    // json_GeneralFile =
+    //   "/drugs_network/general_data?drug_bank_ids=" + drug_bank_ids.join(",");
+    // json_drugData =
+    //   "/drugs_network/drug_data?drug_bank_ids=" + drug_bank_ids.join(",");
+    // json_proteinData =
+    //   "/drugs_network/protein_data?drug_bank_ids=" + drug_bank_ids.join(",");
+    // json_interactionData =
+    //   "/drugs_network/interaction_data?drug_bank_ids=" + drug_bank_ids.join(",");
 }
-
-// function readPrecachedJSONFromDatabase(url) {
-//     var data;
-//     $.ajax({
-//       url: url,
-//       method: "GET",
-//       success: function (data) {
-//         data = data;
-//       },
-//       error: function (error) {
-//           console.error("Error:", error);
-//       }
-//     });
-//     return data;
-//   };
 
 function readPrecachedJSONFromDatabase(url) {
   return new Promise(function (resolve, reject) {
@@ -122,36 +115,20 @@ var drugStatusNameForDialog = "";
 var selectedDrugName1 = "";
 let menu;
 
-// (async function() {
-//   try {
-//       const data = await readPrecachedJSONFromDatabase("your_url_here");
-//       console.log("Data:", data);
-//   } catch (error) {
-//       console.error("Error:", error);
-//   }
-// })();
-// Function to read the Drugs JSON data file
+
 async function readDrugJSON() {
   const jsonFilePath = json_drugData; //url
   try {
     const jsonData = await readPrecachedJSONFromDatabase(jsonFilePath);
-    // console.log("JSON Data:", jsonData);
-
-    // Assuming your JSON data is an array of objects, adjust this code accordingly
-    // drug_xlsxData = jsonData.map(item => item.fields);
     if (typeof jsonData === "string") {
       try {
         var drug_xlsxData1 = JSON.parse(jsonData);
-        //console.log("Data type is string, Parsing data",drug_xlsxData );
-        // var matchingRow = drug_xlsxData.find((row) => row.fields.name === "Sennosides").fields;
-        //   console.log("matching row", matchingRow)
         drug_xlsxData = drug_xlsxData1.map((item) => {
           if (item && item.fields && item.pk) {
             item.fields.pk = item.pk;
           }
           return item.fields;
         });
-        //console.log("Final Drug Data", drug_xlsxData);
       } catch (error) {
         console.error("Error parsing JSON string:", error);
         return;
@@ -159,7 +136,7 @@ async function readDrugJSON() {
     } else {
       drug_xlsxData = jsonData;
     }
-    // readProteinJSON();
+    // alert("finally, type of drug_xlsxData: "+typeof drug_xlsxData + " length "+drug_xlsxData.length);
     (async function () {
       await readProteinJSON();
     })();
@@ -170,31 +147,16 @@ async function readDrugJSON() {
 
 async function readProteinJSON() {
   const jsonFilePath = json_proteinData;
-  // protein_xlsxData = readPrecachedJSONFromDatabase(json_proteinData);
-  // readInteractionJSON();
   try {
     protein_xlsxData = await readPrecachedJSONFromDatabase(jsonFilePath);
-    // readInteractionJSON();
+    // alert("finally, type of protein_xlsxData: "+typeof protein_xlsxData + " length "+protein_xlsxData.length);
     (async function () {
       await readInteractionJSON();
     })();
   } catch (error) {
     console.error("Error:", error);
   }
-  // protein_xlsxData = jsonData;
-  //console.log("ProteinData", protein_xlsxData);
-
-  // fetch(jsonFilePath)
-  //   .then((response) => response.json())
-  //   .then((jsonData) => {
-  //     protein_xlsxData = jsonData;
-  //     //console.log("ProteinData", protein_xlsxData);
-
-  //     readInteractionJSON();
-  //   })
-  //   .catch((error) => {
-  //     console.error("Error reading the file:", error);
-  //   });
+  
 }
 
 async function readInteractionJSON() {
@@ -203,38 +165,20 @@ async function readInteractionJSON() {
     const interaction_xlsxData = await readPrecachedJSONFromDatabase(
       jsonFilePath
     );
-    console.log("JSON Data:", interaction_xlsxData);
     processData(numberofnodes, slicedata);
   } catch (error) {
     console.error("Error:", error);
   }
-  // fetch(jsonFilePath)
-  //   .then((response) => response.json())
-  //   .then((jsonData) => {
-  //     interaction_xlsxData = jsonData;
-  //     // console.log("InteractionData",interaction_xlsxData);
-  //     // console.log("End of Logs ");
-  //     processData(numberofnodes, slicedata);
-  //   })
-  //   .catch((error) => {
-  //     console.error("Error reading the file:", error);
-  //   });
+  
 }
 
 window.onload = function () {
   (async function () {
     await readDrugJSON();
   })();
-  // readDrugJSON();
-  // processData(numberofnodes, slicedata);
-  // getDrugJsonData(drugBankId);
 };
 
 function getDrugJsonData(drugBankId) {
-  // Call to Server to get the data
-  //
-  // protein_xlsxData
-  // interaction_xlsxData
   var url = "/get-drug-network";
   $.ajax(
     {
@@ -246,8 +190,6 @@ function getDrugJsonData(drugBankId) {
     }
   );
 
-  // call process data
-  //processData(numberofnodes);
 }
 
 var exportButton = document.getElementById("exportButton");
@@ -1793,7 +1735,6 @@ function processData(numberofnodes, slicedata) {
       catch {
         data = data.data;
       }
-      console.log(data, "here is the data ");
 
       const uniqueProteinClasses = [
         ...new Set(data.map((d) => d.protein_name)),
