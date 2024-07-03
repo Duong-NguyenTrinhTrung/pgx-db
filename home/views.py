@@ -30,6 +30,11 @@ from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from urllib.parse import unquote
 
+
+def get_atc_code_statistics(request):
+    context = {}
+    return render(request, 'home/atc_code_statistics.html', context)
+
 def variant_mapper(request):
     context = {}
     return render(request, 'home/variant_mapper.html', context)

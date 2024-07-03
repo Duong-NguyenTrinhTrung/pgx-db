@@ -105,14 +105,14 @@
 
     #disease-search-intro {
         display: flex;
-        align-items: center;
+        align-items: top;
         justify-content: center;
         width: 70%;
         margin: 0 auto;
         margin-top: 40px;
     }
     #sub-disease-search-intro-text{
-        width: 100%;
+        width: 70%;
         text-align: justify;
     }
     #sub-disease-search-intro-image{
@@ -123,17 +123,20 @@
 {% endblock %}
 
 {% block content %}
-
+<a href="" target="_blank"></a>
 <div id="disease-search-intro">
     <div id="sub-disease-search-intro-text">
             <h3>DISEASES (Drug indication)</h3>
             <p>
-                Our database provides comprehensive information on approved and investigational drug-indication associations. Approved drug-indications are sourced from RepurposeDrugs, which utilizes a semi-automated pipeline and ClinicalTrial's API, while investigational indications are extracted from the ChEMBL database. We have compiled 1,574 unique drug-indications, mapping them to Unified Medical Language-Concept Unique Identifiers (UML-CUIs) available at DisGeNET. These indications are further aggregated into 25 classes for easier navigation. 
+                Our database provides comprehensive information on approved and investigational drug-indication associations. Approved drug-indications are sourced from <a href="https://repurposedrugs.org/" target="_blank">RepurposeDrugs</a>, which utilizes a semi-automated pipeline and <a href="https://clinicaltrials.gov/data-api/api" target="_blank">ClinicalTrial's API</a>, while investigational indications are extracted from the <a href="https://www.ebi.ac.uk/chembl/" target="_blank">ChEMBL</a> database. We have compiled ~1,600 unique drug-indications, mapping them to Unified Medical Language-Concept Unique Identifiers (UML-CUIs) available at <a href="https://www.disgenet.org/" target="_blank">DisGeNET</a>. These indications are further aggregated into 25 classes for easier navigation. 
+                <br>
+                <br>
+                The image on the right shows the dataflow we used to retrieve the disease data.
             </p>
     </div>
-    <!-- <div id="sub-disease-search-intro-image">
-        <img src="/static/drug/image/atc4.png" alt="Atc code example" style="width: 70%; margin-left: 50px;">
-    </div> -->
+    <div id="sub-disease-search-intro-image">
+        <img src="/static/disease/images/data.png" alt="Atc code example" style="width: 70%; margin-left: 70px;">
+    </div>
 </div>
 
 <div id="disease">
