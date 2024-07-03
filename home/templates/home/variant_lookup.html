@@ -202,12 +202,41 @@
         max-width: 100%;
         overflow-x: auto;
     }
+
+    #variant-search-intro {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 70%;
+        margin: 0 auto;
+        margin-top: 40px;
+    }
+    #sub-variant-search-intro-text{
+        width: 55%;
+        text-align: justify;
+    }
+    #sub-variant-search-intro-image{
+        width: 45%;
+    }
+
 </style>
 {% endblock %}
-
-
-
 {% block content %}
+
+<div id="variant-search-intro">
+    <div id="sub-variant-search-intro-text">
+            <h3>VARIANTS</h3>
+            <p>
+                Users can search for variant data occurring on our collected genes. For each variant, we retrieved its basic annotation (gene, transcript, protein position, wildtype and mutant amino acid, codons), its association study statistics (sourced from <a href="https://app.genebass.org/" target="_blank">Genebass</a> ) and corresponding variant effect prediction scores (sourced from <a href="https://www.ensembl.org/index.html" target="_blank">Ensembl</a> ) from over 41 algorithms, including SIFT, Polyphen, PrimateAI, and AlphaMissense, normalized to facilitate comparisons.
+                As an example, the image on the right shows violin plots summarizing effect prediction scores of 10 variants with means of these scores >= 0.7 in gene <a href="/gene/gene_detail/ENSG00000120659/" target="_blank">TNFSF11</a>
+                <br>
+                </p>
+    </div>
+    <div id="sub-variant-search-intro-image">
+        <img src="/static/variant/images/variant-plot.png" alt="Atc code example" style="width: 100%; margin-left: 10px;">
+    </div>
+</div>
+
 <div id="variant">
     <p>Enter a genename, gene Ensembl ID or variant in <i><span style="color:#f8f9fa;">Ensembl</span></i> format</p>
     <form method="get" action="">

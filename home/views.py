@@ -232,7 +232,7 @@ def tutorial(request):
     return render(request, 'home/tutorial.html', context)
 
 def sort_dict(my_dict):
-    sorted_items_desc = sorted(my_dict.items(), key=lambda item: item[1])
+    sorted_items_desc = sorted(my_dict.items(), key=lambda item: item[1], reverse = True)
     sorted_dict_desc = dict(sorted_items_desc)
     return sorted_dict_desc
 
@@ -274,10 +274,10 @@ def get_adr(drugbank_id):
                     else:
                         color4_data[" ".join(se)]=freq
             adr = {
-                    "color1": sort_dict(color1_data), 
-                    "color2": sort_dict(color2_data), 
-                    "color3": sort_dict(color3_data), 
                     "color4": sort_dict(color4_data), 
+                    "color3": sort_dict(color3_data), 
+                    "color2": sort_dict(color2_data), 
+                    "color1": sort_dict(color1_data), 
                 }
         else:
             adr = "NA"  
@@ -311,10 +311,10 @@ def drug_lookup(request):
             adr = get_adr(item.drug_bankID)
             if adr!="NA":
                 adr_json = {
-                    "color1": [f"{key} ({value}" for key, value in adr.get("color1", {}).items()],
-                    "color2": [f"{key} ({value}" for key, value in adr.get("color2", {}).items()],
-                    "color3": [f"{key} ({value}" for key, value in adr.get("color3", {}).items()],
                     "color4": [f"{key} ({value}" for key, value in adr.get("color4", {}).items()],
+                    "color3": [f"{key} ({value}" for key, value in adr.get("color3", {}).items()],
+                    "color2": [f"{key} ({value}" for key, value in adr.get("color2", {}).items()],
+                    "color1": [f"{key} ({value}" for key, value in adr.get("color1", {}).items()],
                 }
             else:
                 adr_json = "NA"
@@ -452,6 +452,7 @@ def target_lookup(request):
                     'genename': item.genename,
                     'geneID': item.geneID,
                     'protein_name': item.protein_name,
+                    'protein_class': Protein.objects.get(uniprot_ID=item.uniprot_ID).Protein_class,
                     "drug_data": [
                         {
                             "drug_id": interaction.drug_bankID.drug_bankID,
@@ -473,6 +474,7 @@ def target_lookup(request):
                 'genename': item.genename,
                 'geneID': item.geneID,
                 'protein_name': item.protein_name,
+                'protein_class': Protein.objects.get(uniprot_ID=item.uniprot_ID).Protein_class,
                 "drug_data": [
                     {
                         "drug_id": interaction.drug_bankID.drug_bankID,

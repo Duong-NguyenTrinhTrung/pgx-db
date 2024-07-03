@@ -1,7 +1,5 @@
 {% extends "home/base.html" %}
 {% load static %}
-
-
 {% block addon_css %}
 
 <style>
@@ -10,7 +8,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        margin-top: 80px;
+        margin-top: 40px;
     }
 
     #disease-result{
@@ -52,16 +50,11 @@
     #disease-result-table tr:nth-child(odd) {
         background-color: white; /* Color 2 for odd rows */
     } 
-
-
-
-    /* Add background colors to the form and the paragraph */
     #disease p
    {
         display: block;
         width: 70%;
-        background-color: rgba(4, 185, 112, 0.8);
-        /* color: 7c469d; */
+        background-color: #74c69d;
         padding: 10px;
         border-radius: 5px;
     }
@@ -110,15 +103,42 @@
         left: 0;
     }
 
-
+    #disease-search-intro {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 70%;
+        margin: 0 auto;
+        margin-top: 40px;
+    }
+    #sub-disease-search-intro-text{
+        width: 100%;
+        text-align: justify;
+    }
+    #sub-disease-search-intro-image{
+        width: 35%;
+    }
 </style>
 
 {% endblock %}
 
 {% block content %}
+
+<div id="disease-search-intro">
+    <div id="sub-disease-search-intro-text">
+            <h3>DISEASES (Drug indication)</h3>
+            <p>
+                Our database provides comprehensive information on approved and investigational drug-indication associations. Approved drug-indications are sourced from RepurposeDrugs, which utilizes a semi-automated pipeline and ClinicalTrial's API, while investigational indications are extracted from the ChEMBL database. We have compiled 1,574 unique drug-indications, mapping them to Unified Medical Language-Concept Unique Identifiers (UML-CUIs) available at DisGeNET. These indications are further aggregated into 25 classes for easier navigation. 
+            </p>
+    </div>
+    <!-- <div id="sub-disease-search-intro-image">
+        <img src="/static/drug/image/atc4.png" alt="Atc code example" style="width: 70%; margin-left: 50px;">
+    </div> -->
+</div>
+
 <div id="disease">
     <p>Search by <i><span style="color:white;">Disease name</span></i>, <span style="color:white;">Disease class</span></i>, associated <i><span style="color:white;">Drug name</span></i> or <i><span style="color:white;">ATC code</span></i>
-    <br><i>(Multiple inputs are allowed. Please use semi colons to separate the inputs)</i></p>
+    <br><i style="font-weight: 400; color: white;">(Multiple inputs are allowed. Please use semi colons to separate the inputs)</i></p>
     <form method="get" action="">
         <table class="table table-bordered table-gray table-fulltext-two-rows">
             <tbody>
@@ -153,12 +173,12 @@
     <p id="search_result_examples" style="margin: 20px 0 20px; font-size: 20px; font-weight: bold;">Random disease examples</p>
     <table id="disease-result-table">
         <thead>
-            <tr style="background-color: rgba(4, 185, 112, 0.8);">
+            <tr style="background-color: #74c69d;">
                 <th>Disease name</th>
                 <th>Disease class</th>
                 <th>Disease_UML_CUI</th>
                 <th>Associated drug(s)</th>
-                <th>ATC code</th>
+                <th style="text-align: center;">ATC code<br>(assigned <br>for drug)</th>
                 <th style="text-align: center;">Phase of clinical study</th>
                 <th>Association study</th>
                 <th style="text-align: center;">Drug-disease network</th>
@@ -176,7 +196,7 @@
                             <td style="text-align: center; vertical-align: top;" rowspan="{{ item.drugs|length }}">{{ item.disease_UML_CUI }}</td>
                         {% endif %}
                         <td>{{ drug.drugname }} <a href="https://go.drugbank.com/drugs/{{ drug.drug_bankID }}" target="_blank"><i>(id: {{ drug.drug_bankID }}</i>)</a></td>
-                        <td>{{ drug.atc_code }}</td>
+                        <td style="text-align: center;">{{ drug.atc_code }}</td>
                         <td style="text-align: center;">{{ drug.clinical_trial }}</td>
                         <td><a href="{{ drug.link }}" target="_blank">Ref</a></td>
                         <!-- href=" -->
