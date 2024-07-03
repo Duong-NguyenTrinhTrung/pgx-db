@@ -1,7 +1,7 @@
 # from django.conf.urls import url
 from django.urls import path, re_path
 from django.views.decorators.cache import cache_page
-from .views import Home, drug_target_network, drug_lookup, target_lookup, drug_autocomplete_view, protein_autocomplete_view, variant_autocomplete_view, variant_lookup, chromosome_mapper, variant_mapper, target_statistics, about_pgx, get_chromosome_mapping, get_variant_mapping, get_chromosome_mapping_example, get_variant_mapping_example, anno_from_autocomplete_view, variant_anno_from_autocomplete_view, disease_lookup, disease_statistics, disease_autocomplete_view, contribute_to_pgx, tutorial, get_se_definition
+from .views import Home, drug_target_network, drug_lookup, target_lookup, drug_autocomplete_view, protein_autocomplete_view, variant_autocomplete_view, variant_lookup, chromosome_mapper, variant_mapper, target_statistics, about_pgx, get_chromosome_mapping, get_variant_mapping, get_chromosome_mapping_example, get_variant_mapping_example, anno_from_autocomplete_view, variant_anno_from_autocomplete_view, disease_lookup, disease_statistics, disease_autocomplete_view, contribute_to_pgx, tutorial, get_se_definition, get_atc_code_statistics
 
 
 urlpatterns = [
@@ -34,4 +34,6 @@ urlpatterns = [
     path('disease_lookup/', cache_page(3600*24*365)(disease_lookup), name='disease-lookup'),
     path('disease_statistics/', cache_page(3600*24*365)(disease_statistics), name='disease-statistics'),
     path('disease_autocomplete_view/', disease_autocomplete_view, name='disease-autocomplete-view'),
+
+    path('get_atc_code_statistics/', cache_page(3600*24*365)(get_atc_code_statistics), name='get-atc-code-statistics'),
 ]

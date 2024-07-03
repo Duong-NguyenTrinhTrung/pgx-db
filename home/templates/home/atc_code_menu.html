@@ -1,0 +1,15 @@
+{% load static %}
+<!-- RECEPTORS -->
+<li class="dropdown gpcr {% if current_site == 'gpcr' %}highlight_menu{% endif %}" id="atc_code_menu">
+
+    <a tabindex="0" href="{{ hosts.gpcr }}/" class="dropdown-toggle" data-toggle="dropdown" role="button" data-submenu aria-expanded="false">
+        ATC codes<span class="caret"></span>
+    </a>
+    <ul class="dropdown-menu" role="menu">
+        <li><a href="{% url 'atc-lookup' %}">ATC classification hierachy browser</a></li>
+        <li class="divider"></li>
+        <li><a  href="{% url 'get-atc-code-statistics' %}">ATC code statistics</a></li>
+    </ul>
+</li>
+
+

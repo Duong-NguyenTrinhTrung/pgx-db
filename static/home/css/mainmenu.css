@@ -137,6 +137,18 @@ li#disease_menu {
   margin-left: 6px;
 }
 
+li#atc_code_menu {
+  background-position: 8px 4px;
+  background-image: url("/static/home/logo/atc_code/atc.png");
+  background-size: 40px;
+  background-repeat: no-repeat;
+}
+
+li#atc_code_menu > a {
+  padding-left: 56px; /* Adjust padding to create space for the image */
+  display: inline-block; /* Ensure the padding takes effect */
+}
+
 li#target_menu {
   margin-left: -11px;
   background-position: 12px -2px;
