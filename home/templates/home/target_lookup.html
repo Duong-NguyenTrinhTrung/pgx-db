@@ -13,7 +13,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        margin-top: 80px;
+        margin-top: 20px;
     }
 
     #target-result{
@@ -137,11 +137,58 @@
         max-width: 100%;
         overflow-x: auto;
     }
+    #target-search-intro {
+        display: flex;
+        align-items: top;
+        justify-content: center;
+        width: 70%;
+        margin: 0 auto;
+        margin-top: 40px;
+    }
+    #sub-target-search-intro-text{
+        width: 55%;
+        text-align: justify;
+    }
+    #sub-target-search-intro-image{
+        width: 45%;
+    }
+    
+
+    .tooltiptext {
+        visibility: hidden;
+        width: 300px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 10000;
+        /* opacity: 0;
+        transition: opacity 0.3s; */
+    }
+        
 </style>
 
 {% endblock %}
 
 {% block content %}
+
+<div id="target-search-intro">
+    <div id="sub-target-search-intro-text">
+        <h3>INTERACTING PROTEINS (target, enzyme, carrier, transporter)</h3>
+        <p>
+            Users can search for 2,939 interacting proteins for the integrated drugs and compounds in PGxDB. We classified the protein targets into 14 superfamilies, named: <span style="color: #ef476f">adhesion</span>, <span style="color: #9381ff">ion channel</span>, <span style="color: #06d6a0">kinase</span>, <span style="color: #118ab2">enzyme (other than kinase)</span>, <span style="color: #073b4c">GPCR</span>, <span style="color: #390099">transporter</span>, <span style="color: #9e0059">membrane receptor (other than GPCRs)</span>, <span style="color: #ff0054">secreted protein</span>, <span style="color: #ff5400">structural protein</span>, <span style="color: #ffbd00">epigenetic regulator</span>, <span style="color: #6d4c3d">nuclear receptor</span>, <span style="color: #8ac926">transcription factor</span>, <span style="color: #1982c4">surface antigen</span>, and<span style="color: #6a4c93"> unknown</span> (for proteins for which we could not find any superfamily designation).  These superfamilies were originally derived from <a href="https://www.ebi.ac.uk/chembl/" target="_blank">ChEMBL</a> database (version 33) and were further finetuned. 
+            <br>
+            For each protein, we also show its  primary sequence and predicted 3D structure (from AlphaFold protein structure database), then we map variants occurring on its corresponding encoding gene (data retrieved from the GRCh38 genome assembly). As an example, the image on the right shows marks of 3 missent variants on <i>3D structure of Vascular endothelial growth factor receptor 1 (VEGFR-1)</i> encoded from FLT1 gene <a href="" target=""_blank>FLT1</a> which results in amino acid changes at positions 41, 101, 147 from histidine (H) to tyrosine (Y), tyrosine (Y) and asparagine (N), respectively.
+            </p>
+    </div>
+    <div id="sub-target-search-intro-image" style="position: relative;">
+        <img id="flt1-image" src="/static/protein/images/FLT1.png" alt="3D structure of Vascular endothelial growth factor receptor 1 (VEGFR-1) encoded from FLT1 gene" style="width: 90%; margin-left: 60px;">
+        <span class="tooltiptext" id="tooltip-text"><i>Marks of 3 missense variants on gene FLT1 which results in amino acid changes at positions 41, 101, 147 from histidine (H) to tyrosine (Y), tyrosine (Y) and asparagine (N), respectively.</i></span>
+    </div>
+</div>
+
 <div id="target">
     <p>Search by <i><span style="color:#f8f9fa;">UniProt accession number</span></i>, <i><span
                 style="color:#f8f9fa;">protein name</span></i>, <i><span
@@ -187,6 +234,7 @@
             <tr>
                 <th style="text-align: left;">UniProtID</th>
                 <th style="max-width: 200px;">Protein name</th>
+                <th style="max-width: 200px;">Protein class</th>
                 <th style="text-align: left;">Gene ID</th>
                 <th style="text-wrap: nowrap; text-align: left;">Gene symbol</th>
                 <th style="text-align: left;">Details</th>
@@ -198,6 +246,7 @@
                 <tr>
                     <td>{{ item.uniprot_ID }}</td>
                     <td style="max-width: 200px;">{{ item.protein_name }}</td>
+                    <td style="text-align: center;">{{ item.protein_class }}</td>
                     <td>{{ item.geneID }}</td>
                     <td>{{ item.genename }}</td>
                     <td><a href="{% url 'gene:get-gene-detail-data' item.geneID %}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
@@ -218,16 +267,32 @@
 
                 </tr>
             {% endfor %}
-
         </tbody>
     </table>
-
 </div>
 
 {% endblock %}
 {% block addon_js %}
 <script>
     $(document).ready(function () {
+        document.getElementById('flt1-image').addEventListener('mousemove', function(e) {
+            console.log("mouse move");
+            var tooltip = document.getElementById('tooltip-text');
+            var x = e.clientX;
+            var y = e.clientY;
+            tooltip.style.top = (y + 20) + 'px';
+            tooltip.style.left = (x + 20) + 'px';
+            tooltip.style.visibility = 'visible';
+            // tooltip.style.opacity = '1';
+        });
+
+        document.getElementById('flt1-image').addEventListener('mouseout', function() {
+            console.log("mouse out");
+            var tooltip = document.getElementById('tooltip-text');
+            tooltip.style.visibility = 'hidden';
+            // tooltip.style.opacity = '0';
+        });
+
         var autocompleteResults = $('#protein-autocomplete-results');
         $('#search_protein').autocomplete({
             minLength: 3,
@@ -318,7 +383,8 @@
                             }
                             html_data += `<tr>
                                 <td style="max-width: 200px;">${item.uniprot_ID}</td>
-                                <td>${item.protein_name}</td>
+                                <td style="max-width: 200px;">${item.protein_name}</td>
+                                <td style="text-align: center;">${item.protein_class}</td>
                                 <td>${item.geneID}</td>
                                 <td>${item.genename}</td>
                                 <td><a href="/gene/gene_detail/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
@@ -356,7 +422,8 @@
                             }
                             html_data += `<tr>
                                 <td style="max-width: 200px;">${item.uniprot_ID}</td>
-                                <td>${item.protein_name}</td>
+                                <td style="max-width: 200px;">${item.protein_name}</td>
+                                <td style="text-align: center;">${item.protein_class}</td>
                                 <td>${item.geneID}</td>
                                 <td>${item.genename}</td>
                                 <td><a href="/gene/gene_detail/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
@@ -394,6 +461,7 @@
                             html_data += `<tr>
                                 <td>${item.uniprot_ID}</td>
                                 <td style="max-width: 200px;">${item.protein_name}</td>
+                                <td style="text-align: center;">${item.protein_class}</td>
                                 <td>${item.geneID}</td>
                                 <td>${item.genename}</td>
                                 <td><a href="/gene/gene_detail/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>

@@ -633,7 +633,7 @@
         var drug_bank_ids = [];
         // Check if the 'associations' key exists in the JSON response
         if (associations.length > 0) {
-            var tableHtml = '<table id="associated_drug_tbl" ><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID</th><th style="white-space: nowrap;">Drug name</th><th>Short description of drug</th><th style="white-space: nowrap; text-align: center;">No. of </br>interacting <br>proteins</th><th style="white-space: nowrap;text-align: center;">List of interacting proteins</br><i style="font-style: italic; font-weight: 400; color: rgb(51, 122, 183);">(Shown in alphabetically sorted gene names)</i></th><th style="text-align: center;">No. of association studies</th><th style="text-align: center;">List of diseases in studies<br><i style="font-style: italic; font-weight: 400; color:rgb(51, 122, 183)">(Darker colors mean greater clinical trials, which range from 1 to 4. Click to each will open its disease detail page)</i></th></tr></thead><tbody>';
+            var tableHtml = '<table id="associated_drug_tbl" ><thead style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID</th><th style="white-space: nowrap;">Drug name<br><i style="font-style: italic; font-weight: 400; color: rgb(51, 122, 183);">(Alphabetically sorted)</i></th><th>Short description of drug</th><th style="white-space: nowrap; text-align: center;">No. of </br>interacting <br>proteins</th><th style="white-space: nowrap;text-align: center;">List of interacting proteins</br><i style="font-style: italic; font-weight: 400; color: rgb(51, 122, 183);">(Shown in alphabetically sorted gene names)</i></th><th style="text-align: center;">No. of association studies</th><th style="text-align: center;">List of diseases in studies<br><i style="font-style: italic; font-weight: 400; color:rgb(51, 122, 183)">(Darker colors mean greater phases of clinical studies, which range from 1 to 4. Click to each will open its disease detail page)</i></th></tr></thead><tbody>';
 
             for (var i = 0; i < associations.length; i++) {
                 var row = associations[i];
@@ -668,6 +668,7 @@
                     }
                     diseaseLinks.push(`<a class="${phase_class}" target="_blank" href="/disease_lookup/?disease_info=${row.disease_list[j].disease_name}"> ${row.disease_list[j].disease_name}</a>`);
                 }
+                
                 tableHtml += `
                 <tr style="white-space: nowrap;">
                     <td style="vertical-align: top;">
@@ -681,9 +682,9 @@
                     <td style="vertical-align: top;" >${row.name}</td>
                     <td class="long-content" style="vertical-align: top;">${row.description}</td>
                     <td style="vertical-align: top; text-align: center;">${row.target_list.length}</td>
-                    <td style="white-space: normal;">${targetLinks.join("; ")}</td>
-                    <td style="vertical-align: top;">${row.disease_list.length}</td>
-                    <td class="long-content" style="vertical-align: top;">${diseaseLinks.join("; ")}</td>
+                    <td style="white-space: normal;text-align: center;">${targetLinks.length===0 ? "-" : targetLinks.join("; ")}</td>
+                    <td style="vertical-align: top;text-align: center;">${row.disease_list.length}</td>
+                    <td class="long-content" style="vertical-align: top;text-align: center;">${diseaseLinks.length === 0 ? "-" : diseaseLinks.join("; ")}</td>
                 </tr>
                 `
             }
@@ -720,7 +721,7 @@
                 association34_plural_form = "association";
             }
 
-            right_panel_text.innerHTML = "In the network associated with <span style='color: red;'>" + response.atc_code+"</span>, there " + verb + " <i style='color: black'>" + associations.length + "</i> " + drug_plural_form + ":<br> - interacting with <i style='color: black'>" + response.no_of_interacted_protein + "</i> " + protein_plural_form + " in <i style='color: black'>" + response.total_interaction + "</i> " + interaction_plural_form + ", <br> - associating with <i style='color: black'>" + response.no_of_associated_disease + "</i> " + disease_plural_form + " in <i style='color: black'>" + response.total_association_study + "</i> association "+association_plural_form + " (<i style='color: black'>" + response.no_of_associated_disease_phase34 +"</i> "+disease34_plural_form+ " and <i style='color: black'>" + response.total_association_study_phase34 + "</i> " + association34_plural_form + " in clinical trial phase 3, 4)";
+            right_panel_text.innerHTML = "In the network associated with <span style='color: red;'>" + response.atc_code+"</span>, there " + verb + " <i style='color: black'>" + associations.length + "</i> " + drug_plural_form + ":<br> - interacting with <i style='color: black'>" + response.no_of_interacted_protein + "</i> " + protein_plural_form + " in <i style='color: black'>" + response.total_interaction + "</i> " + interaction_plural_form + ", <br> - associating with <i style='color: black'>" + response.no_of_associated_disease + "</i> " + disease_plural_form + " in <i style='color: black'>" + response.total_association_study + "</i> association "+association_plural_form + " (Only <i style='color: black'>" + response.no_of_associated_disease_phase34 +"</i> "+disease34_plural_form+ " and <i style='color: black'>" + response.total_association_study_phase34 + "</i> " + association34_plural_form + " in clinical trial phase 3, 4 will be shown in the network visualization below)";
 
             var atc_url = "{% url 'drugs-network' %}" + "?drug_bank_ids=" + drug_bank_ids.toString();
             right_panel_text_guide.style.fontWeight = "italic";

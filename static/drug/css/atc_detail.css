@@ -17,13 +17,12 @@
     padding: 20px;
 }
 
-
-
-
-
-
 #associated_drug_tbl th {
     background-color: #f2f2f2;
+}
+
+#associated_drug_tbl thead {
+    background-color: #adb5bd;
 }
 
 #associated_drug_tbl th,

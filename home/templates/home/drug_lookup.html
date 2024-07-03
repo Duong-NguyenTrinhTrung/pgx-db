@@ -124,11 +124,58 @@
         background-color: white;
     }
 
+    #drug-search-intro {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 70%;
+        margin: 0 auto;
+        
+    }
+    #sub-drug-search-intro-text{
+        width: 60%;
+        text-align: justify;
+    }
+    #sub-drug-search-intro-image{
+        width: 40%;
+    }
+
 </style>
 
 {% endblock %}
 
 {% block content %}
+<div id="drug-search-intro">
+    <div id="sub-drug-search-intro-text">
+        <h3>DRUGS</h3>
+        <div>
+            <p>
+                Drug entities are the central focus of PGxDB. Users can search for 6,259 drug-like molecules (small molecules and biologics) interacting with one or more proteins. Among these, 432 are biologics (including antibodies, vaccines, recombinant therapeutic proteins, or other biological molecules) and 5,827 are small molecules. Drugs are further classified into six categories based on their clinical development and approval status: approved, vet-approved, nutraceutical, experimental, investigational, and illicit. Most drugs have assigned ATC codes. We provide network views where drugs, their interacting proteins, and associated diseases are organized based on ATC codes. Other aspects are also presented, such as adverse drug reactions, pharmacogenomics, and statistics.
+                As an example, the image on the right shows the drug-protein interactions and drug-disease associations for <a href="/drug_lookup/?drugbank_id=DB01234" target="_blank">Dexamethasone</a> (DrugBank identifier = DB01234) with 16 assigned ATC codes: 
+                <a href="/atc_detail_view/?group_id=R&detail=R01AD53" target="_blank">R01AD53</a>, 
+                <a href="/atc_detail_view/?group_id=D&detail=D07XB05" target="_blank">D07XB05</a>, 
+                <a href="/atc_detail_view/?group_id=D&detail=R01AD03" target="_blank">R01AD03</a>, 
+                <a href="/atc_detail_view/?group_id=D&detail=D10AA03" target="_blank">D10AA03</a>, 
+                <a href="/atc_detail_view/?group_id=S&detail=S01CB01" target="_blank">S01CB01</a>, 
+                <a href="/atc_detail_view/?group_id=S&detail=S02CA06" target="_blank">S02CA06</a>, 
+                <a href="/atc_detail_view/?group_id=S&detail=S03CA01" target="_blank">S03CA01</a>, 
+                <a href="/atc_detail_view/?group_id=C&detail=C05AA09" target="_blank">C05AA09</a>, 
+                <a href="/atc_detail_view/?group_id=S&detail=S01CA01" target="_blank">S01CA01</a>, 
+                <a href="/atc_detail_view/?group_id=D&detail=D07CB04" target="_blank">D07CB04</a>, 
+                <a href="/atc_detail_view/?group_id=H&detail=H02AB02" target="_blank">H02AB02</a>, 
+                <a href="/atc_detail_view/?group_id=S&detail=S01BA01" target="_blank">S01BA01</a>, 
+                <a href="/atc_detail_view/?group_id=A&detail=A01AC02" target="_blank">A01AC02</a>, 
+                <a href="/atc_detail_view/?group_id=S&detail=S03BA01" target="_blank">S03BA01</a>, 
+                <a href="/atc_detail_view/?group_id=D&detail=D07AB19" target="_blank">D07AB19</a>, 
+                <a href="/atc_detail_view/?group_id=S&detail=S02BA06" target="_blank">S02BA06</a>
+                <br>
+                </p>
+        </div>
+    </div>
+    <div id="sub-drug-search-intro-image">
+        <img src="/static/drug/image/drug-search-example.png" alt="Atc code example" style="width: 90%; margin-left: 40px;">
+    </div>
+</div>
 <div id="drug">
     <p>Search by <i><span style="color:#9c6644;">Drugbank ID</span></i> or <i><span style="color:#9c6644;">drug name</span></i></p>
     <form method="get" action="">
@@ -203,7 +250,8 @@
                             <div class="modal-dialog modal-dialog-centered" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="modalLabel">Adverse Drug Reactions</h5>
+                                        <h4 class="modal-title" id="modalLabel">Adverse Drug Reactions for <i>{{ drug.name }}</i></h4>
+                                        <h5 style="font-style: italic; color:#337ab7;">Adverse drug reactions below are sorted descendingly based on frequencies (in brackets) in the surveyed populations</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
@@ -356,7 +404,10 @@
                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="modalLabel">Adverse Drug Reactions</h5>
+                                            
+                                            <h4 class="modal-title" id="modalLabel">Adverse Drug Reactions for <i>${item.name}</i></h4>
+                                            <h5 style="font-style: italic; color:#337ab7;">Adverse drug reactions below are sorted descendingly based on frequencies (in brackets) in the surveyed populations</h5>
+
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
@@ -436,7 +487,9 @@
                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                     <div class="modal-content">
                                         <div class="modal-header">
-                                            <h5 class="modal-title" id="modalLabel">Adverse Drug Reactions</h5>
+                                            <h4 class="modal-title" id="modalLabel">Adverse Drug Reactions for <i>${item.name}</i></h4>
+                                            <h5 style="font-style: italic; color:#337ab7;">Adverse drug reactions below are sorted descendingly based on frequencies (in brackets) in the surveyed populations</h5>
+
                                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
@@ -518,7 +571,9 @@
                                     <div class="modal-dialog modal-dialog-centered" role="document">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="modalLabel">Adverse Drug Reactions</h5>
+                                                <h4 class="modal-title" id="modalLabel">Adverse Drug Reactions for <i>${item.name}</i></h4>
+                                                <h5 style="font-style: italic; color:#337ab7;">Adverse drug reactions below are sorted descendingly based on frequencies (in brackets) in the surveyed populations</h5>
+
                                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
