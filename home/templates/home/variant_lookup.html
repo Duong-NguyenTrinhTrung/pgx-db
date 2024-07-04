@@ -38,7 +38,7 @@
     #variant-result-table th{
         height: 40px;
         
-        background-color: #ff99ac;
+        background-color: rgb(255, 180, 204);
         font-weight: normal;
         color: white;
         font-size: 14px;
@@ -140,7 +140,7 @@
     {
         display: block;
         width: 70%;
-        background-color: #ff99ac;
+        background-color: rgb(255, 180, 204);
         /* Use your desired pastel background color */
         padding: 10px;
         /* Add some padding to the paragraph */
@@ -238,7 +238,10 @@
 </div>
 
 <div id="variant">
-    <p>Enter a genename, gene Ensembl ID or variant in <i><span style="color:#f8f9fa;">Ensembl</span></i> format</p>
+    <p class="lookup-text">Enter a genename, gene Ensembl ID or variant in <i><span style="color:#f8f9fa;">Ensembl</span></i> format
+        <br>
+        <i style="font-weight: 300;">(Multiple inputs are allowed. Please use semi colons to separate the inputs)</i>
+    </p>
     <form method="get" action="">
         <table class="table table-bordered table-gray table-fulltext-two-rows">
             <tbody>

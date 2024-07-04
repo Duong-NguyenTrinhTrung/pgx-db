@@ -5,6 +5,10 @@
 {% block addon_css %}
     <link rel="stylesheet" type="text/css" href="{% static 'drug/css/atc_lookup.css' %}">
     <style>
+        #atc-intro, #atc_search_box, #atc-l1 {
+            width: 70%;
+            margin: 0 auto;
+        }
         #sub-atc-intro {
             display: flex;
         }
@@ -19,7 +23,7 @@
 
 {% block content %}
     {% autoescape off %}
-        <div class="atc-intro">
+        <div id="atc-intro">
             <h3>ATC</h3>
             <div id="sub-atc-intro">
                 <div id="sub-atc-intro-text">
@@ -37,15 +41,15 @@
                         </p>
                 </div>
                 <div id="sub-atc-intro-image">
-                    <img src="/static/drug/image/atc4.png" alt="Atc code example" style="width: 70%; margin-left: 50px;">
+                    <img src="/static/drug/image/atc4.png" alt="Atc code example" style="width: 90%; margin-left: 50px;">
                 </div>
             </div>
-            <h3 style="margin-top: 10px;">Search</h3>
-            <p>A searchable version of the complete ATC index is available below. The search options enable you to find ATC codes and/or ATC levels. </p> 
+            
                 
         </div>
-
-        <div class="row">
+        <div id="atc_search_box">
+            <h3 style="margin-top: 40px;">Search</h3>
+            <p>A searchable version of the complete ATC index is available below. The search options enable you to find ATC codes and/or ATC levels. </p> 
             <form method="GET">
                 <div id="input-group">
                     <div id="input-query">
@@ -59,12 +63,10 @@
                     <button type="submit" id='search'>Search</button>
                 </div>
             </form>
+            <h3 style="margin-top: 30px;">ATC classification hierachy </h3>
         </div>
 
-        <div id="atc-intro">
-            <h3 style="margin-bottom: 5px;">ATC classification hierachy </h3>
-        </div>
-        <div id="atc-l1" style="margin-top: 15px;">
+        <div id="atc-l1" style="margin-top: 10px;">
             <p style="margin-top: 0px; margin-bottom: 15px;">All ATC levels are browsable from 1st to 5th ATC level</p>
             {% for group in atc_groups %}
                 <p style="margin-top: 0px; margin-bottom: 4px;"><a style="color: #e36414" href="{% url 'atc-detail-view' %}?group_id={{ group.id }}">{{ group.id }}: {{ group.name }}</a></p>
