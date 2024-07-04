@@ -13,7 +13,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        margin-top: 20px;
+        margin-top: 80px;
     }
 
     #target-result{
@@ -46,7 +46,7 @@
     #target-result-table th{
         height: 40px;
         text-align: center;
-        background-color: rgb(142, 190, 235);
+        background-color: rgb(142, 190, 240);
         font-weight: normal;
         color: white;
         font-size: 14px;
@@ -73,7 +73,7 @@
    {
         display: block;
         width: 70%;
-        background-color: rgb(142, 190, 235);
+        background-color: rgb(142, 190, 240);
         /* Use your desired pastel background color */
         padding: 10px;
         /* Add some padding to the paragraph */
@@ -189,10 +189,13 @@
 </div>
 
 <div id="target">
-    <p>Search by <i><span style="color:#f8f9fa;">UniProt accession number</span></i>, <i><span
+    <p class="lookup-text">Search by <i><span style="color:#f8f9fa;">UniProt accession number</span></i>, <i><span
                 style="color:#f8f9fa;">protein name</span></i>, <i><span
                     style="color:#f8f9fa;"> genename</span></i> or by <i><span
-                        style="color:#f8f9fa;">Ensembl gene ID</span></i></p>
+                        style="color:#f8f9fa;">Ensembl gene ID</span></i>
+                        <br>
+                        <i style="font-weight: 300;">(Multiple inputs are allowed. Please use semi colons to separate the inputs)</i>
+    </p>
     <form method="get" action="">
         <table class="table table-bordered table-gray table-fulltext-two-rows">
             <tbody>

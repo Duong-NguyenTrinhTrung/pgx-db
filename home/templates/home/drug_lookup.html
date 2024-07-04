@@ -177,7 +177,10 @@
     </div>
 </div>
 <div id="drug">
-    <p>Search by <i><span style="color:#9c6644;">Drugbank ID</span></i> or <i><span style="color:#9c6644;">drug name</span></i></p>
+    <p class="lookup-text">Search by <i><span style="color:#9c6644;">Drugbank ID</span></i> or <i><span style="color:#9c6644;">drug name</span></i>
+        <br>
+        <i style="font-weight: 300;">(Multiple inputs are allowed. Please use semi colons to separate the inputs)</i>
+    </p>
     <form method="get" action="">
         <table class="table table-bordered table-gray table-fulltext-two-rows">
             <tbody>
@@ -360,6 +363,7 @@
             $.ajax({
                 url: "{% url 'drug-lookup' %}?drug="+ drugbank_id,
                 success: function (data) {
+                    $("#search_result_examples").html("RESULTS");
                     $("#drug-result-tbody").html('');
                     var html_data = '';
                     data.drugs.forEach(item => {

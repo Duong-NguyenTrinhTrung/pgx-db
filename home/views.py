@@ -294,16 +294,21 @@ def get_adr(drugbank_id):
 
 def drug_lookup(request):
     drug = request.GET.get('drug')
+    print("inside drug_lookup view : ", drug)
     clinical_status_dict = {0: "Nutraceutical", 1: "Experimental", 2: "Investigational", 3: "Approved", 4: "Vet approved", 5: "Illicit"}
     context = {}
     if drug:
         if drug != 'default':
             drug_id = drug.split(" - ")[0]
-            drug_name = drug.split(" - ")[1]
-            data = Drug.objects.filter(
-                Q(drug_bankID=drug_id) |
-                Q(name=drug_name) 
-            )
+            if len(drug.split(" - "))>1:
+                drug_name = drug.split(" - ")[1]
+                data = Drug.objects.filter(
+                    Q(drug_bankID=drug_id) |
+                    Q(name=drug_name))
+            else:
+                data = Drug.objects.filter(
+                    drug_bankID=drug_id)
+                
         else:
             data = Drug.objects.all()[:20]
         drugs = []

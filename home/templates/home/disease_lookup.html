@@ -8,7 +8,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        margin-top: 40px;
+        margin-top: 80px;
     }
 
     #disease-result{
@@ -35,7 +35,7 @@
     #disease-result-table th{
         height: 40px;
         text-align: left;
-        font-weight: bold;
+        /* font-weight: bold; */
         font-size: 14px;
     }
 
@@ -54,7 +54,7 @@
    {
         display: block;
         width: 70%;
-        background-color: #74c69d;
+        background-color: rgb(144, 210, 157);
         padding: 10px;
         border-radius: 5px;
     }
@@ -140,8 +140,8 @@
 </div>
 
 <div id="disease">
-    <p>Search by <i><span style="color:white;">Disease name</span></i>, <span style="color:white;">Disease class</span></i>, associated <i><span style="color:white;">Drug name</span></i> or <i><span style="color:white;">ATC code</span></i>
-    <br><i style="font-weight: 400; color: white;">(Multiple inputs are allowed. Please use semi colons to separate the inputs)</i></p>
+    <p class="lookup-text">Search by <i><span style="color:mediumblue;">Disease name</span></i>, <span style="color:mediumblue;">Disease class</span></i>, associated <i><span style="color:mediumblue;">Drug name</span></i> or <i><span style="color:mediumblue;">ATC code</span></i>
+    <br><i style="font-weight: 300;color:mediumblue;">(Multiple inputs are allowed. Please use semi colons to separate the inputs)</i></p>
     <form method="get" action="">
         <table class="table table-bordered table-gray table-fulltext-two-rows">
             <tbody>
@@ -176,7 +176,7 @@
     <p id="search_result_examples" style="margin: 20px 0 20px; font-size: 20px; font-weight: bold;">Random disease examples</p>
     <table id="disease-result-table">
         <thead>
-            <tr style="background-color: #74c69d;">
+            <tr style="background-color: rgb(144, 210, 157);">
                 <th>Disease name</th>
                 <th>Disease class</th>
                 <th>Disease_UML_CUI</th>
