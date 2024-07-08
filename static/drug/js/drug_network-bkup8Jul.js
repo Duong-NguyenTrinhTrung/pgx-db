@@ -7,7 +7,7 @@ $(function () {
 //Pass jsonFiles Here
 
 // var json_GeneralFile = "json/json_GeneralFile.json";
-// var json_GeneralFile = "json/json5.json";
+// var json_GeneralFile = "json/data.json";
 // var json_drugData = "json/json_drugData.json";
 // var json_proteinData = "json/json_proteinData.json";
 // var json_interactionData = "json/json_interactionData.json";
@@ -165,7 +165,7 @@ async function readInteractionJSON() {
     const interaction_xlsxData = await readPrecachedJSONFromDatabase(
       jsonFilePath
     );
-    processData(numberofnodes, slicedata , child_selection);
+    processData(numberofnodes, slicedata);
   } catch (error) {
     console.error("Error:", error);
   }
@@ -176,8 +176,6 @@ window.onload = function () {
   (async function () {
     await readDrugJSON();
   })();
-
-  // processData(numberofnodes, slicedata , child_selection);
 };
 
 function getDrugJsonData(drugBankId) {
@@ -1721,43 +1719,9 @@ function stopSimulationIfSettled() {
   }
 }
 
-// Get the buttons by their IDs
-const proteinOnlyButton = document.getElementById('proteinOnly');
-const diseaseOnlyButton = document.getElementById('diseaseOnly');
-const defaultButton = document.getElementById('default');
- let child_selection = 'ProteinOnly' ; 
-// Add event listeners to the buttons
-proteinOnlyButton.addEventListener('click', () => {
-    console.log('Protein Only button clicked');
-    
-    child_selection =  'ProteinOnly';
-    clearGraph();
-    processData(numberofnodes, slicedata , child_selection);
-
-    // Add your logic here
-});
-
-diseaseOnlyButton.addEventListener('click', () => {
-    console.log('Disease Only button clicked');
 
 
-    // Add your logic here
-      child_selection =  'DiseaseOnly'
-      clearGraph();
-      processData(numberofnodes, slicedata , child_selection);
-
-});
-
-defaultButton.addEventListener('click', () => {
-    console.log('Default button clicked');
-    // Add your logic here
-    child_selection = '';
-    clearGraph() ; 
-    processData(numberofnodes, slicedata , child_selection);
-});
-
-
-function processData(numberofnodes, slicedata , child_select) {
+function processData(numberofnodes, slicedata) {
   const jsonFilePath = json_GeneralFile; // JSON file path
 
   //console.log("Inside Process Data Function11");
@@ -1794,41 +1758,6 @@ function processData(numberofnodes, slicedata , child_select) {
 
       console.log(filteredData, "filternodes");
 
-      switch(child_select) {
-        case 'ProteinOnly':
-            console.log('Handling Protein Only');
-            filteredData.forEach(function (row) {
-
-              row.Phase = "";
-              row.Disease_class = "";
-              row.Disease_name = "";
-               return row;
-         });
-            // Add your logic for Protein Only here
-            break;
-        case 'DiseaseOnly':
-
-        filteredData.forEach(function(row) {
-          row.protein = "";
-          row.Protein_Class = "";
-          row.gene_name = '';
-          if (!["Target", "Enzyme", "Transporter", "Carrier", "unknown"].includes(row.interaction_type)) {
-            row.interaction_type = '';
-          }
-        });
-
-            console.log('Handling Disease Only');
-            // Add your logic for Disease Only here
-           
-            break;
-        default:
-            
-            // Add your logic for Default here
-    }
-
-
-
-       
       filteredData.forEach(function (row) {
         var drugName = row.drug_name;
         var drugID = row.drugbank_id;
@@ -2180,8 +2109,7 @@ function createChart(links) {
   //  tag2
   node
     .filter(function (d) {
-      console.log(d , 'protine')
-      return d.child_type === "protein_type" && !d.isParent && d.Protein_Class !== '';
+      return d.child_type === "protein_type" && !d.isParent;
     })
     .append("circle")
     .attr("r", function (d) {
@@ -2759,11 +2687,6 @@ function createLegend() {
   var legendContent3 = d3.select("#trial_to_hide");
   legendContent3.selectAll("div").remove();
 
-  var Interaction_to_hide = d3.select("#Interaction_to_hide");
-
-  
-  var Protein_to_hide = d3.select("#Protein_to_hide");
-
   //console.log("interaction legend",legendContent);
   //console.log("disease legend",legendContent2);
 
@@ -2777,16 +2700,15 @@ function createLegend() {
       ) &&
       !uniqueInteractions.includes(interaction)
     ) {
-      uniqueInteractions.push(interaction);
       if (["Phase1", "Phase2", "Phase3", "Phase4"].includes(interaction)) {
         createLegendItem(interaction, getColor(interaction), legendContent2);
       } else {
         createLegendItem(interaction, getColor(interaction), legendContent);
       }
+      uniqueInteractions.push(interaction);
     }
   });
-  console.log("unique Interactions", uniqueInteractions);
-  
+  //console.log("unique Interactions", uniqueInteractions);
   function createLegendItem(interaction, color, container) {
     //console.log("CreateLegendItem", interaction +"\n"+color);
     //console.log("CreateLegendItem COntainer", container);
@@ -2887,60 +2809,17 @@ function createLegend() {
       .style("margin-left", "10px")
       .text(interaction);
 
-      
-  console.log("unique Interactions 4", uniqueInteractions);
     if (
       uniqueInteractions.includes("Phase1") ||
       uniqueInteractions.includes("Phase2") ||
       uniqueInteractions.includes("Phase3") ||
       uniqueInteractions.includes("Phase4")
     ) {
-      console.log( 'ions.includes("Phase3")')
       legendContent3.style("display", "block");
     } else {
-      
       legendContent3.style("display", "none");
       // Set display to "block" or any other desired value
     }
-
-
-    [
-      "Target",
-      "Phase3",
-      "Enzyme",
-      "Carrier"
-  ]
-
-  if (
-    uniqueInteractions.includes("Target") ||
-    uniqueInteractions.includes("Carrier") ||
-    uniqueInteractions.includes("Enzyme") ||
-    uniqueInteractions.includes("Transporter") ||
-    uniqueInteractions.includes("unknown")
-
-  ) {
-    
-    Interaction_to_hide.style("display", "block");
-  } else {
-    
-    Interaction_to_hide.style("display", "none");
-    // Set display to "block" or any other desired value
-  }
-  
-// Check if any protein from the proteins array is in the uniqueProteins array
-// var isAnyProteinIncluded = proteins.some(function(protein) {
-//   return uniqueProteins.includes(protein);
-// });
-// console.log(uniqueProteins , 'uniqueProteins')
-
-// // Show or hide the element based on the check
-// if (isAnyProteinIncluded) {
-  
-//   Protein_to_hide.style("display", "block");
-// } else {
-//   Protein_to_hide.style("display", "none");
-// }
-
 
     // Event listener for the legend item text
     // Assuming that you have already defined the "nodes" and "links" arrays
@@ -3025,48 +2904,42 @@ function updateChildNodeColors() {
   });
 }
 
-let proteins = [
-  "Adhesion",
-  "Secreted protein",
-  "Enzyme",
-  "GPCR",
-  "Membrane receptor",
-  "Kinase",
-  "Transporter",
-  "Unknown",
-  "Epigenetic regulator",
-  "Structural protein",
-  "Surface antigen",
-  "Ion channel",
-  "Transcription factor",
-  "Nuclear receptor",
-];
 function createProteinsLegend() {
   var hiddenProteins = {}; // Change this to hiddenProteinClasses
+  var proteins = [
+    "Adhesion",
+    "Secreted protein",
+    "Enzyme",
+    "GPCR",
+    "Membrane receptor",
+    "Kinase",
+    "Transporter",
+    "Unknown",
+    "Epigenetic regulator",
+    "Structural protein",
+    "Surface antigen",
+    "Ion channel",
+    "Transcription factor",
+    "Nuclear receptor",
+  ];
   var legendContent = d3.select("#legend_protein_status-content");
-  var uniqueProteins = new Set();
   legendContent.selectAll("div").remove();
-  let flag2 = false ;
+  var uniqueProteins = new Set();
 
   links.forEach(function (link) {
     var proteinClass11 = link.target.Protein_Class; // No need to convert to lowercase
 
+
     if (
       proteins.includes(proteinClass11) &&
-      !uniqueProteins.has(proteinClass11) && proteinClass11 !== '' 
+      !uniqueProteins.has(proteinClass11)
     ) {
-      console.log( 'proteinClass11')
       createLegendItem(proteinClass11, proteinColorMap[proteinClass11]);
       uniqueProteins.add(proteinClass11);
-      flag2 = true
     }
 
-  });
- if(!flag2){
-d3.select("#Protein_to_hide").style("display", "none"); 
- }
 
-  
+  });
   /*
   proteins.forEach(function(protein) {
                     createLegendItem(protein, proteinColorMap[protein]);
@@ -3290,8 +3163,6 @@ function createDiseaseLegend() {
     }
   });
 
-
-
   function createLegendItem(disease, color, diseasetemp) {
     var legendItem = legendContent
       .append("div")
@@ -3359,11 +3230,6 @@ function createDiseaseLegend() {
     // Set display to "block" or any other desired value
   }
 }
-
-
-
-
-
 
 // var legendContent4 = d3.select("#Disease_to_hide");
 
@@ -4022,7 +3888,7 @@ d3.select("#GetmoreData").on("click", function () {
   }
 
   console.log(slicedata, "slicedata");
-  processData(numberofnodes, slicedata ,child_selection);
+  processData(numberofnodes, slicedata);
 
 });
 
@@ -4053,7 +3919,7 @@ d3.select("#ManagePreviousState").on("click", function () {
       numberofnodes -= 200;
     }
   }
-  processData(numberofnodes, slicedata , child_selection);
+  processData(numberofnodes, slicedata);
 
   document.getElementById("GetmoreData").disabled = false;
   if (
