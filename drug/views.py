@@ -682,7 +682,7 @@ def selection_autocomplete(request):
             p_json['id'] = p.gene_id
             p_json['label'] = p.genename
             p_json['type'] = 'Gene'
-            p_json['redirect'] = '/gene/'
+            p_json['redirect'] = '/gene/gene_detail/'
             p_json['category'] = 'Genes'
             results.append(p_json)
 

@@ -116,6 +116,10 @@ li#about_menu {
   margin-left: 7px;
 }
 
+li#about_menu {
+  padding-left: 0;
+}
+
 li#pgx_menu {
   background-position: -19px 2px;
   background-size: 65px;

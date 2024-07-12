@@ -1,12 +1,12 @@
 {% load static %}
 {% csrf_token %}
 
-<div role="tabpanel" class="tab-pane" id="tab_network_adr">
+<div role="tabpanel" class="tab-pane" id="tab_network_adr" style="border: #b4b1b1 1px solid; width: 98%; min-height:400px;">
     <!-- block for showing the atc level network adr -->
-    <div id='atc_level_network_adr' style="border: #b4b1b1 1px solid">
+    <div id='atc_level_network_adr' >
         <div style="margin-top: 20px; margin-left: 20px;">
             <p style="text-align: center; font-size: 16px;">
-                <span style="display: block; color: red ;" id="atc_level_network_adr_text"> </span>
+                <span style="display: block;  ;" id="atc_level_network_adr_text"> </span>
                 <span style="display: none;" class="documentation" id="atc_level_network_adr_read_more"><a href="https://pgx-documentation.readthedocs.io/en/latest/atc_code.html#network-drug-adverse-reaction" target="_blank">Read More</a></span>
                 <span style="color: grey; font-style: italic;" id="atc_level_network_adr_subtext"> </span>
             </p>
@@ -56,8 +56,9 @@
                 {
                     if (response.length >0)
                     {
-                        atc_level_network_adr_text.innerHTML = "Drug adverse reaction of drugs in the network of " + atc_code;
-                        atc_level_network_adr_subtext.innerHTML = "\n(Drug names are listed in alphabetical order;  Frequencies are listed in descending order)";
+                        atc_level_network_adr_text.innerHTML = `Drug adverse reaction of drugs in the network of <span style="color: red;"> ${atc_code} </span>`;
+                        atc_level_network_adr_text.style.color = "#337ab7";
+                        atc_level_network_adr_subtext.innerHTML = "\n&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(Drug names are listed in alphabetical order;  Frequencies are listed in descending order)";
                         adr_download.style.display = "block";
                         atc_level_network_adr_read_more.style.display = "block";
                         atc_level_network_adr_table.style.display = "block";
@@ -149,6 +150,7 @@
                     else
                     {
                         atc_level_network_adr_text.innerHTML = "There is no drug in this network of " + atc_code +" that has adverse reaction";
+                        atc_level_network_adr_text.style.color = "red";
                     }
                 },
             error: function (xhr, status, error) {

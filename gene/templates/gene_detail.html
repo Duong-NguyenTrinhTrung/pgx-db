@@ -398,6 +398,7 @@
             dataArray.forEach(value => {
                 const row = $('<tr>').addClass('data-row');
                 // Variant
+                // row.append($('<td>').addClass('vep-cell variant long-text').css('max-width', '120px').text(value[0].replace(/[_\/]/g, "-")));
                 row.append($('<td>').addClass('vep-cell variant long-text').css('max-width', '120px').text(value[0]));
                 // Transcript
                 row.append($('<td>').addClass('vep-cell').text(value[1]));

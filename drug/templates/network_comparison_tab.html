@@ -1,12 +1,12 @@
 {% load static %}
 {% csrf_token %}
 
-<div role="tabpanel" class="tab-pane" id="tab_network_comparison">
+<div role="tabpanel" class="tab-pane" id="tab_network_comparison" style="border: #b4b1b1 1px solid; width: 98%; min-height:400px;">
     <span class="documentation"><a
             href="https://pgx-documentation.readthedocs.io/en/latest/atc_code.html#network-comparison"
             target="_blank">Read More</a></span>
-    <div style="display: flex; flex-direction: row; gap: 20px; margin-top: 15px;">
-        <div style="display: flex; flex-direction: column; gap: 10px; align-items: center;">
+    <div style="display: flex; flex-direction: row; gap: 20px; ">
+        <div style="display: flex; flex-direction: column; gap: 10px; align-items: center; margin: 20px 0 0 10px;">
             <label for="atc_comparison" style="font-size: 16px; color: rgb(51, 122, 183); font-weight: bold;">Input an
                 ATC code for network comparison</label>
             <input type="text" id="atc_comparison"
@@ -19,7 +19,7 @@
             <button id="btn-network-compare" type="button" style="width: 200px; border-radius: 5px;"
                 class="btn-primary">Compare</button>
         </div>
-        <div>
+        <div style="margin-top: 20px;">
             <select id="compare-type" multiple class="form-control input-lg" size="16">
                 <option value="no-selection" selected="selected">Select an option</option>
                 <!-- <option value="align_network">&nbsp;&nbsp;&nbsp;&nbsp;- Align network</option> -->

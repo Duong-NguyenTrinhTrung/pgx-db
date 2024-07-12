@@ -41,7 +41,7 @@ function createPieChart_Proteins(){
                 // .range(colorArray);
       
         // const max = d3.max(data, (maxData) => maxData.value );
-        const chosen = 854;
+        // const chosen = 854;
 
         const svg = d3.select('#pie-chart-proteins')
         .attr('viewBox', `0 0 ${size} ${size}`)
@@ -86,7 +86,7 @@ function createPieChart_Proteins(){
             .attr('dy', '3.0rem')
       
           // Set default active segment
-          if (pathData.value === chosen) {
+          if (pathData.data.name === "GPCR") {
             const textVal = d3.select(this).select('.data-text__value')
             .classed('data-text--show', true);
       
@@ -127,7 +127,8 @@ function createPieChart_Proteins(){
           }
         })
         .each(function(v, i) {
-          if (v.value === chosen) {
+          if (v.data.name === "GPCR") {
+            console.log(v.data.name+ " type of "+ typeof v.data.name);
             const chosenArc = d3.select(this)
             .attr('d', arcHover);
             activeSegment = this;
@@ -211,7 +212,7 @@ function createPieChart_Drugs() {
             .attr('dy', '3.0rem')
       
           // Set default active segment
-          if (pathData.value === max) {
+          if (pathData.data.name === "Approved") {
             const textVal = d3.select(this).select('.data-text__value')
             .classed('data-text--show', true);
       
@@ -252,7 +253,7 @@ function createPieChart_Drugs() {
           }
         })
         .each(function(v, i) {
-          if (v.value === max) {
+          if (v.data.name === "Approved") {
             const chosenArc = d3.select(this)
             .attr('d', arcHover);
             activeSegment = this;
