@@ -36,11 +36,17 @@
         max-width: 120px;
     }
 
+    #yadcf-filter--structures_scrollable-8 {
+        width: 80px;
+    }
     #yadcf-filter--structures_scrollable-from-8,
     #yadcf-filter--structures_scrollable-to-8,
     #yadcf-filter--structures_scrollable-from-9,
     #yadcf-filter--structures_scrollable-to-9 {
         max-width: 90px;
+    }
+    #yadcf-filter--structures_scrollable-from-10, #yadcf-filter--structures_scrollable-to-10 {
+        width: 70px;
     }
 
     .xtick text,
@@ -138,9 +144,11 @@
                 <div id="gene-3d-chart" style="margin-top: 10px;">
                     <!-- Filter of 3D structure  -->
                     <div class="col-sm-12">
-                        <p style="font-size:18px; font-weight: bold; padding-left:0; margin-left:0;">3D structure<span
-                                style="font-size:18px; font-weight: italic; !important;"> (Obtained from Alphafold 2):
-                            </span></p>
+                        <p style="font-size:18px; font-weight: bold; padding-left:0; margin-left:0;">3D structure
+                            <span id="source_of_displayed_3D_structure"
+                                style="font-size:18px; font-weight: italic; !important;">
+                            </span>
+                        </p>
                         <div id="filter_3d">
                             <div id="filter_3d_row2">
                                 <div id="filter_chain">
@@ -185,6 +193,8 @@
 
         <!-- Variant annotation and VEP scores table  -->
         <div class="gene-table-container" style="margin-top: 40px;">
+            <p style="font-size: 18px; text-align:center">Potential variants on <span
+                style="color: #B69121">{{ genename }}</span> and their effect prediction scores</p>
             <div class="spinner" style="display: none; margin: auto;"></div>
             {% include '_buttons.html' %}
             <div id="structures_scrollable_table">
@@ -195,9 +205,10 @@
                             <th rowspan="2">Transcript</th>
                             <th rowspan="2">Canonical</th>
                             <th rowspan="2">Sequence<br>position</th>
+                            <th style="max-width: 100px;" rowspan="2">Codons</th>
+                            <th rowspan="2">Strand</th>
                             <th rowspan="2">Wildtype AA</th>
                             <th rowspan="2">Mutant AA</th>
-                            <th style="max-width: 100px;" rowspan="2">Codons</th>
                             <th rowspan="2" style="max-width: 120px;" class="long-text">Consequence</th>
                             <th rowspan="2" style="max-width: 90px;">Allele<br>frequency</th>
                             <th rowspan="2" style="max-width: 90px;" class="width-80px">Mean <br> VEP scores</th>
@@ -406,6 +417,10 @@
                 row.append($('<td>').addClass('vep-cell').text('YES'));
                 // Sequence position
                 row.append($('<td>').addClass('vep-cell sequence_position').text(value[5]));
+                // Codons
+                row.append($('<td>').addClass('vep-cell').css('max-width', '100px').text(value[7]));
+                // STRAND
+                row.append($('<td>').addClass('vep-cell').css('max-width', '100px').text(value[9]));
                 // Wildtype and Mutant
                 if (value[6].length === 3) {
                     row.append($('<td>').addClass('vep-cell wt_aa').text(value[6].slice(0, 1)));  // Wildtype
@@ -414,8 +429,6 @@
                     row.append($('<td>').addClass('vep-cell wt_aa').text(value[6]));  // Wildtype
                     row.append($('<td>').addClass('vep-cell mt_aa').text(value[6]));  // Mutant
                 }
-                // Codons
-                row.append($('<td>').addClass('vep-cell').css('max-width', '100px').text(value[7]));
                 // Consequence
                 row.append($('<td>').addClass('vep-cell long-text').css('max-width', '120px').text(value[2]));
                 // Highest AF
@@ -455,7 +468,7 @@
                 colorRangeColumns.forEach(index => {
                     row.append(renderVariantValuesInColorRanges(value[index]));
                 });
-                console.log("Number rows: " + row.length);
+                // console.log("Number rows: " + row.length);
                 // Append the row to the table body
                 tbody.append(row);
             }); // end populate table
@@ -560,7 +573,7 @@
                     showAllVepScoreColumns();
                 }
             )
-            oTable1.column(10).visible(false); // Hide the column `Show all VEP Scores` initially
+            oTable1.column(11).visible(false); // Hide the column `Show all VEP Scores` initially
             $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').parentsUntil('th').css('width', '80x');
             $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').parentsUntil('td').css('width', '80x');
             $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '15');
@@ -704,18 +717,20 @@
             column_filters = column_filters.concat(createYADCFfilters(2, 1, "select", null, "Select", "YES", null, null, "80px"));
             //Sequence position
             column_filters = column_filters.concat(createYADCFfilters(3, 1, "range_number", null, ["Min", "Max"], false, null, null, "80px"));
+            //Codon
+            column_filters = column_filters.concat(createYADCFfilters(6, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
+            //Strand
+            column_filters = column_filters.concat(createYADCFfilters(7, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
             //Wildtype position
             column_filters = column_filters.concat(createYADCFfilters(4, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
             //Mutant position
             column_filters = column_filters.concat(createYADCFfilters(5, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
-            //Codon
-            column_filters = column_filters.concat(createYADCFfilters(6, 1, "multi_select", "select2", "Select", false, null, null, "80px"));
             //Consequence
-            column_filters = column_filters.concat(createYADCFfilters(7, 1, "select", null, "Select", false, null, null, "100px"));
+            column_filters = column_filters.concat(createYADCFfilters(8, 1, "select", null, "Select", false, null, null, "100px"));
             //AF
-            column_filters = column_filters.concat(createYADCFfilters(8, 1, "range_number", null, ["Min", "Max"], false, null, null));
+            column_filters = column_filters.concat(createYADCFfilters(9, 1, "range_number", null, ["Min", "Max"], false, null, null));
             //Mean VEP Score columns
-            column_filters = column_filters.concat(createYADCFfilters(9, 1, "range_number", null, ["Min", "Max"], false, null, null))
+            column_filters = column_filters.concat(createYADCFfilters(10, 1, "range_number", null, ["Min", "Max"], false, null, null))
 
             // update filters
             yadcf.init(
@@ -730,23 +745,23 @@
         
     function hideAllVepScoreColumns() {
         var table = $('#structures_scrollable').DataTable();
-        var start_col_index = 11;
-        var end_col_index = 51;
+        var start_col_index = 12;
+        var end_col_index = 52;
         for (col_index = start_col_index; col_index <= end_col_index; col_index++) {
             var column = table.column(col_index);
             column.visible(false);
         }
-        table.column(10).visible(true);
+        table.column(11).visible(true);
     }
     function showAllVepScoreColumns() {
         var table = $('#structures_scrollable').DataTable();
-        var start_col_index = 11
-        var end_col_index = 51
+        var start_col_index = 12
+        var end_col_index = 52
         for (col_index = start_col_index; col_index <= end_col_index; col_index++) {
             var column = table.column(col_index);
             column.visible(true);
         }
-        table.column(10).visible(false);
+        table.column(11).visible(false);
     }
     var gettableToExcel = (function () {
         var encabezado = '<html><head><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/><style> table, td {border:thin solid black} table {border-collapse:collapse}</style></head><body><table>';

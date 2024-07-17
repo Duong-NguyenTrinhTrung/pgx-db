@@ -2146,6 +2146,12 @@ def retrieving_chemical_substance(atc_code):
 #     reorganized_data["data"] = data
 #     return JsonResponse(reorganized_data, safe=False)
 
+def count_pgx_variant_based_pgx_of_an_atc_code(request):
+    atc_code = request.GET.get("atc_code")
+    no_of_rows = 3
+    return JsonResponse({"no_of_rows": no_of_rows})
+
+
 def get_atc_sub_levels(request):
     atc_code = request.GET.get("atc_code");
     data = {'atc_code': atc_code}
