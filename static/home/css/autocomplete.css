@@ -1,0 +1,10 @@
+.autocomplete-outer {
+  display: none;
+  width: 100%;
+  max-height: 400px;
+  border: 1px solid #ccc;
+  padding: 5px;
+  position: absolute;
+  top: 100%;
+  left: 0;
+}

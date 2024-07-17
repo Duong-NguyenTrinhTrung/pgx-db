@@ -20,7 +20,7 @@ from .views import (
     get_statistics_by_atc_for_detecting_community_drug_disease, 
     get_statistics_by_atc_for_calculating_average_path_length_drug_disease,
     get_statistics_by_atc_for_calculating_average_path_length_drug_protein,
-    atc_comparison_autocomplete_view, get_adr_data, AdrByDrugView, get_adr_data_by_atc, serve_drug_data_json_file, serve_protein_data_json_file, serve_interaction_data_json_file, serve_general_data_json_file, get_data_by_atc_for_network_ADR_comparison
+    atc_comparison_autocomplete_view, get_adr_data, AdrByDrugView, get_adr_data_by_atc, serve_drug_data_json_file, serve_protein_data_json_file, serve_interaction_data_json_file, serve_general_data_json_file, get_data_by_atc_for_network_ADR_comparison, count_pgx_variant_based_pgx_of_an_atc_code
 )
 
 urlpatterns = [
@@ -46,6 +46,7 @@ urlpatterns = [
     path('get_clinical_pgx_data_by_drug/', views.get_clinical_pgx_data_by_drug, name='get-clinical-pgx-data-by-drug'),
     path('get_gene_based_burden_data_by_atc/', views.get_gene_based_burden_data_by_atc, name='get-gene-based-burden-data-by-atc'),
     path('get_variant_based_burden_data_by_atc/', views.get_variant_based_burden_data_by_atc, name='get-variant-based-burden-data-by-atc'),
+    path('count_pgx_variant_based_pgx_of_an_atc_code/', views.count_pgx_variant_based_pgx_of_an_atc_code, name='count-pgx-variant-based-pgx-of-an-atc-code'),
     path('get_variant_based_burden_data_by_drug/', views.get_variant_based_burden_data_by_drug, name='get-variant-based-burden-data-by-drug'),
     path('get_gene_based_burden_data_by_drug/', views.get_gene_based_burden_data_by_drug, name='get-gene-based-burden-data-by-drug'),
     path('get_drug_network/', views.get_drug_network, name='get-drug-network'),

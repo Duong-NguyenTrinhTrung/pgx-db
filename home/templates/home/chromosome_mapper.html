@@ -3,6 +3,7 @@
 
 
 {% block addon_css %}
+<link rel="stylesheet" href="{% static '/home/css/autocomplete.css' %}">
 <link rel="stylesheet" href="{% static '/home/css/font.awesome.all.min.css' %}">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
@@ -101,17 +102,7 @@
         /* Vertically center the content within the td */
     }
 
-    .autocomplete-outer {
-        display: none;
-        width: 650px;
-        max-height: 400px;
-        background-color: white;
-        border: 1px solid #ccc;
-        padding: 5px;
-        position: absolute;
-        top: 100%;
-        left: 0;
-    }
+    
 
     #variant {
         display: flex;

@@ -15,6 +15,9 @@
             background-image: url("/static/home/images/sort-desc.png");
             background-size: 13px;
         }
+        th.sorting div, th.sorting_asc div, th.sorting_desc div {
+            text-align: left;
+        }
     </style>
 {% endblock %}
 
@@ -608,6 +611,17 @@
                     }
                 })
     });
+    function clearAddedOptions() {
+        console.log("clearAddedOptions is called");
+        var selectElement = document.getElementById('atc-sublevel-select');
+        var options = selectElement.options;
+        for (var i = options.length - 1; i >= 0; i--) {
+            if (options[i].value !== 'no-selection') {
+                selectElement.remove(i);
+            }
+        }
+    }
+    
 
     $('input[name="burden-control"]').change(function () {
         $("#atc-sublevel-select").hide();
@@ -631,25 +645,35 @@
         }
         if (value_burden_control == "variant-based") {
             $("#pgx-data-table-div").hide();
+            clearAddedOptions();
             var select = $("#atc-sublevel-select");
             select.show();
             var url = "{% url 'get-atc-sub-levels' %}?atc_code=" + atc_code;
-            $.ajax(
-                {
-                    url: url,
-                    type: "GET",
-                    success: function (response) {
-                        var optionSelect;
-                        response.sub_atc_codes.forEach(function(item) 
-                        {
-                            optionSelect += `<option value=${item.id}>${item.id} (${item.name})</option>`;
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (response) {
+                    var optionSelect;
+                    // Load the JSON file
+                    $.getJSON('/static/static_data/atc_pgx_variant_count.json', function(jsonData) {
+                        // Iterate through the response to process each sub ATC code
+                        response.sub_atc_codes.forEach(function(item) {
+                            console.log(item.id);
+                            // Get the no_of_rows for the current atc_code (item.id)
+                            var no_of_rows = jsonData[item.id] || 0; // Default to 0 if not found
+                            if (no_of_rows > 0) {
+                                optionSelect += `<option value=${item.id}>${item.id} (${item.name})</option>`;
+                                
+                            }
                         });
+                        // Append all options at once to the select element after the loop
                         select.append(optionSelect);
-                    },
-                    error: function (xhr, status, error) {
-                        console.log('variant based pgx- AJAX Error:', error);
-                    }
-                })
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.log('variant based pgx- AJAX Error:', error);
+                }
+            });
         }
     });
 

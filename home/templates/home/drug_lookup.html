@@ -4,6 +4,7 @@
 
 {% block addon_css %}
 <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"> -->
+<link rel="stylesheet" href="{% static '/home/css/autocomplete.css' %}">
 
 
 <style>
@@ -96,17 +97,7 @@
         vertical-align: middle;
     }
 
-    .autocomplete-outer{
-        display: none;
-        width: 650px;
-        max-height: 400px;
-        background-color: white;
-        border: 1px solid #ccc;
-        padding: 5px;
-        position: absolute;
-        top: 100%;
-        left: 0;
-    }
+    
 
     #protein-autocomplete-results,
     #gene-autocomplete-results {

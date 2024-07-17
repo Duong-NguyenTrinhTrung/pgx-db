@@ -3,6 +3,7 @@
 
 
 {% block addon_css %}
+<link rel="stylesheet" href="{% static '/home/css/autocomplete.css' %}">
 <link rel="stylesheet" href="{% static '/home/css/font.awesome.all.min.css' %}">
 <link rel="stylesheet" href="{% static '/home/css/regular.min.css' %}">
 <link rel="stylesheet" href="{% static '/home/css/solid.min.css' %}">
@@ -120,22 +121,13 @@
         padding-bottom: 5px;
     }
 
-    .autocomplete-outer{
-        display: none;
-        width: 650px;
-        max-height: 400px;
-        background-color: white;
-        border: 1px solid #ccc;
-        padding: 5px;
-        position: absolute;
-        top: 100%;
-        left: 0;
-    }
+  
 
     #protein-autocomplete-results,
     #gene-autocomplete-results {
         max-width: 100%;
-        overflow-x: auto;
+        overflow-y: auto;
+        white-space: normal;
     }
     #target-search-intro {
         display: flex;
@@ -206,7 +198,7 @@
                                 class="form-text form-type-textfield form-control optional ui-autocomplete-input" style="width:100%;" size="70%"
                                 autocomplete="on" />
                             <div class="autocomplete-outer">
-                                <div id="protein-autocomplete-results">
+                                <div  id="protein-autocomplete-results">
                                 </div>
                             </div>
                         </div>

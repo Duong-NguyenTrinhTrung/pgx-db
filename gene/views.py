@@ -151,13 +151,29 @@ class GeneDetailBaseView(object):
         "HighestAF",
     ]
 
-    name_dic = {'NMD': 'NMD_transcript', 'cse': 'coding_sequence', 'fsh': 'frameshift',
-                'itc': 'incomplete_terminal_codon', 'ide': 'inframe_deletion', 'iis': 'inframe_insertion',
-                'mis': 'missense', 'pal': 'protein_altering', 'sac': 'splice_acceptor', 'sdo': 'splice_donor',
-                'sd5': 'splice_donor_5th_base', 'sdr': 'splice_donor_region',
-                'spt': 'splice_polypyrimidine_tract', 'sre': 'splice_region', '_sl': 'start_lost',
-                '_sr': 'start_retained', 'sga': 'stop_gained', 'sl_': 'stop_lost', 'sr_': 'stop_retained',
-                'syn': 'synonymous', 'H': 'high', 'M': 'Medium', 'L': 'Low'}
+    name_dic = {'NMD': 'NMD_transcript'
+                , 'cse': 'coding_sequence'
+                , 'fsh': 'frameshift',
+                'itc': 'incomplete_terminal_codon'
+                , 'ide': 'inframe_deletion'
+                , 'iis': 'inframe_insertion',
+                'mis': 'missense'
+                , 'pal': 'protein_altering'
+                , 'sac': 'splice_acceptor'
+                , 'sdo': 'splice_donor',
+                'sd5': 'splice_donor_5th_base'
+                , 'sdr': 'splice_donor_region',
+                'spt': 'splice_polypyrimidine_tract'
+                , 'sre': 'splice_region'
+                , '_sl': 'start_lost',
+                '_sr': 'start_retained'
+                , 'sga': 'stop_gained'
+                , 'sl_': 'stop_lost'
+                , 'sr_': 'stop_retained',
+                'syn': 'synonymous'
+                , 'H': 'high'
+                , 'M': 'Medium'
+                , 'L': 'Low'}
 
     def parse_marker_data(self, marker, vep_variant):
 
@@ -551,7 +567,7 @@ def parse_marker_data(marker, vep_variant): #lower, for one variant
     data_subset["Amino_acids"] = vep_variant[5]
     data_subset["Codons"] = vep_variant[6]
     data_subset["Impact"] = vep_variant[7]
-    data_subset["Strand"] = vep_variant[8]
+    data_subset["Strand"] = "Reverse" if vep_variant[8] == -1 else "Forward"
     data_subset["BayesDel_addAF_rankscore"] = vep_variant[9]
     data_subset["BayesDel_noAF_rankscore"] = vep_variant[10]
     data_subset["CADD_raw_rankscore"] = vep_variant[11]
