@@ -247,12 +247,12 @@
                     <td style="max-width: 200px;">
                     {% for drug in item.drug_data %}
                         {% if drug.atc_code %}
-                            <i class="fa fa-pills fa-solid"></i> <a href="{% url 'atc-detail-view' %}?group_id={{drug.atc_code.0}}&detail={{drug.atc_code}}"
+                            <i class="fa fa-pills fa-solid"></i> <a target="_blank" href="{% url 'atc-detail-view' %}?group_id={{drug.atc_code.0}}&detail={{drug.atc_code}}"
                                 >{{drug.drug_name}}</br>
                             </a>
                         {% else %}
                             <!-- <i class="fa fa-pills fa-solid"></i> <a href="{% url 'get-drug-association' %}?drug_id={{drug.drug_id}}" -->
-                            <i class="fa fa-pills fa-solid"></i> <a href="{% url 'atc-detail-view' %}?group_id={{drug.atc_code.0}}&detail={{drug.atc_code}}"
+                            <i class="fa fa-pills fa-solid"></i> <a target="_blank" href="{% url 'drugs-network' %}?drug_bank_ids={{drug.drug_id}}"
                                 >{{drug.drug_name}}</br>
                             </a>
                         {% endif %}
