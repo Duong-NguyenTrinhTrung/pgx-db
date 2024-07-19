@@ -63,7 +63,7 @@
                                                 <label for="variant-based-burden-control">Variant-based</label>
                                                 </fieldset>
                                                 <select onchange="selectAtcCode(this.value, this.options[this.selectedIndex].text)" id="atc-sublevel-select" multiple class="form-control input-lg" size="4" style="display: none; margin-top: 20px;">
-                                                <option value="no-selection" selected="selected">Select a sub-level ATC code</option>
+                                                
                                                 </select>
                                         </div>
                                 </div>
@@ -267,7 +267,7 @@
 
     function render_gene_based_burden_data(gene_based_burden_data) {
         $("#pgx-data-table-div").show();
-        var tableHtml = '<table class="display compact text-nowrap" id="pgx-data-table"><thead id="headers" style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
+        var tableHtml = '<table class="display compact text-nowrap" id="pgx-data-table" style="margin: unset;"><thead id="headers" style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
         for (var k = 0; k < gene_based_burden_data.length; k++) {
             row = gene_based_burden_data[k];
             for (var l = 0; l < row.burden_data.length; l++) {
@@ -347,8 +347,8 @@
 
     function render_variant_based_burden_data(variant_based_burden_data) {
         $("#pgx-data-table-div").show();
-        var tableHtml = '<table class="display compact text-nowrap" id="pgx-data-table"><thead id="headers" style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">VariantID &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>AC </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>AF </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
-
+        var tableHtml = '<table class="display compact text-nowrap" id="pgx-data-table"><thead id="headers" style="text-align: left; "><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">VariantID &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>AC </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>AF </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
+        
         for (var k = 0; k < variant_based_burden_data.length; k++) {
             row = variant_based_burden_data[k];
             var interactions = variant_based_burden_data[k].interactions;
@@ -443,8 +443,8 @@
         var clinical_pgx_data_control_area = document.getElementById("clinical-pgx-data-control-div");
         var burden_data_control_area = document.getElementById("burden-data-control-div");
 
-        $("#pgx_data_display_area").find('input[name="clinical-pgx-control"]').attr('data-atc-code', atc_code);
-        $("#pgx_data_display_area").find('input[name="burden-control"]').attr('data-atc-code', atc_code);
+        $("#pgx_data_display_area").find('#clinical-pgx-data-control-div').attr('data-atc-code', atc_code);
+        $("#pgx_data_display_area").find('#burden-data-control-div').attr('data-atc-code', atc_code);
         $("#pgx_data_display_area").find('button.exportBtn').attr('data-atc-code', atc_code);
 
         // Get the radio buttons by their IDs
@@ -596,7 +596,7 @@
      $('input[name="clinical-pgx-control"]').click(function () 
     {   
         $('input[name="burden-control"]').prop('checked', false);
-        var atc_code = $('input[name="clinical-pgx-control"]').data('atc-code');
+        var atc_code = $("#clinical-pgx-data-control-div").attr('data-atc-code');
         var url = "{% url 'get-clinical-pgx-data-by-atc' %}?atc_code=" + atc_code;
         $("#atc-sublevel-select").hide();
         $.ajax(
@@ -627,7 +627,7 @@
         $("#atc-sublevel-select").hide();
         var inp = $('#variant-based-clinical-pgx-control').prop('checked', false);
         var value_burden_control = $('input[name="burden-control"]').filter(":checked").val();
-        var atc_code = $('input[name="burden-control"]').filter(":checked").data('atc-code');
+        var atc_code = $("#burden-data-control-div").attr("data-atc-code");
         if (value_burden_control == "gene-based") {
             var url = "{% url 'get-gene-based-burden-data-by-atc' %}?atc_code=" + atc_code;
             $.ajax(
@@ -647,18 +647,21 @@
             $("#pgx-data-table-div").hide();
             clearAddedOptions();
             var select = $("#atc-sublevel-select");
+            select.html("");
             select.show();
+            console.log("atc_code of get-atc-sub-levels "+atc_code);
             var url = "{% url 'get-atc-sub-levels' %}?atc_code=" + atc_code;
             $.ajax({
                 url: url,
                 type: "GET",
                 success: function (response) {
-                    var optionSelect;
+                    var optionSelect = `<option value="no-selection" selected="selected">Select a sub-level ATC code</option>`;
                     // Load the JSON file
                     $.getJSON('/static/static_data/atc_pgx_variant_count.json', function(jsonData) {
                         // Iterate through the response to process each sub ATC code
                         response.sub_atc_codes.forEach(function(item) {
                             console.log(item.id);
+                            
                             // Get the no_of_rows for the current atc_code (item.id)
                             var no_of_rows = jsonData[item.id] || 0; // Default to 0 if not found
                             if (no_of_rows > 0) {
@@ -681,6 +684,7 @@
     {
         //alert("value="+value+" text="+text);
         //retrieve data for an atc code selected
+        $("#pgx-data-table-div").hide();
         $("#waiting-prompt").show();
         $(".spinner").show();
         var atc_code = value;

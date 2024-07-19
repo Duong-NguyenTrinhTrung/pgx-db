@@ -193,7 +193,7 @@
 
         <!-- Variant annotation and VEP scores table  -->
         <div class="gene-table-container" style="margin-top: 40px;">
-            <p style="font-size: 18px; text-align:center">Potential variants on <span
+            <p style="font-size: 18px; text-align:center; color: #337ab7;">Potential variants on gene <span
                 style="color: #B69121">{{ genename }}</span> and their effect prediction scores</p>
             <div class="spinner" style="display: none; margin: auto;"></div>
             {% include '_buttons.html' %}
@@ -917,13 +917,31 @@
                 },
                 margin: {
                     t: 30, // Increase the top margin for the title and plot container
-                    b: 100, // Bottom margin for the x-axis labels and title
+                    b: 130, // Bottom margin for the x-axis labels and title
                     l: 60, // Left margin for the y-axis labels and title
                     r: 40, // Right margin
-                }
+                },
+                annotations: [
+                    {
+                        x: 0,  // X-coordinate of the annotation
+                        y: -0.33, // Y-coordinate of the annotation (negative to position below x-axis)
+                        xref: 'paper',
+                        yref: 'paper',
+                        text: '<i>(Note: Variant labels in the x-axis are denoted as: wild_type amino acid, protein position, mutant amino acid in that order with "*" represents a stop codon)</i>',
+                        showarrow: false,
+                        font: {
+                            size: 14,
+                            color: 'grey',
+                            style: 'italic',
+                        }
+                    }
+                ]
             }
             // Plot
             Plotly.newPlot('variantPlots_content', traces, layout);
+            // var plot_note = document.createElement("p");
+            // plot_note.innerHTML = 'Variant is denoted as wild_type amino acid, protein position, mutant amino acid in that order with "*" represents a stop codon';
+            // $('#variantPlots_content').append(plot_note);
         }
     }
 
