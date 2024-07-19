@@ -643,7 +643,7 @@
             for (var i = 0; i < associations.length; i++) {
                 var row = associations[i];
                 drug_bank_ids.push(row.drug_bankID);
-                var drug_url = "{% url 'drug-network' %}" + "?drug_bank_id=" + row.drug_bankID;
+                var drug_url = "{% url 'drugs-network' %}" + "?drug_bank_ids=" + row.drug_bankID;
                 var targetLinks = [];
                 for (var j = 0; j < row.target_list.length; j++) {
                     var className = "enzyme"
@@ -677,12 +677,12 @@
                 tableHtml += `
                 <tr style="white-space: nowrap;">
                     <td style="vertical-align: top;">
-                        <a href="#" class="associated_drug" 
+                        <a href='${drug_url}' class="associated_drug" target="_blank"
                         data-drugbank_id="${row.drug_bankID}"
-                        onclick="toggleDivVisibility(this, '${drug_url}')" 
                         data-target="#atc_right">
                         ${row.drug_bankID}
-                        </a> <a href="https://go.drugbank.com/drugs/${row.drug_bankID}" style="font-size:14px; color:grey; text-decoration: underline;" target="_blank";>[Ref]</a>
+                        </a> 
+                        <a href="https://go.drugbank.com/drugs/${row.drug_bankID}" style="font-size:14px; color:grey; text-decoration: underline;" target="_blank";>[Ref]</a>
                     </td>
                     <td style="vertical-align: top;" >${row.name}</td>
                     <td class="long-content" style="vertical-align: top;">${row.description}</td>
@@ -729,6 +729,7 @@
             right_panel_text.innerHTML = "In the network associated with <span style='color: red;'>" + response.atc_code+"</span>, there " + verb + " <i style='color: black'>" + associations.length + "</i> " + drug_plural_form + ":<br> - interacting with <i style='color: black'>" + response.no_of_interacted_protein + "</i> " + protein_plural_form + " in <i style='color: black'>" + response.total_interaction + "</i> " + interaction_plural_form + ", <br> - associating with <i style='color: black'>" + response.no_of_associated_disease + "</i> " + disease_plural_form + " in <i style='color: black'>" + response.total_association_study + "</i> association "+association_plural_form + " (Only <i style='color: black'>" + response.no_of_associated_disease_phase34 +"</i> "+disease34_plural_form+ " and <i style='color: black'>" + response.total_association_study_phase34 + "</i> " + association34_plural_form + " in clinical trial phase 3, 4 will be shown in the network visualization below)";
 
             var atc_url = "{% url 'drugs-network' %}" + "?drug_bank_ids=" + drug_bank_ids.toString();
+            var single_drug_url = "{% url 'drugs-network' %}" + "?drug_bank_ids=";
             right_panel_text_guide.style.fontWeight = "italic";
             right_panel_text_guide.style.display = "block";
             right_panel_text_guide.style.marginBottom = "10px";
