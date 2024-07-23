@@ -194,8 +194,8 @@
                 </tr>
                 <tr>
                     <td colspan="3" style="text-align: left; padding-left: 30px;">Examples: <a
-                            href="{% url 'drug-lookup' %}?drugbank_id=DB00195" target='_blank' hreflang="en">DB00002</a>; 
-                            <a href="{% url 'drug-lookup' %}?drugbank_id=DB00195" target='_blank' hreflang="en">Cetuximab</a>;
+                            href="{% url 'drug-lookup' %}?drugbank_id=DB00002" target='_blank' hreflang="en">DB00002</a>; 
+                            <a href="{% url 'drug-lookup' %}?drugbank_id=DB00002" target='_blank' hreflang="en">Cetuximab</a>;
                             ... </td>
                 </tr>
             </tbody>
@@ -220,7 +220,7 @@
         <tbody id="drug-result-tbody">
             {% for drug in drugs %}
                 <tr>
-                    <td>{{ drug.drug_bankID }}</td>
+                    <td><a target="_blank" href="/drugs_network?drug_bank_ids={{ drug.drug_bankID }}">{{ drug.drug_bankID }}</a></td>
                     <td>{{ drug.name }}</td>
                     {% if drug.atc_code != 'Not assigned' %}
                         <td>
@@ -418,7 +418,7 @@
                             </div>`
                         }
                         html_data += `<tr>
-                                        <td>${item.drug_bankID}</td>
+                                        <td><a target="_blank" href="/drugs_network?drug_bank_ids=${item.drug_bankID}">${item.drug_bankID}</a></td>
                                         <td>${item.name}</td>
                                         <td>${atcCodeHtml}</td>
                                         <td>${item.drug_type}</td>
@@ -500,7 +500,7 @@
                             </div>`
                         }
                         html_data += `<tr>
-                                        <td>${item.drug_bankID}</td>
+                                        <td><a target="_blank" href="/drugs_network?drug_bank_ids=${item.drug_bankID}">${item.drug_bankID}</a></td>
                                         <td>${item.name}</td>
                                         <td>${atcCodeHtml}</td>
                                         <td>${item.drug_type}</td>
@@ -584,7 +584,7 @@
                                 </div>`
                             }
                             html_data += `<tr>
-                                                <td>${item.drug_bankID}</td>
+                                                <td><a target="_blank" href="/drugs_network?drug_bank_ids=${item.drug_bankID}">${item.drug_bankID}</a></td>
                                                 <td>${item.name}</td>
                                                 <td>${atcCodeHtml}</td>
                                                 <td>${item.drug_type}</td>
