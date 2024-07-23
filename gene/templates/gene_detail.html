@@ -1033,85 +1033,201 @@
         });
     }
 
+    let element = document.querySelector('#structure_display');
+    let config = { backgroundColor: 'white' };
+    var viewer = $3Dmol.createViewer(element, config );
+    let spanElement = document.querySelector("#source_of_displayed_3D_structure");
+    
+    // Load the 3D structure from a PDB file hosted online
+    // var pdbUrl = "{% static 'gene/pdb-test/A5X5Y0.pdb' %}"; 
+    var pdbUrl = "{% static 'gene/pdb/' %}" + "{{ protein_name }}" + ".pdb";
+    var long_sequence_protein = ["P98164","P04275","Q07954","P98160","O60494","P21817","P78527","Q13315","P08519","Q92736","P78559","Q02817","P46939","P15924","Q86YZ3","Q14643","Q5T4S7","Q8WXI7","P01266","Q02224","O15230","P25391","Q16787","P13611","P42858","P35556","Q75N90","Q15413","P04114","P11532"];
+
     // <!-- Script for filtering options of 3d-structure  -->
     $(document).ready(function () {
-
-        var structureDisplay = document.getElementById('structure_display');
-        var protein_name = "{{ protein_name }}";
-
-        var variant_info_for_3D_view = JSON.parse('{{ variant_info_for_3D_view|safe }}');
-        var resi = []
-        for (var v of variant_info_for_3D_view) {
-            resi.push(v.protein_position);
-        }
-        viewer_bkup = viewer;
-
-        // Count the number of chains
-        const chains = new Set();
-        const model = viewer.getModel()
-        const atoms = model.selectedAtoms({});
-        for (let i = 0; i < atoms.length; i++) {
-            const atom = atoms[i];
-            chains.add(atom.chain);
-        }
-
-        const chainSelect = document.getElementById('chainSelect');
-        const chainArray = Array.from(chains); // Convert the set to an array for easier manipulation
-        chainArray.sort(); // Sort the chains in alphabetical order (optional)
-        for (const chain of chainArray) {
-            const option = document.createElement("option");
-            option.value = chain;
-            option.textContent = chain;
-            chainSelect.appendChild(option);
-        }
-
-        chainSelect.addEventListener('change', (event) => {
-            var selectedChain = chainSelect.value;
-
-            if (selectedChain !== "") {
-                viewer.setStyle({}, { cartoon: { color: '#ced4da', opacity: 1 } });
-                viewer.addStyle({ chain: selectedChain }, { cartoon: { color: 'spectrum', opacity: 1 } });
-            }
-            viewer.render();
-        });
-
-        const variantVisibilitySelect = document.getElementById('variantVisibilitySelect');
-        variantVisibilitySelect.addEventListener('change', (event) => {
-            const selectedvisibility = event.target.value;
-            if (selectedvisibility === 'hide') {
-                viewer.setStyle({}, { cartoon: { color: "spectrum" } });
-                var colorSelect = document.getElementById("colorSelect");
-                colorSelect.value = "spectrum";
-            } else {
-                viewer.setStyle({}, { cartoon: { color: '#ced4da', thickness: 0.5 } });
-                viewer.addStyle({ resi: resi }, { stick: { colorscheme: 'greenCarbon' } });
-                var colorSelect = document.getElementById("colorSelect");
-                colorSelect.value = "grey";
-            }
-            viewer.render();
-        });
-
-        var colorSelect = document.getElementById('colorSelect');
-        colorSelect.addEventListener('change', (event) => {
-            const selectedColor = event.target.value;
-            if (selectedColor === 'grey') {
-                viewer.setStyle({}, { cartoon: { color: '#ced4da' } });
-            } else {
-                viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
-                for (const option of variantVisibilitySelect.options) {
-                    if (option.value === "hide") {
-                        option.selected = true;
-                        break;
-                    }
+        jQuery.ajax( pdbUrl, {
+            success: function(data) {
+                // let v = viewer;
+                viewer.addModel( data, "pdb" );                       /* load data */
+                viewer.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
+                viewer.zoomTo();                                      /* set camera */
+                viewer.render();                                      /* render scene */
+                // viewer.zoom(1.2, 1000);                               /* slight zoom */
+                var proteinName = "{{ protein_name }}"; 
+                if (long_sequence_protein.includes(proteinName)){
+                    spanElement.innerHTML = "(Obtained from PDB):";
                 }
-            }
-            viewer.render();
-        });
+                else {
+                    spanElement.innerHTML = "(Obtained from Alphafold 2):";
+                }
+                var structureDisplay = document.getElementById('structure_display');
+                var protein_name = "{{ protein_name }}";
 
-        function addLabelForResidueNth(nth, labelText, labelOptions) {
-            const labels = viewer.addResLabels({ resi: nth }, labelOptions);
-            return labels;
-        }
+                var variant_info_for_3D_view = JSON.parse('{{ variant_info_for_3D_view|safe }}');
+                var resi = []
+                for (var v of variant_info_for_3D_view) {
+                    resi.push(v.protein_position);
+                }
+
+                // Count the number of chains
+                const chains = new Set();
+                const model = viewer.getModel()
+                const atoms = model.selectedAtoms({});
+                for (let i = 0; i < atoms.length; i++) {
+                    const atom = atoms[i];
+                    chains.add(atom.chain);
+                }
+
+                const chainSelect = document.getElementById('chainSelect');
+                const chainArray = Array.from(chains); // Convert the set to an array for easier manipulation
+                chainArray.sort(); // Sort the chains in alphabetical order (optional)
+                for (const chain of chainArray) {
+                    const option = document.createElement("option");
+                    option.value = chain;
+                    option.textContent = chain;
+                    chainSelect.appendChild(option);
+                }
+
+                chainSelect.addEventListener('change', (event) => {
+                    var selectedChain = chainSelect.value;
+
+                    if (selectedChain !== "") {
+                        viewer.setStyle({}, { cartoon: { color: '#ced4da', opacity: 1 } });
+                        viewer.addStyle({ chain: selectedChain }, { cartoon: { color: 'spectrum', opacity: 1 } });
+                    }
+                    viewer.render();
+                });
+
+                const variantVisibilitySelect = document.getElementById('variantVisibilitySelect');
+                variantVisibilitySelect.addEventListener('change', (event) => {
+                    const selectedvisibility = event.target.value;
+                    if (selectedvisibility === 'hide') {
+                        viewer.setStyle({}, { cartoon: { color: "spectrum" } });
+                        var colorSelect = document.getElementById("colorSelect");
+                        colorSelect.value = "spectrum";
+                    } else {
+                        viewer.setStyle({}, { cartoon: { color: '#ced4da', thickness: 0.5 } });
+                        viewer.addStyle({ resi: resi }, { stick: { colorscheme: 'greenCarbon' } });
+                        var colorSelect = document.getElementById("colorSelect");
+                        colorSelect.value = "grey";
+                    }
+                    viewer.render();
+                });
+
+                var colorSelect = document.getElementById('colorSelect');
+                colorSelect.addEventListener('change', (event) => {
+                    const selectedColor = event.target.value;
+                    if (selectedColor === 'grey') {
+                        viewer.setStyle({}, { cartoon: { color: '#ced4da' } });
+                    } else {
+                        viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
+                        for (const option of variantVisibilitySelect.options) {
+                            if (option.value === "hide") {
+                                option.selected = true;
+                                break;
+                            }
+                        }
+                    }
+                    viewer.render();
+                });
+
+                function addLabelForResidueNth(nth, labelText, labelOptions) {
+                    const labels = viewer.addResLabels({ resi: nth }, labelOptions);
+                    return labels;
+                }
+            },
+            error: function(hdr, status, err) {
+                console.error( "Failed to load PDB " + pdbUrl + ": " + err );
+                spanElement.innerHTML = ":";
+                var message = document.createElement('p');
+                message.textContent = 'Sorry! We could not find a good representative 3D structure for this long-sequence protein';
+                message.style.color = 'grey';
+                message.style.textAlign = 'center';
+                message.style.fontSize = '18px';
+                message.style.position = 'absolute';
+                message.style.top = '20%';
+                message.style.left = '50%';
+                message.style.transform = 'translate(-50%, -50%)';
+                message.style.zIndex = '1';
+                element.append(message);
+            },
+        } );
+
+        // var structureDisplay = document.getElementById('structure_display');
+        // var protein_name = "{{ protein_name }}";
+
+        // var variant_info_for_3D_view = JSON.parse('{{ variant_info_for_3D_view|safe }}');
+        // var resi = []
+        // for (var v of variant_info_for_3D_view) {
+        //     resi.push(v.protein_position);
+        // }
+
+        // // Count the number of chains
+        // const chains = new Set();
+        // const model = viewer.getModel()
+        // const atoms = model.selectedAtoms({});
+        // for (let i = 0; i < atoms.length; i++) {
+        //     const atom = atoms[i];
+        //     chains.add(atom.chain);
+        // }
+
+        // const chainSelect = document.getElementById('chainSelect');
+        // const chainArray = Array.from(chains); // Convert the set to an array for easier manipulation
+        // chainArray.sort(); // Sort the chains in alphabetical order (optional)
+        // for (const chain of chainArray) {
+        //     const option = document.createElement("option");
+        //     option.value = chain;
+        //     option.textContent = chain;
+        //     chainSelect.appendChild(option);
+        // }
+
+        // chainSelect.addEventListener('change', (event) => {
+        //     var selectedChain = chainSelect.value;
+
+        //     if (selectedChain !== "") {
+        //         viewer.setStyle({}, { cartoon: { color: '#ced4da', opacity: 1 } });
+        //         viewer.addStyle({ chain: selectedChain }, { cartoon: { color: 'spectrum', opacity: 1 } });
+        //     }
+        //     viewer.render();
+        // });
+
+        // const variantVisibilitySelect = document.getElementById('variantVisibilitySelect');
+        // variantVisibilitySelect.addEventListener('change', (event) => {
+        //     const selectedvisibility = event.target.value;
+        //     if (selectedvisibility === 'hide') {
+        //         viewer.setStyle({}, { cartoon: { color: "spectrum" } });
+        //         var colorSelect = document.getElementById("colorSelect");
+        //         colorSelect.value = "spectrum";
+        //     } else {
+        //         viewer.setStyle({}, { cartoon: { color: '#ced4da', thickness: 0.5 } });
+        //         viewer.addStyle({ resi: resi }, { stick: { colorscheme: 'greenCarbon' } });
+        //         var colorSelect = document.getElementById("colorSelect");
+        //         colorSelect.value = "grey";
+        //     }
+        //     viewer.render();
+        // });
+
+        // var colorSelect = document.getElementById('colorSelect');
+        // colorSelect.addEventListener('change', (event) => {
+        //     const selectedColor = event.target.value;
+        //     if (selectedColor === 'grey') {
+        //         viewer.setStyle({}, { cartoon: { color: '#ced4da' } });
+        //     } else {
+        //         viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
+        //         for (const option of variantVisibilitySelect.options) {
+        //             if (option.value === "hide") {
+        //                 option.selected = true;
+        //                 break;
+        //             }
+        //         }
+        //     }
+        //     viewer.render();
+        // });
+
+        // function addLabelForResidueNth(nth, labelText, labelOptions) {
+        //     const labels = viewer.addResLabels({ resi: nth }, labelOptions);
+        //     return labels;
+        // }
 
     });
 

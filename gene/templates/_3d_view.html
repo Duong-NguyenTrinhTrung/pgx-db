@@ -15,11 +15,11 @@
 
 <div id="structure_display" style="width: 100%; height: 550px;"></div>
 
-<script>
+<!-- <script>
     // Create the viewer
     let element = document.querySelector('#structure_display');
     let config = { backgroundColor: 'white' };
-    let viewer = $3Dmol.createViewer(element, config );
+    var viewer = $3Dmol.createViewer(element, config );
     let spanElement = document.querySelector("#source_of_displayed_3D_structure");
     
     // Load the 3D structure from a PDB file hosted online
@@ -27,37 +27,40 @@
     var pdbUrl = "{% static 'gene/pdb/' %}" + "{{ protein_name }}" + ".pdb";
     var long_sequence_protein = ["P98164","P04275","Q07954","P98160","O60494","P21817","P78527","Q13315","P08519","Q92736","P78559","Q02817","P46939","P15924","Q86YZ3","Q14643","Q5T4S7","Q8WXI7","P01266","Q02224","O15230","P25391","Q16787","P13611","P42858","P35556","Q75N90","Q15413","P04114","P11532"];
 
-    jQuery.ajax( pdbUrl, {
-        success: function(data) {
-            // let v = viewer;
-            viewer.addModel( data, "pdb" );                       /* load data */
-            viewer.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
-            viewer.zoomTo();                                      /* set camera */
-            viewer.render();                                      /* render scene */
-            // viewer.zoom(1.2, 1000);                               /* slight zoom */
-            var proteinName = "{{ protein_name }}"; 
-            if (long_sequence_protein.includes(proteinName)){
-                spanElement.innerHTML = "(Obtained from PDB):";
-            }
-            else {
-                spanElement.innerHTML = "(Obtained from Alphafold 2):";
-            }
-        },
-        error: function(hdr, status, err) {
-            console.error( "Failed to load PDB " + pdbUrl + ": " + err );
-            spanElement.innerHTML = ":";
-            var message = document.createElement('p');
-            message.textContent = 'Sorry! We could not find a good representative 3D structure for this long-sequence protein';
-            message.style.color = 'grey';
-            message.style.textAlign = 'center';
-            message.style.fontSize = '18px';
-            message.style.position = 'absolute';
-            message.style.top = '20%';
-            message.style.left = '50%';
-            message.style.transform = 'translate(-50%, -50%)';
-            message.style.zIndex = '1';
-            element.append(message);
-        },
-    } );
+    $(document).ready(function() {
+        jQuery.ajax( pdbUrl, {
+            success: function(data) {
+                // let v = viewer;
+                viewer.addModel( data, "pdb" );                       /* load data */
+                viewer.setStyle({}, {cartoon: {color: 'spectrum'}});  /* style all atoms */
+                viewer.zoomTo();                                      /* set camera */
+                viewer.render();                                      /* render scene */
+                // viewer.zoom(1.2, 1000);                               /* slight zoom */
+                var proteinName = "{{ protein_name }}"; 
+                if (long_sequence_protein.includes(proteinName)){
+                    spanElement.innerHTML = "(Obtained from PDB):";
+                }
+                else {
+                    spanElement.innerHTML = "(Obtained from Alphafold 2):";
+                }
+            },
+            error: function(hdr, status, err) {
+                console.error( "Failed to load PDB " + pdbUrl + ": " + err );
+                spanElement.innerHTML = ":";
+                var message = document.createElement('p');
+                message.textContent = 'Sorry! We could not find a good representative 3D structure for this long-sequence protein';
+                message.style.color = 'grey';
+                message.style.textAlign = 'center';
+                message.style.fontSize = '18px';
+                message.style.position = 'absolute';
+                message.style.top = '20%';
+                message.style.left = '50%';
+                message.style.transform = 'translate(-50%, -50%)';
+                message.style.zIndex = '1';
+                element.append(message);
+            },
+        } );
 
-</script>
+    });
+    
+</script> -->
