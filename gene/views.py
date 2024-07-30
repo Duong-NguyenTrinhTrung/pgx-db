@@ -248,6 +248,7 @@ class GeneDetailBaseView(object):
         return data_subset
 
     def get_gene_detail_data(self, slug):
+        print("get_gene_detail_data:", slug)
         context = {}
         if slug is not None:
             if cache.get("variant_data_" + slug) is not None:
@@ -283,15 +284,20 @@ class GeneDetailBaseView(object):
                 table_with_mean_vep_score = []
                 variant_info_for_3D = []
                 protein_with_variant_index_list=[] 
+                
                 for data_row in table.to_numpy():
                     try:
                         cleaned_values = [x for x in data_row[10:-2] if str(x) != '']
                         mean_vep_score = round(np.mean(cleaned_values), 2)
                         if np.isnan(mean_vep_score):
                             mean_vep_score = "nan"
-                        # print("data_row", data_row)
-                        # print("shape of data_row", data_row.shape)
+                        std_vep_score = round(np.std(cleaned_values, ddof=1), 2)
+                        if np.isnan(std_vep_score):
+                            std_vep_score = "nan"
+                        print("mean_vep_score: ", mean_vep_score, " std_vep_score: ", std_vep_score)
+                        
                         data_row = np.append(data_row, mean_vep_score)
+                        data_row = np.append(data_row, std_vep_score)
                         # print("after data_row", data_row)
                         table_with_mean_vep_score.append(data_row)
                         temp = {"variant_marker": data_row[0],
@@ -535,6 +541,8 @@ list_necessary_columns = [
     "HighestAF",
 ]
 
+list_necessary_columns_2 = ["Transcript_ID", "Consequence", "Protein_position", "Amino_acids", "Codons", "HighestAF"] + list_necessary_columns[9:-2]
+
 name_dic = {'NMD': 'NMD_transcript', 'cse': 'coding_sequence', 'fsh': 'frameshift',
             'itc': 'incomplete_terminal_codon', 'ide': 'inframe_deletion', 'iis': 'inframe_insertion',
             'mis': 'missense', 'pal': 'protein_altering', 'sac': 'splice_acceptor', 'sdo': 'splice_donor',
@@ -661,15 +669,23 @@ def get_variant_annotation_and_vep(request, slug): #lower for one gene
                     mean_vep_score = round(np.mean(cleaned_values), 2)
                     if np.isnan(mean_vep_score):
                         mean_vep_score = "nan"
+
+                    std_vep_score = round(np.std(cleaned_values, ddof=1), 2)
+                    if np.isnan(std_vep_score):
+                        std_vep_score = "nan"
+
                     data_row = np.append(data_row, mean_vep_score)
+                    data_row = np.append(data_row, std_vep_score)
                     table_with_mean_vep_score.append(data_row)
                     
                 except Exception as e:
                     pass
+            print("length data_row ", len(table_with_mean_vep_score[0]))
             # print("table_with_mean_vep_score length ", len(table_with_mean_vep_score))
             table_with_protein_pos_int = []
             fields = list(table.columns)
             fields.append("Mean_VEP_score")
+            fields.append("Std_VEP_score")
             number_of_fields = len(fields)
             for data_row in table_with_mean_vep_score:
                 try:
@@ -717,15 +733,23 @@ def get_gene_detail_data(request, slug): #upper
                 marker_ID_data = list(set(Variant.objects.filter(Gene_ID=geneid).values_list(
                     "VariantMarker", flat=True)))
             objs = Gene.objects.filter(gene_id=geneid).values_list("primary_transcript", flat=True)
+            protein_position_and_corresponding_lowest_mean_VEP_score = {}
+            
             if objs:
                 pt = objs[0] #take the primary_transcript
                 for marker in marker_ID_data:
                     vep_variants = VepVariant.objects.filter(
-                        Q(Variant_marker=marker)&Q(Transcript_ID=pt)).exclude(Protein_position__icontains='-').values_list("Transcript_ID", "Consequence", "Protein_position", "Amino_acids", "Codons", "HighestAF"
+                        Q(Variant_marker=marker)&Q(Transcript_ID=pt)).exclude(Protein_position__icontains='-').values_list(*list_necessary_columns_2
                         )
                     try:
                         for vep_variant in vep_variants:
                             coseq = vep_variant[1].split(",")
+                            cleaned_values = [x for x in vep_variant[6:] if str(x) != '']
+                            mean_vep_score = round(np.mean(cleaned_values), 2)
+                            if np.isnan(mean_vep_score):
+                                mean_vep_score = "nan"
+                            # one protein postion may have more than one variants --> more than one MVS
+                            protein_position_and_corresponding_lowest_mean_VEP_score.setdefault(vep_variant[2], []).append(mean_vep_score)
                             consequences=[]
                             if len(coseq) >= 1:
                                 for c in coseq:
@@ -739,14 +763,13 @@ def get_gene_detail_data(request, slug): #upper
                                     "mtaa": vep_variant[3].split("/")[1], #mutant AA
                                     "codon": vep_variant[4],
                                     "HighestAF": str(vep_variant[5]),
+                                    "Mean_VEP_Score": mean_vep_score,
                                     }
                             variant_info_for_3D.append(temp)
                             protein_with_variant_index_list.append(vep_variant[2])
                     except Exception as e:
                         pass
-            print("before ", len(variant_info_for_3D))
             variant_info_for_3D = remove_duplicates(variant_info_for_3D)
-            print("after ", len(variant_info_for_3D))
             variant_info_for_3D_view = sorted(variant_info_for_3D, key=lambda x: int(x['protein_position']))
             context['variant_info_for_3D_view'] = json.dumps(variant_info_for_3D_view)
             context['protein_with_variant_index_list'] = protein_with_variant_index_list
@@ -759,35 +782,31 @@ def get_gene_detail_data(request, slug): #upper
             protein_name = Protein.objects.filter(geneID=slug).values_list("uniprot_ID", flat=True)[0]
             context["protein_name"] = protein_name
             context["amino_seq_num_list"] = amino_seq_num_list
+            
+            new_dict = {}
+            for key, values in protein_position_and_corresponding_lowest_mean_VEP_score.items():
+                numeric_values = [float(v) for v in values if v != 'nan']
+                if numeric_values:
+                    new_dict[key] = min(numeric_values)
+                else:
+                    new_dict[key] = 'nan'
+            # print("---- new_dict: ", new_dict)
+            
             chunks = []
             for i in range(0, len(amino_seq), 10):
                 temp={
-                    "aa_and_index":[[ amino_seq[i+k-1:i+k],k] for k in range(1, 11)],
-                    "position": i + 10
+                    "aa_and_index_and_score":[[ amino_seq[i+k-1:i+k], k, new_dict.get(str(i+k)) ] for k in range(1, 11)],
+                    "position": i + 10,
                 }
                 chunks.append(temp)
             chunks[-1]["position"] = len(amino_seq)
             context["chunks"] = chunks
+            print("------ chunks ", chunks)
             context["af_pdb"] = Protein.objects.filter(geneID=slug).values_list("af_pdb", flat=True)[0]
             variants = [item["variant_marker"] for item in variant_info_for_3D_view]
             context['variants'] = list(set(variants))
             cache.set("gene_detail_data_" + slug, context, 60 * 60)
     return render(request, 'gene_detail.html', context)
-
-
-# class GeneDetailBrowser(
-#     GeneDetailBaseView,
-#     TemplateView,
-# ):
-#     template_name = 'gene_detail.html'
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         slug = kwargs.get('slug')
-#         print("Slug: ", slug)
-#         context.update(self.get_gene_detail_data(slug))
-#         # context.update(self.get_gene_detail_data(slug))
-#         return context
 
 
 class GenebassVariantListView(TemplateView):

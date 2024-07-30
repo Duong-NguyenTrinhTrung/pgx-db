@@ -45,8 +45,8 @@ function createPieChart_Proteins(){
 
         const svg = d3.select('#pie-chart-proteins')
         .attr('viewBox', `0 0 ${size} ${size}`)
-        .attr('width', size)
-        .attr('height', size)
+        .attr('width', "100%")
+        .attr('height', "100%")
       
         const g = svg.append('g')
         .attr("transform", `translate(${size / 2},${size / 2})`);
@@ -171,8 +171,8 @@ function createPieChart_Drugs() {
 
         const svg = d3.select('#pie-chart-drugs')
         .attr('viewBox', `0 0 ${size} ${size}`)
-        .attr('width', size)
-        .attr('height', size)
+        .attr('width', '100%')
+        .attr('height', '100%')
       
         const g = svg.append('g')
         .attr("transform", `translate(${size / 2},${size / 2})`);
@@ -303,8 +303,8 @@ function createPieChart_ATClevel1() {
 
         const svg = d3.select('#pie-chart-ATC')
         .attr('viewBox', `0 0 ${size} ${size}`)
-        .attr('width', size)
-        .attr('height', size)
+        .attr('width', '100%')
+        .attr('height', '100%')
       
         const g = svg.append('g')
         .attr("transform", `translate(${size / 2},${size / 2})`);
@@ -439,8 +439,8 @@ function createPieChart_Mutations() {
 
         const svg = d3.select('#pie-chart-mutations')
         .attr('viewBox', `0 0 ${size} ${size}`)
-        .attr('width', size)
-        .attr('height', size)
+        .attr('width', "100%")
+        .attr('height', "100%")
       
         const g = svg.append('g')
         .attr("transform", `translate(${size / 2},${size / 2})`);

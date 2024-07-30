@@ -158,6 +158,10 @@
         /* opacity: 0;
         transition: opacity 0.3s; */
     }
+    .ui-state-highlight {
+        font-weight: bolder;
+        color: red !important;
+    }
         
 </style>
 
@@ -314,7 +318,16 @@
             close: function (event, ui) {
                 autocompleteResults.hide(); 
             }
-        });
+        }).data("ui-autocomplete")._renderItem = function (ul, item) {
+            var newText = String(item.value).replace(
+                    new RegExp(this.term, "gi"),
+                    "<span class='ui-state-highlight'>$&</span>");
+            console.log("Render Item: "+ newText);
+            return $("<li></li>")
+                .data("item.autocomplete", item)
+                .append("<div>" + newText + "</div>")
+                .appendTo(ul);
+        };
         // Hide autocomplete results when clicking outside of the input and results
         
         //  $("#search_protein").on('keyup', function() {

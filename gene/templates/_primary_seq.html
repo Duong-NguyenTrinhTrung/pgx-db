@@ -5,16 +5,16 @@
 <div>
     <p style="font-size:18px; font-weight: bold; padding-left:0; margin:10px 0 0;">Encoded protein: <span style="color: #B69121">{{ protein_name }}</span> -
         length: <span style="color: #B69121">{{ seq_length }}</span></p>
-    <p style="font-size:16px; padding-left:0; margin:10px 0 0; color:red; font-style: italic;">Click on each double underlined amino acid to see its variant(s)</p>
+    <p style="font-size:16px; padding-left:0; margin:10px 0 0; color:red; font-style: italic;">Click on each underlined amino acid to see its variant(s)</p>
     <div id="threeD_view_upper">
         <p></p>
         <div class="text-area" id="myTextArea">
             {% for d in chunks %}
                 <div
                         {% if not forloop.last %}
-                            style="text-align: right; width: 165px; margin-right: 4px; background-color: bisque; margin-bottom: 4px;"
+                            style="text-align: right; width: 165px; margin-right: 4px; background-color: rgba(224, 225, 221, 0.3);margin-bottom: 4px;"
                         {% else %}
-                            style="text-align: left; margin-bottom: 4px; background-color: bisque; width: 165px;"
+                            style="text-align: left; margin-bottom: 4px; background-color: rgba(224, 225, 221, 0.3); width: 165px;"
                         {% endif %}
                 >
                     {% if not forloop.last %}
@@ -25,20 +25,20 @@
                     {% if not forloop.last %}
                         <div class="amino_acid_chunk"
                              style="display: flex; align-items: center; justify-content: space-between; margin: 0 7px;">
-                            {% for a in d.aa_and_index %}
-                                {% if a.0 in "GAVLIFWMP" %}
-                                    <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-10|add:a.1 }}')"><span class="yellow color-coded-text">{{ a.0 }}</span></a></div>
+                            {% for a in d.aa_and_index_and_score %}
+                                {% if a.2 > 0.75 %}
+                                    <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-10|add:a.1 }}')"><span style="color: #370617;" class="color-coded-text">{{ a.0 }}</span></a></div>
                                 {% else %}
-                                    {% if a.0 in "STCYNQ" %}
-                                        <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-10|add:a.1 }}')"><span class="green color-coded-text">{{ a.0 }}</span></a></div>
+                                    {% if a.2 > 0.5 %}
+                                        <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-10|add:a.1 }}')"><span style="color: #9d0208;" class="color-coded-text">{{ a.0 }}</span></a></div>
                                     {% else %}
-                                        {% if a.0 in "DE" %}
-                                            <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-10|add:a.1 }}')"><span class="red color-coded-text">{{ a.0 }}</span></a></div>
+                                        {% if a.2 > 0.25 %}
+                                            <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-10|add:a.1 }}')"><span style="color: #d00000;" class="color-coded-text">{{ a.0 }}</span></a></div>
                                         {% else %}
-                                            {% if a.0 in "KHR" %}
-                                                <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-10|add:a.1 }}')"><span class="blue color-coded-text">{{ a.0 }}</span></a></div>
+                                            {% if a.2 > 0 %}
+                                                <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-10|add:a.1 }}')"><span style="color: #f48c06;" class="color-coded-text">{{ a.0 }}</span></a></div>
                                             {% else %}
-                                                <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-10|add:a.1 }}')"><span class="color-coded-text">{{ a.0 }}</span></a></div>
+                                                <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-10|add:a.1 }}')"><span style="color: darkgrey;" class="color-coded-text">{{ a.0 }}</span></a></div>
                                             {% endif %}
                                         {% endif %}
                                     {% endif %}
@@ -47,20 +47,20 @@
                         </div>
                     {% else %}
                         <div class="amino_acid_chunk" style="display: flex; gap: 5px; align-items: left;  margin: 0 7px;">
-                            {% for a in d.aa_and_index %}
-                                {% if a.0 in "GAVLIFWMP" %}
-                                    <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-6|add:a.1 }}')"><span class="yellow color-coded-text">{{ a.0 }}</span></a></div>
+                            {% for a in d.aa_and_index_and_score %}
+                                {% if a.2 > 0.75 %}
+                                    <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-6|add:a.1 }}')"><span style="color: #370617;" class="color-coded-text">{{ a.0 }}</span></a></div>
                                 {% else %}
-                                    {% if a.0 in "STCYNQ" %}
-                                        <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-6|add:a.1 }}')"><span class="green color-coded-text">{{ a.0 }}</span></a></div>
+                                    {% if a.0 > 0.5 %}
+                                        <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-6|add:a.1 }}')"><span style="color: #9d0208;" class="color-coded-text">{{ a.0 }}</span></a></div>
                                     {% else %}
-                                        {% if a.0 in "DE" %}
-                                            <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-6|add:a.1 }}')"><span class="red color-coded-text">{{ a.0 }}</span></a></div>
+                                        {% if a.0 > 0.25 %}
+                                            <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-6|add:a.1 }}')"><span style="color: #d00000;" class="color-coded-text">{{ a.0 }}</span></a></div>
                                         {% else %}
-                                            {% if a.0 in "KHR" %}
-                                                <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-6|add:a.1 }}')"><span class="blue color-coded-text">{{ a.0 }}</span></a></div>
+                                            {% if a.2 > 0 %}
+                                                <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-10|add:a.1 }}')"><span style="color: #f48c06;" class="color-coded-text">{{ a.0 }}</span></a></div>
                                             {% else %}
-                                                <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-6|add:a.1 }}')"><span class="color-coded-text">{{ a.0 }}</span></a></div>
+                                                <div class="residue"><a href="#3D_view_upper" onclick="showAAtooltip(event, '{{ d.position|add:-10|add:a.1 }}')"><span style="color: darkgrey;" class="color-coded-text">{{ a.0 }}</span></a></div>
                                             {% endif %}
                                         {% endif %}
                                     {% endif %}
@@ -108,7 +108,7 @@
                 if (residueDiv) {
                     for (var v of variant_info_for_3D_view) {
                         if (v.protein_position == p) {
-                            tooltip_text += `Protein position: <span class="AA_residue_span">${v.protein_position}</span>,<br> Widetype amino acid: <span class="AA_residue_span">${v.wtaa}</span>,<br> Mutant amino acid: <span class="AA_residue_span">${v.mtaa}</span>,<br> Codon: <span class="AA_residue_span">${v.codon}</span>,<br> Variant_marker: <a href="#" onclick="showTableWithFilteredOnSelectedVariant('${v.variant_marker}'); return false;"><span>${v.variant_marker}</span></a><span style="color: grey; font-style: italic;"> (<-- Click for details)</span>,<br> Consequence: <span class="AA_residue_span">${v.consequence}</span><br> Frequency: <span class="AA_residue_span">${v.HighestAF}</span><br><br>`;
+                            tooltip_text += `Protein position: <span class="AA_residue_span">${v.protein_position}</span>,<br> Widetype amino acid: <span class="AA_residue_span">${v.wtaa}</span>,<br> Mutant amino acid: <span class="AA_residue_span">${v.mtaa}</span>,<br> Codon: <span class="AA_residue_span">${v.codon}</span>,<br> Variant_marker: <a href="#" onclick="showTableWithFilteredOnSelectedVariant('${v.variant_marker}'); return false;"><span>${v.variant_marker}</span></a><span style="color: grey; font-style: italic;"> (<-- Click for details)</span>,<br> Consequence: <span class="AA_residue_span">${v.consequence}</span><br> Frequency: <span class="AA_residue_span">${v.HighestAF}</span><br> Mean_VEP_Score: <span class="AA_residue_span">${v.Mean_VEP_Score}</span><br><br>`;
                         }
                     }
                 }

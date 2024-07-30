@@ -238,7 +238,7 @@
                     {% if drug.adr == "NA" %}
                         NA
                     {% else %}
-                        <a href="#" data-toggle="modal" data-target="#adrModal">View Details</a>
+                      {{ drug.no_of_size_effects }}  <a href="#" data-toggle="modal" data-target="#adrModal">(View Details)</a>
 
                         <div class="modal fade"  id="adrModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
                             <div class="modal-dialog modal-dialog-centered" role="document">
@@ -305,7 +305,13 @@
                     },
                     dataType: 'json',
                     success: function (data) {
-                        response(data.suggestions);
+                        if (data.suggestions.length > 0) {
+                            response(data.suggestions);
+                        }
+                        else {
+                            response(['No results found!'])
+                        }
+                        
                     }
                 });
             },
@@ -317,6 +323,7 @@
                 return false;
             },
             open: function (event, ui) {
+                console.log("open automcomplete: "+ ui.toString());
                 autocompleteResults.show(); 
             },
             close: function (event, ui) {
@@ -394,7 +401,7 @@
                                                     ${c}%) <button data-se-name=${c.split("(")[0].trim()} data-remote-url="{% url 'get-se-definition' %}" class="se-definition-button"><span class="glyphicon glyphicon-info-sign"></span></button><br>
                                                 </span>`;
                             });
-                            adr_cell=`<a href="#" data-toggle="modal" data-target="#adrModal">View Details</a>
+                            adr_cell=`${item.no_of_size_effects} <a href="#" data-toggle="modal" data-target="#adrModal">(View Details)</a>
                             <div class="modal fade" id="adrModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                     <div class="modal-content">
@@ -477,7 +484,7 @@
                                                     ${c}%) <button data-se-name=${c.split("(")[0].trim()} data-remote-url="{% url 'get-se-definition' %}" class="se-definition-button"><span class="glyphicon glyphicon-info-sign"></span></button><br>
                                                 </span>`;
                             });
-                            adr_cell=`<a href="#" data-toggle="modal" data-target="#adrModal">View Details</a>
+                            adr_cell=`${item.no_of_size_effects} <a href="#" data-toggle="modal" data-target="#adrModal">(View Details)</a>
                             <div class="modal fade" id="adrModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered" role="document">
                                     <div class="modal-content">
@@ -561,7 +568,7 @@
                                                         ${c}%) <button data-se-name=${c.split("(")[0].trim()} data-remote-url="{% url 'get-se-definition' %}" class="se-definition-button"><span class="glyphicon glyphicon-info-sign"></span></button><br>
                                                     </span>`;
                                 });
-                                adr_cell=`<a href="#" data-toggle="modal" data-target="#adrModal">View Details</a>
+                                adr_cell=`${item.no_of_size_effects} <a href="#" data-toggle="modal" data-target="#adrModal">(View Details)</a>
                                 <div class="modal fade" id="adrModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered" role="document">
                                         <div class="modal-content">

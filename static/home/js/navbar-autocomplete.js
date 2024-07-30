@@ -10,6 +10,8 @@ $.widget( "custom.catcomplete", $.ui.autocomplete,
     },
     //The _renderMenu function is being overridden. This function is responsible for rendering the menu of options that appears when the user starts typing in the input field. The function takes two arguments, ul and items, which are the menu element and the list of options to be rendered, respectively.
     _renderMenu: function( ul, items ) {
+      
+
       //create a variable that refers to the current context of the widget, so that it can be used inside the $.each function.
       //currentCategory is a variable that keeps track of the current category being rendered in the menu
       var that = this,
@@ -17,20 +19,31 @@ $.widget( "custom.catcomplete", $.ui.autocomplete,
       //iterates over each item in the items array
       $.each( items, function( index, item ) {
         var li;
-        //checks if the current item's category is different from the current category being rendered
-        if ( item.category != currentCategory ) {
-          //adds a new list item to the menu with the class 'ui-autocomplete-category' and the text of the current item's category
-          ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
-          //updates the current category being rendered to be the category of the current item
-          currentCategory = item.category;
+        // console.log("Render: " + item +"; type "+ typeof item );
+        if (item.label == 'No results found') {
+          li = that._renderItemData( ul, item );
+          li.attr( "aria-label",  item.label );
+          li.addClass("no-result");
+          // li.css.color = "red";
+          
+        } 
+        else {
+          //checks if the current item's category is different from the current category being rendered
+          if ( item.category != currentCategory ) {
+            //adds a new list item to the menu with the class 'ui-autocomplete-category' and the text of the current item's category
+            ul.append( "<li class='ui-autocomplete-category'>" + item.category + "</li>" );
+            //updates the current category being rendered to be the category of the current item
+            currentCategory = item.category;
+          }
+          //calls the _renderItemData function of the parent widget and passing the ul and the current item as the argument, the _renderItemData function renders the current item in the menu.
+          li = that._renderItemData( ul, item );
+          //checks if the current item has a category
+          if ( item.category ) {
+            //adds an 'aria-label' attribute to the current item's list element, with the value being the item's category and label concatenated together with a colon
+            li.attr( "aria-label", item.category + " : " + item.label );
+          }
         }
-        //calls the _renderItemData function of the parent widget and passing the ul and the current item as the argument, the _renderItemData function renders the current item in the menu.
-        li = that._renderItemData( ul, item );
-        //checks if the current item has a category
-        if ( item.category ) {
-          //adds an 'aria-label' attribute to the current item's list element, with the value being the item's category and label concatenated together with a colon
-          li.attr( "aria-label", item.category + " : " + item.label );
-        }
+        
       });
     }
   }

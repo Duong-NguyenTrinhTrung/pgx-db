@@ -256,6 +256,10 @@
             }
         }
         );
+        // Force a redraw after initialization to fix header alignment
+        setTimeout(function () {
+            oTable1.columns.adjust().draw(false);
+        }, 100);
         $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').attr('size', '4');
         $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '10')
         $("#pgx-data-table_filter").find("input").css("margin-left", "10px");
@@ -275,7 +279,7 @@
                 tableHtml += `
                     <tr>
                         <td style="vertical-align: top;" >${row.drug_id}</td>
-                        <td style="vertical-align: top;" >${row.gene_name}</td>
+                        <td style="vertical-align: top;" ><a href="/gene/gene_detail/${row.gene_id}" target="_blank">${row.gene_name}</a></td>
                         <td style="vertical-align: top;" >${row.moa}</td>
                         <td style="vertical-align: top;" >${value.annotation}</td>
                         <td style="vertical-align: top;" >${Number(value.n_cases).toFixed(0)}</td>
@@ -336,6 +340,10 @@
             }
         }
         );
+        // Force a redraw after initialization to fix header alignment
+        setTimeout(function () {
+            oTable1.columns.adjust().draw(false);
+        }, 100);
         $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').attr('size', '4');
         $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '10')
         $("#pgx-data-table_filter").find("input").css("margin-left", "10px");
@@ -358,8 +366,8 @@
                 tableHtml += `
                     <tr>
                         <td style="vertical-align: top;" >${row.drug_id}</td>
-                        <td style="vertical-align: top;" >${value.genename}</td>
-                        <td style="vertical-align: top;" >${value.variant_marker__VariantMarker}</td>
+                        <td style="vertical-align: top;" ><a href="/gene/gene_detail/${value.gene_id}" target="_blank">${value.genename}</a></td>
+                        <td style="vertical-align: top;" ><a href="/gene/gene_detail/${value.gene_id}/?variant_marker=${value.variant_marker__VariantMarker}" target="_blank">${value.variant_marker__VariantMarker}</a></td>
                         <td style="vertical-align: top;" >${value.annotation}</td>
                         <td style="vertical-align: top;" >${Number(value.n_cases).toFixed(0)}</td>
                         <td style="vertical-align: top;" >${Number(value.n_controls).toFixed(0)}</td>
@@ -428,6 +436,10 @@
             }
         }
         );
+        // Force a redraw after initialization to fix header alignment
+        setTimeout(function () {
+            oTable1.columns.adjust().draw(false);
+        }, 100);
         $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').attr('size', '4');
         $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '10')
         $("#pgx-data-table_filter").find("input").css("margin-left", "10px");

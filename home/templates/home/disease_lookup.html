@@ -234,14 +234,20 @@
             minLength: 3,
             select: function (event, ui) {
                 var current = $('#search_disease').val();
+                var current_value = "";
                 if (!current.includes(";")){ //fresh terms
                     prev=[];
                 }
-                $('#search_disease').val(prev.join("")+ui.item.value);
-                if (!prev.includes(ui.item.value+";"))
-                {
-                    prev.push(ui.item.value+";");
+                if(!prev.includes(ui.item.value)) {
+                    prev.push(ui.item.value);
                 }
+                
+                $('#search_disease').val(prev.join(";"));
+                
+                // if (!prev.includes(ui.item.value+";"))
+                // {
+                //     prev.push(ui.item.value+";");
+                // }
                 $("#submit_disease").click();                       
                 return false;
             },
