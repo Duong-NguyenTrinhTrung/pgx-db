@@ -1,0 +1,316 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+{% block addon_css %}
+<link rel="stylesheet" href="{% static '/home/css/autocomplete.css' %}">
+
+<style>
+    #adr, #adr-result{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 80px;
+    }
+
+    #adr-result{
+        margin-top: 20px;
+        width: 70%;
+        margin: 20px auto;
+    }
+
+    #adr-result-table {
+        border-radius: 5px;
+        min-width: 100%;
+    }
+
+    #adr-result-table th:first-child{
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+    }
+
+    #adr-result-table th:last-child {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+    }
+
+    #adr-result-table th{
+        height: 40px;
+        text-align: left;
+        background-color: #dad7cd; 
+        font-weight: normal;
+        font-size: 14px;
+    }
+
+    #adr-result-table th, td {
+        padding: 0 7px;
+    }
+
+    #adr-result-table tr:nth-child(even) {
+        background-color: #e5e5e5; /* Color 1 for even rows */
+    }
+
+    #adr-result-table tr:nth-child(odd) {
+        background-color: white; /* Color 2 for odd rows */
+    }
+
+    #adr p
+   {
+        display: block;
+        width: 70%;
+        background-color: #dad7cd;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    #adr form
+    {
+        background-color: #F2F5F6;
+        padding: 3px;
+        border-radius: 5px;
+        width: 70%;
+        height: 95px
+    }
+
+    #adr input
+    {
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    #adr_search,
+    #adr_reset
+     {
+        margin-right: 10px;
+    }
+
+    input.form-control {
+        width: 650px;
+    }
+
+    td {
+        vertical-align: middle;
+    }
+
+    .color1 { color: #f48c06; }
+    .color2 { color: #d00000; }
+    .color3 { color: #9d0208; }
+    .color4 { color: #6a040f; }
+
+    .se-definition-button {
+        border: none;
+        background-color: white;
+    }
+
+    #adr-search-intro {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 70%;
+        margin: 0 auto;
+        
+    }
+    #sub-adr-search-intro-text{
+        width: 60%;
+        text-align: justify;
+    }
+    #sub-adr-search-intro-image{
+        width: 40%;
+    }
+
+</style>
+
+{% endblock %}
+
+{% block content %}
+<div id="adr-search-intro">
+    <div id="sub-adr-search-intro-text">
+        <h3>ADVERSE DRUG REACTION (SIDE EFFECT)</h3>
+        <div>
+            <p>
+                Drug entities are the central focus of PGxDB. Users can search for 6,259 drug-like molecules (small molecules and biologics) interacting with one or more proteins. Among these, 432 are biologics (including antibodies, vaccines, recombinant therapeutic proteins, or other biological molecules) and 5,827 are small molecules. Drugs are further classified into six categories based on their clinical development and approval status: approved, vet-approved, nutraceutical, experimental, investigational, and illicit. Most drugs have assigned ATC codes. We provide network views where drugs, their interacting proteins, and associated diseases are organized based on ATC codes. Other aspects are also presented, such as adverse drug reactions, pharmacogenomics, and statistics.
+                As an example, the image on the right shows the drug-protein interactions and drug-disease associations for <a href="/drug_lookup/?drugbank_id=DB01234" target="_blank">Dexamethasone</a> (DrugBank identifier = DB01234) with 16 assigned ATC codes: 
+                <a href="/atc_detail_view/?group_id=R&detail=R01AD53" target="_blank">R01AD53</a>, 
+                <a href="/atc_detail_view/?group_id=D&detail=D07XB05" target="_blank">D07XB05</a>, 
+                <a href="/atc_detail_view/?group_id=D&detail=R01AD03" target="_blank">R01AD03</a>, 
+                <a href="/atc_detail_view/?group_id=D&detail=D10AA03" target="_blank">D10AA03</a>, 
+                <a href="/atc_detail_view/?group_id=S&detail=S01CB01" target="_blank">S01CB01</a>, 
+                <a href="/atc_detail_view/?group_id=S&detail=S02CA06" target="_blank">S02CA06</a>, 
+                <a href="/atc_detail_view/?group_id=S&detail=S03CA01" target="_blank">S03CA01</a>, 
+                <a href="/atc_detail_view/?group_id=C&detail=C05AA09" target="_blank">C05AA09</a>, 
+                <a href="/atc_detail_view/?group_id=S&detail=S01CA01" target="_blank">S01CA01</a>, 
+                <a href="/atc_detail_view/?group_id=D&detail=D07CB04" target="_blank">D07CB04</a>, 
+                <a href="/atc_detail_view/?group_id=H&detail=H02AB02" target="_blank">H02AB02</a>, 
+                <a href="/atc_detail_view/?group_id=S&detail=S01BA01" target="_blank">S01BA01</a>, 
+                <a href="/atc_detail_view/?group_id=A&detail=A01AC02" target="_blank">A01AC02</a>, 
+                <a href="/atc_detail_view/?group_id=S&detail=S03BA01" target="_blank">S03BA01</a>, 
+                <a href="/atc_detail_view/?group_id=D&detail=D07AB19" target="_blank">D07AB19</a>, 
+                <a href="/atc_detail_view/?group_id=S&detail=S02BA06" target="_blank">S02BA06</a>
+                <br>
+                </p>
+        </div>
+    </div>
+    <div id="sub-adr-search-intro-image">
+        <img src="/static/drug/image/adr-search-example.png" alt="ADR example" style="width: 90%; margin-left: 40px;">
+    </div>
+</div>
+<div id="adr">
+    <p class="lookup-text">Search by <i><span style="color:grey;">Side effect name</span></i>
+        <br>
+        <i style="font-weight: 300;">(Multiple inputs are allowed. Please use semi colons to separate the inputs)</i>
+    </p>
+    <form method="get" action="">
+        <table class="table table-bordered table-gray table-fulltext-two-rows">
+            <tbody>
+                <tr>
+                    <td>
+                        <div style="position: relative;">
+                            <input id="search_adr"
+                                class="form-text form-type-textfield form-control optional ui-autocomplete-input" style="width:100%;" size="70%"
+                                autocomplete="on" />
+                            <div class="autocomplete-outer">
+                                <div id="adr-autocomplete-results">
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="h-center"><input id="submit_adr" type="submit" value="Search"
+                            class="button js-form-submit form-submit form-type-submit btn btn-default btn-block"></td>
+                    <td class="h-center"><input id="reset_adr" type="reset" value="Reset"
+                            class="button js-form-submit form-submit form-type-submit btn btn-default btn-block"></td>
+                </tr>
+                <tr>
+                    <td colspan="3" style="text-align: left; padding-left: 30px;">Examples: 
+                            </td>
+                </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+<div id="adr-result">
+    <p id="search_result_examples" style="margin: 20px 0 20px; font-size: 20px; font-weight: bold;">Random ADR examples</p>
+    <table id="adr-result-table">
+        <thead>
+            <tr>
+                <th >Side effects</th>
+                <th >Side effect definition</th>
+                <th>DrugBank ID</th>
+                <th>Drug name</th>
+                <th style="text-align: center;">Frequency<br>%</th>
+                <th>ATC code</th>
+                <th>Reference</th>
+            </tr>
+        </thead>
+        <tbody id="adr-result-tbody">
+            {% for item in data.drug_and_freq %}
+                {% if forloop.first %}
+                    <tr >
+                        <td style="vertical-align: top;" rowspan="{{ data.drug_and_freq|length }}">{{ data.se_name }}</td>
+                        <td style="vertical-align: top; min-width: 300px; max-width: 400px;" rowspan="{{ data.drug_and_freq|length }}">{{ data.se_definition }}</td>
+                        <td><a target="_blank" href="/drugs_network?drug_bank_ids={{ item.drugbank_id }}">{{ item.drugbank_id }}</a></td>
+                        <td>{{ item.drug_name }}</td>
+                        <td class="{{ item.color }}" style="text-align: center;">{{ item.frequency }}</td>
+                        {% if item.atc_code != 'Not assigned' %}
+                            <td>
+                                    <a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id={{ item.atc_code.0 }}&detail={{ item.atc_code }}">{{ item.atc_code }}</a>
+                            </td>
+                        {% else %}
+                            <td>{{ item.atc_code }}</td>
+                        {% endif %}
+                        <td>Link</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td><a target="_blank" href="/drugs_network?drug_bank_ids={{ item.drugbank_id }}">{{ item.drugbank_id }}</a></td>
+                        <td>{{ item.drug_name }}</td>
+                        <td class="{{ item.color }} " style="text-align: center;">{{ item.frequency }}</td>
+                        {% if item.atc_code != 'Not assigned' %}
+                            <td>
+                                    <a title="Click to show network" href="{% url 'atc-detail-view' %}?group_id={{ item.atc_code.0 }}&detail={{ item.atc_code }}">{{ item.atc_code }}</a>
+                            </td>
+                        {% else %}
+                            <td>{{ item.atc_code }}</td>
+                        {% endif %}
+                        <td>Link</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}
+{% block addon_js %}
+
+<script>
+    $(document).ready(function () {
+        var autocompleteResults = $('#adr-autocomplete-results');
+        $('#search_adr').autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "{% url 'adr-autocomplete-view' %}",
+                    data: {
+                        query: request.term
+                    },
+                    dataType: 'json',
+                    success: function (data) {
+                        response(data.suggestions);
+                    }
+                });
+            },
+            autoFocus: true,
+            minLength: 3,
+            select: function (event, ui) {
+                $('#search_adr').val(ui.item.value);
+                $("#submit_adr").click();
+                return false;
+            },
+            open: function (event, ui) {
+                autocompleteResults.show(); 
+            },
+            close: function (event, ui) {
+                autocompleteResults.hide(); 
+            }
+        });
+        
+        $("#submit_adr").click(function() {
+            document.getElementById("search_result_examples").innerHTML = "Result(s)";
+        
+            $.ajax({
+                url: "{% url 'adr-lookup' %}?se_name="+ $("#search_adr").val(),
+                success: function (data) {
+                    $("#adr-result-tbody").html('');
+                    var html_data = '';
+                    data.drug_and_freq.forEach(item => {
+                        
+                    })
+
+                    $("#adr-result-tbody").html(html_data);
+                }
+            });
+        });
+        
+        $("#reset_adr").click(function() {
+            document.getElementById("search_result_examples").innerHTML = "Random adverse drug reaction examples";
+        
+            $.ajax({
+                    url: "{% url 'adr-lookup' %}?adr=default",
+                    success: function (data) {
+                        $("#adr-result-tbody").html('');
+                        var html_data = '';
+                        $("#drug-result-tbody").html(html_data);
+                    }
+                });
+        });
+
+        $("form").submit(function (event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+        });
+        
+    });
+</script>
+
+{% endblock %}

@@ -30,6 +30,98 @@ from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from urllib.parse import unquote
 
+def adr_lookup(request):
+    se_name = request.GET.get('se_name')
+    adr = []
+    if se_name: # if the request is sent with para
+        if se_name!="default": # if the request para is not "default", i.e., http://localhost:8000/adr_lookup/?se_name=Influenza
+            print("a query term is passed for adr_lookup")
+            data = SideEffect.objects.filter(side_effect_name=se_name)[:1]
+        else: # if the request para is "default"
+            print("default para is passed for adr_lookup")
+            data = SideEffect.objects.all()[:2] # return None if there is no instance
+
+        if data:
+            for item in data:
+                reactions = AdverseDrugReaction.objects.filter(adr_data__icontains=item.side_effect_name)
+                drug_and_freqs = []
+                for reaction in reactions:
+                    drug_bankID = reaction.drug_bankID.drug_bankID
+                    drug_name = reaction.drug_bankID.name
+                    try:
+                        atc_code = DrugAtcAssociation.objects.get(drug_id=drug_bankID).atc_id.id
+                    except:
+                        atc_code = "Not assigned"
+                    se_pairs = reaction.adr_data.split(",")
+                    fre = 0
+                    color = ""
+                    for p in se_pairs:
+                        if p.find(item.side_effect_name.lower())>0:
+                            fre = float(p.split()[-1][1:-2])
+                            if fre<=25:
+                                color = "color1"
+                            elif fre<=50:
+                                color = "color2"
+                            elif fre<=75:
+                                color = "color3"
+                            else:
+                                color = "color4"
+                            break
+                    drug_and_freqs.append({"drugbank_id": drug_bankID,
+                                            "drug_name": drug_name,
+                                            "atc_code": atc_code,
+                                            "frequency": fre, "color": color})
+                    drug_and_freqs = sorted(drug_and_freqs, key=lambda x: x["frequency"], reverse=True)
+                adr.append({"se_name": item.side_effect_name, "se_definition": item.side_effect_definition, "drug_and_freq": drug_and_freqs})
+    else: # if the request is sent without para
+        print("no para is passed for adr_lookup")
+        data = SideEffect.objects.all()[:2]
+        # se_definition = list(se_instance.values_list("side_effect_definition", flat=True))
+        print("data  ", data)
+        for item in data:
+            reactions = AdverseDrugReaction.objects.filter(adr_data__icontains=item.side_effect_name)
+            drug_and_freqs = []
+            for reaction in reactions:
+                drug_bankID = reaction.drug_bankID.drug_bankID
+                drug_name = reaction.drug_bankID.name
+                try:
+                    atc_code = DrugAtcAssociation.objects.get(drug_id=drug_bankID).atc_id.id
+                except:
+                    atc_code = "Not assigned"
+                se_pairs = reaction.adr_data.split(",")
+                print("item.side_effect_name ", item.side_effect_name)
+                print("se_pairs :", se_pairs)
+                fre = "None"#
+                color = "black"
+                for pair in se_pairs:
+                    pair = pair.trim()
+                    adr_term = " ".join(pair.split()[:-1])
+                    if adr_term.find(item.side_effect_name.lower())>0:
+                        fre = float(p.split()[-1][1:-2])
+                        if fre<=25:
+                            color = "color1"
+                        elif fre<=50:
+                            color = "color2"
+                        elif fre<=75:
+                            color = "color3"
+                        else:
+                            color = "color4"
+                        break
+                print("fre ", fre, " color ", color)
+                drug_and_freqs.append({"drugbank_id": drug_bankID,
+                                        "drug_name": drug_name,
+                                        "atc_code": atc_code,
+                                        "frequency": fre, "color": color})
+                drug_and_freqs = sorted(drug_and_freqs, key=lambda x: x["frequency"], reverse=True)
+            adr.append({"se_name": item.side_effect_name, "se_definition": item.side_effect_definition, "drug_and_freq": drug_and_freqs})
+    context = {}
+    context["data"] = adr
+    # print("se " , context)
+    return render(request, 'home/adr_lookup.html', context)
+    
+
+def adr_autocomplete_view(request):
+    pass
 
 def get_atc_code_statistics(request):
     context = {}
@@ -116,6 +208,7 @@ def variant_autocomplete_view(request):
 def drug_autocomplete_view(request):
     query = request.GET.get('query', '')
     drugs = Drug.objects.filter(Q(drug_bankID__icontains=query)|Q(name__icontains=query))
+    results = []
     if len(drugs) > 0:
         results = [drug.drug_bankID + " - "+ drug.name for drug in drugs]
     return JsonResponse({'suggestions': results})
@@ -147,7 +240,6 @@ def common_menu(request):
     }
     return render(request, 'home/common_menu.html', context)
 
-# http://localhost:8000/get_chromosome_mapping/?version=GRCh38&anno1=ensembl&input=22&anno2=ucsc
 def get_chromosome_mapping(request):
     version = request.GET.get("version")
     anno_from = request.GET.get("anno_from")
@@ -253,7 +345,6 @@ def get_se_definition(request):
     }
     return JsonResponse(context)
 
-
 def get_adr(drugbank_id):
     try:
         adr_instance = AdverseDrugReaction.objects.filter(drug_bankID=drugbank_id).first()
@@ -284,13 +375,16 @@ def get_adr(drugbank_id):
                     "color2": sort_dict(color2_data), 
                     "color1": sort_dict(color1_data), 
                 }
+            no_of_se = len(pairs)
+            print("drugbank_id ", drugbank_id, " no_of_se ", no_of_se)
         else:
             adr = "NA"  
+            no_of_se = 0  
         
     except AdverseDrugReaction.DoesNotExist:
         adr = "NA"
 
-    return adr
+    return adr, no_of_se
 
 def drug_lookup(request):
     drug = request.GET.get('drug')
@@ -299,6 +393,7 @@ def drug_lookup(request):
     context = {}
     if drug:
         if drug != 'default':
+            print("drug para is default")
             drug_id = drug.split(" - ")[0]
             if len(drug.split(" - "))>1:
                 drug_name = drug.split(" - ")[1]
@@ -310,6 +405,7 @@ def drug_lookup(request):
                     drug_bankID=drug_id)
                 
         else:
+            print("drug para is not default")
             data = Drug.objects.all()[:20]
         drugs = []
         for item in data:
@@ -318,7 +414,9 @@ def drug_lookup(request):
                 code = "Not assigned"
             else:
                 code = list(atc_code)
-            adr = get_adr(item.drug_bankID)
+            adr, no_of_se = get_adr(item.drug_bankID)
+            # print("------- adr ", adr)
+            print("-------in view function no_of_se ", no_of_se)
             if adr!="NA":
                 adr_json = {
                     "color4": [f"{key} ({value}" for key, value in adr.get("color4", {}).items()],
@@ -335,10 +433,12 @@ def drug_lookup(request):
                 'drug_type': item.drugtype.type_detail,
                 'Clinical_status': clinical_status_dict.get(item.Clinical_status),
                 "adr": adr,
-                "adr_json": adr_json
+                "adr_json": adr_json,
+                "no_of_size_effects": no_of_se,
             })
         return JsonResponse({'drugs': drugs})
     else:
+        print("no drug para")
         data = Drug.objects.all()[:20]
         drugs = []
         for item in data:
@@ -347,7 +447,7 @@ def drug_lookup(request):
                 code = "Not assigned"
             else:
                 code = list(atc_code)
-            adr = get_adr(item.drug_bankID)
+            adr, no_of_se = get_adr(item.drug_bankID)
             if adr!="NA":
                 adr_json = {
                     "color1": [f"{key} ({value}" for key, value in adr.get("color1", {}).items()],
@@ -364,7 +464,8 @@ def drug_lookup(request):
                 'drug_type': item.drugtype.type_detail,
                 'Clinical_status': clinical_status_dict.get(item.Clinical_status),
                 "adr": adr,
-                "adr_json": adr_json
+                "adr_json": adr_json,
+                "no_of_size_effects": no_of_se,
             })
         context["drugs"] = drugs
         return render(request, 'home/drug_lookup.html', context)

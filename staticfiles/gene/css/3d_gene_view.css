@@ -1,54 +1,53 @@
 
 #gene_view_3D{
     display: flex;
-    /* height: 850px; */
     border: 1px solid red;
     position: relative;
 }
-
-
 #gene-3d-chart{
-    /* margin: 5px 5px; */
     box-sizing: border-box; 
-    /* border: 1px solid #337ab7; */
-
-    /* the plot for the 3d structure might bigger than the container, so set this */
-    /* overflow: hidden;  */
     flex: 1; /* for the div without specifying the width, flex=1 --> extend the remaining width of the container */
     position: relative;
 }
-
 .primary_seq {
     word-wrap: break-word; /* Wrap long words */
-    /* white-space: normal; Allow line breaks */
-    /* line-height: 1;  */
     font-size: 16px;
 }
-
 .amino_acid_chunk:last-child{
   text-align: left;
 }
-
 .color-coded-text {
     display: inline;
     padding: 0;
     margin: 0;
   }
-  
-  .color-coded-text.yellow {
+  /* .color-coded-text.green {
     color: green;
   }
-  
   .color-coded-text.red {
     color: red;
   }
-  
   .color-coded-text.blue {
     color: blue;
   }
-  
-  .color-coded-text.green {
+  .color-coded-text.yellow {
     color: orange;
+  } */
+
+  .residue  .color1 { 
+    color: orange; 
+  }
+  .residue  .color2 { 
+    color: orangered; 
+  }
+  .residue  .color3 { 
+    color: red; 
+  }
+  .residue  .color4 { 
+    color: darkred; 
+  }
+  .residue  .color5 { 
+    color: black; 
   }
 
   .text-area {

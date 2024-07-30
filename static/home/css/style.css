@@ -373,18 +373,28 @@ a.external_link:link, a.external_link:visited, a.external_link:hover, a.external
 }
 
 .data-text__value {
-  font-size: 50px;
+  font-size: 3vw;
   /* move up  */
-  transform: translateY(-14px); 
+  /* transform: translateY(-14px);  */
   opacity: 0;
 }
 
 .data-text__name {
   font-size: 14px;
   /* move down  */
-  transform: translateY(14px);
+  /* transform: translateY(14px); */
   opacity: 0;
 }
+
+_::-webkit-full-page-media, _:future, :root .safari_only {
+  .data-text__value {
+    transform: translateY(-20px);  
+  }
+  .data-text__name {
+    transform: translateY(20px);  
+  }
+}
+
 /* .data-text__longname {
   font-size: 14px;
   transform: translateY(14px);

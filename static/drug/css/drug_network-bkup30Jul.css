@@ -930,20 +930,7 @@ body{
     font-size: 16px;
 }
 
-
-
-.atc-right-network{
-    overflow: hidden ;
-}
-body{  
-    overflow: hidden ;
-}
-#proteinOnly:focus{
-    background-color: #007bff;
-}
-
 /* here is the css of the pop up button  */
-
 .popup {
     display: flex; /* Show the popup by default */
     position: fixed;
@@ -956,7 +943,6 @@ body{
     align-items: flex-start; /* Align items to the top */
     padding-top: 100px; /* Margin top */
 }
-
 .popup-content {
     background-color: white;
     padding: 20px;
@@ -966,7 +952,6 @@ body{
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     width: 300px; /* Adjust width as needed */
 }
-
 .close-btn {
     position: absolute;
     top: 10px;
@@ -974,7 +959,6 @@ body{
     font-size: 30px;
     cursor: pointer;
 }
-
 .submit-btn2 {
     display: block;
     margin-left: auto;
@@ -984,7 +968,4 @@ body{
     cursor: pointer;
     font-size: 16px;
 }
-
 /* ended popup css  */
-
-

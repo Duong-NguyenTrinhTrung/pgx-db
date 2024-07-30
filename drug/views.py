@@ -6,8 +6,9 @@ import pandas as pd
 from django.core.cache import cache
 from django.db.models import (
     Count,
-    Q,
+    Q, F
 )
+
 from django.http import (
     Http404,
     HttpResponse,
@@ -713,7 +714,10 @@ def selection_autocomplete(request):
             p_json['category'] = 'Variant'
             results.append(p_json)
 
-        data = json.dumps(results)
+        if len(results)==0:
+            data = json.dumps(["No results found"])
+        else:
+            data = json.dumps(results)
     else:
         data = 'fail'
     mimetype = 'application/json'
@@ -1176,6 +1180,7 @@ def get_genebased_data_from_genebass(atc_code):
                 data_genebass = GenebassPGx.objects.filter(Q(gene_id=gene_id)&Q(drugbank_id=drug.drug_bankID))
                 if len(data_genebass) != 0:
                         response_data.append({
+                                "gene_id": gene_id,
                                 "gene_name": gene_name,
                                 "drug_id": drug.drug_bankID,
                                 "moa": interaction.interaction_type.title(),
@@ -1309,6 +1314,11 @@ def get_variant_based_burden_data_by_atc(request):
         drug_objs = Drug.objects.filter(drug_bankID__in=undup_drugs).order_by('name')
         gene_names = list(set(Interaction.objects.filter(drug_bankID__in=undup_drugs).values_list("uniprot_ID__genename", flat=True)))
         response_data=[]
+        # Fetch all genes and create a mapping of genename to gene_id
+        genes = Gene.objects.filter(genename__in=gene_names).values('genename', 'gene_id')
+        gene_mapping = {gene['genename']: gene['gene_id'] for gene in genes}
+
+        
         for drug in drug_objs:
             genebass_data = GenebassVariantPGx.objects.filter(
                 drugbank_id=drug, genename__in=gene_names
@@ -1325,13 +1335,17 @@ def get_variant_based_burden_data_by_atc(request):
                 'AC',
                 'AF',
             )
-            
+            # Add gene_id to each entry based on the mapping
+            genebass_data_with_ids = []
+            for entry in genebass_data:
+                entry['gene_id'] = gene_mapping.get(entry['genename'])
+                genebass_data_with_ids.append(entry)
+
             if len(genebass_data) != 0:
                 response_data.append(
                 {
                     "drug_id": drug.drug_bankID,
-                    "burden_data": list(genebass_data),
-                    # "burden_data_full": list(genebass_data),
+                    "burden_data": list(genebass_data_with_ids),
                 })
             
         if len(response_data)>0:

@@ -1,7 +1,7 @@
 # from django.conf.urls import url
 from django.urls import path, re_path
 from django.views.decorators.cache import cache_page
-from .views import Home, drug_target_network, drug_lookup, target_lookup, drug_autocomplete_view, protein_autocomplete_view, variant_autocomplete_view, variant_lookup, chromosome_mapper, variant_mapper, target_statistics, about_pgx, get_chromosome_mapping, get_variant_mapping, get_chromosome_mapping_example, get_variant_mapping_example, anno_from_autocomplete_view, variant_anno_from_autocomplete_view, disease_lookup, disease_statistics, disease_autocomplete_view, contribute_to_pgx, tutorial, get_se_definition, get_atc_code_statistics
+from .views import Home, drug_target_network, drug_lookup, target_lookup, drug_autocomplete_view, protein_autocomplete_view, variant_autocomplete_view, variant_lookup, chromosome_mapper, variant_mapper, target_statistics, about_pgx, get_chromosome_mapping, get_variant_mapping, get_chromosome_mapping_example, get_variant_mapping_example, anno_from_autocomplete_view, variant_anno_from_autocomplete_view, disease_lookup, disease_statistics, disease_autocomplete_view, contribute_to_pgx, tutorial, get_se_definition, get_atc_code_statistics, adr_autocomplete_view, adr_lookup
 
 
 urlpatterns = [
@@ -13,6 +13,9 @@ urlpatterns = [
     path('drug-autocomplete/', drug_autocomplete_view, name='drug-autocomplete-view'),
     path("drug_target_network/", drug_target_network, name='drug-target-network'),
     path("get_se_definition/", get_se_definition, name='get-se-definition'),
+
+    path("adr_lookup/", cache_page(3600*24*365)(adr_lookup), name='adr-lookup'),
+    path('adr_autocomplete/', adr_autocomplete_view, name='adr-autocomplete-view'),
 
     path("target_lookup/", cache_page(3600*24*365)(target_lookup), name='target-lookup'),
     path("target_statistics/", cache_page(3600*24*365)(target_statistics), name='target-statistics'),

@@ -21,8 +21,8 @@ class DrugNetworkGetDataService(object):
         drug_protein_interactions = Interaction.objects.filter(drug_bankID=self.drug.drug_bankID)
         drug_disease_interactions = DrugDiseaseStudy.objects.filter(drug_bankID=self.drug.drug_bankID)
         general_data = []
-        for t1 in drug_protein_interactions:
-                if len(drug_disease_interactions) != 0:
+        for t1 in drug_protein_interactions: # loop through all interactions
+                if len(drug_disease_interactions) != 0: 
                     for t2 in drug_disease_interactions:
                         interaction_info = {
                             "interaction_id": t1.interaction_id,
@@ -161,11 +161,10 @@ class DrugsNetworkGetDataService:
         Get general data for drugs network
         """
         drug_protein_interactions = Interaction.objects.filter(drug_bankID__in=self.drug_bank_ids).distinct()
-        drug_disease_interactions = DrugDiseaseStudy.objects.filter(drug_bankID__in=self.drug_bank_ids).distinct()
-        # print("drug_protein_interactions ", drug_protein_interactions.values_list("interaction_id"))
-        # print("drug_disease_interactions ", drug_disease_interactions.values_list("drug_bankID"))
         general_data = []
         for t1 in drug_protein_interactions:
+                drug_bank_id = t1.drug_bankID
+                drug_disease_interactions = DrugDiseaseStudy.objects.filter(drug_bankID=drug_bank_id).distinct()
                 if len(drug_disease_interactions) != 0:
                     for t2 in drug_disease_interactions:
                         interaction_info = {
