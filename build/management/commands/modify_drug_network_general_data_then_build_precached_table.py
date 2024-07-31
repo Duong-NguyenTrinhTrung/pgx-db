@@ -54,8 +54,7 @@ class Command(BaseCommand):
         atc_code_lengths = [3,4]
         for length in atc_code_lengths:
             list_of_atc_codes = self.get_atc_code_list(length)
-            for atc_code in list_of_atc_codes[1:2]: 
-            # for atc_code in [x for x in list_of_atc_codes if x not in ["S01", "L01", "L01X"]]: 
+            for atc_code in [x for x in list_of_atc_codes if x not in ["S01", "L01", "L01X"]]: 
                 print(atc_code)
                 list_of_drugs = self.get_list_of_drugs_belong_to_a_network(atc_code)
                 print("list_of_drugs ", list_of_drugs)
