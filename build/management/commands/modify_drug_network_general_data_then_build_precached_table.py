@@ -80,5 +80,6 @@ class Command(BaseCommand):
                     atc_code=atc_code
                     )
                 obj.general_json_data=json_general_string
+                obj.save()
 
 

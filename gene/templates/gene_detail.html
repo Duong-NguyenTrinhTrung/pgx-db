@@ -449,7 +449,6 @@
                 }
                 // Std VEP scores
                 const stdVEPScore = value[54];
-                console.log("length "+value.length)
                 if (isNaN(stdVEPScore)) {
                     row.append($('<td>').addClass('vep-cell').css({ 'color': '#d62828', 'max-width': '90px' }).text('None'));
                 } else {
@@ -511,9 +510,7 @@
                             $("#structures_scrollable_body").find('tr').each(function () {
                                 variant_maker_list.push($(this).find('.variant').text());
                             });
-                            // console.log("variant_maker_list "+typeof variant_maker_list);
-                            // variant_maker_list = [...new Set(variant_maker_list)];
-                            // console.log("variant_maker_list "+typeof variant_maker_list);
+                            
                             $.ajax(
                                 {
                                     url: "/plot-variants/?variant_maker_list=" + variant_maker_list.toString(),
@@ -531,9 +528,6 @@
             })
             console.log("oTable after created in populateTable "+oTable1);
             applyFiltersOnVEPTable(oTable1);
-            // end apply datatable features on table of variants and VEP scores initially
-
-            // new url for filtering one variant
             var urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('variant_marker')) {
                 var variant_marker = urlParams.get('variant_marker');
@@ -551,7 +545,6 @@
                     $("#structures_scrollable_body").find('tr').each(function () {
                         variant_maker_list.push($(this).find('.variant').text());
                     });
-                    // variant_maker_list = [...new Set(variant_maker_list)];
                     $.ajax(
                         {
                             url: "/plot-variants/?variant_maker_list=" + variant_maker_list.toString(),
@@ -595,7 +588,6 @@
             $("#structures_scrollable_body").find('tr').each(function () {
                 variant_maker_list.push($(this).find('.variant').text());
             });
-            // variant_maker_list = [...new Set(variant_maker_list)];
             $.ajax(
                 {
                     url: "/plot-variants/?variant_maker_list=" + variant_maker_list.toString(),
@@ -617,7 +609,6 @@
                 $("#structures_scrollable_body").find('tr').each(function () {
                     variant_maker_list.push($(this).find('.variant').text());
                 });
-                // variant_maker_list = [...new Set(variant_maker_list)];
                 $.ajax(
                     {
                         url: "/plot-variants/?variant_maker_list=" + variant_maker_list.toString(),
@@ -642,7 +633,6 @@
                     $("#structures_scrollable_body").find('tr').each(function () {
                         variant_maker_list.push($(this).find('.variant').text());
                     });
-                    // variant_maker_list = [...new Set(variant_maker_list)];
                     $.ajax(
                         {
                             url: "/plot-variants/?variant_maker_list=" + variant_maker_list.toString(),
@@ -866,9 +856,16 @@
     });
 
     function draw_multiple_variant_plot(data) {
+        var det;
+        if (data.length==1){
+            det = "this variant";
+        }
+        else {
+            det = "these variants";
+        }
         const isAllZero = data.every(item => item.values.length == 0);
         if (isAllZero) {
-            $('#variantPlots_content').html('<div style="height: 100px;"><p style="color: red; text-align: center;">There are no VEP scores and plot for this variant!</p></div>');
+            $('#variantPlots_content').html(`<div style="height: 100px;"><p style="color: red; text-align: center;">There are no VEP scores and plot for ${det}!</p></div>`);
         }
         else {
             $('#variantPlots_content').html('');  // clear data
@@ -878,10 +875,6 @@
 
             // Create violin plot traces
             const traces = values.map((v, index) => {
-                // const meanValue = v.reduce((acc, val) => acc + val, 0)/v.length;
-                // Generate red shades based on mean value
-                // const color = `rgba(${255**meanValue}, 50, 0, 0.6)`; 
-                // const color = d3.quantize(t => d3.interpolateSpectral(t * 0.5 + 0.1), v.length)[index];
                 const color = d3.range(10).map(d => d3.interpolateRainbow(d / 10))[index];
                 const name = v.every(val => val === 0) ? 'Zero VEP score' : categories[index];
                 return {
@@ -950,9 +943,6 @@
             }
             // Plot
             Plotly.newPlot('variantPlots_content', traces, layout);
-            // var plot_note = document.createElement("p");
-            // plot_note.innerHTML = 'Variant is denoted as wild_type amino acid, protein position, mutant amino acid in that order with "*" represents a stop codon';
-            // $('#variantPlots_content').append(plot_note);
         }
     }
 
@@ -1243,10 +1233,12 @@
     });
 
     var protein_with_variant_index_list = "{{ protein_with_variant_index_list|safe }}";
+    console.log("--------In js, protein_with_variant_index_list "+protein_with_variant_index_list)
     protein_with_variant_index_list = protein_with_variant_index_list.slice(1, -1);
     protein_with_variant_index_list = protein_with_variant_index_list.split("', '");
     // Remove the single quotes from each element in the array
     protein_with_variant_index_list = protein_with_variant_index_list.map(item => item.replace(/'/g, ''));
+    console.log("--------In js, protein_with_variant_index_list "+protein_with_variant_index_list)
 
     function addUnderlineClass() {
         var residues = document.querySelectorAll('.residue');
@@ -1254,10 +1246,10 @@
             var anchor = residue.querySelector('a');
             var onclickValue = anchor.getAttribute('onclick');
             var match = onclickValue.match(/showAAtooltip\(event, '(\d+)'\)/);
-            // console.log("residue "+residue +" match "+match +" match[1] "+match[1]+" type of match[1] "+typeof match[1]);
             if (match && match[1]) {
                 var param = match[1];
                 if (protein_with_variant_index_list.includes(param)) {
+                    console.log("param in protein positions with variant list: "+param)
                     anchor.classList.add('underline');
                     var span = residue.querySelector('span');
                     span.classList.add('underline');

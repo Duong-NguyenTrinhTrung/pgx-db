@@ -329,7 +329,7 @@ class GeneDetailBaseView(object):
                 context['variant_info_for_3D_view'] = json.dumps(variant_info_for_3D_view)
                 context['length'] = len(table_with_protein_pos_int)
                 context['protein_with_variant_index_list'] = protein_with_variant_index_list
-                # print("protein_with_variant_index_list ", protein_with_variant_index_list)
+                # print("-----------In view function: protein_with_variant_index_list ", protein_with_variant_index_list)
                 context["name_dic"] = self.name_dic
                 context['gene'] = Gene.objects.filter(gene_id=slug).values_list("genename", flat=True)[0]
                 context['geneID'] = slug
@@ -725,18 +725,24 @@ def get_gene_detail_data(request, slug): #upper
             variant_info_for_3D = []
             protein_with_variant_index_list=[] 
             if slug.startswith("ENSG"):
+                print("slug startswith ENSG slug = ",slug) 
                 marker_ID_data = list(set(Variant.objects.filter(Gene_ID=slug).values_list(
                     "VariantMarker", flat=True)))
                 geneid = slug
+                print("-------- length marker_ID_data ", len(marker_ID_data))
+                print("-------- 20_4699235_C/G in marker_ID_data ", ("20_4699235_C/G" in marker_ID_data))
             else:
+                print("slug not startswith ENSG slug = ",slug)
                 geneid = Gene.objects.filter(genename=slug).values_list("gene_id")[0][0]
                 marker_ID_data = list(set(Variant.objects.filter(Gene_ID=geneid).values_list(
                     "VariantMarker", flat=True)))
+                print("length marker_ID_data ", len(marker_ID_data))
             objs = Gene.objects.filter(gene_id=geneid).values_list("primary_transcript", flat=True)
             protein_position_and_corresponding_lowest_mean_VEP_score = {}
             
             if objs:
                 pt = objs[0] #take the primary_transcript
+                print("primary transcript = ", pt)
                 for marker in marker_ID_data:
                     vep_variants = VepVariant.objects.filter(
                         Q(Variant_marker=marker)&Q(Transcript_ID=pt)).exclude(Protein_position__icontains='-').values_list(*list_necessary_columns_2
@@ -754,13 +760,19 @@ def get_gene_detail_data(request, slug): #upper
                             if len(coseq) >= 1:
                                 for c in coseq:
                                     consequences.append(name_dic.get(c).title())
+                            if vep_variant[3].find("/")>0:
+                                wtaa = vep_variant[3].split("/")[0]
+                                mtaa = vep_variant[3].split("/")[1]
+                            else:
+                                wtaa = vep_variant[3]
+                                mtaa = vep_variant[3]
                             temp = {
                                     "geneID": geneid,
                                     "variant_marker": marker,
                                     "consequence": ", ".join(list(set(consequences))),
                                     "protein_position": vep_variant[2],
-                                    "wtaa": vep_variant[3].split("/")[0], #wildtype AA
-                                    "mtaa": vep_variant[3].split("/")[1], #mutant AA
+                                    "wtaa": wtaa, #wildtype AA
+                                    "mtaa": mtaa, #mutant AA
                                     "codon": vep_variant[4],
                                     "HighestAF": str(vep_variant[5]),
                                     "Mean_VEP_Score": mean_vep_score,
@@ -768,11 +780,12 @@ def get_gene_detail_data(request, slug): #upper
                             variant_info_for_3D.append(temp)
                             protein_with_variant_index_list.append(vep_variant[2])
                     except Exception as e:
-                        pass
+                        print("----- marker ", marker, " has exception ", e)
             variant_info_for_3D = remove_duplicates(variant_info_for_3D)
             variant_info_for_3D_view = sorted(variant_info_for_3D, key=lambda x: int(x['protein_position']))
             context['variant_info_for_3D_view'] = json.dumps(variant_info_for_3D_view)
             context['protein_with_variant_index_list'] = protein_with_variant_index_list
+            # print("---- VIEW function: protein_with_variant_index_list: ", protein_with_variant_index_list)
             context['genename'] = Gene.objects.filter(gene_id=slug).values_list("genename", flat=True)[0]
             context['geneID'] = slug
             amino_seq = Protein.objects.filter(geneID=slug).values_list("sequence", flat=True)[0]
@@ -794,14 +807,26 @@ def get_gene_detail_data(request, slug): #upper
             
             chunks = []
             for i in range(0, len(amino_seq), 10):
-                temp={
-                    "aa_and_index_and_score":[[ amino_seq[i+k-1:i+k], k, new_dict.get(str(i+k)) ] for k in range(1, 11)],
-                    "position": i + 10,
-                }
-                chunks.append(temp)
-            chunks[-1]["position"] = len(amino_seq)
+                t = []
+                for k in range(1, 11):
+                    aa = amino_seq[i+k-1:i+k]
+                    score = new_dict.get(str(i+k), "no variants")
+                    n = protein_position_and_corresponding_lowest_mean_VEP_score.get(str(i+k))
+                    if not(n):
+                        no_of_variants_at_aa = 0
+                    else:
+                        no_of_variants_at_aa = len(n)
+                    t.append([aa, k, score, no_of_variants_at_aa])
+                
+                chunks.append({
+                            "aa_and_index_and_score":t,
+                            "position": i + 10
+                    })
+            chunks[-1]["position"] = 10 + int(len(amino_seq)/10)*10
             context["chunks"] = chunks
-            print("------ chunks ", chunks)
+            print("\n\n------ chunks length", len(chunks))
+            for i,chunk in enumerate(chunks):
+                print(i, " --- chunk ", chunk)
             context["af_pdb"] = Protein.objects.filter(geneID=slug).values_list("af_pdb", flat=True)[0]
             variants = [item["variant_marker"] for item in variant_info_for_3D_view]
             context['variants'] = list(set(variants))
