@@ -12,6 +12,7 @@ from .models import (
 )
 from rest_framework import generics
 from .serializers import VepVariantSerializer
+from django.db.models import Q
 
 class VepVariantListView(generics.ListAPIView):
     serializer_class = VepVariantSerializer
@@ -85,36 +86,8 @@ class VEPFromVariantBaseView:
                 cache.set("vep_by_variant_marker_" + slug, returned_data, 60 * 60)
             context['vep'] = returned_data
         return context
-    
-def get_variant_vep_scores_and_plot(request):
-    """
-        Get the vep scores for a specific variant
-    """
-    variant_maker_list = request.GET.get("variant_maker_list").split(',')
-    variant_maker_list_data = []
 
-    # Get variant
-    for variant_marker in variant_maker_list:
-        try:
-            variant = Variant.objects.filter(VariantMarker=variant_marker).first()
-        except Variant.DoesNotExist:
-            variant = None
-
-        # Get gene
-        if variant:
-            gene = variant.Gene_ID
-        else:
-            gene = None
-
-        transcript_ids = VepVariant.objects.filter(Variant_marker=variant_marker).values_list('Transcript_ID', flat=True)
-        temp = VepVariant.objects.filter(Variant_marker=variant_marker).values('Amino_acids', 'Protein_position').first()
-        # print("temp ", temp)
-        if temp["Amino_acids"].find("/")<0:
-            category2 = temp["Amino_acids"]+temp["Protein_position"]+temp["Amino_acids"]
-        else:
-            category2 = temp["Amino_acids"].split("/")[0]+temp["Protein_position"]+temp["Amino_acids"].split("/")[1]
-        list_vep_scores = VepVariant.objects.filter(Variant_marker=variant_marker).values(
-                        "BayesDel_addAF_rankscore",
+list_of_score_names = ["BayesDel_addAF_rankscore",
                         "BayesDel_noAF_rankscore",
                         "CADD_raw_rankscore",
                         "ClinPred_rankscore",
@@ -154,9 +127,35 @@ def get_variant_vep_scores_and_plot(request):
                         "Integrated_fitCons_rankscore",
                         "PhastCons30way_mammalian_rankscore",
                         "PhyloP30way_mammalian_rankscore",
-                        "LINSIGHT_rankscore",
-        ).first()
+                        "LINSIGHT_rankscore"]
+    
+def get_variant_vep_scores_and_plot(request):
+    """
+        Get the vep scores for a specific variant
+    """
+    variant_maker_list = request.GET.get("variant_maker_list").split(',')
+    variant_maker_list_data = []
 
+    # Get variant
+    for variant_marker in variant_maker_list:
+        try:
+            variant = Variant.objects.get(VariantMarker=variant_marker) # primary key
+        except Variant.DoesNotExist:
+            variant = None
+
+        # Get primary transcript
+        if variant:
+            prrimary_ts = variant.Gene_ID.primary_transcript
+        else:
+            prrimary_ts = None
+
+        temp = VepVariant.objects.filter(Q(Variant_marker=variant_marker)&Q(Transcript_ID=prrimary_ts)).values('Amino_acids', 'Protein_position').first()
+        if temp["Amino_acids"].find("/")<0:
+            category2 = temp["Amino_acids"]+temp["Protein_position"]+temp["Amino_acids"]
+        else:
+            category2 = temp["Amino_acids"].split("/")[0]+temp["Protein_position"]+temp["Amino_acids"].split("/")[1]
+        list_vep_scores = VepVariant.objects.filter(Q(Variant_marker=variant_marker)&Q(Transcript_ID=prrimary_ts)).values(
+                        *list_of_score_names).first()
         if list_vep_scores:
             list_vep_scores = list(list_vep_scores.values())
         else:
@@ -165,7 +164,7 @@ def get_variant_vep_scores_and_plot(request):
         # Remove NaN values
         list_vep_scores = list(filter(lambda value: not math.isnan(value), list_vep_scores))
         variant_maker_list_data.append({"category":variant_marker, "category2":category2, "values": list_vep_scores})
-
+    
     return JsonResponse(
         {
             "variant_maker_list_data": variant_maker_list_data,
