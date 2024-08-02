@@ -5,7 +5,7 @@
 <div>
     <p style="font-size:18px; font-weight: bold; padding-left:0; margin:10px 0 0;">Encoded protein: <span style="color: #B69121">{{ protein_name }}</span> -
         length: <span style="color: #B69121">{{ seq_length }}</span></p>
-    <p style="font-size:16px; padding-left:0; margin:10px 0 0; color:red; font-style: italic;">Click on each underlined amino acid to see its variant(s). Darker underlined amino acids have variants with more significant predicted effects</p>
+    <p style="font-size:16px; padding-left:0; margin:10px 0 0; color:#c1121f; font-style: italic;">Click on each underlined amino acid to see its variant(s). Darker underlined amino acids have variants with more significant predicted effects</p>
     <div id="threeD_view_upper">
         <p></p>
         <div class="text-area" id="myTextArea">
@@ -14,13 +14,13 @@
                     {% if not forloop.last %}
                         style="text-align: right; width: 165px; margin-right: 4px; background-color: rgba(224, 225, 221, 0.3);margin-bottom: 4px;"
                     {% else %}
-                        style="text-align: left; margin-bottom: 4px; background-color: rgba(224, 225, 221, 0.3); width: 165px;"
+                        style="text-align: right; margin-bottom: 4px; background-color: rgba(224, 225, 221, 0.3); width: 165px;"
                     {% endif %}
                 >
                     {% if not forloop.last %}
                         <span style="margin-right: 7px; font-size: 15px;">{{ d.position }}</span> <br>
                     {% else %}
-                        <br>
+                    <span style="margin-right: 7px; font-size: 15px;">{{ d.position }}</span> <br>
                     {% endif %}
                     {% if not forloop.last %}
                         <div class="amino_acid_chunk"

@@ -42,61 +42,6 @@ warnings.filterwarnings('ignore')
 
 # this is for API call
 class GeneDetailBaseView(object):
-    browser_columns = [
-        "Variant_marker",  # MarkerID
-        "Transcript_ID",
-        "Consequence",
-        "cDNA_position",
-        "CDS_position",
-        "Protein_position",
-        "Amino_acids",
-        "Codons",
-        "Impact",
-        "Strand",
-        "BayesDel_addAF_rankscore",
-        "BayesDel_noAF_rankscore",
-        "CADD_raw_rankscore",
-        "ClinPred_rankscore",
-        "DANN_rankscore",
-        "DEOGEN2_rankscore",
-        "Eigen_PC_raw_coding_rankscore",
-        "Eigen_raw_coding_rankscore",
-        "FATHMM_converted_rankscore",
-        "GERP_RS_rankscore",
-        "GM12878_fitCons_rankscore",
-        "GenoCanyon_rankscore",
-        "H1_hESC_fitCons_rankscore",
-        "HUVEC_fitCons_rankscore",
-        "LIST_S2_rankscore",
-        "LRT_converted_rankscore",
-        "M_CAP_rankscore",
-        "MPC_rankscore",
-        "MVP_rankscore",
-        "MetaLR_rankscore",
-        "MetaRNN_rankscore",
-        "MetaSVM_rankscore",
-        "MutPred_rankscore",
-        "MutationAssessor_rankscore",
-        "MutationTaster_converted_rankscore",
-        "PROVEAN_converted_rankscore",
-        "Polyphen2_HDIV_rankscore",
-        "Polyphen2_HVAR_rankscore",
-        "PrimateAI_rankscore",
-        "REVEL_rankscore",
-        "SIFT4G_converted_rankscore",
-        "SIFT_converted_rankscore",
-        "SiPhy_29way_logOdds_rankscore",
-        "VEST4_rankscore",
-        "bStatistic_converted_rankscore",
-        "Fathmm_MKL_coding_rankscore",
-        "Fathmm_XF_coding_rankscore",
-        "Integrated_fitCons_rankscore",
-        "PhastCons30way_mammalian_rankscore",
-        "PhyloP30way_mammalian_rankscore",
-        "AM_pathogenicity",
-        "HighestAF"
-    ]
-
     list_necessary_columns = [
         "Transcript_ID",
         "Consequence",
@@ -150,6 +95,8 @@ class GeneDetailBaseView(object):
         "AM_pathogenicity",
         "HighestAF",
     ]
+
+    browser_columns = ["Variant_marker"] + list_necessary_columns
 
     name_dic = {'NMD': 'NMD_transcript'
                 , 'cse': 'coding_sequence'
@@ -244,125 +191,7 @@ class GeneDetailBaseView(object):
         data_subset["AM_pathogenicity"] = vep_variant[49]
         data_subset["HighestAF"] = vep_variant[50]
         data_subset["primary"] = "YES"
-
         return data_subset
-
-    def get_gene_detail_data(self, slug):
-        print("get_gene_detail_data:", slug)
-        context = {}
-        if slug is not None:
-            if cache.get("variant_data_" + slug) is not None:
-                context = cache.get("variant_data_" + slug)
-            else:
-                browser_columns = self.browser_columns
-                table = pd.DataFrame(columns=browser_columns)
-                geneid = ""
-                if slug.startswith("ENSG"):
-                    marker_ID_data = Variant.objects.filter(Gene_ID=slug).values_list(
-                        "VariantMarker")
-                    geneid = slug
-                else:
-                    geneid = Gene.objects.filter(genename=slug).values_list("gene_id")[0][0]
-                    marker_ID_data = Variant.objects.filter(Gene_ID=geneid).values_list(
-                        "VariantMarker")
-
-                # Below code should be rewritten to avoid N+1 queries
-                for marker in marker_ID_data:
-                    # Retrieve all VEP variants for each variant marker
-                    vep_variants = VepVariant.objects.filter(
-                        # *: passing every element of a list to values_list rather than passing a list as one argument
-                        Variant_marker=marker).exclude(Protein_position__icontains='-').values_list(
-                        *self.list_necessary_columns)
-                    for vep_variant in vep_variants:
-                        data_subset = self.parse_marker_data(marker, vep_variant)
-                        table = table.append(data_subset, ignore_index=True)
-
-                table.fillna('', inplace=True)
-
-                context = dict()
-
-                table_with_mean_vep_score = []
-                variant_info_for_3D = []
-                protein_with_variant_index_list=[] 
-                
-                for data_row in table.to_numpy():
-                    try:
-                        cleaned_values = [x for x in data_row[10:-2] if str(x) != '']
-                        mean_vep_score = round(np.mean(cleaned_values), 2)
-                        if np.isnan(mean_vep_score):
-                            mean_vep_score = "nan"
-                        std_vep_score = round(np.std(cleaned_values, ddof=1), 2)
-                        if np.isnan(std_vep_score):
-                            std_vep_score = "nan"
-                        print("mean_vep_score: ", mean_vep_score, " std_vep_score: ", std_vep_score)
-                        
-                        data_row = np.append(data_row, mean_vep_score)
-                        data_row = np.append(data_row, std_vep_score)
-                        # print("after data_row", data_row)
-                        table_with_mean_vep_score.append(data_row)
-                        temp = {"variant_marker": data_row[0],
-                                "geneID": geneid,
-                                "consequence": data_row[2],
-                                "protein_position": data_row[5],
-                                "wtaa": data_row[6].split("/")[0], #wildtype AA
-                                "mtaa": data_row[6].split("/")[1], #mutant AA
-                                "codon": data_row[7]}
-                                # "mean_vep_score": mean_vep_score}
-                        variant_info_for_3D.append(temp)
-                        protein_with_variant_index_list.append(data_row[5])
-                    except Exception as e:
-                        pass
-                # print("table_with_mean_vep_score ", table_with_mean_vep_score)
-                table_with_protein_pos_int = []
-                for data_row in table_with_mean_vep_score:
-                    try:
-                        data_row[5] = int(data_row[5])  # protein position
-                        table_with_protein_pos_int.append(data_row)
-                    except Exception as e:
-                        pass
-                
-                variant_info_for_3D_view = sorted(variant_info_for_3D, key=lambda x: int(x['protein_position']))
-                context['array'] = table_with_protein_pos_int
-                # print("table_with_protein_pos_int ")
-                # for i in range(len(table_with_protein_pos_int)):
-                #     print(i," \n--------", table_with_protein_pos_int[i])
-                context['variant_info_for_3D_view'] = json.dumps(variant_info_for_3D_view)
-                context['length'] = len(table_with_protein_pos_int)
-                context['protein_with_variant_index_list'] = protein_with_variant_index_list
-                # print("-----------In view function: protein_with_variant_index_list ", protein_with_variant_index_list)
-                context["name_dic"] = self.name_dic
-                context['gene'] = Gene.objects.filter(gene_id=slug).values_list("genename", flat=True)[0]
-                context['geneID'] = slug
-                amino_seq = Protein.objects.filter(geneID=slug).values_list("sequence", flat=True)[0]
-                amino_seq_num_list = list(range(1, len(amino_seq) + 1))
-                context["amino_seq"] = amino_seq
-                context["seq_length"] = len(amino_seq)
-                protein_name = Protein.objects.filter(geneID=slug).values_list("uniprot_ID", flat=True)[0]
-                context["protein_name"] = protein_name
-                context["amino_seq_num_list"] = amino_seq_num_list
-                chunks = []
-                for i in range(0, len(amino_seq), 10):
-                    temp={
-                        "aa_and_index":[[ amino_seq[i+k-1:i+k],k] for k in range(1, 11)],
-                        "position": i + 10
-                    }
-                    chunks.append(temp)
-                chunks[-1]["position"] = len(amino_seq)
-                context["chunks"] = chunks
-                context["af_pdb"] = Protein.objects.filter(geneID=slug).values_list("af_pdb", flat=True)[0]
-                transcripts = [item[1] for item in table_with_protein_pos_int]
-                context['transcripts'] = list(set(transcripts))
-                variants = [item[0] for item in table_with_protein_pos_int]
-                context['variants'] = list(set(variants))
-                consequences = []
-                for item in table_with_protein_pos_int:
-                    coseq = item[2].split(",")
-                    if len(coseq) >= 1:
-                        consequences += coseq
-                context['consequences'] = list(set(consequences))
-                cache.set("variant_data_" + slug, context, 60 * 60)
-        return context
-
 
 class GenebasedAssociationStatisticsView:
     def get_association_statistics_by_variant_marker(self, slug):
@@ -432,60 +261,7 @@ class DrugByGeneBaseView(object):
             context['list_of_targeting_drug'] = table
         return context
 
-browser_columns = [
-    "Variant_marker",  # MarkerID
-    "Transcript_ID",
-    "Consequence",
-    "cDNA_position",
-    "CDS_position",
-    "Protein_position",
-    "Amino_acids",
-    "Codons",
-    "Impact",
-    "Strand",
-    "BayesDel_addAF_rankscore",
-    "BayesDel_noAF_rankscore",
-    "CADD_raw_rankscore",
-    "ClinPred_rankscore",
-    "DANN_rankscore",
-    "DEOGEN2_rankscore",
-    "Eigen_PC_raw_coding_rankscore",
-    "Eigen_raw_coding_rankscore",
-    "FATHMM_converted_rankscore",
-    "GERP_RS_rankscore",
-    "GM12878_fitCons_rankscore",
-    "GenoCanyon_rankscore",
-    "H1_hESC_fitCons_rankscore",
-    "HUVEC_fitCons_rankscore",
-    "LIST_S2_rankscore",
-    "LRT_converted_rankscore",
-    "M_CAP_rankscore",
-    "MPC_rankscore",
-    "MVP_rankscore",
-    "MetaLR_rankscore",
-    "MetaRNN_rankscore",
-    "MetaSVM_rankscore",
-    "MutPred_rankscore",
-    "MutationAssessor_rankscore",
-    "MutationTaster_converted_rankscore",
-    "PROVEAN_converted_rankscore",
-    "Polyphen2_HDIV_rankscore",
-    "Polyphen2_HVAR_rankscore",
-    "PrimateAI_rankscore",
-    "REVEL_rankscore",
-    "SIFT4G_converted_rankscore",
-    "SIFT_converted_rankscore",
-    "SiPhy_29way_logOdds_rankscore",
-    "VEST4_rankscore",
-    "bStatistic_converted_rankscore",
-    "Fathmm_MKL_coding_rankscore",
-    "Fathmm_XF_coding_rankscore",
-    "Integrated_fitCons_rankscore",
-    "PhastCons30way_mammalian_rankscore",
-    "PhyloP30way_mammalian_rankscore",
-    "AM_pathogenicity",
-    "HighestAF"
-]
+
 
 list_necessary_columns = [
     "Transcript_ID",
@@ -541,7 +317,9 @@ list_necessary_columns = [
     "HighestAF",
 ]
 
-list_necessary_columns_2 = ["Transcript_ID", "Consequence", "Protein_position", "Amino_acids", "Codons", "HighestAF"] + list_necessary_columns[9:-2]
+browser_columns = ["Variant_marker"] + list_necessary_columns
+
+list_necessary_columns_2 = ["Transcript_ID", "Consequence", "Protein_position", "Amino_acids", "Codons", "HighestAF"] + list_necessary_columns[9:-1]
 
 name_dic = {'NMD': 'NMD_transcript', 'cse': 'coding_sequence', 'fsh': 'frameshift',
             'itc': 'incomplete_terminal_codon', 'ide': 'inframe_deletion', 'iis': 'inframe_insertion',
@@ -648,29 +426,16 @@ def get_variant_annotation_and_vep(request, slug): #lower for one gene
                     for vep_variant in vep_variants:
                         data_subset = parse_marker_data(marker, vep_variant)
                         table = table.append(data_subset, ignore_index=True)
-            # else:
-            #     # print(" ---------- there is no primary transcript")
-            #     for marker in marker_ID_data:
-            #         # Retrieve all VEP variants for each variant marker
-            #         vep_variants = VepVariant.objects.filter(
-            #             Variant_marker=marker).exclude(Protein_position__icontains='-').values_list(
-            #             *list_necessary_columns)
-            #         for vep_variant in vep_variants:
-            #             data_subset = parse_marker_data(marker, vep_variant)
-            #             table = table.append(data_subset, ignore_index=True)
-
             table.fillna('', inplace=True)
-            # print("table type ", type(table))
-            # print("table shape ", table.shape)
             table_with_mean_vep_score = []
-            for data_row in table.to_numpy():
+            for i, data_row in enumerate(table.to_numpy()):
                 try:
                     cleaned_values = [x for x in data_row[10:-2] if str(x) != '']
-                    mean_vep_score = round(np.mean(cleaned_values), 2)
+                    mean_vep_score = round(np.mean(cleaned_values), 3)
                     if np.isnan(mean_vep_score):
                         mean_vep_score = "nan"
 
-                    std_vep_score = round(np.std(cleaned_values, ddof=1), 2)
+                    std_vep_score = round(np.std(cleaned_values, ddof=1), 3)
                     if np.isnan(std_vep_score):
                         std_vep_score = "nan"
 
@@ -679,8 +444,7 @@ def get_variant_annotation_and_vep(request, slug): #lower for one gene
                     table_with_mean_vep_score.append(data_row)
                     
                 except Exception as e:
-                    pass
-            print("length data_row ", len(table_with_mean_vep_score[0]))
+                    print("Exception ", e)
             # print("table_with_mean_vep_score length ", len(table_with_mean_vep_score))
             table_with_protein_pos_int = []
             fields = list(table.columns)
@@ -729,10 +493,7 @@ def get_gene_detail_data(request, slug): #upper
                 marker_ID_data = list(set(Variant.objects.filter(Gene_ID=slug).values_list(
                     "VariantMarker", flat=True)))
                 geneid = slug
-                print("-------- length marker_ID_data ", len(marker_ID_data))
-                print("-------- 20_4699235_C/G in marker_ID_data ", ("20_4699235_C/G" in marker_ID_data))
             else:
-                print("slug not startswith ENSG slug = ",slug)
                 geneid = Gene.objects.filter(genename=slug).values_list("gene_id")[0][0]
                 marker_ID_data = list(set(Variant.objects.filter(Gene_ID=geneid).values_list(
                     "VariantMarker", flat=True)))
@@ -750,8 +511,8 @@ def get_gene_detail_data(request, slug): #upper
                     try:
                         for vep_variant in vep_variants:
                             coseq = vep_variant[1].split(",")
-                            cleaned_values = [x for x in vep_variant[6:] if str(x) != '']
-                            mean_vep_score = round(np.mean(cleaned_values), 2)
+                            cleaned_values = [x for x in vep_variant[6:] if str(x) != 'nan']
+                            mean_vep_score = round(np.mean(cleaned_values), 3)
                             if np.isnan(mean_vep_score):
                                 mean_vep_score = "nan"
                             # one protein postion may have more than one variants --> more than one MVS
@@ -824,9 +585,9 @@ def get_gene_detail_data(request, slug): #upper
                     })
             chunks[-1]["position"] = 10 + int(len(amino_seq)/10)*10
             context["chunks"] = chunks
-            print("\n\n------ chunks length", len(chunks))
-            for i,chunk in enumerate(chunks):
-                print(i, " --- chunk ", chunk)
+            # print("\n\n------ chunks length", len(chunks))
+            # for i,chunk in enumerate(chunks):
+            #     print(i, " --- chunk ", chunk)
             context["af_pdb"] = Protein.objects.filter(geneID=slug).values_list("af_pdb", flat=True)[0]
             variants = [item["variant_marker"] for item in variant_info_for_3D_view]
             context['variants'] = list(set(variants))
