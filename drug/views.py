@@ -851,15 +851,7 @@ def atc_detail_view(request):
     group2s = AtcTherapeuticGroup.objects.filter(id__icontains=group_id)
     for group in group2s:
         group.name = format_atc_name(group.name)
-    # group3s = AtcPharmacologicalGroup.objects.filter(id__icontains=group_id)
-    # for group in group3s:
-    #     group.name = format_atc_name(group.name)
-    # group4s = AtcChemicalGroup.objects.filter(id__icontains=group_id)
-    # for group in group4s:
-    #     group.name = format_atc_name(group.name)
-    # group5s = AtcChemicalSubstance.objects.filter(id__icontains=group_id)
-    # for group in group5s:
-    #     group.name = format_atc_name(group.name)
+    
     context = {'group2s': group2s, "group_id": group_id,
                "group_name": group_name}
     end_time = perf_counter()

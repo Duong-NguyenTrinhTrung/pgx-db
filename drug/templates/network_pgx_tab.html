@@ -97,6 +97,15 @@
 
     function tableToExcel(element) {
         atc_code = element.data('atc-code');
+
+        if ($('#variant-based-clinical-pgx-control').prop('checked')){
+            atc_code = atc_code+"-clinical-pharmacogenomics";
+        }else if ($('#genebased-burden-control').prop('checked')){
+            atc_code = atc_code+"-gene-based-association-statistics";
+        } else {
+            atc_code = $('#atc-sublevel-select').val()+"-variant-based-association-statistics";
+        }
+        
         var encabezado = '<html><head><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/><style> table, td {border:thin solid black} table {border-collapse:collapse}</style></head><body><table>';
 
         var header_el = $('#headers')
@@ -447,9 +456,8 @@
 </script>
 
 <script>
-    var hasPGxData;
+
     function showPGxTable(atc_code){
-        // alert("at beginning of showPGxTable : hasPGxData = "+hasPGxData);
         var pgx_data_display_area = document.getElementById("pgx_data_display_area");
         var pgx_data_display_area_inner = document.getElementById("pgx_data_display_area_inner");
         var clinical_pgx_data_control_area = document.getElementById("clinical-pgx-data-control-div");
@@ -474,7 +482,7 @@
                         pgx_data_display_area.style.display = "block";
                         pgx_data_display_area_inner.style.display = "block";
                         clinical_pgx_data_control_area.style.display = "block";
-                        hasPGxData = true;
+                        hasPGxData.push("clinical");
                         // show it
                         render_clinical_pgx_data(clinical_response);
                         // also check if there are burden data (either gene- or variant-based)
@@ -532,7 +540,7 @@
                                     pgx_data_display_area.style.display = "block";
                                     pgx_data_display_area_inner.style.display = "block";
                                     burden_data_control_area.style.display = "block";
-                                    hasPGxData = true
+                                    hasPGxData.push("gene-based");
                                     //if yes, show it, its radio button is checked
                                     geneBasedRadio.checked = true;
                                     render_gene_based_burden_data(burden_response);
@@ -548,17 +556,14 @@
                                                 pgx_data_display_area.style.display = "block";
                                                 pgx_data_display_area_inner.style.display = "block";
                                                 burden_data_control_area.style.display = "block";
-                                                hasPGxData = true;
+                                                hasPGxData.push("variant-based");
                                                 //yes --> show it
                                                 variantBasedRadio.checked = true;
                                                 geneBasedRadio.checked = false;
                                                 geneBasedRadio.disabled = true;
                                                 render_variant_based_burden_data(burden_response);
                                             }
-                                            else{
-                                                hasPGxData = false;
-                                                // alert("no pgx data, hasPGxData = "+hasPGxData);
-                                            }
+                                            
                                         },
                                         error: function (xhr, status, error) {
                                             console.log('AJAX Error:', error);

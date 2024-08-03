@@ -357,30 +357,41 @@
 
 
 <script>
-    // var isNetworkPGxTabClicked = false;
-    $("#variant-based-clinical-pgx-control").prop("checked", true);
-    $("#genebased-burden-control").prop("checked", false);
-    $("#variant-based-burden-control").prop("checked", false);
+    
     function network_pgx_tab_clicked()
     {   
-        $("#variant-based-clinical-pgx-control").prop("checked", true);
-        $("#genebased-burden-control").prop("checked", false);
-        $("#variant-based-burden-control").prop("checked", false);
+        console.log("hasPGxData "+hasPGxData);
         var sp = document.getElementById("read_more_pgx");
         var p = document.getElementById('tab_network_pgx_message');
         var d = document.getElementById('pgx_data_display_area');
         p.style.display="none";
-        console.log("hasPGxData: " + hasPGxData);
-        if (!hasPGxData){
+        if (hasPGxData.length==0){
             sp.style.display = "none";
             p.style.display="block";
             d.style.display="none";
 
         }else{
-            
             sp.style.display="inline";
             p.style.display="none";
             d.style.display="block";
+        }
+        if (hasPGxData.includes("clinical")){
+            $("#variant-based-clinical-pgx-control").prop("checked", true);
+            $("#genebased-burden-control").prop("checked", false);
+            $("#variant-based-burden-control").prop("checked", false);
+            $("#atc-sublevel-select").hide();
+        }
+        else if(hasPGxData.includes("gene-based")){
+            $("#variant-based-clinical-pgx-control").prop("checked", false);
+            $("#genebased-burden-control").prop("checked", true);
+            $("#variant-based-burden-control").prop("checked", false);
+            $("#atc-sublevel-select").hide();
+        }
+        else if(hasPGxData.includes("variant-based")){
+            $("#variant-based-clinical-pgx-control").prop("checked", false);
+            $("#genebased-burden-control").prop("checked", false);
+            $("#variant-based-burden-control").prop("checked", true);
+            $("#atc-sublevel-select").show();
         }
     }
 
@@ -617,7 +628,7 @@
 
 <!-- Showing all drugs associated with an ATC code -->
 <script>
-
+    var hasPGxData;
     function clean_drug_network() 
     {
         var drug_network = $('#graphvisibility');
@@ -726,7 +737,7 @@
                 association34_plural_form = "association";
             }
 
-            right_panel_text.innerHTML = "In the network associated with <span style='color: red;'>" + response.atc_code+"</span>, there " + verb + " <i style='color: black'>" + associations.length + "</i> " + drug_plural_form + ":<br> - interacting with <i style='color: black'>" + response.no_of_interacted_protein + "</i> " + protein_plural_form + " in <i style='color: black'>" + response.total_interaction + "</i> " + interaction_plural_form + ", <br> - associating with <i style='color: black'>" + response.no_of_associated_disease + "</i> " + disease_plural_form + " in <i style='color: black'>" + response.total_association_study + "</i> association "+association_plural_form + " (Only <i style='color: black'>" + response.no_of_associated_disease_phase34 +"</i> "+disease34_plural_form+ " and <i style='color: black'>" + response.total_association_study_phase34 + "</i> " + association34_plural_form + " in clinical trial phase 3, 4 will be shown in the network visualization below)";
+            right_panel_text.innerHTML = "In the network associated with <span id='right_panel_atc_code' style='color: red;'>" + response.atc_code+"</span>, there " + verb + " <i style='color: black'>" + associations.length + "</i> " + drug_plural_form + ":<br> - interacting with <i style='color: black'>" + response.no_of_interacted_protein + "</i> " + protein_plural_form + " in <i style='color: black'>" + response.total_interaction + "</i> " + interaction_plural_form + ", <br> - associating with <i style='color: black'>" + response.no_of_associated_disease + "</i> " + disease_plural_form + " in <i style='color: black'>" + response.total_association_study + "</i> association "+association_plural_form + " (Only <i style='color: black'>" + response.no_of_associated_disease_phase34 +"</i> "+disease34_plural_form+ " and <i style='color: black'>" + response.total_association_study_phase34 + "</i> " + association34_plural_form + " in clinical trial phase 3, 4 will be shown in the network visualization below)";
 
             var atc_url = "{% url 'drugs-network' %}" + "?drug_bank_ids=" + drug_bank_ids.toString();
             var single_drug_url = "{% url 'drugs-network' %}" + "?drug_bank_ids=";
@@ -789,6 +800,7 @@
                 }
             }
         }
+        var atcCode;
         // Function to show the ATC level drug-target network where there is at least one drug
         function showATCLevelNetwork(index) {
             removeActive(index);
@@ -796,8 +808,10 @@
             //button.style.borderColor = "red"
             button.classList.add("active");
             $("#tabs_network > ul.nav.nav-tabs a:first").tab('show');
-            const atcCode = button.getAttribute("data-atc-code");
-
+            atcCode = button.getAttribute("data-atc-code");
+            
+            hasPGxData = [];
+            console.log("hasPGxData is reset");
             const url = button.getAttribute('data-remote-url'); //"{% url 'get-drug-atc-association' %}"
             $.ajax(
                 {

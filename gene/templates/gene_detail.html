@@ -13,7 +13,6 @@
 <link rel="stylesheet" type="text/css"
     href="https://cdn.datatables.net/v/dt/jszip-2.5.0/dt-1.10.16/b-1.5.1/b-html5-1.5.1/datatables.min.css" />
 <link rel="stylesheet" href="{% static 'home/css/construct_browser.css' %}" type="text/css" />
-
 <link rel="stylesheet" href="{% static 'gene/css/gene-detail.css' %}" type="text/css" />
 <style>
     th.width-80px {
@@ -117,6 +116,8 @@
         padding-left: 5px;
         padding-right: 5px;
     }
+
+
 </style>
 {% endblock addon_css %}
 
@@ -215,7 +216,8 @@
                             <th rowspan="2" style="max-width: 90px;" class="width-80px">Std <br> VEP scores</th>
                             <th rowspan="2"><a id="show-all-vep-score" href="#">Show VEP Scores</a></th>
                             <th colspan="41">VEP scores from different algorithms <a href="#"
-                                    id="vep-score-algorithms">Hide VEP scores</a></th>
+                                    id="vep-score-algorithms" title="Click here to show per-variant association statistics">Hide VEP scores </a>
+                            </th>
                         </tr>
                         <tr>
                             <!-- Score block -->
@@ -764,14 +766,16 @@
         }
         table.column(12).visible(false);
     }
-    var gettableToExcel = (function () {
+    var tableToExcel = (function () {
         var encabezado = '<html><head><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/><style> table, td {border:thin solid black} table {border-collapse:collapse}</style></head><body><table>';
 
         var header_el = $('#headers')
         var header_th_els = header_el.find('th')
         var header = ''
         for (var th_i = 0; th_i < header_th_els.length; th_i++) {
-            header += '<th>' + getHeaderContent(header_th_els[th_i]) + '</th>'
+            if (th_i!=12){
+                header += '<th>' + getHeaderContent(header_th_els[th_i]) + '</th>'
+            }
         }
         header = '<tr>' + header + '</tr>'
         header = '<thead>' + header + '</thead>'
@@ -782,7 +786,10 @@
             var row = rows[i]
             excel_content += '<tr>'
             for (var j = 0; j < row.length; j++) {
-                excel_content += '<td>' + row[j] + '</td>'
+                if (j != 12){
+                    excel_content += '<td>' + row[j] + '</td>'
+                }
+                    
             }
             excel_content += '</tr>'
         }
@@ -794,7 +801,7 @@
         var a = document.createElement("a");
         document.body.appendChild(a);
         a.href = url;
-        a.download = "{{slug}}.xls";
+        a.download = "{{ gene_name }}-VEP-scores.xls";
         a.click();
 
         setTimeout(function () {
@@ -812,49 +819,7 @@
         });
         return content;
     }
-    var tableToExcel = (function () {
-        var encabezado = '<html><head><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/><style> table, td {border:thin solid black} table {border-collapse:collapse}</style></head><body><table>';
-
-        var header_el = $('#genebass-tables-header')
-        var header_th_els = header_el.find('th')
-        var header = ''
-        for (var th_i = 0; th_i < header_th_els.length; th_i++) {
-            if (th_i == 3) {
-                header += '<th>' + 'Phenocode' + '</th>'
-            } else {
-                header += '<th>' + header_th_els[th_i].textContent + '</th>'
-            }
-        }
-        header = '<tr>' + header + '</tr>'
-        header = '<thead>' + header + '</thead>'
-        var excel_content = ''
-        // Lay toan bo data trong datatable, chi lay cac rows thoa man dieu kien filter
-
-        var rows = $('#genebass-tables').DataTable().rows({ search: 'applied' }).data()
-        for (var i = 0; i < rows.length; i++) {
-            var row = rows[i]
-            excel_content += '<tr>'
-            for (var j = 0; j < row.length; j++) {
-                excel_content += '<td>' + row[j] + '</td>'
-            }
-            excel_content += '</tr>'
-        }
-
-        var piePagina = "</table></body></html>";
-        var tabla = encabezado + header + excel_content + piePagina;
-        var myBlob = new Blob([tabla], { type: 'application/vnd.ms-excel' });
-        var url = window.URL.createObjectURL(myBlob);
-        var a = document.createElement("a");
-        document.body.appendChild(a);
-        a.href = url;
-        a.download = "DrugBrowserData.xls";
-        a.click();
-
-        setTimeout(function () {
-            window.URL.revokeObjectURL(url);
-        }, 0);
-    });
-
+    
     function draw_multiple_variant_plot(data) {
         var det;
         if (data.length==1){
@@ -1038,11 +1003,25 @@
     let config = { backgroundColor: 'white' };
     var viewer = $3Dmol.createViewer(element, config );
     let spanElement = document.querySelector("#source_of_displayed_3D_structure");
+    var resiList = [];
     
     // Load the 3D structure from a PDB file hosted online
     // var pdbUrl = "{% static 'gene/pdb-test/A5X5Y0.pdb' %}"; 
     var pdbUrl = "{% static 'gene/pdb/' %}" + "{{ protein_name }}" + ".pdb";
     var long_sequence_protein = ["P98164","P04275","Q07954","P98160","O60494","P21817","P78527","Q13315","P08519","Q92736","P78559","Q02817","P46939","P15924","Q86YZ3","Q14643","Q5T4S7","Q8WXI7","P01266","Q02224","O15230","P25391","Q16787","P13611","P42858","P35556","Q75N90","Q15413","P04114","P11532"];
+
+    function removeHighlightedClass(){
+        resiList = [];
+        // Remove highlight from any previously highlighted element
+        const previouslyHighlightedElements = document.getElementsByClassName('highlighted');
+                        [...previouslyHighlightedElements].forEach(element => {
+                            element.classList.remove('highlighted');
+                        });
+        // Remove on 3D structure
+        console.log("--- removeHighlightedClass is called: can we passed viewer here "+viewer);
+        viewer.addStyle({ resi: resiList }, { stick: { colorscheme: 'greenCarbon', radius: 1.4, opacity: 1.0 } });
+        viewer.render();
+    }
 
     // <!-- Script for filtering options of 3d-structure  -->
     $(document).ready(function () {
@@ -1090,8 +1069,9 @@
                 }
 
                 chainSelect.addEventListener('change', (event) => {
-                    var selectedChain = chainSelect.value;
+                    removeHighlightedClass();
 
+                    var selectedChain = chainSelect.value;
                     if (selectedChain !== "") {
                         viewer.setStyle({}, { cartoon: { color: '#ced4da', opacity: 1 } });
                         viewer.addStyle({ chain: selectedChain }, { cartoon: { color: 'spectrum', opacity: 1 } });
@@ -1101,6 +1081,8 @@
 
                 const variantVisibilitySelect = document.getElementById('variantVisibilitySelect');
                 variantVisibilitySelect.addEventListener('change', (event) => {
+                    removeHighlightedClass();
+
                     const selectedvisibility = event.target.value;
                     if (selectedvisibility === 'hide') {
                         viewer.setStyle({}, { cartoon: { color: "spectrum" } });
@@ -1117,6 +1099,8 @@
 
                 var colorSelect = document.getElementById('colorSelect');
                 colorSelect.addEventListener('change', (event) => {
+                    removeHighlightedClass();
+
                     const selectedColor = event.target.value;
                     if (selectedColor === 'grey') {
                         viewer.setStyle({}, { cartoon: { color: '#ced4da' } });
@@ -1128,6 +1112,7 @@
                                 break;
                             }
                         }
+                        
                     }
                     viewer.render();
                 });
@@ -1274,7 +1259,7 @@
         html2canvas(element).then(canvas => {
             const link = document.createElement('a');
             link.href = canvas.toDataURL('/');
-            link.download = 'structure_display.png';
+            link.download = '{{ protein_name }}-3D-structure.png';
             link.click();
         }).catch(error => {
             console.error('Error capturing the image:', error);

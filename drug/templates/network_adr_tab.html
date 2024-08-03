@@ -160,9 +160,11 @@
     }
 
     function downloadTableToExcel(element) {
+        var atc_code = $("#right_panel_atc_code").text();
+        console.log("downloadTableToExcel atc_code = "+atc_code);
         let table = document.getElementById("adr_table_content"); // you can use document.getElementById('tableId') as well by providing id to the table tag
         TableToExcel.convert(table, { // html code may contain multiple tables so here we are refering to 1st table tag
-            name: `ADR.xlsx`, // fileName you could use any name
+            name: `${atc_code}-adverse-drug-reaction.xlsx`, // fileName you could use any name
             sheet: {
             name: 'Sheet 1' // sheetName
             }
