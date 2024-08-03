@@ -12,6 +12,7 @@ $(function () {
 // var json_proteinData = "json/json_proteinData.json";
 // var json_interactionData = "json/json_interactionData.json";
 
+
 var json_GeneralFile = "/static/json-sample/json_GeneralFile.json";
 var json_drugData = "/static/json-sample/json_drugData.json";
 var json_proteinData = "/static/json-sample/json_proteinData.json";
@@ -187,6 +188,7 @@ window.onload = function () {
   //   checkedInteractionTypes,
   //   checkedPhases
   // );
+
 };
 
 function getDrugJsonData(drugBankId) {
@@ -1558,7 +1560,7 @@ var nodes = []; // Declare nodes array outside of the createChart function
 var links = []; // Declare links array outside of the createChart function
 var thresholdSlider = document.getElementById("threshold-slider");
 var thresholdValueLabel = document.getElementById("threshold-value");
-var chartDataJ;
+// var chartDataJ;
 var selectedDrugName1 = "";
 var selectedProteinName1 = "";
 var selectedInteractionName1 = "";
@@ -1734,6 +1736,7 @@ function stopSimulationIfSettled() {
 
 // Get the buttons by their IDs
 const proteinOnlyButton = document.getElementById("proteinOnly");
+
 const diseaseOnlyButton = document.getElementById("diseaseOnly");
 const defaultButton = document.getElementById("default");
 
@@ -1741,10 +1744,22 @@ let child_selection = "ProteinOnly";
 
 // Add event listeners to the buttons
 proteinOnlyButton.addEventListener("click", () => {
+  simulation.stop();
+
   console.log("Protein Only button clicked");
 
   d3.select("#Protein_to_hide").style("display", "block");
+
   child_selection = "ProteinOnly";
+
+
+  proteinOnlyButton.style.backgroundColor = "#3333";
+
+  diseaseOnlyButton.style.backgroundColor = "white";
+
+  defaultButton.style.backgroundColor = "white";
+
+
   clearGraph();
 
 var hiddenInteractions = {
@@ -1761,19 +1776,26 @@ var hiddenInteractions = {
 
   nodes = child_nodes_data ; 
   links = child_links_data ;
+
    createChart(links);
-
-
 
   // Add your logic here
 });
 
 diseaseOnlyButton.addEventListener("click", () => {
   console.log("Disease Only button clicked");
-
+ simulation.stop();
+ 
   d3.select("#Protein_to_hide").style("display", "none");
   // Add your logic here
   child_selection = "DiseaseOnly";
+  proteinOnlyButton.style.backgroundColor = "white";
+
+  diseaseOnlyButton.style.backgroundColor = "#3333";
+
+  defaultButton.style.backgroundColor = "white";
+
+
   clearGraph();
 
   nodes = disease_nodes_data ; 
@@ -1785,10 +1807,15 @@ console.log('disease_links_data' ,disease_links_data)
 
 defaultButton.addEventListener("click", () => {
   console.log("Default button clicked");
-  
+  simulation.stop();
   d3.select("#Protein_to_hide").style("display", "block");
   // Add your logic here
   child_selection = "";
+  proteinOnlyButton.style.backgroundColor = "white";
+
+  diseaseOnlyButton.style.backgroundColor = "white";
+
+  defaultButton.style.backgroundColor = "#3333";
   clearGraph();
 
   nodes = default_nodes_data ; 
@@ -1828,6 +1855,7 @@ document.getElementById("submitBtn").addEventListener("click", function () {
   console.log("Checked Interaction Types:", checkedInteractionTypes);
   console.log("Checked Phases:", checkedPhases);
   child_selection = "ProteinOnly";
+  
   clearGraph();
   processData(
     numberofnodes,
@@ -1866,6 +1894,7 @@ function processData(
       catch {
         data = data.data;
       }
+
       
 
 
@@ -1876,7 +1905,7 @@ function processData(
 
       // Extract nodes and links from the JSON data
       // console.log("inside processData: ", data);
-      chartDataJ = data;
+      // chartDataJ = data;
 
       function getUniqueValues(data, key) {
         const uniqueValues = new Set();
@@ -1970,52 +1999,11 @@ function processData(
         var disease_phase;
         disease_interaction = "Phase" + row?.Phase;
         disease_phase = row?.Phase;
-
         var drugStatus = clinicalStatusMap[row.Drug_status];
         var drugType = row?.drugtype;
         var proteinClass = row?.Protein_Class;
-
         var disease = row.Disease_name; // getting the new disease
         var Disease_class = row.Disease_class;
-
-        switch (child_select) {
-         
-          case "ProteinOnly":
-      
-            proteinOnlyButton.style.backgroundColor = "#3333";
-
-            diseaseOnlyButton.style.backgroundColor = "white";
-
-            defaultButton.style.backgroundColor = "white";
-        
-
-            // Add your logic for Protein Only here
-            break;
-          case "DiseaseOnly":
-      
-            proteinOnlyButton.style.backgroundColor = "white";
-
-            diseaseOnlyButton.style.backgroundColor = "#3333";
-
-            defaultButton.style.backgroundColor = "white";
-
-            console.log("Handling Disease Only");
-            // Add your logic for Disease Only here
-            // tag1
-         
-
-            break;
-
-          default:
-         
-            proteinOnlyButton.style.backgroundColor = "white";
-
-            diseaseOnlyButton.style.backgroundColor = "white";
-
-            defaultButton.style.backgroundColor = "#3333";
-            // Add your logic for Default here
-
-        }
 
         if (
           !child_nodes_data.find(function (node) {
@@ -2150,7 +2138,6 @@ if (checkedInteractionTypes.includes(row.interaction_type)) {
 if (checkedPhases.includes(disease_phase)) {
   if (
     !disease_nodes_data.find(function (node) {
-      console.log('disease' ,disease)
       return node.id === disease;
     })
   ) {
@@ -2240,9 +2227,6 @@ fitlerdata_length = filteredData.length  ;
       // tag5
       // Create the chart using D3.js
 
-nodes =  child_nodes_data ; 
-links = child_links_data ;
- createChart(links);
 
 
       // Add an event listener to detect changes in the threshold slider value
@@ -2250,6 +2234,11 @@ links = child_links_data ;
         thresholdValueLabel.textContent = thresholdSlider.value;
         updateChartVisibility();
       });
+
+
+      nodes =  child_nodes_data ; 
+      links = child_links_data ;
+       createChart(links);
     })
     .catch((error) => {
       console.error("Error reading the JSON file:", error);
@@ -2264,7 +2253,7 @@ var svg, chart;
 var simulation = null;
 // Create the Forced Directed Network Chart
 function createChart(links) {
-  
+  // clearGraph();
  console.log(nodes ,'child_nodes_data')
    hiddenInteractions = {
     target: false,
@@ -2409,9 +2398,9 @@ function createChart(links) {
       d3
         .forceLink(links)
         .id((d) => d.id)
-        .distance(distanceBetweenNodes)
+        .distance(150)
     )
-    .force("charge", d3.forceManyBody().strength(-150))
+    .force("charge", d3.forceManyBody().strength(-50))
     .force("center", d3.forceCenter(svgWidth / 2, (svgHeight - 180) / 2))
     .on("tick", () => {
       // Logic for rendering or updating nodes and links on each tick
@@ -2796,6 +2785,7 @@ function createChart(links) {
   }
   let remove_element = removeElements(true_node, False_node);
   removeDivContainingSpanText(remove_element);
+
 }
 
 // Update the chart visibility based on the threshold value
@@ -4211,6 +4201,17 @@ function drag(simulation) {
 
 let btn_count = 0;
 d3.select("#GetmoreData").on("click", function () {
+
+  simulation.stop(); 
+
+  filteredData = [];
+  child_nodes_data = [];
+  disease_nodes_data= []
+  child_links_data = [];
+  default_nodes_data = [] ;
+  default_links_data = [] ; 
+
+
   clearGraph();
 
   btn_count++;
@@ -4237,7 +4238,11 @@ d3.select("#GetmoreData").on("click", function () {
     }
   }
 
-  console.log(slicedata, "slicedata");
+  console.log("processdata element" ,numberofnodes,slicedata, child_selection,
+ checkedInteractionTypes,
+    checkedPhases );
+
+
   processData(
     numberofnodes,
     slicedata,
@@ -4247,10 +4252,19 @@ d3.select("#GetmoreData").on("click", function () {
   );
 });
 
+
+
 document.getElementById("ManagePreviousState").style.display = "none";
 
 d3.select("#ManagePreviousState").on("click", function () {
-  clearGraph();
+  simulation.stop();
+  filteredData = [];
+  child_nodes_data = [];
+  disease_nodes_data= []
+  child_links_data = [];
+  default_nodes_data = [] ;
+  default_links_data = [] ; 
+  
   btn_count--;
   if (btn_count <= 0) {
     document.getElementById("ManagePreviousState").style.display = "none";
@@ -4274,6 +4288,7 @@ d3.select("#ManagePreviousState").on("click", function () {
       numberofnodes -= 200;
     }
   }
+
   processData(
     numberofnodes,
     slicedata,
@@ -4282,7 +4297,10 @@ d3.select("#ManagePreviousState").on("click", function () {
     checkedPhases
   );
 
+
+
   document.getElementById("GetmoreData").disabled = false;
+
   if (
     document.getElementById("GetmoreData").innerHTML === "Maximum data reached"
   ) {
