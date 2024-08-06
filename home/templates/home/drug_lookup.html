@@ -318,12 +318,19 @@
             autoFocus: true,
             minLength: 3,
             select: function (event, ui) {
-                $('#search_drug').val(ui.item.value);
-                $("#submit_drug").click();
+                var current = $('#search_drug').val();
+                var current_value = "";
+                if (!current.includes(";")){ //fresh terms
+                    prev=[];
+                }
+                if(!prev.includes(ui.item.value)) {
+                    prev.push(ui.item.value);
+                }
+                $('#search_drug').val(prev.join(";"));
+                $("#submit_drug").click();                       
                 return false;
             },
             open: function (event, ui) {
-                console.log("open automcomplete: "+ ui.toString());
                 autocompleteResults.show(); 
             },
             close: function (event, ui) {

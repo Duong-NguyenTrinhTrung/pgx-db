@@ -1784,8 +1784,6 @@ var hiddenInteractions = {
 
 diseaseOnlyButton.addEventListener("click", () => {
   console.log("Disease Only button clicked");
-
-  clearGraph();
  simulation.stop();
  
   d3.select("#Protein_to_hide").style("display", "none");
@@ -1798,14 +1796,14 @@ diseaseOnlyButton.addEventListener("click", () => {
   defaultButton.style.backgroundColor = "white";
 
 
+  clearGraph();
 
   nodes = disease_nodes_data ; 
-  links = disease_links_data ;
+ links = disease_links_data ;
  
 console.log('disease_links_data' ,disease_links_data)
  createChart(links);
 });
-
 
 defaultButton.addEventListener("click", () => {
   console.log("Default button clicked");
@@ -1824,7 +1822,6 @@ defaultButton.addEventListener("click", () => {
   links = default_links_data ;
    createChart(links);
 });
-
 
 document.getElementById("closeBtn").addEventListener("click", function () {
   document.getElementById("popup").style.display = "none";
@@ -1890,6 +1887,7 @@ function processData(
   fetch(jsonFilePath)
     .then((response) => response.json())
     .then((data) => {
+
       try {
         var data = JSON.parse(data.data);
       }
@@ -2237,8 +2235,9 @@ fitlerdata_length = filteredData.length  ;
         updateChartVisibility();
       });
 
-      nodes =  child_nodes_data; 
-      links = child_links_data;
+
+      nodes =  child_nodes_data ; 
+      links = child_links_data ;
        createChart(links);
     })
     .catch((error) => {
@@ -4203,18 +4202,17 @@ function drag(simulation) {
 let btn_count = 0;
 d3.select("#GetmoreData").on("click", function () {
 
-  clearGraph();
-
   simulation.stop(); 
 
   filteredData = [];
   child_nodes_data = [];
   disease_nodes_data= []
   child_links_data = [];
- disease_links_data = [] ;
+  default_nodes_data = [] ;
   default_links_data = [] ; 
 
 
+  clearGraph();
 
   btn_count++;
   document.getElementById("ManagePreviousState").style.display = "block";
@@ -4254,6 +4252,8 @@ d3.select("#GetmoreData").on("click", function () {
   );
 });
 
+
+
 document.getElementById("ManagePreviousState").style.display = "none";
 
 d3.select("#ManagePreviousState").on("click", function () {
@@ -4261,9 +4261,8 @@ d3.select("#ManagePreviousState").on("click", function () {
   filteredData = [];
   child_nodes_data = [];
   disease_nodes_data= []
-
   child_links_data = [];
-  disease_links_data = [] ;
+  default_nodes_data = [] ;
   default_links_data = [] ; 
   
   btn_count--;
@@ -4308,7 +4307,6 @@ d3.select("#ManagePreviousState").on("click", function () {
     document.getElementById("GetmoreData").innerHTML = "Get more data";
   }
 });
-
 
 function clearGraph() {
   const svg = d3.select("#chart");
