@@ -116,7 +116,8 @@
                 if (residueDiv) {
                     for (var v of variant_info_for_3D_view) {
                         if (v.protein_position == p) {
-                            tooltip_text += `Protein position: <span class="AA_residue_span">${v.protein_position}</span>,<br> Widetype amino acid: <span class="AA_residue_span">${v.wtaa}</span>,<br> Mutant amino acid: <span class="AA_residue_span">${v.mtaa}</span>,<br> Codon: <span class="AA_residue_span">${v.codon}</span>,<br> Variant_marker: <a href="#" onclick="showTableWithFilteredOnSelectedVariant('${v.variant_marker}'); return false;"><span>${v.variant_marker}</span></a><span style="color: grey; font-style: italic;"> (<-- Click for details)</span>,<br> Consequence: <span class="AA_residue_span">${v.consequence}</span><br> Frequency: <span class="AA_residue_span">${v.HighestAF}</span><br> Mean_VEP_Score: <span class="AA_residue_span">${v.Mean_VEP_Score}</span><br><br>`;
+                            tooltip_text += `Protein position: <span class="AA_residue_span">${v.protein_position}</span>,<br> Widetype amino acid: <span class="AA_residue_span">${v.wtaa}</span>,<br> Mutant amino acid: <span class="AA_residue_span">${v.mtaa}</span>,<br> Codon: <span class="AA_residue_span">${v.codon}</span>,<br> Variant_marker: <a href="#" onclick="showTableWithFilteredOnSelectedVariant('${v.variant_marker}'); return false;"><span>${v.variant_marker}</span></a><span style="color: grey; font-style: italic;"> (<-- Click for details)</span>,<br> Consequence: <span class="AA_residue_span">${v.consequence}</span><br> Frequency: <span class="AA_residue_span">${v.HighestAF}</span><br> Mean_VEP_Score: <span class="AA_residue_span">${v.Mean_VEP_Score}</span><br><br><br>
+                            <span style="color:#c1121f";><i >Click on the amino acid again to deselect it</i></span><br>`;
                         }
                     }
                 }

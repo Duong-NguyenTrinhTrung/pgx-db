@@ -162,7 +162,7 @@ def anno_from_autocomplete_view(request):
     return JsonResponse({'suggestions': anno_from_examples})
 
 def protein_autocomplete_view(request):
-    query = request.GET.get('query', '')
+    query = request.GET.get('query', '').split(";")[-1]
     proteins = Protein.objects.filter(Q(uniprot_ID__icontains=query) | Q(protein_name__icontains=query) | Q(geneID__icontains=query) | Q(genename__icontains=query))
     result_uniprot_id = Protein.objects.filter(uniprot_ID__icontains=query)
     
@@ -179,34 +179,31 @@ def protein_autocomplete_view(request):
             results = [protein.protein_name for protein in result_protein_name]
     else:
         results = [protein.uniprot_ID for protein in result_uniprot_id]
-    # results = [protein.geneID + "(" + protein.genename + ") " + protein.uniprot_ID + " (" + protein.protein_name +")" for protein in proteins]
     return JsonResponse({'suggestions': results})
 
 def variant_autocomplete_view(request):
-    query = request.GET.get('query', '')
-    # variants = Variant.objects.filter(Q(VariantMarker__icontains=query))
+    query = request.GET.get('query', '').split(";")[-1]
     variants = Variant.objects.filter(
         Q(VariantMarker__icontains=query) | 
         Q(Gene_ID__gene_id__icontains=query) | 
         Q(Gene_ID__genename__iexact=query)
     )
-    
     results = []
     if variants.exists():
         number_variants = len(variants)
-        if len(variants) > 15:
-            variants = variants[:15]
+        if len(variants) > 20:
+            variants = variants[:20]
         results = [
             variant.VariantMarker + " in gene " + variant.Gene_ID.genename +
             " (" + variant.Gene_ID.gene_id + ")"
             for variant in variants
         ]
-        if number_variants > 15:
-            results.append(f"Show all results ({number_variants})")
+        if number_variants > 20:
+            results.append(f"20/{number_variants} results are showed")
     return JsonResponse({'suggestions': results})
 
 def drug_autocomplete_view(request):
-    query = request.GET.get('query', '')
+    query = request.GET.get('query', '').split(";")[-1]
     drugs = Drug.objects.filter(Q(drug_bankID__icontains=query)|Q(name__icontains=query))
     results = []
     if len(drugs) > 0:
@@ -387,27 +384,32 @@ def get_adr(drugbank_id):
     return adr, no_of_se
 
 def drug_lookup(request):
-    drug = request.GET.get('drug')
-    print("inside drug_lookup view : ", drug)
+    input = request.GET.get('drug')
+    print("inside drug_lookup view : ", input)
     clinical_status_dict = {0: "Nutraceutical", 1: "Experimental", 2: "Investigational", 3: "Approved", 4: "Vet approved", 5: "Illicit"}
     context = {}
-    if drug:
-        if drug != 'default':
-            print("drug para is default")
-            drug_id = drug.split(" - ")[0]
-            if len(drug.split(" - "))>1:
-                drug_name = drug.split(" - ")[1]
-                data = Drug.objects.filter(
-                    Q(drug_bankID=drug_id) |
-                    Q(name=drug_name))
-            else:
-                data = Drug.objects.filter(
-                    drug_bankID=drug_id)
-                
+    results = []
+    if input:
+        if input != 'default':
+            try:
+                drug_ids = [drug.split(" - ")[0] for drug in input.split(";")]
+                drug_names = [drug.split(" - ")[1] for drug in input.split(";")]
+                print("-- drug_ids ", drug_ids)
+                print("-- drug_names ", drug_names)
+                if len(drug_ids)>1:
+                    data = Drug.objects.filter(
+                        Q(drug_bankID__in=drug_ids) |
+                        Q(name__in=drug_names))
+                else:
+                    data = Drug.objects.filter(
+                        Q(drug_bankID=drug_ids[0]) |
+                        Q(name=drug_names[0]))
+            except:
+                data = []
         else:
-            print("drug para is not default")
+            print("drug para is default")
             data = Drug.objects.all()[:20]
-        drugs = []
+        
         for item in data:
             atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True)
             if len(atc_code)==0:
@@ -415,7 +417,6 @@ def drug_lookup(request):
             else:
                 code = list(atc_code)
             adr, no_of_se = get_adr(item.drug_bankID)
-            # print("------- adr ", adr)
             print("-------in view function no_of_se ", no_of_se)
             if adr!="NA":
                 adr_json = {
@@ -426,7 +427,7 @@ def drug_lookup(request):
                 }
             else:
                 adr_json = "NA"
-            drugs.append({
+            results.append({
                 'drug_bankID': item.drug_bankID,
                 'name': item.name,
                 'atc_code': code,
@@ -436,11 +437,10 @@ def drug_lookup(request):
                 "adr_json": adr_json,
                 "no_of_size_effects": no_of_se,
             })
-        return JsonResponse({'drugs': drugs})
+        return JsonResponse({'drugs': results})
     else:
         print("no drug para")
         data = Drug.objects.all()[:20]
-        drugs = []
         for item in data:
             atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True)
             if len(atc_code)==0:
@@ -457,7 +457,7 @@ def drug_lookup(request):
                 }
             else:
                 adr_json = "NA"
-            drugs.append({
+            results.append({
                 'drug_bankID': item.drug_bankID,
                 'name': item.name,
                 'atc_code': code,
@@ -467,7 +467,7 @@ def drug_lookup(request):
                 "adr_json": adr_json,
                 "no_of_size_effects": no_of_se,
             })
-        context["drugs"] = drugs
+        context["drugs"] = results
         return render(request, 'home/drug_lookup.html', context)
     
 def get_atc_code(drug_bankID):
@@ -479,13 +479,17 @@ def get_atc_code(drug_bankID):
 
 def variant_lookup(request):
     context = {}
-    variant_id = request.GET.get('variant_id')
-    if variant_id:
-        if variant_id != 'default':
-            objects = Variant.objects.filter(VariantMarker=variant_id)
+    input = request.GET.get('variant_id')
+    variants = []
+    if input:
+        if input != 'default':
+            try:
+                variant_ids = [q.split(" ")[0].strip() for q in input.split(";")]
+                objects = Variant.objects.filter(VariantMarker__in=variant_ids)
+            except Exception as e:
+                objects = []
         else:
             objects = Variant.objects.all()[:20]
-        variants = []
         for item in objects:
             variants.append({
                 "VariantMarker": item.VariantMarker,
@@ -496,7 +500,6 @@ def variant_lookup(request):
         return JsonResponse({'variants': variants})
     else:
         objects = Variant.objects.all()[:20]
-        variants = []
         for item in objects:
             variants.append({
                 "VariantMarker": item.VariantMarker,
@@ -539,45 +542,44 @@ def variant_search(request):
 
 def target_lookup(request):
     context = {}
-    # target = request.GET.get('target')
-    encoded_target = request.GET.get('target')
-    if encoded_target:
-        target = unquote(encoded_target)
-        print("Target: ", target) # Transitional endoplasmic reticulum ATPase (TER ATPase) (EC 3.6.4.6) (15S Mg(2+)-ATPase p97 subunit) (Valosin-containing protein) (VCP)
-        
-        if target:
-            if target != 'default':
+    input = request.GET.get('target')
+    print("input: ", input) # Transitional endoplasmic reticulum ATPase (TER ATPase) (EC 3.6.4.6) (15S Mg(2+)-ATPase p97 subunit) (Valosin-containing protein) (VCP)
+    items = []
+    if input:
+        if input != 'default':
+            try:
+                encoded_targets = [unquote(t) for t in input.split(";")]
                 proteins = Protein.objects.filter(
-                    Q(uniprot_ID=target) |
-                    Q(protein_name=target) |
-                    Q(geneID=target) |
-                    Q(genename=target)
+                    Q(uniprot_ID__in = encoded_targets) |
+                    Q(protein_name__in = encoded_targets) |
+                    Q(geneID__in = encoded_targets) |
+                    Q(genename__in = encoded_targets)
                 )
-            else:
-                proteins = Protein.objects.all()[:10]
-            items = []
-            for item in proteins:
-                interactions = Interaction.objects.filter(uniprot_ID=item.uniprot_ID)
-                items.append({
-                    'uniprot_ID': item.uniprot_ID,
-                    'genename': item.genename,
-                    'geneID': item.geneID,
-                    'protein_name': item.protein_name,
-                    'protein_class': Protein.objects.get(uniprot_ID=item.uniprot_ID).Protein_class,
-                    "drug_data": [
-                        {
-                            "drug_id": interaction.drug_bankID.drug_bankID,
-                            "drug_name": interaction.drug_bankID.name.title(),
-                            "atc_code": get_atc_code(interaction.drug_bankID)
-                        }
-                        for interaction in interactions
-                    ],
-                })
-            return JsonResponse({'items': items})
+            except:
+                proteins = []
+        else:
+            proteins = Protein.objects.all()[:10]
+        
+        for item in proteins:
+            interactions = Interaction.objects.filter(uniprot_ID=item.uniprot_ID)
+            items.append({
+                'uniprot_ID': item.uniprot_ID,
+                'genename': item.genename,
+                'geneID': item.geneID,
+                'protein_name': item.protein_name,
+                'protein_class': Protein.objects.get(uniprot_ID=item.uniprot_ID).Protein_class,
+                "drug_data": [
+                    {
+                        "drug_id": interaction.drug_bankID.drug_bankID,
+                        "drug_name": interaction.drug_bankID.name.title(),
+                        "atc_code": get_atc_code(interaction.drug_bankID)
+                    }
+                    for interaction in interactions
+                ],
+            })
+        return JsonResponse({'items': items})
     else:
-        # If no target parameter provided, get 6 records
         proteins = Protein.objects.all()[:10]
-        items = []
         for item in proteins:
             interactions = Interaction.objects.filter(uniprot_ID=item.uniprot_ID)
             items.append({
@@ -1201,7 +1203,6 @@ def disease_statistics(request):
             "phase4": [DrugDiseaseStudy.objects.filter(Q(clinical_trial="4")&Q(drug_bankID__drugtype__type_detail="Small Molecule") & Q(disease_name__disease_class=dc)).count() for dc in disease_classes],
         },
     }
-
     return render(request, 'home/disease_statistics.html', context)
 
 def disease_autocomplete_view(request):

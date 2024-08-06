@@ -203,9 +203,7 @@
                 {% endfor %}
             {% endfor %}
         </tbody>
-        
     </table>
-
 </div>
 
 {% endblock %}
@@ -214,7 +212,6 @@
 <script>
     var prev = [];
     $(document).ready(function () {
-        // autocomplete 
         var autocompleteResults = $('#disease-autocomplete-results');
         $('#search_disease').autocomplete({
             source: function (request, response) {
@@ -225,8 +222,11 @@
                     },
                     dataType: 'json',
                     success: function (data) {
-                        response(data.suggestions);
-                        // console.log(data.suggestions);
+                        if (data.suggestions.length>0){
+                            response(data.suggestions);
+                        }else{
+                            response(["No results found!"]);
+                        }
                     }
                 });
             },
@@ -241,13 +241,7 @@
                 if(!prev.includes(ui.item.value)) {
                     prev.push(ui.item.value);
                 }
-                
                 $('#search_disease').val(prev.join(";"));
-                
-                // if (!prev.includes(ui.item.value+";"))
-                // {
-                //     prev.push(ui.item.value+";");
-                // }
                 $("#submit_disease").click();                       
                 return false;
             },

@@ -281,14 +281,12 @@
             tooltip.style.top = (y + 20) + 'px';
             tooltip.style.left = (x + 20) + 'px';
             tooltip.style.visibility = 'visible';
-            // tooltip.style.opacity = '1';
         });
 
         document.getElementById('flt1-image').addEventListener('mouseout', function() {
             console.log("mouse out");
             var tooltip = document.getElementById('tooltip-text');
             tooltip.style.visibility = 'hidden';
-            // tooltip.style.opacity = '0';
         });
 
         var autocompleteResults = $('#protein-autocomplete-results');
@@ -302,14 +300,29 @@
                     },
                     dataType: 'json',
                     success: function (data) {
-                        response(data.suggestions);
+                        if (data.suggestions.length > 0) {
+                            response(data.suggestions);
+                        }
+                        else {
+                            response(['No results found!'])
+                        }
+                        
                     }
                 });
             },
             autoFocus: true,
+            minLength: 3,
             select: function (event, ui) {
-                $('#search_protein').val(ui.item.value);
-                $("#submit_protein").click();
+                var current = $('#search_protein').val();
+                var current_value = "";
+                if (!current.includes(";")){ //fresh terms
+                    prev=[];
+                }
+                if(!prev.includes(ui.item.value)) {
+                    prev.push(ui.item.value);
+                }
+                $('#search_protein').val(prev.join(";"));
+                $("#submit_protein").click();                       
                 return false;
             },
             open: function (event, ui) {
@@ -328,45 +341,7 @@
                 .append("<div>" + newText + "</div>")
                 .appendTo(ul);
         };
-        // Hide autocomplete results when clicking outside of the input and results
         
-        //  $("#search_protein").on('keyup', function() {
-        //     if ($(this).val().lenth >= 3){
-        //         $.ajax({
-        //             url: "{% url 'target-lookup' %}?target="+ $(this).val(),
-        //             success: function (data) {
-        //                 console.log(data.items);
-        //                 $("#target-result-tbody").html('');
-        //                 var html_data = '';
-        //                 data.items.forEach(item => {
-        //                     var drug_list = [];
-        //                     for (var j = 0; j<item.drug_data.length;j++) {
-        //                         if (item.drug_data[j].atc_code)
-        //                         {
-        //                             drug_list.push(`<i class="fa fa-pills fa-solid"></i> <a href="{% url 'atc-detail-view' %}?group_id=${item.drug_data[j].atc_code.charAt(0)}&detail=${item.drug_data[j].atc_code}"> ${item.drug_data[j].drug_name}</a></br>`);
-        //                         }
-        //                         else
-        //                         {
-        //                             drug_list.push(`<i class="fa fa-pills fa-solid"></i> <a href="{% url 'get-drug-association' %}?drug_id=${item.drug_data[j].drug_id}">${item.drug_data[j].drug_name}</a></br>`);
-        //                         }
-        //                     }
-        //                     html_data += `<tr>
-        //                         <td>${item.uniprot_ID}</td>
-        //                         <td style="max-width: 200px;">${item.protein_name}</td>
-        //                         <td>${item.geneID}</td>
-        //                         <td>${item.genename}</td>
-        //                         <td><a href="/gene/${item.geneID}"  target="_blank" rel="noopener noreferrer"><i>Link</i></a></td>
-        //                         <td style="max-width: 200px;">${drug_list.join('')}</td>
-        //                     </tr>`;
-        //                 });
-                        
-        //                 $("#target-result-tbody").html(html_data);
-        //             }
-        //         });
-        //     }
-            
-        // }); 
-
         var urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('uniprot_id')) {
             var uniprot_id = urlParams.get('uniprot_id');
