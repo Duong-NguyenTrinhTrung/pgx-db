@@ -364,10 +364,12 @@
 
         //case 1: drug_id is passed when the drug has no atc code --> left panel just has None, no atc hierachy tree
         if (urlParams.has('drugbank_id')) {
+            console.log("urlParams.has('drugbank_id')");
             var drugbank_id = urlParams.get('drugbank_id');
             $.ajax({
                 url: "{% url 'drug-lookup' %}?drug="+ drugbank_id,
                 success: function (data) {
+                    console.log("ajax results length: "+data.drugs.length);
                     $("#search_result_examples").html("RESULTS");
                     $("#drug-result-tbody").html('');
                     var html_data = '';
