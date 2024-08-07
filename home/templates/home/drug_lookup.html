@@ -298,22 +298,26 @@
         var autocompleteResults = $('#drug-autocomplete-results');
         $('#search_drug').autocomplete({
             source: function (request, response) {
-                $.ajax({
-                    url: "{% url 'drug-autocomplete-view' %}",
-                    data: {
-                        query: request.term
-                    },
-                    dataType: 'json',
-                    success: function (data) {
-                        if (data.suggestions.length > 0) {
-                            response(data.suggestions);
+                var term = request.term.split(";")[request.term.split(";").length -1];
+                if (term.length > 2) {
+                    $.ajax({
+                        url: "{% url 'drug-autocomplete-view' %}",
+                        data: {
+                            query: term
+                        },
+                        dataType: 'json',
+                        success: function (data) {
+                            if (data.suggestions.length > 0) {
+                                response(data.suggestions);
+                            }
+                            else {
+                                response(['No results found!'])
+                            }
+                            
                         }
-                        else {
-                            response(['No results found!'])
-                        }
-                        
-                    }
-                });
+                    });
+                }
+                
             },
             autoFocus: true,
             minLength: 3,
