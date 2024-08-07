@@ -511,7 +511,7 @@ def get_gene_detail_data(request, slug): #upper
                     try:
                         for vep_variant in vep_variants:
                             coseq = vep_variant[1].split(",")
-                            cleaned_values = [x for x in vep_variant[6:] if str(x) != 'nan']
+                            cleaned_values = [x for x in vep_variant[6:] if isinstance(x, float)]
                             mean_vep_score = round(np.mean(cleaned_values), 3)
                             if np.isnan(mean_vep_score):
                                 mean_vep_score = "nan"
@@ -542,6 +542,7 @@ def get_gene_detail_data(request, slug): #upper
                             protein_with_variant_index_list.append(vep_variant[2])
                     except Exception as e:
                         print("----- marker ", marker, " has exception ", e)
+                        raise
             variant_info_for_3D = remove_duplicates(variant_info_for_3D)
             variant_info_for_3D_view = sorted(variant_info_for_3D, key=lambda x: int(x['protein_position']))
             context['variant_info_for_3D_view'] = json.dumps(variant_info_for_3D_view)
@@ -556,7 +557,6 @@ def get_gene_detail_data(request, slug): #upper
             protein_name = Protein.objects.filter(geneID=slug).values_list("uniprot_ID", flat=True)[0]
             context["protein_name"] = protein_name
             context["amino_seq_num_list"] = amino_seq_num_list
-            
             new_dict = {}
             for key, values in protein_position_and_corresponding_lowest_mean_VEP_score.items():
                 numeric_values = [float(v) for v in values if v != 'nan']
@@ -564,7 +564,6 @@ def get_gene_detail_data(request, slug): #upper
                     new_dict[key] = min(numeric_values)
                 else:
                     new_dict[key] = 'nan'
-            # print("---- new_dict: ", new_dict)
             
             chunks = []
             for i in range(0, len(amino_seq), 10):
@@ -585,9 +584,7 @@ def get_gene_detail_data(request, slug): #upper
                     })
             chunks[-1]["position"] = 10 + int(len(amino_seq)/10)*10
             context["chunks"] = chunks
-            # print("\n\n------ chunks length", len(chunks))
-            # for i,chunk in enumerate(chunks):
-            #     print(i, " --- chunk ", chunk)
+            
             context["af_pdb"] = Protein.objects.filter(geneID=slug).values_list("af_pdb", flat=True)[0]
             variants = [item["variant_marker"] for item in variant_info_for_3D_view]
             context['variants'] = list(set(variants))

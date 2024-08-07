@@ -392,22 +392,27 @@ def drug_lookup(request):
     if input:
         if input != 'default':
             try:
-                drug_ids = [drug.split(" - ")[0] for drug in input.split(";")]
-                drug_names = [drug.split(" - ")[1] for drug in input.split(";")]
-                print("-- drug_ids ", drug_ids)
-                print("-- drug_names ", drug_names)
-                if len(drug_ids)>1:
-                    data = Drug.objects.filter(
-                        Q(drug_bankID__in=drug_ids) |
-                        Q(name__in=drug_names))
+                if input.find(" - ")>0:
+                    drug_ids = [drug.split(" - ")[0] for drug in input.split(";")]
+                    drug_names = [drug.split(" - ")[1] for drug in input.split(";")]
+                    # print("-- drug_ids ", drug_ids)
+                    # print("-- drug_names ", drug_names)
+                    if len(drug_ids)>1:
+                        data = Drug.objects.filter(
+                            Q(drug_bankID__in=drug_ids) |
+                            Q(name__in=drug_names))
+                    else:
+                        data = Drug.objects.filter(
+                            Q(drug_bankID=drug_ids[0]) |
+                            Q(name=drug_names[0]))
                 else:
                     data = Drug.objects.filter(
-                        Q(drug_bankID=drug_ids[0]) |
-                        Q(name=drug_names[0]))
-            except:
+                            drug_bankID=input
+                            )
+            except Exception as e:
+                print("Exception ", e)
                 data = []
         else:
-            print("drug para is default")
             data = Drug.objects.all()[:20]
         
         for item in data:
@@ -417,7 +422,6 @@ def drug_lookup(request):
             else:
                 code = list(atc_code)
             adr, no_of_se = get_adr(item.drug_bankID)
-            print("-------in view function no_of_se ", no_of_se)
             if adr!="NA":
                 adr_json = {
                     "color4": [f"{key} ({value}" for key, value in adr.get("color4", {}).items()],
@@ -439,7 +443,6 @@ def drug_lookup(request):
             })
         return JsonResponse({'drugs': results})
     else:
-        print("no drug para")
         data = Drug.objects.all()[:20]
         for item in data:
             atc_code = DrugAtcAssociation.objects.filter(drug_id=item.drug_bankID).values_list('atc_id', flat=True)
@@ -469,6 +472,7 @@ def drug_lookup(request):
             })
         context["drugs"] = results
         return render(request, 'home/drug_lookup.html', context)
+    
     
 def get_atc_code(drug_bankID):
     try:
