@@ -810,7 +810,7 @@ div {
 
 #all-legends {
     border: 1px solid #ccc;
-    padding: 10px;
+    padding: 30px; /* yang start change 10px to 30px */
     display: inline-block;
     vertical-align: top;
     width: 100%;
@@ -969,7 +969,7 @@ body{
     text-align: start;
     position: relative;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    width: 300px; /* Adjust width as needed */
+    width: 30%; /* yang end */
 }
 
 .close-btn {
@@ -992,4 +992,34 @@ body{
 
 /* ended popup css  */
 
+
+/*yang start */
+#blinking {
+    position: absolute;
+    top: -26px;
+    left: 0;
+    padding: 5px;
+    background-color: #fdfcdc;
+    color: red;
+    border: 1px solid #ccc;
+    animation: blink 1s finite;
+    font-size: 13px;
+  }
+
+  @keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  .nw_filter_text {
+    color: darkgrey;
+    font-size: 1.2rem;
+  }
+
+  #nw_filter_master_text {
+    color: #337ab7;
+  }
+
+  /*yang end */
 

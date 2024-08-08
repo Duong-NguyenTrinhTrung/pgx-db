@@ -2,7 +2,6 @@ $(function () {
   $("#all-legends").draggable({
     containment: "window",
   });
-  $("#blinking").show();
 });
 
 //Pass jsonFiles Here
@@ -1679,19 +1678,6 @@ var drugStatuses = [
   "Vet-approved",
   "Illicit",
 ];
-
-var hiddenInteractions = {
-  target: false,
-  enzyme: false,
-  transporter: false,
-  carrier: false,
-  unknown: false,
-  Phase1: false,
-  Phase2: false,
-  Phase3: false,
-  Phase4: false,
-};
-
 var drugTypes = ["Biotech", "Small Molecule"];
 
 // Generate all combinations of leftXrightY.png for the image paths
@@ -1776,18 +1762,17 @@ proteinOnlyButton.addEventListener("click", () => {
 
   clearGraph();
 
-//  hiddenInteractions = {
-//   target: false,
-//   enzyme: false,
-//   transporter: false,
-//   carrier: false,
-//   unknown: false,
-//   Phase1: false,
-//   Phase2: false,
-//   Phase3: false,
-//   Phase4: false,
-// };
-
+var hiddenInteractions = {
+  target: false,
+  enzyme: false,
+  transporter: false,
+  carrier: false,
+  unknown: false,
+  Phase1: false,
+  Phase2: false,
+  Phase3: false,
+  Phase4: false,
+};
 
   nodes = child_nodes_data ; 
   links = child_links_data ;
@@ -1818,7 +1803,6 @@ diseaseOnlyButton.addEventListener("click", () => {
   links = disease_links_data ;
  
 console.log('disease_links_data' ,disease_links_data)
-
  createChart(links);
 });
 
@@ -1838,10 +1822,7 @@ defaultButton.addEventListener("click", () => {
 
   nodes = default_nodes_data ; 
   links = default_links_data ;
-  console.log('here is the default data' ,default_nodes_data , default_links_data )
    createChart(links);
-
-
 });
 
 
@@ -1857,117 +1838,40 @@ function getCheckedValues(containerId) {
   const checkedValues = [];
   checkboxes.forEach((checkbox) => {
     if (checkbox.checked) {
-      checkedValues.push(checkbox.value);
-
-      // if (checkbox.value.includes("Phase")) {
-      //   const phaseNumber = checkbox.value.replace("Phase", "");
-      //   checkedValues.push(phaseNumber);
-      // }
-      //  else 
-      //  {
-      // }
+      if (checkbox.value.includes("Phase")) {
+        const phaseNumber = checkbox.value.replace("Phase", "");
+        checkedValues.push(phaseNumber);
+      } else {
+        checkedValues.push(checkbox.value);
+      }
     }
   });
   return checkedValues;
 }
-function getunCheckedValues(containerId) {
-  const checkboxes = document.querySelectorAll(
-    `#${containerId} input[type="checkbox"]`
-  );
-  const checkedValues = [];
-  checkboxes.forEach((checkbox) => {
-    if (!checkbox.checked) {
-      checkedValues.push(checkbox.value);
-
-      // if (checkbox.value.includes("Phase")) {
-      //   const phaseNumber = checkbox.value.replace("Phase", "");
-      //   checkedValues.push(phaseNumber);
-      // }
-      //  else 
-      //  {
-      // }
-    }
-  });
-  return checkedValues;
-}
-
-function capitalizeFirstLetter(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
-}
-
-// Function to click elements with matching text from arrays
-function clickElementsByText(arrays) {
-  const elements = document.querySelectorAll('div, button ,span');
-
-  const textsToMatch = arrays.flat().map(capitalizeFirstLetter);
-console.log(textsToMatch , 'textsToMatch' )
-  // Loop through each text in the combined array
-  textsToMatch.forEach(text => {
-      // Loop through each element to find and click matching elements
-      elements.forEach(element => {
-          if (element.textContent.trim().includes(text)) {
-              element.click();
-
-          }
-      });
-  });
-}
-
-
-
-
-
 let checkedInteractionTypes = [];
-let  checkedPhases = [];
-
-let checkedInteractionTypes2 = [];
-let  checkedPhases2 = [];
-
-
-let uniqueInteractionTypes = []; 
-let  uniquePhases =[] ;
-
+checkedPhases = [];
 // Handle submit button click
 document.getElementById("submitBtn").addEventListener("click", function () {
-  checkedInteractionTypes2 = getCheckedValues("interactionTypesContainer");
-  checkedPhases2 = getCheckedValues("phasesContainer");
-  if (checkedInteractionTypes2.length === 0 || checkedPhases2.length === 0) {
+  checkedInteractionTypes = getCheckedValues("interactionTypesContainer");
+  checkedPhases = getCheckedValues("phasesContainer");
 
-  alert("Please Select the filterations")
-}
-else {
-  checkedInteractionTypes = getunCheckedValues("interactionTypesContainer");
-  checkedPhases = getunCheckedValues("phasesContainer");
-
-// Call the function with the arrays
-clickElementsByText([checkedInteractionTypes, checkedPhases]);
-
+  console.log("Checked Interaction Types:", checkedInteractionTypes);
   console.log("Checked Phases:", checkedPhases);
   child_selection = "ProteinOnly";
   
-  
-//   checkedInteractionTypes.forEach(phase => {
-//     hiddenInteractions[phase] = true;
-// });
-// checkedPhases.forEach(phase => {
-//   hiddenInteractions[phase] = true;
-// });
-  
-  // clearGraph();
-  // processData(
-  //   numberofnodes,
-  //   slicedata,
-  //   child_selection,
-  //   checkedInteractionTypes,
-  //   checkedPhases
-  // );
+  clearGraph();
+  processData(
+    numberofnodes,
+    slicedata,
+    child_selection,
+    checkedInteractionTypes,
+    checkedPhases
+  );
 
   document.getElementById("popup").style.display = "none";
 
   // You can now use the checked values as needed
   // For example, save them to another array or perform an action with them
-}
- 
 });
 
 flag_first = false;
@@ -1992,6 +1896,10 @@ function processData(
       catch {
         data = data.data;
       }
+
+      
+
+
       console.log("here is the data first data " , data)
       const uniqueProteinClasses = [
         ...new Set(data.map((d) => d.protein_name)),
@@ -2016,28 +1924,12 @@ function processData(
       }
 
       // Get unique interaction types
-       uniqueInteractionTypes = getUniqueValues(data, "interaction_type");
+      const uniqueInteractionTypes = getUniqueValues(data, "interaction_type");
       console.log("Unique Interaction Types:", uniqueInteractionTypes);
 
-      //yang start
-      uniqueInteractionTypes = uniqueInteractionTypes.map(element => {
-        return element.charAt(0).toUpperCase() + element.slice(1);
-      }); //yang end
-      
-
       // Get unique phases
-       uniquePhases = getUniqueValues(data, "Phase");
+      const uniquePhases = getUniqueValues(data, "Phase");
       console.log("Unique Phases:", uniquePhases);
-      //yang start
-      uniquePhases.sort((a, b) => {
-        let numA = parseInt(a.replace("Phase", ""));
-        let numB = parseInt(b.replace("Phase", ""));
-        return numA - numB;
-      }); //yang end
-
-  
-
-
 
       // Function to create checkboxes
       function createCheckboxes(containerId, items) {
@@ -2063,7 +1955,6 @@ function processData(
       // Create checkboxes for interaction types and phases
       createCheckboxes("interactionTypesContainer", uniqueInteractionTypes);
       createCheckboxes("phasesContainer", uniquePhases);
-
 
       let filteredData = data;
 
@@ -2217,7 +2108,7 @@ function processData(
 
 
 // child_nodes_data
-// if (checkedInteractionTypes.includes(row.interaction_type)) {
+if (checkedInteractionTypes.includes(row.interaction_type)) {
   
   if (
     !child_nodes_data.find(function (node) {
@@ -2242,11 +2133,11 @@ function processData(
     type: interaction,
     // disease_type: "temp"
   });
-// }
+}
 // child_nodes_data ended 
   
 // disease_nodes_data 
-// if (checkedPhases.includes(disease_phase)) {
+if (checkedPhases.includes(disease_phase)) {
   if (
     !disease_nodes_data.find(function (node) {
       return node.id === disease;
@@ -2268,16 +2159,16 @@ function processData(
     type: disease_interaction,
     // disease_type: disease_interaction // You can customize the type for disease links
   });
-// }
+}
 // disease_nodes_data ended 
 
 // default_nodes_data 
 
 
-// if (
-//   checkedInteractionTypes.includes(row.interaction_type) || 
-//   checkedPhases.includes(disease_phase)
-// ) {
+if (
+  checkedInteractionTypes.includes(row.interaction_type) || 
+  checkedPhases.includes(disease_phase)
+) {
 
   if (
     !default_nodes_data.find(function (node) {
@@ -2323,7 +2214,7 @@ function processData(
     type: disease_interaction,
     // disease_type: disease_interaction // You can customize the type for disease links
   });
-
+}
 // default_nodes_data ended 
 
 
@@ -2365,23 +2256,23 @@ var simulation = null;
 function createChart(links) {
   // clearGraph();
  console.log(nodes ,'child_nodes_data')
-  //  hiddenInteractions = {
-  //   target: false,
-  //   enzyme: false,
-  //   transporter: false,
-  //   carrier: false,
-  //   unknown: false,
-  //   Phase1: false,
-  //   Phase2: false,
-  //   Phase3: false,
-  //   Phase4: false,
-  // };
+   hiddenInteractions = {
+    target: false,
+    enzyme: false,
+    transporter: false,
+    carrier: false,
+    unknown: false,
+    Phase1: false,
+    Phase2: false,
+    Phase3: false,
+    Phase4: false,
+  };
 
-  //  hiddenProteinClasses ={}
-  //  hiddenDiseaseClasses = {};
-  //  hiddenDrugTypes = {};
-  //  hiddenInteractionTypes = {};
-  //  hiddenDrugStatuses = {};
+  hiddenProteinClasses ={}
+   hiddenDiseaseClasses = {};
+   hiddenDrugTypes = {};
+   hiddenInteractionTypes = {};
+   hiddenDrugStatuses = {};
   var childNodeMap = {};
       links.forEach(function (link) {
         if (!link.target.isParent) {
@@ -2896,8 +2787,6 @@ function createChart(links) {
   let remove_element = removeElements(true_node, False_node);
   removeDivContainingSpanText(remove_element);
 
-
-  clickElementsByText([checkedInteractionTypes, checkedPhases]);
 }
 
 // Update the chart visibility based on the threshold value
@@ -3059,6 +2948,17 @@ var colorMap = {
 //   Phase3: "red",
 //   Phase4: "orange"
 // };
+var hiddenInteractions = {
+  target: false,
+  enzyme: false,
+  transporter: false,
+  carrier: false,
+  unknown: false,
+  Phase1: false,
+  Phase2: false,
+  Phase3: false,
+  Phase4: false,
+};
 
 //Legends Dragable code below
 // Assuming you've imported D3 as d3
@@ -3288,10 +3188,6 @@ function createLegend() {
     // Event listener for the legend item text
     // Assuming that you have already defined the "nodes" and "links" arrays
     // and the "hiddenInteractions" object to track the visibility of interactions.
-
-    
-// clickElementsByText([checkedInteractionTypes, checkedPhases]);
-
     legendText.on("click", function () {
       var clickedText = d3.select(this);
       var interaction = clickedText.text();
