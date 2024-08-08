@@ -10,7 +10,7 @@ from drug.views import DrugByAtcBaseView, DescriptionByAtcBaseView, AtcCodesByLe
 from variant.views import VEPFromVariantBaseView
 from protein.views import BundleByTargetCodeView
 from django.core.cache import cache
-from variant.models import GenebassVariant, GenebassCategory, VariantPhenocode
+from variant.models import GenebassCategory, VariantPhenocode
 import pandas as pd
 
 class DrugToDiseaseAssociationRestApiView(DiseaseAssociationByDrugView, APIView,):

@@ -360,7 +360,6 @@
     
     function network_pgx_tab_clicked()
     {   
-        console.log("hasPGxData "+hasPGxData);
         var sp = document.getElementById("read_more_pgx");
         var p = document.getElementById('tab_network_pgx_message');
         var d = document.getElementById('pgx_data_display_area');
@@ -669,22 +668,42 @@
                     }
                     targetLinks.push(`<a style="color: white;" class="uniProt_ID ${className}" target="_blank" href="/gene/gene_detail/${row.target_list[j].gene_id}"> ${row.target_list[j].genename}</a>`);
                 }
-                //
-                var diseaseLinks = [];
-                for (var j = 0; j < row.disease_list.length; j++) {
-                    var phase_class = "phase1"
-                    if (row.disease_list[j].phase == "2") {
-                        phase_class = "phase2";
-                    }
-                    else if (row.disease_list[j].phase == "3") {
-                        phase_class = "phase3";
-                    }
-                    else if (row.disease_list[j].phase == "4") {
-                        phase_class = "phase4";
-                    }
-                    diseaseLinks.push(`<a class="${phase_class}" target="_blank" href="/disease_lookup/?disease_info=${row.disease_list[j].disease_name}"> ${row.disease_list[j].disease_name}</a>`);
-                }
                 
+                var groupedDiseases = {
+                    phase1: [],
+                    phase2: [],
+                    phase3: [],
+                    phase4: []
+                };
+
+                for (var j = 0; j < row.disease_list.length; j++) {
+                    var disease = row.disease_list[j];
+                    var phase_class = "phase1";
+                    var phase_key = "phase1";
+
+                    if (disease.phase == "2") {
+                        phase_class = "phase2";
+                        phase_key = "phase2";
+                    }
+                    else if (disease.phase == "3") {
+                        phase_class = "phase3";
+                        phase_key = "phase3";
+                    }
+                    else if (disease.phase == "4") {
+                        phase_class = "phase4";
+                        phase_key = "phase4";
+                    }
+                    groupedDiseases[phase_key].push(`<a class="${phase_class}" target="_blank" href="/disease_lookup/?disease_info=${disease.disease_name}">${disease.disease_name}</a>`);
+                }
+                var diseaseLinks = [];
+                for (var phase in groupedDiseases) {
+                    if (groupedDiseases[phase].length > 0) {
+                        diseaseLinks.push(`<strong>${phase.replace("phase", "Phase ")}:</strong>`);
+                        diseaseLinks = diseaseLinks.concat(groupedDiseases[phase]);
+                        diseaseLinks.push("<br>");
+                    }
+                }
+
                 tableHtml += `
                 <tr style="white-space: nowrap;">
                     <td style="vertical-align: top;">
@@ -700,7 +719,7 @@
                     <td style="vertical-align: top; text-align: center;">${row.target_list.length}</td>
                     <td style="white-space: normal;text-align: center;">${targetLinks.length===0 ? "-" : targetLinks.join("; ")}</td>
                     <td style="vertical-align: top;text-align: center;">${row.disease_list.length}</td>
-                    <td class="long-content" style="vertical-align: top;text-align: center;">${diseaseLinks.length === 0 ? "-" : diseaseLinks.join("; ")}</td>
+                    <td class="long-content" style="vertical-align: top;text-align: left;">${diseaseLinks.length === 0 ? "No diseases" : diseaseLinks.join(" ")}</td>
                 </tr>
                 `
             }
@@ -811,7 +830,6 @@
             atcCode = button.getAttribute("data-atc-code");
             
             hasPGxData = [];
-            console.log("hasPGxData is reset");
             const url = button.getAttribute('data-remote-url'); //"{% url 'get-drug-atc-association' %}"
             $.ajax(
                 {
@@ -824,7 +842,6 @@
                         list_associated_drugs_in_table(response);
                         // show tabs
                         $("#tabs_network").attr("data-atc-code", response.atc_code);
-                        console.log("showATCLevelNetwork: " + $("#tabs_network").attr("data-atc-code") + "; response.atc_code: " + response.atc_code);
                         if (response.associations.length>0)
                         {
                             draw_atc_level_network(button, response);

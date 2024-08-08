@@ -110,13 +110,14 @@
                 <div class="popup" id="popup">
                     <div class="popup-content">
                       <span class="close-btn" id="closeBtn"></span>
-                      
-                      <p>Please select your filter options and submit to see the network</p>
-                      <h1>Filter by Drug-protein Mode of interactions</h1>
+                      <!-- yang start  -->
+                      <h2 id="nw_filter_master_text">Please select your filter options and submit to see the network</h2>
+                      <h3 class="nw_filter_text">Filter by Drug-protein Mode of interactions</h3>
                       <div id="interactionTypesContainer"></div>
                       <!-- <div id="legend-content"> -->
-                      <h2>Filter by Drug-disease association study Phases</h2>
+                      <h3 class="nw_filter_text">Filter by Drug-disease association study Phases</h3>
                       <div id="phasesContainer"></div>
+                      <!-- yang end  -->
             
                       <button class="submit-btn2" id="submitBtn">Submit</button>
                     </div>
@@ -128,6 +129,9 @@
             <div id="chart"></div>
             <div id="legendsMainDiv" class="center-vertical-container">
                 <div id="all-legends">
+                    <!-- yang start  -->
+                    <div id="blinking" style="display: none;">Select/deselect elements below to filter the network</div>
+                     <!-- yang end  -->
                     <div id="legend_drug_status">
                         <h3>Clinical status</h3>
                         <div id="legend_drug_status-content">

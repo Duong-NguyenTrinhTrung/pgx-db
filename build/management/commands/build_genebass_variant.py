@@ -111,7 +111,7 @@ class Command(BaseCommand):
             ))
 
         objects = []
-
+        
         for index, row in enumerate(data.iterrows()):
             markerID = data[index: index + 1]["markerID"].values[0]
             if markerID.startswith("chr1:"):

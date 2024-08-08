@@ -1146,6 +1146,8 @@ def disease_lookup(request):
                         'link': item[2],
                         'atc_code': str(DrugAtcAssociation.objects.filter(drug_id=item[0]).values_list('atc_id', flat=True).first()),
                         })
+                temp.sort(key=lambda x: int(x['clinical_trial']), reverse=True)
+                print("----- temp ", temp)
                 response_data.append({
                     'disease_name':d.disease_name,
                     'disease_class': d.disease_class,
@@ -1167,6 +1169,8 @@ def disease_lookup(request):
                         'link': item[2],
                         'atc_code': str(DrugAtcAssociation.objects.filter(drug_id=item[0]).values_list('atc_id', flat=True).first()),
                         })
+                temp.sort(key=lambda x: int(x['clinical_trial']), reverse=True)
+                print("----- temp ", temp)
                 response_data.append({
                     'disease_name':d.disease_name,
                     'disease_class': d.disease_class,

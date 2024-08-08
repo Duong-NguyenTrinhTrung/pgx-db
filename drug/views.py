@@ -36,7 +36,7 @@ from drug.models import (AtcAnatomicalGroup,
 from gene.models import Gene
 from interaction.models import Interaction
 from protein.models import Protein
-from variant.models import GenebassVariant, GenebassPGx, GenebassVariantPGx, Variant, Pharmgkb
+from variant.models import GenebassPGx, GenebassVariantPGx, Variant, Pharmgkb
 from disease.models import DrugDiseaseStudy, Disease
 
 from .models import (
@@ -136,37 +136,16 @@ class AdrByDrugView:
             return response_data
 
 def drawNetworkAndSaveInAPlot(G, pat, name, title):
-    # Create a simple graph
-    # G = nx.Graph()
-    # G.add_edges_from([(1, 2), (1, 3), (2, 3), (2, 4), (3, 4), (4, 5)])
-
-    # Visualize the graph
     pos = nx.spring_layout(G, seed=42)  # Set seed for reproducibility
     nx.draw(G, pos, with_labels=True, font_weight='bold', node_color='skyblue', node_size=1000, font_size=10)
 
-    # Assign colors to nodes based on community
-    # colors = [partition[node] for node in G.nodes]
-
-    # Draw the graph with nodes colored by community
-    # nx.draw(G, pos, node_color=colors, cmap=plt.cm.get_cmap('viridis'), with_labels=True, font_weight='bold', node_size=1000, font_size=10)
-
-    # plt.title("Simple Graph with Fake Data")
     plt.title(title)
     plt.show()
     plt.savefig(path+"/"+name+".png")
 
-# from drug.models import (AtcAnatomicalGroup,
-#     AtcChemicalGroup,
-#     AtcChemicalSubstance,
-#     AtcPharmacologicalGroup,
-#     AtcTherapeuticGroup,
-#     DrugAtcAssociation,
-# )
 
 def sort_dict(my_dict):
-    # Sorting in descending order by values
     sorted_items_desc = sorted(my_dict.items(), key=lambda item: item[1], reverse=True)
-    # Converting sorted items back to a dictionary for descending order
     sorted_dict_desc = dict(sorted_items_desc)
     return sorted_dict_desc
 
@@ -285,7 +264,6 @@ def get_drugs_network(request):
 
     drug_bank_ids = request.GET.get('drug_bank_ids')
     drug_bank_ids = drug_bank_ids.split(',')
-    # drug_bank_ids = ["DB00001", "DB00004", "DB00007", "DB00093", "DB00011"]
     context = {
         'drug_bank_ids': drug_bank_ids,
     }
@@ -300,8 +278,6 @@ def get_drug_general_data(request, drug_bank_id):
         drug = Drug.objects.get(drug_bankID=drug_bank_id)
     except Drug.DoesNotExist:
         raise Http404("Drug does not exist")
-    # import pdb
-    # pdb.set_trace()
     data = DrugNetworkGetDataService(drug=drug).get_general_data() # without s
 
     return JsonResponse(data, safe=False)
@@ -370,14 +346,9 @@ def get_drugs_data(request):
     drug_bank_ids = drug_bank_ids.split(',')
 
     data = DrugsNetworkGetDataService(drug_bank_ids=drug_bank_ids).get_drug_data()
-    # Serialize the queryset to JSON
     serialized_data = serializers.serialize('json', data)
 
-    # Return the serialized data in a JsonResponse
     return JsonResponse(serialized_data, safe=False)
-
-
-    # return JsonResponse(data, safe=False)
 
 # Retrieve data for many interactions
 def get_drugs_interaction_data(request):
@@ -414,9 +385,6 @@ def drug_atc_expansion(request, drugbank_id):  # put a parameter drugbank_id her
     # Specify the drug of interest
     drug_name = "Insulin human"
 
-    # Retrieve the drug object based on the drugbank_id
-    # And change the code getting drug to bellow
-    # drug = get_object_or_404(Drug, drug_bankID=drugbank_id)
     drug = Drug.objects.get(drug_bankID=drugbank_id)
 
     # Get the related ATC code of the drug
@@ -447,68 +415,49 @@ def drug_atc_expansion(request, drugbank_id):  # put a parameter drugbank_id her
         temp = DrugAtcAssociation.objects.filter(atc_id__id__startswith=code).values_list('drug_id__drug_bankID',
                                                                                           flat=True)
         drugListDict[code] = list(set([item for item in temp]))
-        # name=AtcAnatomicalGroup.objects.filter(id=code).values_list('name', flat=True)[0]
-        # codeNameListDict[code]=name
     for code in atc_therapeutic_group_list:
         temp = DrugAtcAssociation.objects.filter(atc_id__id__startswith=code).values_list('drug_id__drug_bankID',
                                                                                           flat=True)
         drugListDict[code] = list(set([item for item in temp]))
-        # name=AtcTherapeuticGroup.objects.filter(id=code).values_list('name', flat=True)[0]
-        # codeNameListDict[code]=name
     for code in atc_pharmacological_group_list:
         temp = DrugAtcAssociation.objects.filter(atc_id__id__startswith=code).values_list('drug_id__drug_bankID',
                                                                                           flat=True)
         drugListDict[code] = list(set([item for item in temp]))
-        # name=AtcPharmacologicalGroup.objects.filter(id=code).values_list('name', flat=True)[0]
-        # codeNameListDict[code]=name
     for code in atc_chemical_group_list:
         temp = DrugAtcAssociation.objects.filter(atc_id__id__startswith=code).values_list('drug_id__drug_bankID',
                                                                                           flat=True)
         drugListDict[code] = list(set([item for item in temp]))
-        # name=AtcChemicalGroup.objects.filter(id=code).values_list('name', flat=True)[0]
-        # codeNameListDict[code]=name
     for code in atc_chemical_substance_list:
         temp = DrugAtcAssociation.objects.filter(atc_id__id__startswith=code).values_list('drug_id__drug_bankID',
                                                                                           flat=True)
         drugListDict[code] = list(set([item for item in temp]))
-        # name=AtcChemicalSubstance.objects.filter(id=code).values_list('name', flat=True)[0]
-        # codeNameListDict[code]=name
 
 
     # Convert the list to a JSON string
     json_drugList_data = json.dumps(drugListDict)
-    # json_codeName_data = json.dumps(codeNameListDict)
 
     # Pass the JSON string to the template context
     context['json_drugList_data'] = json_drugList_data
     context['drugListDict'] = drugListDict
-    # context['codeNameListDict'] = codeNameListDict
-    # context['json_codeName_data'] = json_codeName_data
     context['atc_anatomical_group_list'] = atc_anatomical_group_list
     context['atc_therapeutic_group_list'] = atc_therapeutic_group_list
     context['atc_pharmacological_group_list'] = atc_pharmacological_group_list
     context['atc_chemical_group_list'] = atc_chemical_group_list
     context['atc_chemical_substance_list'] = atc_chemical_substance_list
 
-    # return render(request, 'drug_atc_tabs.html', context)
     return render(request, 'drug_atc_tabs_horizontal.html', context)
-    # return render(request, 'drug_atc_tabs-leftshape.html', context)
 
 
 def search_drugs(request):
-    # extracts the search query parameter named 'q' from the GET request's query parameters. If 'q' is not present, the variable query is assigned the value None
     query = request.GET.get('q')
 
-    # This line filters the Drug model's objects based on the search query. It uses the icontains lookup to perform a case-insensitive search on both the name and aliases fields, using the '|' (OR) operator to combine the two queries.
     drugs = Drug.objects.filter(Q(name__icontains=query) | Q(aliases__icontains=query))
 
-    # creates a list of distinct drug names from the queryset drugs. The values_list method retrieves a list of tuples containing the 'name' field values, and the flat=True argument turns it into a flat list. The distinct() method ensures that only unique drug names are included.
     drug_names = drugs.values_list('name', flat=True).distinct()
 
     # Get related ATC codes and associated drugs for each drug
     drug_info = []
     for drug in drugs:
-        # filters the DrugAtcAssociation model's objects based on the drug's ATC associations. It selects objects whose 'atc_id' is included in the drug's related ATC associations.
         drug_atc_associations = DrugAtcAssociation.objects.filter(atc_id__in=drug.drugatcassociation.all())
         atc_codes = drug_atc_associations.values_list('atc_id__id', flat=True).distinct()
 
@@ -762,10 +711,7 @@ def get_drug_statistics(request):
     return render(request, 'drugstatistics.html', context)
 
 
-
-# Help from chatGPT.
 def drug_interaction_detail(request, drugbank_id):
-    # Retrieve the drug object
     drug = get_object_or_404(Drug, drug_bankID=drugbank_id)
 
     # a) Retrieve all the uniprot_ID of proteins that have interactions with the drug
@@ -801,8 +747,6 @@ def drug_interaction_detail(request, drugbank_id):
         'chemical_substance_names': chemical_substance_names,
         'atc_parents': atc_parents
     }
-
-    # return render(request, '_drug_detail.html', context)
     return render(request, 'drug_atc_tabs.html', context)
 
 
@@ -820,7 +764,6 @@ class AtcAnatomicalGroupListView(FilterView, ListView):
 
 def atc_lookup(request):
     atc_groups = AtcAnatomicalGroup.objects.all()
-    # Uppercase the names before returning
     for group in atc_groups:
         group.name = group.name.upper()
     context = {
@@ -867,28 +810,7 @@ def atc_search_view(request):
         inp = request.GET.get('atc_code_inp', '').strip()
         query_option = request.GET.get('query_option', '')
         if inp != "":       
-            # Search "id" field in all models
-            # if len(inp) > 7:
-            #     print("invalid inp")
-            # else:
-            #     if len(inp) > 5:  # search for id length =7
-            #         results += list(AtcChemicalSubstance.objects.filter(id__iexact=inp).values('id', 'name'))
-            #     else:
-            #         if len(inp) == 5:  # search for id length =5
-            #             results += list(AtcChemicalGroup.objects.filter(id__iexact=inp).values('id', 'name'))
-            #         else:
-            #             if len(inp) == 4:  # search for id length =5
-            #                 results += list(
-            #                     AtcPharmacologicalGroup.objects.filter(id__iexact=inp).values('id', 'name'))
-            #             else:
-            #                 if len(inp) == 3:  # search for id length =5
-            #                     results += list(
-            #                         AtcTherapeuticGroup.objects.filter(id__iexact=inp).values('id', 'name'))
-            #                 else:
-            #                     results += list(
-            #                         AtcAnatomicalGroup.objects.filter(id__iexact=inp).values('id', 'name'))
             if query_option == 'containing':
-                # Search "name" field in all models
                 results += list(AtcAnatomicalGroup.objects.filter(Q(id__icontains=inp)|Q(name__icontains=inp)).values('id', 'name'))
                 results += list(AtcTherapeuticGroup.objects.filter(Q(id__icontains=inp)|Q(name__icontains=inp)).values('id', 'name'))
                 results += list(
@@ -896,7 +818,6 @@ def atc_search_view(request):
                 results += list(AtcChemicalGroup.objects.filter(Q(id__icontains=inp)|Q(name__icontains=inp)).values('id', 'name'))
                 results += list(AtcChemicalSubstance.objects.filter(Q(id__icontains=inp)|Q(name__icontains=inp)).values('id', 'name'))
             elif query_option == 'startingwith':
-                # Search "id" field in all models
                 results += list(AtcAnatomicalGroup.objects.filter(Q(id__istartswith=inp)|Q(name__istartswith=inp)).values('id', 'name'))
                 results += list(AtcTherapeuticGroup.objects.filter(Q(id__istartswith=inp)|Q(name__istartswith=inp)).values('id', 'name'))
                 results += list(
@@ -2104,53 +2025,6 @@ def retrieving_chemical_group(atc_code):
 
 def retrieving_chemical_substance(atc_code):
     return list(AtcChemicalSubstance.objects.filter(id__startswith=atc_code).values('id', 'name'))
-
-
-# def get_atc_sub_levels(request):
-#     atc_code = request.GET.get("atc_code");
-#     data = {'atc_code': atc_code}
-#     if len(atc_code) == 1:
-#         data = {"anatomical_group": retrieving_anatomical_group(atc_code),
-#                 "therapeutic_group": retrieving_therapeutic_group(atc_code),
-#                 "pharmacological_group": retrieving_pharmacological_group(atc_code),
-#                 "chemical_group": retrieving_chemical_group(atc_code),
-#                 "chemical_substance": retrieving_chemical_substance(atc_code)}
-#     if len(atc_code) == 3:
-#         data = {"therapeutic_group": retrieving_therapeutic_group(atc_code),
-#                 "pharmacological_group": retrieving_pharmacological_group(atc_code),
-#                 "chemical_group": retrieving_chemical_group(atc_code),
-#                 "chemical_substance": retrieving_chemical_substance(atc_code)}
-#     if len(atc_code) == 4:
-#         data = {"pharmacological_group": retrieving_pharmacological_group(atc_code),
-#                 "chemical_group": retrieving_chemical_group(atc_code),
-#                 "chemical_substance": retrieving_chemical_substance(atc_code)}
-#     if len(atc_code) == 5:
-#         data = {"chemical_group": retrieving_chemical_group(atc_code),
-#                 "chemical_substance": retrieving_chemical_substance(atc_code)}
-#     if len(atc_code) == 7:
-#         data = {"chemical_substance": retrieving_chemical_substance(atc_code)}
-
-#     # re-organize the data
-#     reorganized_data = {}
-
-#     # Loop through each element in the original data
-#     for group_type, group_list in data.items():
-#         # Create a dictionary to hold the grouped elements
-#         grouped_elements = {}
-
-#         # Loop through the elements in the group_list
-#         for element in group_list:
-#             # Extract the element ID
-#             element_id = element['id']
-
-#             # Add the element to the grouped_elements dictionary
-#             grouped_elements[element_id] = element
-
-#         # Add the grouped_elements to the reorganized_data using the group_type as the key
-#         reorganized_data[group_type] = grouped_elements
-#     reorganized_data["atc_code"] = atc_code
-#     reorganized_data["data"] = data
-#     return JsonResponse(reorganized_data, safe=False)
 
 def count_pgx_variant_based_pgx_of_an_atc_code(request):
     atc_code = request.GET.get("atc_code")
