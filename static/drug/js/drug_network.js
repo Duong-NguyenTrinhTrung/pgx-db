@@ -2059,11 +2059,15 @@ function processData(
           container.appendChild(div);
         });
       }
-
       // Create checkboxes for interaction types and phases
       createCheckboxes("interactionTypesContainer", uniqueInteractionTypes);
       createCheckboxes("phasesContainer", uniquePhases);
 
+      // yang start
+      $("#waiting-prompt").hide();
+      $(".spinner").hide();
+      $("#popup-content").show(); 
+      // yang end
 
       let filteredData = data;
 
