@@ -959,7 +959,7 @@ body{
     justify-content: center;
     align-items: flex-start; /* Align items to the top */
     padding-top: 100px; /* Margin top */
-    z-index: 9998;
+    z-index: 998;
 }
 
 #popup-content {
@@ -1023,4 +1023,65 @@ body{
   }
 
   /*yang end */
+
+    #dialog3 {
+        position: absolute;
+        top: 47%;
+        z-index: 3;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 20px;
+        display: none;
+        width: 70%;
+        height: 90vh;
+        max-height: 90%;
+        overflow-y: auto;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    }
+    #close-button3 {
+        width: 24px;
+        height: 24px;
+        border: none;
+        background-color: transparent;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    #dialog3 table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        border-left: none; /* Remove left border */
+        border-right: none; /* Remove right border */
+    }
+
+    #dialog3 table tr {
+        border-bottom: 1px solid #ddd;
+      }
+      
+      #dialog3 table td {
+        padding: 12px 8px;
+        vertical-align: top;
+      }
+      
+      #dialog3 table td:first-child {
+        font-weight: bold;
+        width: 30%; /* Adjust width as necessary */
+      }
+      
+      #dialog3 table td:nth-child(2) a {
+        color: #007bff; /* Link color */
+        text-decoration: none;
+      }
+      
+      #dialog3 table td:nth-child(2) a:hover {
+        text-decoration: underline;
+      }
+      
+      #dialog3 table tr:last-child {
+        border-bottom: none; /* Remove border from the last row */
+      }
+
 
