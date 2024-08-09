@@ -108,9 +108,12 @@
                     <button type="button" id="more_details" class="btmbar pgx_btn"> Read more </button>
                 </div>
                 <div class="popup" id="popup">
-                    <div class="popup-content">
+                    <!-- yang start  -->
+                    <p id="waiting-prompt" style="text-align: center;"><i> <mark>Please kindly wait when the data is being loaded! </i></mark> 
+                    </p>
+                    <div class="spinner" style="margin: auto;">  </div>
+                    <div id="popup-content"> <!-- yang change class to id -->
                       <span class="close-btn" id="closeBtn"></span>
-                      <!-- yang start  -->
                       <h2 id="nw_filter_master_text">Please select your filter options and submit to see the network</h2>
                       <h3 class="nw_filter_text">Filter by Drug-protein Mode of interactions</h3>
                       <div id="interactionTypesContainer"></div>

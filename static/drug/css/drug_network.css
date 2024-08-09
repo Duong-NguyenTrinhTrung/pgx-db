@@ -962,14 +962,15 @@ body{
     z-index: 9998;
 }
 
-.popup-content {
+#popup-content {
     background-color: white;
     padding: 20px;
     border-radius: 10px;
     text-align: start;
     position: relative;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    width: 30%; /* yang end */
+    width: 30%; /* yang start */
+    display: none; /* yang end */
 }
 
 .close-btn {
