@@ -86,6 +86,21 @@
             </div>
         </div>
 
+        <!-- disease dialog  -->
+
+        <div id="dialog3" style="display: none">
+            <div class="toolbar2">
+            <div class="toolbar-left">
+                <h1 id="drug-name3"></h1>
+            </div>
+            <div class="toolbar-right">
+                <button id="close-button3">✕</button>
+            </div>
+            </div>
+            <div id="table-container" class="tab-content2"></div>
+        </div>
+        <!-- disease dialog  ended  -->
+
         <div id="screenshot">
             <!--Screennshot div closing-->
             <div  style="display: flex; justify-content: space-between;">
@@ -105,14 +120,13 @@
                     <button   type="button" id="GetmoreData" class="btmbar pgx_btn" style="text-decoration-line: underline;"> Get more
                     data </button>
                     <button id="ManagePreviousState" class="btmbar pgx_btn">Previous State</button>
-                    <button type="button" id="more_details" class="btmbar pgx_btn"> Read more </button>
                 </div>
                 <div class="popup" id="popup">
                     <!-- yang start  -->
                     <p id="waiting-prompt" style="text-align: center;"><i> <mark>Please kindly wait when the data is being loaded! </i></mark> 
                     </p>
                     <div class="spinner" style="margin: auto;">  </div>
-                    <div id="popup-content"> <!-- yang change class to id -->
+                    <div class="popup-content"> 
                       <span class="close-btn" id="closeBtn"></span>
                       <h2 id="nw_filter_master_text">Please select your filter options and submit to see the network</h2>
                       <h3 class="nw_filter_text">Filter by Drug-protein Mode of interactions</h3>
