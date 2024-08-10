@@ -104,29 +104,28 @@
         <div id="screenshot">
             <!--Screennshot div closing-->
             <div  style="display: flex; justify-content: space-between;">
-                <div class="btmbar-container">
-
-                    <button type="button" class="btmbar zoom-in-btn pgx_btn"> Zoom In </button>
-                    <button type="button" class="btmbar col-xs-2 margin-left zoom-out-btn pgx_btn"> Zoom Out </button>
-                    <label class="btmbar" for="threshold-slider" style="display: none;">&nbsp;Threshold Value:</label>
-                    <input class="btmbar" type="range" id="threshold-slider" min="1" max="" value="" step="1"
-                      style="display: none;">
-                    <span class="btmbar" id="threshold-value" style="display: none;"></span>
-                    <button type="button" id="exportButton" class="btmbar pgx_btn">Export</button>
-                    <button type="button" id="redrawChart" class="btmbar pgx_btn">Redraw</button>
-                    <button  type="button" class="btmbar pgx_btn" id="proteinOnly">Drug Protein </button>
-                    <button type="button" class="btmbar pgx_btn" id="diseaseOnly"> Drug Disease </button>
-                    <button type="button" class="btmbar pgx_btn" id="default">Both</button>
-                    <button   type="button" id="GetmoreData" class="btmbar pgx_btn" style="text-decoration-line: underline;"> Get more
-                    data </button>
-                    <button id="ManagePreviousState" class="btmbar pgx_btn">Previous State</button>
-                </div>
+                <div class="btmbar-container"> 
+                        <button type="button" class="btmbar zoom-in-btn pgx_btn"> Zoom In </button>
+                        <button type="button" class="btmbar col-xs-2 margin-left zoom-out-btn pgx_btn"> Zoom Out </button>
+                        <label class="btmbar" for="threshold-slider" style="display: none;">&nbsp;Threshold Value:</label>
+                        <input class="btmbar" type="range" id="threshold-slider" min="1" max="" value="" step="1" style="display: none;">
+                        <span class="btmbar" id="threshold-value" style="display: none;"></span>
+                        <button type="button" id="exportButton" class="btmbar pgx_btn">Export</button>
+                        <button type="button" id="redrawChart" class="btmbar pgx_btn">Redraw</button>
+                        <button  type="button" class="btmbar pgx_btn" id="proteinOnly">Drug-Protein only</button>
+                        <button type="button" class="btmbar pgx_btn" id="diseaseOnly"> Drug-Disease only</button>
+                        <button type="button" class="btmbar pgx_btn" id="default">Both</button>
+                        <button   type="button" id="GetmoreData" class="btmbar pgx_btn" style="text-decoration-line: underline;"> Get more data </button>
+                        <button id="ManagePreviousState" class="btmbar pgx_btn">Previous State</button>
+                </div><!--yang end-->
                 <div class="popup" id="popup">
                     <!-- yang start  -->
-                    <p id="waiting-prompt" style="text-align: center;"><i> <mark>Please kindly wait when the data is being loaded! </i></mark> 
-                    </p>
-                    <div class="spinner" style="margin: auto;">  </div>
-                    <div class="popup-content"> 
+                    <div id="nw_spinner">
+                        <!-- <p id="waiting-prompt" style="text-align: center;"><i> <mark>Please kindly wait when the data is being loaded! </i></mark> 
+                        </p> -->
+                        <div class="spinner" style="margin: auto;">  </div>
+                    </div>
+                    <div id="popup-content"> 
                       <span class="close-btn" id="closeBtn"></span>
                       <h2 id="nw_filter_master_text">Please select your filter options and submit to see the network</h2>
                       <h3 class="nw_filter_text">Filter by Drug-protein Mode of interactions</h3>

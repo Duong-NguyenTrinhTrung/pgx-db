@@ -8,7 +8,7 @@ $(function () {
 //Pass jsonFiles Here
 
 // var json_GeneralFile = "json/json_GeneralFile.json";
-// var json_GeneralFile = "json/json5.json";
+// var json_GeneralFile = "json/missing_Drug.json";
 // var json_drugData = "json/json_drugData.json";
 // var json_proteinData = "json/json_proteinData.json";
 // var json_interactionData = "json/json_interactionData.json";
@@ -1800,16 +1800,14 @@ const diseaseOnlyButton = document.getElementById("diseaseOnly");
 const defaultButton = document.getElementById("default");
 let child_selection = "ProteinOnly";
 
-
-// Add event listeners to the buttons
-proteinOnlyButton.addEventListener("click", () => {
-  simulation.stop();
+function showProteinOnlyNetwork(child_selection){
+  // simulation.stop();
 
   console.log("Protein Only button clicked");
 
   d3.select("#Protein_to_hide").style("display", "block");
 
-  child_selection = "ProteinOnly";
+  child_selection = child_selection;
 
 
   proteinOnlyButton.style.backgroundColor = "#3333";
@@ -1838,6 +1836,10 @@ proteinOnlyButton.addEventListener("click", () => {
   links = child_links_data ;
 
    createChart(links);
+}
+// Add event listeners to the buttons
+proteinOnlyButton.addEventListener("click", () => {
+  showProteinOnlyNetwork("ProteinOnly");
 
   // Add your logic here
 });
@@ -1846,7 +1848,7 @@ diseaseOnlyButton.addEventListener("click", () => {
   console.log("Disease Only button clicked");
 
   clearGraph();
- simulation.stop();
+//  simulation.stop();
  
   d3.select("#Protein_to_hide").style("display", "none");
   // Add your logic here
@@ -1870,7 +1872,7 @@ console.log('disease_links_data' ,disease_links_data)
 
 defaultButton.addEventListener("click", () => {
   console.log("Default button clicked");
-  simulation.stop();
+  // simulation.stop();
   d3.select("#Protein_to_hide").style("display", "block");
   // Add your logic here
   child_selection = "";
@@ -1992,6 +1994,7 @@ clickElementsByText([checkedInteractionTypes, checkedPhases]);
 
   console.log("Checked Phases:", checkedPhases);
   child_selection = "ProteinOnly";
+  showProteinOnlyNetwork(child_selection);
   
   
 //   checkedInteractionTypes.forEach(phase => {
@@ -2110,9 +2113,8 @@ function processData(
       createCheckboxes("phasesContainer", uniquePhases);
 
       // yang start
-      $("#waiting-prompt").hide();
-      $(".spinner").hide();
-      $("#popup-content").show(); 
+      $('#nw_spinner').css({'visibility': 'hidden', 'opacity': '0'});
+      $('#popup-content').css({'visibility': 'visible', 'opacity': '1'});
       // yang end
 
 
@@ -2588,33 +2590,51 @@ function createChart(links) {
     var distanceBetweenNodes = 60;
   }
 
-  simulation = d3
-    .forceSimulation(nodes)
-    .force(
-      "link",
-      d3
-        .forceLink(links)
-        .id((d) => d.id)
-        .distance(150)
-    )
-    .force("charge", d3.forceManyBody().strength(-50))
-    .force("center", d3.forceCenter(svgWidth / 2, (svgHeight - 180) / 2))
-    .on("tick", () => {
-      // Logic for rendering or updating nodes and links on each tick
-    })
-    .on("end", () => {
-      // Fix the nodes' positions when the simulation ends
-      nodes.forEach((node) => {
-        node.fx = node.x;
-        node.fy = node.y;
-      });
+  // simulation = d3
+  //   .forceSimulation(nodes)
+  //   .force(
+  //     "link",
+  //     d3
+  //       .forceLink(links)
+  //       .id((d) => d.id)
+  //       .distance(150)
+  //   )
+  //   .force("charge", d3.forceManyBody().strength(-50))
+  //   .force("center", d3.forceCenter(svgWidth / 2, (svgHeight - 180) / 2))
+  //   .on("tick", () => {
+  //     // Logic for rendering or updating nodes and links on each tick
+  //   })
+  //   .on("end", () => {
+  //     // Fix the nodes' positions when the simulation ends
+  //     nodes.forEach((node) => {
+  //       node.fx = node.x;
+  //       node.fy = node.y;
+  //     });
+  //   });
+
+  const simulation = d3.forceSimulation(nodes)
+  .force("link", d3.forceLink(links).id(d => d.id).distance(130))
+  .force("charge", d3.forceManyBody().strength(-150))
+  .force("x", d3.forceX(svgWidth / 2))  // Attraction towards the center on the x-axis
+  .force("y", d3.forceY((svgHeight - 180) / 2))  // Attraction towards the center on the y-axis
+  // .force("collision", d3.forceCollide().radius(50)) // Adjust radius as needed
+  .on("tick", () => {
+    // Logic for rendering or updating nodes and links on each tick
+  })
+  .on("end", () => {
+    // Fix the nodes' positions when the simulation ends
+    nodes.forEach((node) => {
+      node.fx = node.x;
+      node.fy = node.y;
     });
+  });
+
 
   // Function to check if the simulation is settled and stop it
 
   // // Start the checking process after a delay to allow initial forces to act
   setTimeout(stopSimulationIfSettled, 4000);
-
+// 
   link = svg
     .selectAll(".link")
     .data(links)
@@ -3064,7 +3084,7 @@ function redrawChart1(originalLinks) {
 }
 
 function redrawChart(originalLinks) {
-  if (simulation) {
+  if (true) {
     //console.log("Simulation before restart: ", simulation);
 
     // Unfix the node positions
@@ -3085,7 +3105,7 @@ function redrawChart(originalLinks) {
         node.fy = node.y;
       });
     });
-    setTimeout(stopSimulationIfSettled, 4000);
+    setTimeout(stopSimulationIfSettled, 3000);
 
     //console.log("Simulation after restart: ", simulation);
   } else {
@@ -4396,7 +4416,7 @@ d3.select("#GetmoreData").on("click", function () {
 
   clearGraph();
 
-  simulation.stop(); 
+  // simulation.stop(); 
 
   filteredData = [];
   child_nodes_data = [];
@@ -4447,7 +4467,7 @@ console.log(child_selection , ' child slection ')
 document.getElementById("ManagePreviousState").style.display = "none";
 
 d3.select("#ManagePreviousState").on("click", function () {
-  simulation.stop();
+  // simulation.stop();
   filteredData = [];
   child_nodes_data = [];
   disease_nodes_data= []

@@ -726,8 +726,8 @@ div {
     border: 16px solid #c0bdbd;
     border-top: 16px solid #3498db;
     border-radius: 50%;
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     animation: spin 2s linear infinite;
 }
 
@@ -797,7 +797,7 @@ div {
     /* or absolute, depending on your layout */
     top: 10%;
     margin-right: 20px;
-    right: 0;
+    right: 30px;
     /* align it to the right edge of the viewport */
     width: 185px;
     /* set the width */
@@ -950,15 +950,14 @@ body{
   
 .popup {
     display: flex; /* Show the popup by default */
+    flex-direction: column;
     position: fixed;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(255, 255, 255, 1);
-    justify-content: center;
-    align-items: flex-start; /* Align items to the top */
-    padding-top: 100px; /* Margin top */
+    padding-top: 10px; /* Margin top */
     z-index: 998;
 }
 
@@ -970,7 +969,6 @@ body{
     position: relative;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     width: 30%; /* yang start */
-    display: none; /* yang end */
 }
 
 .close-btn {
@@ -1021,6 +1019,19 @@ body{
   #nw_filter_master_text {
     color: #337ab7;
   }
+
+  #nw_spinner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    visibility: visible;
+    opacity: 1;
+  }
+  #submitBtn {
+    margin: 0 auto;
+  }
+
+ 
 
   /*yang end */
 
