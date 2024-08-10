@@ -1986,15 +1986,16 @@ document.getElementById("submitBtn").addEventListener("click", function () {
   alert("Please Select the filterations")
 }
 else {
-  checkedInteractionTypes = getunCheckedValues("interactionTypesContainer");
-  checkedPhases = getunCheckedValues("phasesContainer");
+    checkedInteractionTypes = getunCheckedValues("interactionTypesContainer");
+    checkedPhases = getunCheckedValues("phasesContainer");
 
-// Call the function with the arrays
-clickElementsByText([checkedInteractionTypes, checkedPhases]);
+    // Call the function with the arrays
+    clickElementsByText([checkedInteractionTypes, checkedPhases]);
+    
 
-  console.log("Checked Phases:", checkedPhases);
-  child_selection = "ProteinOnly";
-  showProteinOnlyNetwork(child_selection);
+    console.log("Checked Phases:", checkedPhases);
+    child_selection = "ProteinOnly";
+    showProteinOnlyNetwork(child_selection);
   
   
 //   checkedInteractionTypes.forEach(phase => {
@@ -2114,7 +2115,8 @@ function processData(
 
       // yang start
       $('#nw_spinner').css({'visibility': 'hidden', 'opacity': '0'});
-      $('#popup-content').css({'visibility': 'visible', 'opacity': '1'});
+      // $('#popup-content').css({'visibility': 'visible', 'opacity': '1'});
+      $("#popup-content").show();
       // yang end
 
 

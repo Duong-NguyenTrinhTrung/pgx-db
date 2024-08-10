@@ -969,6 +969,7 @@ body{
     position: relative;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     width: 30%; /* yang start */
+    display: none;
 }
 
 .close-btn {
