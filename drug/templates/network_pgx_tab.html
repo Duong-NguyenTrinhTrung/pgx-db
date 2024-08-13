@@ -41,7 +41,7 @@
                                         <fieldset style="width:250px; border-radius: 5px;">
                                                 <legend
                                                 style="font-size: 14px; margin-bottom:0; text-decoration: none; color: #337ab7;">
-                                                Clinical PGx data</legend>
+                                                Clinical PGx data (Variant drug response)</legend>
                                                 <input id="variant-based-clinical-pgx-control" data-atc-code=""
                                                 name="clinical-pgx-control" type="radio" class="custom-radio" value="variant-based-clinical-pgx" checked>
                                                 <label for="variant-based-clinical-pgx-control">Variant-based (only)</label>
@@ -453,6 +453,7 @@
         $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '10')
         $("#pgx-data-table_filter").find("input").css("margin-left", "10px");
     }
+    
 </script>
 
 <script>
@@ -730,5 +731,30 @@
             });
         
     }
+    $(document).ready(function() {
+        // $(document).on('click', '.fClick', function(){ 
+        //     alert("hey!");
+        // }); 
+        $(document).on('change', '#yadcf-filter--pgx-data-table-0', function(){
+            console.log("drug select");
+            var selected_drugbank_id = $(this).find("option:selected").val();
+            if (selected_drugbank_id != -1) {
+                $("#yadcf-filter--pgx-data-table-1").attr("disabled", "disabled");
+            }
+            else {
+                $("#yadcf-filter--pgx-data-table-1").removeAttr("disabled");
+            }
+        });
+        $(document).on('change', '#yadcf-filter--pgx-data-table-1', function(){
+            console.log("gene select");
+            var selected_drugbank_id = $(this).find("option:selected").val();
+            if (selected_drugbank_id != -1) {
+                $("#yadcf-filter--pgx-data-table-0").attr("disabled", "disabled");
+            }
+            else {
+                $("#yadcf-filter--pgx-data-table-0").removeAttr("disabled");
+            }
+        });
+    });
 </script>
 {% endblock %}

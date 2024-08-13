@@ -322,13 +322,14 @@
             autoFocus: true,
             minLength: 3,
             select: function (event, ui) {
+                var newValue = ui.item.value.split(" - ")[0];
                 var current = $('#search_drug').val();
                 var current_value = "";
                 if (!current.includes(";")){ //fresh terms
                     prev=[];
                 }
-                if(!prev.includes(ui.item.value)) {
-                    prev.push(ui.item.value);
+                if(!prev.includes(newValue)) {
+                    prev.push(newValue);
                 }
                 $('#search_drug').val(prev.join(";"));
                 $("#submit_drug").click();                       
