@@ -406,8 +406,9 @@ def drug_lookup(request):
                             Q(drug_bankID=drug_ids[0]) |
                             Q(name=drug_names[0]))
                 else:
+                    drug_ids = input.split(";")
                     data = Drug.objects.filter(
-                            drug_bankID=input
+                            drug_bankID__in=drug_ids
                             )
             except Exception as e:
                 print("Exception ", e)

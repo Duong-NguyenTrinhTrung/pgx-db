@@ -1840,6 +1840,8 @@ function showProteinOnlyNetwork(child_selection){
 // Add event listeners to the buttons
 proteinOnlyButton.addEventListener("click", () => {
   showProteinOnlyNetwork("ProteinOnly");
+
+  // Add your logic here
 });
 
 diseaseOnlyButton.addEventListener("click", () => {
@@ -1984,15 +1986,16 @@ document.getElementById("submitBtn").addEventListener("click", function () {
   alert("Please Select the filterations")
 }
 else {
-  checkedInteractionTypes = getunCheckedValues("interactionTypesContainer");
-  checkedPhases = getunCheckedValues("phasesContainer");
+    checkedInteractionTypes = getunCheckedValues("interactionTypesContainer");
+    checkedPhases = getunCheckedValues("phasesContainer");
 
-// Call the function with the arrays
-clickElementsByText([checkedInteractionTypes, checkedPhases]);
+    // Call the function with the arrays
+    clickElementsByText([checkedInteractionTypes, checkedPhases]);
+    
 
-  console.log("Checked Phases:", checkedPhases);
-  child_selection = "ProteinOnly";
-  showProteinOnlyNetwork(child_selection);
+    console.log("Checked Phases:", checkedPhases);
+    child_selection = "ProteinOnly";
+    showProteinOnlyNetwork(child_selection);
   
   
 //   checkedInteractionTypes.forEach(phase => {
@@ -2035,16 +2038,12 @@ function processData(
   fetch(jsonFilePath)
     .then((response) => response.json())
     .then((data) => {
-
-
       try {
         var data = JSON.parse(data.data);
       }
       catch {
         data = data.data;
       }
-
-
       console.log("here is the data first data " , data)
       const uniqueProteinClasses = [
         ...new Set(data.map((d) => d.protein_name)),
@@ -2069,7 +2068,7 @@ function processData(
       }
 
       // Get unique interaction types
-      uniqueInteractionTypes = getUniqueValues(data, "interaction_type");
+       uniqueInteractionTypes = getUniqueValues(data, "interaction_type");
       console.log("Unique Interaction Types:", uniqueInteractionTypes);
 
       //yang start
@@ -2114,11 +2113,13 @@ function processData(
       createCheckboxes("interactionTypesContainer", uniqueInteractionTypes);
       createCheckboxes("phasesContainer", uniquePhases);
 
-       // yang start
-       $('#nw_spinner').css({'visibility': 'hidden', 'opacity': '0'});
-       // $('#popup-content').css({'visibility': 'visible', 'opacity': '1'});
-       $("#popup-content").show();
-       // yang end
+      // yang start
+      $('#nw_spinner').css({'visibility': 'hidden', 'opacity': '0'});
+      // $('#popup-content').css({'visibility': 'visible', 'opacity': '1'});
+      $("#popup-content").show();
+      // yang end
+
+
       let filteredData = data;
 
       if (thredhold_value < 5 && child_nodes > 180) {
@@ -3069,7 +3070,7 @@ d3.select("#redrawChart").on("click", function () {
   redrawChart(links);
 });
 
-function redrawChart2(originalLinks) {
+function redrawChart1(originalLinks) {
   if (simulation) {
     //console.log("Simulation before restart: ", simulation);
 
@@ -3083,10 +3084,10 @@ function redrawChart2(originalLinks) {
     //console.log("Simulation is not defined");
   }
 }
-console.log("created the new redraw function there that function be resolve now ")
+
 function redrawChart(originalLinks) {
   if (true) {
-    console.log("Simulation before restart: ", simulation);
+    //console.log("Simulation before restart: ", simulation);
 
     // Unfix the node positions
     nodes.forEach(function (node) {
@@ -3106,7 +3107,7 @@ function redrawChart(originalLinks) {
         node.fy = node.y;
       });
     });
-    // setTimeout(stopSimulationIfSettled, 3000);
+    setTimeout(stopSimulationIfSettled, 3000);
 
     //console.log("Simulation after restart: ", simulation);
   } else {
@@ -3114,10 +3115,10 @@ function redrawChart(originalLinks) {
   }
 }
 
-function redrawChart1(originalLinks) {
+function redrawChart2(originalLinks) {
   // Restart the simulation
 
-  if (simulation) {
+  if (simulation.alpha() < 0.01) {
     // Manually restart the simulation
     simulation.alpha(1).restart();
 
