@@ -430,7 +430,9 @@ def get_variant_annotation_and_vep(request, slug): #lower for one gene
             table_with_mean_vep_score = []
             for i, data_row in enumerate(table.to_numpy()):
                 try:
-                    cleaned_values = [x for x in data_row[10:-2] if str(x) != '']
+                    # cleaned_values = [x for x in data_row[10:-2] if str(x) != '']
+                    cleaned_values = [x for x in data_row[10:-2] if x is not None and str(x) != '']
+
                     mean_vep_score = round(np.mean(cleaned_values), 3)
                     if np.isnan(mean_vep_score):
                         mean_vep_score = "nan"
@@ -556,6 +558,8 @@ def get_gene_detail_data(request, slug): #upper
             context["seq_length"] = len(amino_seq)
             protein_name = Protein.objects.filter(geneID=slug).values_list("uniprot_ID", flat=True)[0]
             context["protein_name"] = protein_name
+            protein_text_name = Protein.objects.filter(geneID=slug).values_list("protein_name", flat=True)[0]
+            context["protein_text_name"] = protein_text_name
             context["amino_seq_num_list"] = amino_seq_num_list
             new_dict = {}
             for key, values in protein_position_and_corresponding_lowest_mean_VEP_score.items():

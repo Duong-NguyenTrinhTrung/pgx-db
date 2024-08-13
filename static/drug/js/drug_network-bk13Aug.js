@@ -4,7 +4,6 @@ $(function () {
   });
   $("#blinking").show();
 });
-  
 
 //Pass jsonFiles Here
 
@@ -1774,8 +1773,8 @@ function xlsxToJson(file, callback) {
 let flag_tabclicked = false;
 let flag_processData = false;
 
-let numberofnodes = 3;
-let slicedata = 600;
+let numberofnodes = 2;
+let slicedata = 400;
 
 window.parent.postMessage({ data: slicedata }, "*");
 
@@ -1802,22 +1801,13 @@ const defaultButton = document.getElementById("default");
 let child_selection = "ProteinOnly";
 
 function showProteinOnlyNetwork(child_selection){
-  proteinOnlyButton.style.backgroundColor = "#3333";
-  diseaseOnlyButton.style.backgroundColor = "white";
-  defaultButton.style.backgroundColor = "white";
-}
-
-showProteinOnlyNetwork(child_selection);
-
-// Add event listeners to the buttons
-proteinOnlyButton.addEventListener("click", () => {
   // simulation.stop();
 
   console.log("Protein Only button clicked");
 
   d3.select("#Protein_to_hide").style("display", "block");
 
-  child_selection = "ProteinOnly";
+  child_selection = child_selection;
 
 
   proteinOnlyButton.style.backgroundColor = "#3333";
@@ -1846,10 +1836,7 @@ proteinOnlyButton.addEventListener("click", () => {
   links = child_links_data ;
 
    createChart(links);
-
-  // Add your logic here
-});
-
+}
 // Add event listeners to the buttons
 proteinOnlyButton.addEventListener("click", () => {
   showProteinOnlyNetwork("ProteinOnly");
@@ -2005,6 +1992,7 @@ clickElementsByText([checkedInteractionTypes, checkedPhases]);
 
   console.log("Checked Phases:", checkedPhases);
   child_selection = "ProteinOnly";
+  showProteinOnlyNetwork(child_selection);
   
   
 //   checkedInteractionTypes.forEach(phase => {
@@ -2079,47 +2067,26 @@ function processData(
         });
         return Array.from(uniqueValues);
       }
- // Get unique interaction types
 
- uniqueInteractionTypes = getUniqueValues(data, "interaction_type");
+      // Get unique interaction types
+      uniqueInteractionTypes = getUniqueValues(data, "interaction_type");
+      console.log("Unique Interaction Types:", uniqueInteractionTypes);
 
- console.log("Unique Interaction Types:", uniqueInteractionTypes);
+      //yang start
+      uniqueInteractionTypes = uniqueInteractionTypes.map(element => {
+        return element.charAt(0).toUpperCase() + element.slice(1);
+      }); //yang end
 
+      // Get unique phases
+       uniquePhases = getUniqueValues(data, "Phase");
+      console.log("Unique Phases:", uniquePhases);
 
-
- //yang start
-
- uniqueInteractionTypes = uniqueInteractionTypes.map(element => {
-
-   return element.charAt(0).toUpperCase() + element.slice(1);
-
- }); //yang end
-
-
-
- // Get unique phases
-
-  uniquePhases = getUniqueValues(data, "Phase");
-
- console.log("Unique Phases:", uniquePhases);
-
-
-
- //yang start
-
- uniquePhases.sort((a, b) => {
-
-   let numA = parseInt(a.replace("Phase", ""));
-
-   let numB = parseInt(b.replace("Phase", ""));
-
-   return numA - numB;
-
- }); //yang end
-
-
-
-
+      //yang start
+      uniquePhases.sort((a, b) => {
+        let numA = parseInt(a.replace("Phase", ""));
+        let numB = parseInt(b.replace("Phase", ""));
+        return numA - numB;
+      }); //yang end
 
   
       // Function to create checkboxes
@@ -2146,12 +2113,12 @@ function processData(
       // Create checkboxes for interaction types and phases
       createCheckboxes("interactionTypesContainer", uniqueInteractionTypes);
       createCheckboxes("phasesContainer", uniquePhases);
-   // yang start
-   $('#nw_spinner').css({'visibility': 'hidden', 'opacity': '0'});
-   // $('#popup-content').css({'visibility': 'visible', 'opacity': '1'});
-   $("#popup-content").show();
-   // yang end
 
+       // yang start
+       $('#nw_spinner').css({'visibility': 'hidden', 'opacity': '0'});
+       // $('#popup-content').css({'visibility': 'visible', 'opacity': '1'});
+       $("#popup-content").show();
+       // yang end
       let filteredData = data;
 
       if (thredhold_value < 5 && child_nodes > 180) {
@@ -2646,7 +2613,7 @@ function createChart(links) {
   //     });
   //   });
 
-   simulation = d3.forceSimulation(nodes)
+  const simulation = d3.forceSimulation(nodes)
   .force("link", d3.forceLink(links).id(d => d.id).distance(130))
   .force("charge", d3.forceManyBody().strength(-150))
   .force("x", d3.forceX(svgWidth / 2))  // Attraction towards the center on the x-axis
@@ -2654,30 +2621,6 @@ function createChart(links) {
   // .force("collision", d3.forceCollide().radius(50)) // Adjust radius as needed
   .on("tick", () => {
     // Logic for rendering or updating nodes and links on each tick
-    link
-    .attr("x1", function (d) {
-      return Math.max(0, Math.min(svgWidth, d.source.x));
-    })
-    .attr("y1", function (d) {
-      return Math.max(0, Math.min(svgHeight, d.source.y));
-    })
-    .attr("x2", function (d) {
-      return Math.max(0, Math.min(svgWidth, d.target.x));
-    })
-    .attr("y2", function (d) {
-      if (d.target.child_type === "disease_type") {
-        return Math.max(0, Math.min(svgHeight, d.target.y)) + 8;
-      } else {
-        return Math.max(0, Math.min(svgHeight, d.target.y));
-      }
-    });
-
-  node.attr("transform", function (d) {
-    return `translate(${Math.max(
-      0,
-      Math.min(svgWidth, d.x)
-    )},${Math.max(0, Math.min(svgHeight, d.y))})`;
-  });
   })
   .on("end", () => {
     // Fix the nodes' positions when the simulation ends
@@ -2889,32 +2832,32 @@ function createChart(links) {
     .attr("class", "node-label");
   // tag4
 
-  // simulation.on("tick", function () {
-  //   link
-  //     .attr("x1", function (d) {
-  //       return Math.max(0, Math.min(svgWidth, d.source.x));
-  //     })
-  //     .attr("y1", function (d) {
-  //       return Math.max(0, Math.min(svgHeight, d.source.y));
-  //     })
-  //     .attr("x2", function (d) {
-  //       return Math.max(0, Math.min(svgWidth, d.target.x));
-  //     })
-  //     .attr("y2", function (d) {
-  //       if (d.target.child_type === "disease_type") {
-  //         return Math.max(0, Math.min(svgHeight, d.target.y)) + 8;
-  //       } else {
-  //         return Math.max(0, Math.min(svgHeight, d.target.y));
-  //       }
-  //     });
+  simulation.on("tick", function () {
+    link
+      .attr("x1", function (d) {
+        return Math.max(0, Math.min(svgWidth, d.source.x));
+      })
+      .attr("y1", function (d) {
+        return Math.max(0, Math.min(svgHeight, d.source.y));
+      })
+      .attr("x2", function (d) {
+        return Math.max(0, Math.min(svgWidth, d.target.x));
+      })
+      .attr("y2", function (d) {
+        if (d.target.child_type === "disease_type") {
+          return Math.max(0, Math.min(svgHeight, d.target.y)) + 8;
+        } else {
+          return Math.max(0, Math.min(svgHeight, d.target.y));
+        }
+      });
 
-  //   node.attr("transform", function (d) {
-  //     return `translate(${Math.max(
-  //       0,
-  //       Math.min(svgWidth, d.x)
-  //     )},${Math.max(0, Math.min(svgHeight, d.y))})`;
-  //   });
-  // });
+    node.attr("transform", function (d) {
+      return `translate(${Math.max(
+        0,
+        Math.min(svgWidth, d.x)
+      )},${Math.max(0, Math.min(svgHeight, d.y))})`;
+    });
+  });
 
   // new code of dragable
 
@@ -3123,7 +3066,7 @@ function hideNodeAndChildren(node) {
 }
 
 d3.select("#redrawChart").on("click", function () {
-  redrawChart3(links);
+  redrawChart(links);
 });
 
 function redrawChart2(originalLinks) {
@@ -3140,7 +3083,8 @@ function redrawChart2(originalLinks) {
     //console.log("Simulation is not defined");
   }
 }
-function redrawChart3(originalLinks) {
+console.log("created the new redraw function there that function be resolve now ")
+function redrawChart(originalLinks) {
   if (true) {
     console.log("Simulation before restart: ", simulation);
 
@@ -3151,7 +3095,7 @@ function redrawChart3(originalLinks) {
     });
 
     // Add nodes and links to the simulation and restart
-    // simulation.nodes(nodes).force("link").links(links);
+    simulation.nodes(nodes).force("link").links(links);
 
     simulation.alpha(1).restart();
 
@@ -3190,26 +3134,6 @@ function redrawChart1(originalLinks) {
     });
   }
 }
-
-
-// new redraw graph 
-const redrawChart = () => {
-  // Restart the simulation
-  console.log(simulation , 'here is the simulation ')
-  nodes.forEach(function (node) {
-    node.x += (Math.random() - 0.5) * 20; // Adjust the 20 to control the displacement range
-    node.y += (Math.random() - 0.5) * 20;
-  });
-
-  // Restart the simulation to apply the new positions
-  simulation
-    .alpha(0.3) // Set the alpha to a high value to reheat the simulation
-    .restart();
-
-
-  };
-  
-
 
 // Get color based on interaction type
 // Get color based on interaction type

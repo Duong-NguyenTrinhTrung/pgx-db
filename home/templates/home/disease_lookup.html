@@ -117,21 +117,21 @@
 <a href="" target="_blank"></a>
 <div id="disease-search-intro">
     <div id="sub-disease-search-intro-text">
-            <h3>DISEASES (Drug indication)</h3>
+            <h3>INDICATIONS</h3>
             <p>
                 Our database provides comprehensive information on approved and investigational drug-indication associations. Approved drug-indications are sourced from <a href="https://repurposedrugs.org/" target="_blank">RepurposeDrugs</a>, which utilizes a semi-automated pipeline and <a href="https://clinicaltrials.gov/data-api/api" target="_blank">ClinicalTrial's API</a>, while investigational indications are extracted from the <a href="https://www.ebi.ac.uk/chembl/" target="_blank">ChEMBL</a> database. We have compiled ~1,600 unique drug-indications, mapping them to Unified Medical Language-Concept Unique Identifiers (UML-CUIs) available at <a href="https://www.disgenet.org/" target="_blank">DisGeNET</a>. These indications are further aggregated into 25 classes for easier navigation. 
                 <br>
                 <br>
-                The image on the right shows the dataflow we used to retrieve the disease data.
+                The image on the right shows the dataflow we used to retrieve the indication data.
             </p>
     </div>
     <div id="sub-disease-search-intro-image">
-        <img src="/static/disease/images/data.png" alt="Atc code example" style="width: 70%; margin-left: 70px;">
+        <img src="/static/disease/images/data.png" alt="Indication information retrieval flow" style="width: 70%; margin-left: 70px;">
     </div>
 </div>
 
 <div id="disease">
-    <p class="lookup-text">Search by <i><span style="color:mediumblue;">Disease name</span></i>, <span style="color:mediumblue;">Disease class</span></i>, associated <i><span style="color:mediumblue;">Drug name</span></i> or <i><span style="color:mediumblue;">ATC code</span></i>
+    <p class="lookup-text">Search by <i><span style="color:mediumblue;">Indication name</span></i>, <span style="color:mediumblue;">Indication class</span></i>, associated <i><span style="color:mediumblue;">Drug name</span></i> or <i><span style="color:mediumblue;">ATC code</span></i>
     <br><i style="font-weight: 300;color:mediumblue;">(Multiple inputs are allowed. Please use semi colons to separate the inputs)</i></p>
     <form method="get" action="">
         <table class="table table-bordered table-gray table-fulltext-two-rows">
@@ -164,18 +164,18 @@
 </div>
 
 <div id="disease-result">
-    <p id="search_result_examples" style="margin: 20px 0 20px; font-size: 20px; font-weight: bold;">Random disease examples</p>
+    <p id="search_result_examples" style="margin: 20px 0 20px; font-size: 20px; font-weight: bold;">Random indication examples</p>
     <table id="disease-result-table">
         <thead>
             <tr style="background-color: rgb(144, 210, 157);">
-                <th>Disease name</th>
-                <th>Disease class</th>
-                <th>Disease_UML_CUI</th>
+                <th>Indication name</th>
+                <th>Indication class</th>
+                <th>Indication_UML_CUI</th>
                 <th>Associated drug(s)</th>
                 <th style="text-align: center;">ATC code<br>(assigned <br>for drug)</th>
                 <th style="text-align: center;">Phase of clinical study</th>
                 <th>Association study</th>
-                <th style="text-align: center;">Drug-disease network</th>
+                <th style="text-align: center;">Drug-indication network</th>
             </tr>
         </thead>
 

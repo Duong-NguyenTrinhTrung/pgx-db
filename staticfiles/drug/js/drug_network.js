@@ -1175,12 +1175,22 @@ function showDialog_Child(title, childName) {
         //console.log("dd: " + proteinName11111);
         var tabContent = document.querySelector('.tab-content1');
         tabContent.innerHTML = ''; // Clear the existing content
+        // add the link to gene detail page using geneID
 
         // Your code to fetch the row where column name "name" matches selectedDrugName1
         // Assuming you have the data in the global variable 'protein_xlsxData'
         var matchingRow = protein_xlsxData.find((row) => row.uniprot_ID === proteinName11111);
         // console.log(matchingRow);
         if (matchingRow) {
+            console.log("Matching row, gene id = ", matchingRow["geneID"]);
+            //yang start
+            let pElement = document.createElement("p");
+            let geneID = matchingRow["geneID"];
+            pElement.innerHTML = `Click here to see variants on this protein <a target="_blank" href="/gene/gene_detail/${geneID}">See variant</a>`;
+            tabContent.append(pElement);
+            // yang end
+
+            
             // Create a table to display the protein structure information
             var proteinStructureTable = document.createElement('div');
             proteinStructureTable.classList.add('protein-info-table');

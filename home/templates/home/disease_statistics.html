@@ -24,8 +24,8 @@
 {% block content %}
 <br>
 <br>
-<h2 style="font-family: Arial">Classes of diseases categorized by phases of drug-disease clinical study and drug types</h2>
-<p style="color: black; font-size: 16px;"><i>Click on a clinical phase (1, 2, 3 or 4), then choose drug type(s) to see the statistics plots of disease classes</i></p>
+<h2 style="font-family: Arial">Classes of indications categorized by phases of drug-indication clinical study and drug types</h2>
+<p style="color: black; font-size: 16px;"><i>Click on a clinical phase (1, 2, 3 or 4), then choose drug type(s) to see the statistics plots of indication classes</i></p>
 
 <br>
 <br>
@@ -111,7 +111,7 @@
       }
       else{
         if (sum==0){
-            alert(`Wow, there is no disease in "${text}" category!`)
+            alert(`Wow, there is no indication in "${text}" category!`)
         }else{
             create_and_show_donut(drawdata, colors, elementId, text, canvasWidth, canvasHeight)
         }

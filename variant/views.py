@@ -183,6 +183,8 @@ def get_genebass_tables(request):
     except Variant.DoesNotExist:
         variant = None
 
+    print("------ get_genebass_tables is call for variant ", variant)
+
     # Get gene
     if variant:
         gene = variant.Gene_ID
@@ -243,6 +245,7 @@ def get_genebass_tables(request):
         context=context,
         request=request,
     )
+    print("---- context ", context)
 
     return HttpResponse(html)
 
