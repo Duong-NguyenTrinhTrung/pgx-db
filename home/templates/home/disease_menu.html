@@ -3,12 +3,12 @@
 <li class="dropdown gpcr {% if current_site == 'gpcr' %}highlight_menu{% endif %}" id="disease_menu">
 
     <a tabindex="0" href="{{ hosts.gpcr }}/" class="dropdown-toggle" data-toggle="dropdown" role="button" data-submenu aria-expanded="false">
-        Diseases<span class="caret"></span>
+        Indication<span class="caret"></span>
     </a>
     <ul class="dropdown-menu" role="menu">
-        <li><a href="{% url 'disease-lookup' %}">Disease search</a></li>
+        <li><a href="{% url 'disease-lookup' %}">Indication search</a></li>
         <li class="divider"></li>
-        <li><a href="{% url 'disease-statistics' %}">Disease statistics</a></li>
+        <li><a href="{% url 'disease-statistics' %}">Indication statistics</a></li>
     </ul>
 </li>
 

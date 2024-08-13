@@ -132,6 +132,8 @@
                 ID:</strong> <a href="https://www.genecards.org/Search/Keyword?queryString={{ geneID }}" target="_blank"><span>{{ geneID }}</span></a></p>
         <p style="text-align: left; font-size: 14px; display: block; margin-bottom: 10px;"><strong>UniProt ID:</strong>
             <a href="https://www.uniprot.org/uniprotkb/{{ protein_name }}/entry" target="_blank"><span>{{ protein_name }}</span></a></p>
+        <p style="text-align: left; font-size: 14px; display: block; margin-bottom: 10px;"><strong>Protein name:</strong>
+            <a href="https://www.uniprot.org/uniprotkb/{{ protein_name }}/entry" target="_blank"><span>{{ protein_text_name }}</span></a></p>
     </div>
     <!-- Right panel  -->
     <div class="col-md-10">
@@ -194,7 +196,7 @@
 
         <!-- Variant annotation and VEP scores table  -->
         <div class="gene-table-container" style="margin-top: 40px;">
-            <p style="font-size: 18px; text-align:center; color: #337ab7;">Potential variants on gene <span
+            <p style="font-size: 18px; text-align:center; color: #337ab7;">Variants on gene <span
                 style="color: #B69121">{{ genename }}</span> and their effect prediction scores</p>
             <div class="spinner" style="display: none; margin: auto;"></div>
             {% include '_buttons.html' %}
@@ -322,14 +324,17 @@
         function renderVariantValuesInColorRanges(value) {
             const COLORS = [
                 '#FFE169', '#FAD643', '#EDC531', '#DBB42C', '#C9A227',
-                '#B69121', '#A47E1B', '#926C15', '#805B10', '#76520E'
+                '#B69121', '#A47E1B', '#926C15', '#805B10', '#76520E', '#fdf0d5',
             ];
 
             let color;
             if (value) {
                 value = parseFloat(value);
+                if (isNaN(value)) {
+                    value = null; // Set value to null if it's NaN
+                }
             } else {
-                value = 0.0;
+                value = "None"; // Set value to null if it's falsy
             }
 
             if (value < 0.1) {
@@ -350,8 +355,10 @@
                 color = COLORS[7];
             } else if (value < 0.9) {
                 color = COLORS[8];
-            } else {
+            } else if (value!="None"){
                 color = COLORS[9];
+            }else{
+                color=COLORS[10];
             }
             return $('<td>').addClass('vep-cell').css('background-color', color).text(value);
         }
@@ -477,6 +484,7 @@
 
                 colorRangeColumns.forEach(index => {
                     row.append(renderVariantValuesInColorRanges(value[index]));
+
                 });
                 // console.log("Number rows: " + row.length);
                 // Append the row to the table body
