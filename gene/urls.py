@@ -1,6 +1,6 @@
 from django.urls import path, re_path
 from .views import (
-    GenebassVariantListView,
+    # GenebassVariantListView,
     filter_gene_detail_page,
     get_gene_detail_data,
     get_variant_annotation_and_vep
