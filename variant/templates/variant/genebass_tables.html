@@ -37,7 +37,53 @@
     <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
     </div>
-    
+    <script>
+        function getHeaderContent(element) {
+            var content = "";
+            element.childNodes.forEach(function (value) {
+                if (value.nodeType === Node.TEXT_NODE) {
+                    // console.log("Current textNode value is : ", value.nodeValue.trim());
+                    // sChildTextSum += value.nodeValue;
+                    content += ` ${value.nodeValue.trim()}`;
+                }
+            });
+            return content;
+        }
+        function genebassVariantTableToExcel(){
+            var encabezado = '<html><head><meta http-equiv="content-type" content="text/plain; charset=UTF-8"/><style> table, td {border:thin solid black} table {border-collapse:collapse}</style></head><body><table>';
+
+            var header_el = $('#genebass-tables-header');
+            var header_th_els = header_el.find('th');
+            var header = ''
+            for (var th_i = 0; th_i < header_th_els.length; th_i++) {
+                header += '<th>' + getHeaderContent(header_th_els[th_i]) + '</th>'
+            }
+            header = '<tr>' + header + '</tr>'
+            header = '<thead>' + header + '</thead>'
+            var excel_content = ''
+            // Lay toan bo data trong datatable, chi lay cac rows thoa man dieu kien filter
+            var rows = $('#genebass-tables').DataTable().rows({ search: 'applied' }).data()
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i]
+                excel_content += '<tr>'
+                for (var j = 0; j < row.length; j++) {
+                    excel_content += '<td>' + row[j] + '</td>'
+                }
+                excel_content += '</tr>'
+            }
+
+            var piePagina = "</table></body></html>";
+            var tabla = encabezado + header + excel_content + piePagina;
+            var myBlob = new Blob([tabla], { type: 'application/vnd.ms-excel' });
+            var url = window.URL.createObjectURL(myBlob);
+            var a = document.createElement("a");
+            document.body.appendChild(a);
+            a.href = url;
+            var genename = '{{ gene.genename }}';
+            a.download = `${genename}.xls`;
+            a.click();
+        }
+    </script>
 {% else %}
     <!-- Display the message when there are no associations -->
     <p style="margin-top: 30px; color: #337ab7; text-align: center;">{{ "There is no significant burden associations (p_values<=0.05) of this variant" }}</p>
