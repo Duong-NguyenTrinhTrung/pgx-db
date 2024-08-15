@@ -97,9 +97,14 @@ class DiseaseAssociationByDrugView:
                             f"Disease(s) associated with the drug {drug.name} ({drug_id})": result,
                         }
                         cache.set("get_disease_association_by_drug_"+drug_id, response_data, timeout=60 * 15)
-                    return response_data
+                        return response_data
                 except:
-                    raise Http404("Drug does not exist")
+                    # raise Http404("Drug does not exist")
+                    response_data = {
+                                        "Results": "No such drug or wrong input. Please check it again!",
+                                    }
+                    return response_data
+        
 
 
 class AdrByDrugView:
@@ -127,12 +132,21 @@ class AdrByDrugView:
                                     "Frequency (in percentage)": percentage,
                                     }
                             result.append(temp)
-                # Create a JSON response with the data
-                response_data = {
-                    "Adverse drug reaction": result,
-                }
-                
-                cache.set("get_drug_adr_"+drug_id, response_data, timeout=60 * 15)
+                    # Create a JSON response with the data
+                    response_data = {
+                        "Adverse drug reaction": result,
+                    }
+                    cache.set("get_drug_adr_"+drug_id, response_data, timeout=60 * 15)
+                else:
+                    try:
+                        drug = Drug.objects.get(drug_bankID=drug_id)
+                        response_data = {
+                            "Adverse drug reaction": "This drug has no adverse drug reaction found",
+                            }
+                    except:
+                        response_data = {
+                            "Adverse drug reaction": "Drug not found or wrong input. Please check it again!"
+                        }
             return response_data
 
 def drawNetworkAndSaveInAPlot(G, pat, name, title):
@@ -2278,23 +2292,30 @@ class DrugDiseaseAssociationByAtcBaseView:
                 returned_data = cache.get("associations_by_atc_code_" + slug)
             else:
                 drug_ids = DrugAtcAssociation.objects.filter(atc_id__id__istartswith=slug).values_list("drug_id", flat=True)
-                returned_data = []
-                for drug_id in drug_ids:
-                    associations = DrugDiseaseStudy.objects.filter(drug_bankID=drug_id).values_list("disease_name__disease_name", "disease_name__disease_class", "clinical_trial", "link", "standard_inchiKey")
-                    drug_name = Drug.objects.get(drug_bankID=drug_id).name
-                    for association in associations:
-                        temp={
-                            "drug_bankID":drug_id,
-                            "drug_name": drug_name,
-                            "disease_name":association[0],
-                            "disease_class":association[1],
-                            "clinical_trial":association[2],
-                            "link":association[3],
-                            "standard_inchiKey":association[4],
-                        }
-                        returned_data.append(temp)
-                context = dict()
-                cache.set("associations_by_atc_code_" + slug, returned_data, 60 * 60)
+                if len(drug_ids)>0:
+                    returned_data = []
+                    for drug_id in drug_ids:
+                        associations = DrugDiseaseStudy.objects.filter(drug_bankID=drug_id).values_list("disease_name__disease_name", "disease_name__disease_class", "clinical_trial", "link", "standard_inchiKey")
+                        drug_name = Drug.objects.get(drug_bankID=drug_id).name
+                        for association in associations:
+                            temp={
+                                "drug_bankID":drug_id,
+                                "drug_name": drug_name,
+                                "disease_name":association[0],
+                                "disease_class":association[1],
+                                "clinical_trial":association[2],
+                                "link":association[3],
+                                "standard_inchiKey":association[4],
+                            }
+                            returned_data.append(temp)
+                    context = dict()
+                    cache.set("associations_by_atc_code_" + slug, returned_data, 60 * 60)
+                else:
+                    try:
+                        atc = DrugAtcAssociation.objects.get(atc_id__id__istartswith=slug)
+                        returned_data = [{"Results": "This ATC code does not has any drug-indication associations"}]
+                    except:
+                        returned_data = [{"Results": "No ATC code found or wrong input. Please check it again!"}]
             context['associations_by_atc_code'] = returned_data
         return context
     

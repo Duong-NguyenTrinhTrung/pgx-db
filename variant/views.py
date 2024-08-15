@@ -207,6 +207,7 @@ def get_genebass_tables(request):
         'n_controls',
         'phenocode__description',
         'phenocode',
+        # 'phenocode',
         # 'n_cases_defined',
         # 'n_cases_both_sexes',
         # 'n_cases_females',
@@ -220,6 +221,25 @@ def get_genebass_tables(request):
         'AF_Controls',
         'Pvalue',
     )
+
+    # list_genebass =[
+    #     { 
+    #         "n_cases": gv.n_cases,
+    #         "n_controls": gv.n_controls,
+    #         "phenocode_description": gv.phenocode.description,
+    #         "phenocode": gv.phenocode,
+    #         "n_cases": gv.n_cases,
+    #         "drug_phenocode": "drug_phenocode",
+    #         "category_description": gv.category.category_description,
+    #         "AC": gv.AC,
+    #         "AF": gv.AF,
+    #         "BETA": gv.BETA,
+    #         "SE": gv.SE,
+    #         "AF_Cases": gv.AF_Cases,
+    #         "Pvalue": gv.Pvalue,
+    #     } 
+    # for gv in genebass_variants]
+    
 
     if list_genebass.count() > 0:
         context = {

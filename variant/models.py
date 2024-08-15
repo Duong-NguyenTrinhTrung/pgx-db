@@ -44,7 +44,6 @@ class VepVariant(models.Model):
     Variant_marker = models.ForeignKey(
         "variant.variant", on_delete=models.CASCADE
     )
-
     Transcript_ID = models.CharField(max_length=255)
     Consequence = models.CharField(max_length=255)
     cDNA_position = models.CharField(max_length=255)
@@ -245,8 +244,5 @@ class Pharmgkb(models.Model):
         null=True,
     )
 
-class VariantStatistics(models.Model):
-    # 'GeneID', 'TranscriptID', 'Chromosome', 'Total SNP', 'No_of__synonymous', 
-    pass
 
 

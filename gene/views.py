@@ -40,6 +40,121 @@ from django.db.models import (
 
 warnings.filterwarnings('ignore')
 
+list_necessary_columns = [
+    "Transcript_ID",
+    "Consequence",
+    "cDNA_position",
+    "CDS_position",
+    "Protein_position",
+    "Amino_acids",
+    "Codons",
+    "Impact",
+    "Strand",
+    "BayesDel_addAF_rankscore",
+    "BayesDel_noAF_rankscore",
+    "CADD_raw_rankscore",
+    "ClinPred_rankscore",
+    "DANN_rankscore",
+    "DEOGEN2_rankscore",
+    "Eigen_PC_raw_coding_rankscore",
+    "Eigen_raw_coding_rankscore",
+    "FATHMM_converted_rankscore",
+    "GERP_RS_rankscore",
+    "GM12878_fitCons_rankscore",
+    "GenoCanyon_rankscore",
+    "H1_hESC_fitCons_rankscore",
+    "HUVEC_fitCons_rankscore",
+    "LIST_S2_rankscore",
+    "LRT_converted_rankscore",
+    "M_CAP_rankscore",
+    "MPC_rankscore",
+    "MVP_rankscore",
+    "MetaLR_rankscore",
+    "MetaRNN_rankscore",
+    "MetaSVM_rankscore",
+    "MutPred_rankscore",
+    "MutationAssessor_rankscore",
+    "MutationTaster_converted_rankscore",
+    "PROVEAN_converted_rankscore",
+    "Polyphen2_HDIV_rankscore",
+    "Polyphen2_HVAR_rankscore",
+    "PrimateAI_rankscore",
+    "REVEL_rankscore",
+    "SIFT4G_converted_rankscore",
+    "SIFT_converted_rankscore",
+    "SiPhy_29way_logOdds_rankscore",
+    "VEST4_rankscore",
+    "bStatistic_converted_rankscore",
+    "Fathmm_MKL_coding_rankscore",
+    "Fathmm_XF_coding_rankscore",
+    "Integrated_fitCons_rankscore",
+    "PhastCons30way_mammalian_rankscore",
+    "PhyloP30way_mammalian_rankscore",
+    "AM_pathogenicity",
+    "HighestAF",
+]
+
+browser_columns = ["Variant_marker"] + list_necessary_columns
+
+list_necessary_columns_2 = ["Transcript_ID", "Consequence", "Protein_position", "Amino_acids", "Codons", "HighestAF"] + list_necessary_columns[9:-1]
+
+name_dic = {'NMD': 'NMD_transcript', 'cse': 'coding_sequence', 'fsh': 'frameshift',
+            'itc': 'incomplete_terminal_codon', 'ide': 'inframe_deletion', 'iis': 'inframe_insertion',
+            'mis': 'missense', 'pal': 'protein_altering', 'sac': 'splice_acceptor', 'sdo': 'splice_donor',
+            'sd5': 'splice_donor_5th_base', 'sdr': 'splice_donor_region',
+            'spt': 'splice_polypyrimidine_tract', 'sre': 'splice_region', '_sl': 'start_lost',
+            '_sr': 'start_retained', 'sga': 'stop_gained', 'sl_': 'stop_lost', 'sr_': 'stop_retained',
+            'syn': 'synonymous', 'H': 'high', 'M': 'Medium', 'L': 'Low'}
+
+# this is for API call
+class BasicVariantAnnotationFromGeneIDView(object):
+    list_necessary_columns = [
+        "Transcript_ID",
+        "Consequence",
+        "cDNA_position",
+        "CDS_position",
+        "Protein_position",
+        "Amino_acids",
+        "Codons",
+        "Impact",
+        "Strand",
+        "HighestAF"]
+    
+    def get_basic_annotation_for_all_variant_by_gene(self, slug):
+        
+        context = {}
+        if slug is not None:
+            print("slug not none ", slug)
+            if cache.get("get_basic_annotation_for_all_variant_by_gene_data_" + slug) is not None:
+                data = cache.get("get_basic_annotation_for_all_variant_by_gene_data_" + slug)
+            else:
+                try:
+                    results = []
+                    primary_ts = Gene.objects.get(gene_id=slug).primary_transcript
+                    data = VepVariant.objects.filter(Transcript_ID=primary_ts).values_list(*list_necessary_columns)
+                    for i, item in enumerate(data):
+                        consequence_list = item[1].split(",")
+                        t = [name_dic.get(c) for c in consequence_list]
+
+                        results.append({
+                            "Transcript_ID": item[0],
+                            "Consequence": ",".join(t),
+                            "cDNA_position": item[2],
+                            "CDS_position": item[3],
+                            "Protein_position": item[4],
+                            "Amino_acids": item[5],
+                            "Codons": item[6],
+                            "Impact": item[7],
+                            "Strand": item[8],
+                            "HighestAF": str(item[9])
+                        })
+                    # print("------results ", results)
+
+                except Exception as e:
+                    print("Exception: ", e)
+                    results = [{"Results": "No gene found or wrong input. Please check it again!"}]
+                return results
+
 # this is for API call
 class GeneDetailBaseView(object):
     list_necessary_columns = [
@@ -225,7 +340,6 @@ class GenebasedAssociationStatisticsView:
             context['association_statistics_data'] = table
         return context
 
-
 class DrugByGeneBaseView(object):
     def get_drug_by_gene_data(self, slug):
         context = {}
@@ -260,74 +374,6 @@ class DrugByGeneBaseView(object):
                     cache.set("drug_data_" + slug, table, 60 * 60)
             context['list_of_targeting_drug'] = table
         return context
-
-
-
-list_necessary_columns = [
-    "Transcript_ID",
-    "Consequence",
-    "cDNA_position",
-    "CDS_position",
-    "Protein_position",
-    "Amino_acids",
-    "Codons",
-    "Impact",
-    "Strand",
-    "BayesDel_addAF_rankscore",
-    "BayesDel_noAF_rankscore",
-    "CADD_raw_rankscore",
-    "ClinPred_rankscore",
-    "DANN_rankscore",
-    "DEOGEN2_rankscore",
-    "Eigen_PC_raw_coding_rankscore",
-    "Eigen_raw_coding_rankscore",
-    "FATHMM_converted_rankscore",
-    "GERP_RS_rankscore",
-    "GM12878_fitCons_rankscore",
-    "GenoCanyon_rankscore",
-    "H1_hESC_fitCons_rankscore",
-    "HUVEC_fitCons_rankscore",
-    "LIST_S2_rankscore",
-    "LRT_converted_rankscore",
-    "M_CAP_rankscore",
-    "MPC_rankscore",
-    "MVP_rankscore",
-    "MetaLR_rankscore",
-    "MetaRNN_rankscore",
-    "MetaSVM_rankscore",
-    "MutPred_rankscore",
-    "MutationAssessor_rankscore",
-    "MutationTaster_converted_rankscore",
-    "PROVEAN_converted_rankscore",
-    "Polyphen2_HDIV_rankscore",
-    "Polyphen2_HVAR_rankscore",
-    "PrimateAI_rankscore",
-    "REVEL_rankscore",
-    "SIFT4G_converted_rankscore",
-    "SIFT_converted_rankscore",
-    "SiPhy_29way_logOdds_rankscore",
-    "VEST4_rankscore",
-    "bStatistic_converted_rankscore",
-    "Fathmm_MKL_coding_rankscore",
-    "Fathmm_XF_coding_rankscore",
-    "Integrated_fitCons_rankscore",
-    "PhastCons30way_mammalian_rankscore",
-    "PhyloP30way_mammalian_rankscore",
-    "AM_pathogenicity",
-    "HighestAF",
-]
-
-browser_columns = ["Variant_marker"] + list_necessary_columns
-
-list_necessary_columns_2 = ["Transcript_ID", "Consequence", "Protein_position", "Amino_acids", "Codons", "HighestAF"] + list_necessary_columns[9:-1]
-
-name_dic = {'NMD': 'NMD_transcript', 'cse': 'coding_sequence', 'fsh': 'frameshift',
-            'itc': 'incomplete_terminal_codon', 'ide': 'inframe_deletion', 'iis': 'inframe_insertion',
-            'mis': 'missense', 'pal': 'protein_altering', 'sac': 'splice_acceptor', 'sdo': 'splice_donor',
-            'sd5': 'splice_donor_5th_base', 'sdr': 'splice_donor_region',
-            'spt': 'splice_polypyrimidine_tract', 'sre': 'splice_region', '_sl': 'start_lost',
-            '_sr': 'start_retained', 'sga': 'stop_gained', 'sl_': 'stop_lost', 'sr_': 'stop_retained',
-            'syn': 'synonymous', 'H': 'high', 'M': 'Medium', 'L': 'Low'}
 
 def parse_marker_data(marker, vep_variant): #lower, for one variant 
     # def is_primary_ts(ts):
@@ -594,58 +640,6 @@ def get_gene_detail_data(request, slug): #upper
             context['variants'] = list(set(variants))
             cache.set("gene_detail_data_" + slug, context, 60 * 60)
     return render(request, 'gene_detail.html', context)
-
-
-class GenebassVariantListView(TemplateView):
-    template_name = "genebass/variant_list.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        genebass_variants_list = GenebassVariant.objects.filter(  # Filter to get all genebass variants for a gene
-            markerID__in=Variant.objects.filter(  
-                Gene_ID=self.kwargs['pk']  # Gen Gene by gene_id
-            ).values_list('VariantMarker', flat=True)
-        ).values(
-            'n_cases',
-            'n_controls',
-            'phenocode__description',
-            'phenocode',
-            # 'n_cases_defined',
-            # 'n_cases_both_sexes',
-            # 'n_cases_females',
-            # 'n_cases_males',
-            'category',
-            'AC',
-            'AF',
-            'BETA',
-            'SE',
-            'AF_Cases',
-            'AF_Controls',
-            'Pvalue',
-        )
-
-        # genebass_variants_list = genebass_variants_list[:5000]
-
-        phenotypes = GenebassVariant.objects.filter(  # Filter to get all genebass variants for a gene
-            markerID__in=Variant.objects.filter(  # Filter to get all variants for a gene
-                Gene_ID=self.kwargs['pk']  # Gen Gene by gene_id
-            ).values_list('VariantMarker', flat=True)
-        ).values_list('phenocode', flat=True).distinct()
-
-        # change query to take categories
-        categories = GenebassVariant.objects.filter(  # Filter to get all genebass variants for a gene
-            markerID__in=Variant.objects.filter(  # Filter to get all variants for a gene
-                Gene_ID=self.kwargs['pk']  # Gen Gene by gene_id
-            ).values_list('VariantMarker', flat=True)
-        ).values_list('category', flat=True).distinct()
-
-        context['gene'] = Gene.objects.get(pk=self.kwargs['pk'])
-        context['variant_list'] = genebass_variants_list
-        context['phenotypes'] = phenotypes
-        context['categories'] = categories
-
-        return context
 
 
 def get_protein_position_of_variant(request):
