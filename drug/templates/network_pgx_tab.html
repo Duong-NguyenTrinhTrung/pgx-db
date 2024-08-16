@@ -69,7 +69,7 @@
                                 </div>
                         </div>
                         <!-- a place to display prompt message  -->
-                        <p id="waiting-prompt" style="text-align: center; display: none"><i> <mark>Please kindly wait when
+                        <p id="pgx-tab-waiting-prompt" style="text-align: center; display: none"><i> <mark>Please kindly wait when
                                         the data is being loaded! </i></mark> </p>
                         <div class="spinner" style="display: none; margin: auto;">
                 </div>
@@ -703,7 +703,7 @@
         //alert("value="+value+" text="+text);
         //retrieve data for an atc code selected
         $("#pgx-data-table-div").hide();
-        $("#waiting-prompt").show();
+        $("#pgx-tab-waiting-prompt").show();
         $(".spinner").show();
         var atc_code = value;
         var url2 = "{% url 'get-variant-based-burden-data-by-atc' %}?atc_code=" + atc_code;
@@ -716,12 +716,12 @@
                     if (response.length>0){
                         $("#pgx-data-table-div").show();
                         $(".spinner").hide();
-                        $("#waiting-prompt").hide();
+                        $("#pgx-tab-waiting-prompt").hide();
                         create_pgx_variant_based_table(response);
                     }else{
                         $("#pgx-data-table-div").hide();
                         $(".spinner").hide();
-                        $("#waiting-prompt").hide();
+                        $("#pgx-tab-waiting-prompt").hide();
                         //alert("No variant-based burden data associated with drugs in this ATC code!");
                     }
                 },
