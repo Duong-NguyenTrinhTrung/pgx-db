@@ -304,7 +304,7 @@
 
         let structures_scrollable = $("#pgx-data-table");
         structures_scrollable.show();
-        let oTable1 = structures_scrollable.DataTable({
+        let oTable2 = structures_scrollable.DataTable({
             deferRender: true,
             scrollY: true,
             scrollX: true,
@@ -343,7 +343,7 @@
         column_filters = column_filters.concat(createYADCFfilters(7, 1, "range_number", null, ["Min", "Max"], false, null, null, width = "70px"));
         // update filters
         yadcf.init(
-            oTable1, column_filters, {
+            oTable2, column_filters, {
             cumulative_filtering: false,
             rowCallBack: function (row, data) {
             }
@@ -351,7 +351,7 @@
         );
         // Force a redraw after initialization to fix header alignment
         setTimeout(function () {
-            oTable1.columns.adjust().draw(false);
+            oTable2.columns.adjust().draw(false);
         }, 100);
         $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').attr('size', '4');
         $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '10')
@@ -393,7 +393,7 @@
 
         let structures_scrollable = $("#pgx-data-table");
         structures_scrollable.show();
-        let oTable1 = structures_scrollable.DataTable({
+        let oTable3 = structures_scrollable.DataTable({
             deferRender: true,
             scrollY: true,
             scrollX: true,
@@ -439,15 +439,15 @@
 
         // update filters
         yadcf.init(
-            oTable1, column_filters, {
-            cumulative_filtering: false,
+            oTable3, column_filters, {
+            cumulative_filtering: false, // set to true --> lost filter
             rowCallBack: function (row, data) {
             }
         }
         );
         // Force a redraw after initialization to fix header alignment
         setTimeout(function () {
-            oTable1.columns.adjust().draw(false);
+            oTable3.columns.adjust().draw(false);
         }, 100);
         $(".yadcf-filter-wrapper").find('input.yadcf-filter-range-number.yadcf-filter-range').attr('size', '4');
         $(".yadcf-filter-wrapper").find('input.yadcf-filter.ui-autocomplete-input').attr('size', '10')
@@ -731,30 +731,32 @@
             });
         
     }
-    $(document).ready(function() {
-        // $(document).on('click', '.fClick', function(){ 
-        //     alert("hey!");
-        // }); 
-        $(document).on('change', '#yadcf-filter--pgx-data-table-0', function(){
-            console.log("drug select");
-            var selected_drugbank_id = $(this).find("option:selected").val();
-            if (selected_drugbank_id != -1) {
-                $("#yadcf-filter--pgx-data-table-1").attr("disabled", "disabled");
-            }
-            else {
-                $("#yadcf-filter--pgx-data-table-1").removeAttr("disabled");
-            }
-        });
-        $(document).on('change', '#yadcf-filter--pgx-data-table-1', function(){
-            console.log("gene select");
-            var selected_drugbank_id = $(this).find("option:selected").val();
-            if (selected_drugbank_id != -1) {
-                $("#yadcf-filter--pgx-data-table-0").attr("disabled", "disabled");
-            }
-            else {
-                $("#yadcf-filter--pgx-data-table-0").removeAttr("disabled");
-            }
-        });
-    });
+    // $(document).ready(function() {
+    //     // $(document).on('click', '.fClick', function(){ 
+    //     //     alert("hey!");
+    //     // }); 
+    //     $(document).on('change', '#yadcf-filter--pgx-data-table-0', function(){
+    //         console.log("drug select");
+    //         var selected_drugbank_id = $(this).find("option:selected").val();
+    //         if (selected_drugbank_id != -1) {
+    //             $("#yadcf-filter--pgx-data-table-1").val(-1).change();
+    //             // $("#yadcf-filter--pgx-data-table-1").attr("disabled", "disabled");
+    //         }
+    //         // else {
+    //         //     $("#yadcf-filter--pgx-data-table-1").removeAttr("disabled");
+    //         // }
+    //     });
+    //     $(document).on('change', '#yadcf-filter--pgx-data-table-1', function(){
+    //         console.log("gene select");
+    //         var selected_drugbank_id = $(this).find("option:selected").val();
+    //         if (selected_drugbank_id != -1) {
+    //             $("#yadcf-filter--pgx-data-table-0").val(-1).change();
+    //             // $("#yadcf-filter--pgx-data-table-0").attr("disabled", "disabled");
+    //         }
+    //         // else {
+    //         //     $("#yadcf-filter--pgx-data-table-0").removeAttr("disabled");
+    //         // }
+    //     });
+    // });
 </script>
 {% endblock %}

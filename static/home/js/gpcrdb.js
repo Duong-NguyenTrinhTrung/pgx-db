@@ -65,7 +65,66 @@ function copyListToClipboard(selected, delimiter = " ") {
  * The asterisk indicates an optional function argument
  */
 
-function createYADCFfilters(start_column, num_cols, filter_type, select_type = null, filter_default_label = "", filter_reset_button_text = false, filter_match_mode = null, column_data_type = null, width = null, html5_data=null) {
+// this is new
+function customRangeFilter(filterVal, columnVal) {
+  // If the column value is None, return false to exclude it from the filter
+  if (columnVal === "None" || columnVal === null || columnVal === undefined) {
+      return false;
+  }
+  
+  // Convert filterVal and columnVal to floats for comparison
+  const [min, max] = filterVal.split('-').map(val => parseFloat(val));
+  columnVal = parseFloat(columnVal);
+
+  // If min or max is not a number, return true (do not filter out the row)
+  if (isNaN(min) && isNaN(max)) {
+      return true;
+  }
+  if (!isNaN(min) && columnVal < min) {
+      return false;
+  }
+  if (!isNaN(max) && columnVal > max) {
+      return false;
+  }
+  return true;
+}
+
+
+// function createYADCFfilters(start_column, num_cols, filter_type, select_type = null, filter_default_label = "", filter_reset_button_text = false, filter_match_mode = null, column_data_type = null, width = null, html5_data=null) {
+//   let filters = [];
+//   for (let i = 0; i < num_cols; i++) {
+//     let filter = {
+//       "column_number": start_column + i,
+//       filter_type,
+//       filter_default_label,
+//       filter_reset_button_text,
+//       //"filter_function": customRangeFilter // this is new
+//     };
+//     if (select_type !== null) {
+//       filter["select_type"] = select_type;
+//      }
+//     if (filter_match_mode !== null) {
+//       filter["filter_match_mode"] = filter_match_mode;
+//     }
+//     if (column_data_type !== null) {
+//       filter["column_data_type"] = column_data_type;
+//     }
+//     if (width !== null) {
+//       filter["select_type_options"] = {
+//         width
+//       };
+//     }
+//     if (html5_data !== null) {
+//       filter["html5_data"] = html5_data;
+//     }
+
+//     filters.push(filter);
+//   }
+//   return filters;
+// }
+
+
+function createYADCFfilters(start_column, num_cols, filter_type, select_type = null, filter_default_label = "", filter_reset_button_text = false, filter_match_mode = null, column_data_type = null, width = null, html5_data = null) {
   let filters = [];
   for (let i = 0; i < num_cols; i++) {
     let filter = {
@@ -76,7 +135,7 @@ function createYADCFfilters(start_column, num_cols, filter_type, select_type = n
     };
     if (select_type !== null) {
       filter["select_type"] = select_type;
-     }
+    }
     if (filter_match_mode !== null) {
       filter["filter_match_mode"] = filter_match_mode;
     }
