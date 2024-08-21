@@ -1044,8 +1044,10 @@ def _get_clinical_pgx_data_by_atc(atc_code):
                 pharmgkb_data = Pharmgkb.objects.filter(Q(geneid=gene_id)&Q(drugbank_id=drug))
                 if len(pharmgkb_data) != 0:
                         response_data.append({
+                                "gene_id": gene_id,
                                 "gene_name": gene_name,
                                 "drug_id": drug.drug_bankID,
+                                "drug_name": drug.name,
                                 "moa": interaction.interaction_type.title(),
                                 "clinical_data": [
                                     {
