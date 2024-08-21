@@ -1,14 +1,24 @@
 {% load static %}
 {% csrf_token %}
 
+<!-- var atcCode;
+        // Function to show the ATC level drug-target network where there is at least one drug
+        function showATCLevelNetwork(index) {
+            removeActive(index);
+            const button = networkButtons[index];
+            //button.style.borderColor = "red"
+            button.classList.add("active");
+            $("#tabs_network > ul.nav.nav-tabs a:first").tab('show');
+            atcCode = button.getAttribute("data-atc-code"); -->
+
+
 <div role="tabpanel" class="tab-pane" id="tab_network_comparison" style="border: #b4b1b1 1px solid; width: 98%; min-height:400px;">
     <span class="documentation"><a
             href="https://pgx-documentation.readthedocs.io/en/latest/atc_code.html#network-comparison"
             target="_blank">Read More</a></span>
     <div style="display: flex; flex-direction: row; gap: 20px; ">
         <div style="display: flex; flex-direction: column; gap: 10px; align-items: center; margin: 20px 0 0 10px;">
-            <label for="atc_comparison" style="font-size: 16px; color: rgb(51, 122, 183); font-weight: bold;">Input an
-                ATC code for network comparison</label>
+            <label id = "atc_code_nw_comparison_tab" for="atc_comparison" style="font-size: 16px; color: rgb(51, 122, 183); font-weight: bold;"></label>
             <input type="text" id="atc_comparison"
                 class="form-text form-type-textfield form-control optional ui-autocomplete-input" autocomplete="on"
                 placeholder="ATC code" style="width: 100%;">
@@ -74,7 +84,6 @@
 <script src="{% static 'home/js/selection-autocomplete.js' %}"></script>
 
 <script>
-    
     var autocompleteResults = $('#atc-comparison-autocomplete-results');
     $('#atc_comparison').autocomplete({
         source: function (request, response) {

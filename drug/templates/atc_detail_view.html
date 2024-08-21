@@ -403,6 +403,14 @@
     }
 
     function network_comparison_tab_clicked(){
+
+        var activeButton = $('.network-button.active');
+        var atcCode = activeButton.data('atc-code');  // Use .data() to get the data attribute
+        
+        // Now use the atcCode to update the label
+        var lbl = $("#atc_code_nw_comparison_tab");
+        lbl.html(`You are in the network of <span style="color: red;">${atcCode}</span>.<br>Input another
+                    ATC code for network comparison`);
         const e1 = $("#result-compare-area-text");
         e1.html("");
         const e2 = $("#result-compare-table");
