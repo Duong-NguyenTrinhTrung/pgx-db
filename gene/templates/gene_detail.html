@@ -378,6 +378,8 @@
                 $(".spinner").hide();
                 $("#structures_scrollable_table").show();
                 $("#VepTableToExcel").show();
+                $("td.mean-vep-score-none").text("None");
+                $("td.std-vep-score-none").text("None");
                 return  oTable;      
                 }catch(error) {
                         console.error('Error fetching data:', error);
@@ -452,15 +454,14 @@
                 // Mean VEP scores
                 const meanVEPScores = value[53];
                 if (isNaN(meanVEPScores)) {
-                    row.append($('<td>').addClass('vep-cell').css({ 'color': '#d62828', 'max-width': '90px' }).text('None'));
-                    row.addClass("mean-vep-score-none");
+                    row.append($('<td>').addClass('vep-cell mean-vep-score-none').css({ 'color': '#d62828', 'max-width': '90px' }).text(''));
                 } else {
                     row.append($('<td>').addClass('vep-cell').css('max-width', '90px').text(meanVEPScores));
                 }
                 // Std VEP scores
                 const stdVEPScore = value[54];
                 if (isNaN(stdVEPScore)) {
-                    row.append($('<td>').addClass('vep-cell').css({ 'color': '#d62828', 'max-width': '90px' }).text('None'));
+                    row.append($('<td>').addClass('vep-cell std-vep-score-none').css({ 'color': '#d62828', 'max-width': '90px' }).text(''));
                 } else {
                     row.append($('<td>').addClass('vep-cell').css('max-width', '90px').text(stdVEPScore));
                 }
@@ -1274,6 +1275,7 @@
             console.error('Error capturing the image:', error);
         });
     }
+    
     </script>
 <script src="{% static 'home/js/d3.v7.min.js' %}"></script>
 {% endblock addon_js %}
