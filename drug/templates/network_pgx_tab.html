@@ -149,7 +149,7 @@
         $("#pgx-data-table-div").show();
         // render data at table "#pgx-data-table"
         var tableHtml = '<table class="display compact text-nowrap" id="pgx-data-table"><thead id="headers" style="text-align: left;"><tr>'+
-            '<th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th>'+
+            '<th style="white-space: nowrap;">Drug name &nbsp; &nbsp; &nbsp; &nbsp; </th>'+
             '<th style="white-space: nowrap;">Gene name &nbsp; &nbsp; &nbsp; &nbsp; </th>'+
             '<th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp; &nbsp; &nbsp;</th>'+
             '<th style="white-space: nowrap; text-align: center;">Variant/Haplotypes&nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp;</th>'+
@@ -174,8 +174,8 @@
                 value = row.clinical_data[l];
                 tableHtml += `
                     <tr>
-                        <td style="vertical-align: top;" >${row.drug_id}</td>
-                        <td style="vertical-align: top;" >${row.gene_name}</td>
+                        <td style="vertical-align: top;" ><a target="_blank" href="/drugs_network?drug_bank_ids=${row.drug_id}">${row.drug_name}</a></td>
+                        <td style="vertical-align: top;" ><a target="_blank" href="/gene/gene_detail/${row.gene_id}">${row.gene_name}</a></td>
                         <td style="vertical-align: top;" >${row.moa}</td>
                         <td style="vertical-align: top; white-space: normal;" >${value.Variant_or_Haplotypes}</td>
                         <td style="vertical-align: top;" >PMID:<a href="https://pubmed.ncbi.nlm.nih.gov/${value.PMID}" target="_blank">${value.PMID}</a></td>
