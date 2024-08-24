@@ -558,8 +558,10 @@ def get_gene_detail_data(request, slug): #upper
                         )
                     try:
                         for vep_variant in vep_variants:
+                            if (vep_variant[2]=="2"):
+                                print("positiion 2, ")
                             coseq = vep_variant[1].split(",")
-                            cleaned_values = [x for x in vep_variant[6:] if isinstance(x, float)]
+                            cleaned_values = [x for x in vep_variant[6:] if isinstance(x, float) and not np.isnan(x)]
                             mean_vep_score = round(np.mean(cleaned_values), 3)
                             if np.isnan(mean_vep_score):
                                 mean_vep_score = "nan"
@@ -575,6 +577,10 @@ def get_gene_detail_data(request, slug): #upper
                             else:
                                 wtaa = vep_variant[3]
                                 mtaa = vep_variant[3]
+                            if (vep_variant[2]=="2"):
+                                print("******------ positiion 2, wtaa:", wtaa, " mtaa:", mtaa, "vep score:")
+                                for v in vep_variant[6:]:
+                                    print(type(v))
                             temp = {
                                     "geneID": geneid,
                                     "variant_marker": marker,
@@ -593,6 +599,7 @@ def get_gene_detail_data(request, slug): #upper
                         raise
             variant_info_for_3D = remove_duplicates(variant_info_for_3D)
             variant_info_for_3D_view = sorted(variant_info_for_3D, key=lambda x: int(x['protein_position']))
+            # print("*********---------- variant_info_for_3D_view after remove dup and sort ", variant_info_for_3D_view[:10])
             context['variant_info_for_3D_view'] = json.dumps(variant_info_for_3D_view)
             context['protein_with_variant_index_list'] = protein_with_variant_index_list
             # print("---- VIEW function: protein_with_variant_index_list: ", protein_with_variant_index_list)
