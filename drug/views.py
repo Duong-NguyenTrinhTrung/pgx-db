@@ -93,9 +93,15 @@ class DiseaseAssociationByDrugView:
                                             "Reference link": association.link,
                                             }
                                     result.append(temp)
-                        response_data = {
-                            f"Disease(s) associated with the drug {drug.name} ({drug_id})": result,
-                        }
+                        if len(results)>0:
+                            response_data = {
+                                f"Indication(s) associated with the drug {drug.name} ({drug_id})": result,
+                            }
+                        else:
+                            response_data = {
+                                f"Indication(s) associated with the drug {drug.name} ({drug_id})": "No results found or wrong input. Please check it again!",
+                            }
+
                         cache.set("get_disease_association_by_drug_"+drug_id, response_data, timeout=60 * 15)
                         return response_data
                 except:
@@ -113,39 +119,42 @@ class AdrByDrugView:
             if cache.get("get_drug_adr_"+drug_id):
                 response_data = cache.get("get_drug_adr_"+drug_id)
             else:
-                result = []
-                adr = AdverseDrugReaction.objects.filter(drug_bankID=drug_id)
-                if len(adr):
-                    se_pair_list = adr.first().adr_data.split(", ")
-                    for pair in se_pair_list:
-                        if pair:
-                            se_name = " ".join(pair.split()[:-1])
-                            percentage = float(pair.split()[-1][1:-2])
-                            se = SideEffect.objects.filter(side_effect_name=se_name)
-                            if se:
-                                definition = se.first().side_effect_definition
-                            else:
-                                definition = "NA"
-                            temp = {
-                                    "Side effect": se_name,
-                                    "Definition": definition,
-                                    "Frequency (in percentage)": percentage,
-                                    }
-                            result.append(temp)
-                    # Create a JSON response with the data
-                    response_data = {
-                        "Adverse drug reaction": result,
-                    }
-                    cache.set("get_drug_adr_"+drug_id, response_data, timeout=60 * 15)
-                else:
-                    try:
-                        drug = Drug.objects.get(drug_bankID=drug_id)
-                        response_data = {
-                            "Adverse drug reaction": "This drug has no adverse drug reaction found",
+                try:
+                    drug = Drug.objects.get(drug_bankID=drug_id)
+                    if drug:
+                        drugname = drug.name
+                        results = []
+                        adr = AdverseDrugReaction.objects.filter(drug_bankID=drug_id)
+                        if len(adr):
+                            se_pair_list = adr.first().adr_data.split(", ")
+                            for pair in se_pair_list:
+                                if pair:
+                                    se_name = " ".join(pair.split()[:-1])
+                                    percentage = float(pair.split()[-1][1:-2])
+                                    se = SideEffect.objects.filter(side_effect_name=se_name)
+                                    if se:
+                                        definition = se.first().side_effect_definition
+                                    else:
+                                        definition = "NA"
+                                    temp = {
+                                            "Side effect": se_name,
+                                            "Definition": definition,
+                                            "Frequency (in percentage)": percentage,
+                                            }
+                                    results.append(temp)
+                        if len(results)>0:
+                            # Create a JSON response with the data
+                            response_data = {
+                                f"Adverse drug reaction for {drugname} ({drug_id})": results,
                             }
-                    except:
-                        response_data = {
-                            "Adverse drug reaction": "Drug not found or wrong input. Please check it again!"
+                        else:
+                            response_data = {
+                                f"Adverse drug reaction for {drugname} ({drug_id})": "This drug has no adverse drug reaction found",
+                                }
+                        cache.set("get_drug_adr_"+drug_id, response_data, timeout=60 * 15)
+                except:
+                    response_data = {
+                            f"Adverse drug reaction": "Drug not found or wrong input. Please check it again!"
                         }
             return response_data
 
@@ -2133,6 +2142,7 @@ class DescriptionByAtcBaseView:
                 context = dict()
                 cache.set("description_by_atc_data_" + slug, description, 60 * 60)
             context['description'] = description
+            context['atc_code'] = slug
         return context
 
 def retrieving_atc_description(atc_code):
@@ -2196,8 +2206,14 @@ class TargetsByDrugBaseView:
             if cache.get("targets_by_drug_" + slug) is not None:
                 list_of_targets = cache.get("targets_by_drug_" + slug)
             else:
-                list_of_targets_id = Interaction.objects.filter(drug_bankID = slug).values_list("uniprot_ID", flat=True)
-                list_of_targets = Protein.objects.filter(uniprot_ID__in=list_of_targets_id).values_list("uniprot_ID", "protein_name", "geneID", "genename")
+                try:
+                    drug = Drug.objects.get(drug_bankID=slug)
+                except:
+                    drug = None
+                    list_of_targets = [{"Results": "No drug found or wrong input. Please check it again!"}]
+                if drug:
+                    list_of_targets_id = Interaction.objects.filter(drug_bankID = slug).values_list("uniprot_ID", flat=True)
+                    list_of_targets = Protein.objects.filter(uniprot_ID__in=list_of_targets_id).values_list("uniprot_ID", "protein_name", "geneID", "genename")
                 context = dict()
                 cache.set("targets_by_drug_" + slug, list_of_targets, 60 * 60)
             context['list_of_targets'] = list_of_targets
@@ -2210,12 +2226,19 @@ class AtcCodesByDrugView:
             if cache.get("atc_codes_by_drug_" + slug) is not None:
                 returned_data = cache.get("atc_codes_by_drug_" + slug)
             else:
-                list_of_atc_codes = list(DrugAtcAssociation.objects.filter(
-                        drug_id=slug).values_list("atc_id"))
                 returned_data = []
-                for code in list_of_atc_codes:
-                    name = AtcChemicalSubstance.objects.get(id=code[0]).name
-                    returned_data.append({"Atc code": code, "Description": name })
+                try:
+                    drug = Drug.objects.get(drug_bankID=slug)
+                except:
+                    drug = None
+                    returned_data.append({"Results": "No drugs found or wrong input! Please check it again!" })
+                if drug:
+                    list_of_atc_codes = list(DrugAtcAssociation.objects.filter(
+                            drug_id=slug).values_list("atc_id"))
+                    for code in list_of_atc_codes:
+                        print("code ", code)
+                        name = AtcChemicalSubstance.objects.get(id=code[0]).name
+                        returned_data.append({"atc_code": code[0], "description": name })
 
                 context = dict()
                 cache.set("atc_codes_by_drug_" + slug, returned_data, 60 * 60)
@@ -2259,6 +2282,7 @@ class PGxByAtcCodeView:
                 context = dict()
                 cache.set("pgx_by_atc_codes_" + slug, returned_data, 60 * 60)
             context['pgx'] = returned_data
+            context['atc_code'] = slug
         return context
     
 class DrugTargetInteractionByAtcBaseView:
@@ -2284,6 +2308,7 @@ class DrugTargetInteractionByAtcBaseView:
                 context = dict()
                 cache.set("interactions_by_atc_code_" + slug, returned_data, 60 * 60)
             context['interactions_by_atc_code'] = returned_data
+            context['atc_code'] = slug
         return context
     
 class DrugDiseaseAssociationByAtcBaseView:
@@ -2319,5 +2344,6 @@ class DrugDiseaseAssociationByAtcBaseView:
                     except:
                         returned_data = [{"Results": "No ATC code found or wrong input. Please check it again!"}]
             context['associations_by_atc_code'] = returned_data
+            context['atc_code'] = returned_data
         return context
     

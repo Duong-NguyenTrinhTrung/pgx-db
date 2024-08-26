@@ -347,19 +347,14 @@ class DrugByGeneBaseView(object):
             if cache.get("drug_data_" + slug) is not None:
                 table = cache.get("drug_data_" + slug)
             else:
-                table = pd.DataFrame()
+                results = pd.DataFrame()
 
-                if slug.upper().startswith("ENSG"):
-                    try:
-                        protein = Protein.objects.get(geneID=slug)
-                    except ObjectDoesNotExist:
-                        print(f"No Protein found for geneID: {slug}")
-                        protein = None
-                else:
-                    try:
-                        protein = Protein.objects.get(genename=slug.upper())
-                    except ObjectDoesNotExist:
-                        protein = None
+                try:
+                    protein = Protein.objects.get(Q(geneID=slug)|Q(genename=slug.upper()))
+                except:
+                    protein = None
+                    results = [{"Results": "No gene found or wrong input. Please check it again!"}]
+                
                 if protein:
                     protein_ID = protein.uniprot_ID
 
@@ -367,12 +362,12 @@ class DrugByGeneBaseView(object):
                         uniprot_ID=protein_ID).values_list("drug_bankID", "actions", "known_action", "interaction_type")
                     for drug in drugs:
                         drug_df = pd.DataFrame([drug])
-                        table = table.append(drug_df, ignore_index=True)
-                    table.fillna('', inplace=True)
-                    table.columns=["drug_bankID", "actions", "known_action", "interaction_type"]
+                        results = results.append(drug_df, ignore_index=True)
+                    results.fillna('', inplace=True)
+                    results.columns=["drug_bankID", "actions", "known_action", "interaction_type"]
                     context = dict()
-                    cache.set("drug_data_" + slug, table, 60 * 60)
-            context['list_of_targeting_drug'] = table
+                    cache.set("drug_data_" + slug, results, 60 * 60)
+            context['list_of_targeting_drug'] = results
         return context
 
 def parse_marker_data(marker, vep_variant): #lower, for one variant 
