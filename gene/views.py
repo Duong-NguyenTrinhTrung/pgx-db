@@ -558,8 +558,6 @@ def get_gene_detail_data(request, slug): #upper
                         )
                     try:
                         for vep_variant in vep_variants:
-                            if (vep_variant[2]=="2"):
-                                print("positiion 2, ")
                             coseq = vep_variant[1].split(",")
                             cleaned_values = [x for x in vep_variant[6:] if isinstance(x, float) and not np.isnan(x)]
                             mean_vep_score = round(np.mean(cleaned_values), 3)
@@ -577,10 +575,6 @@ def get_gene_detail_data(request, slug): #upper
                             else:
                                 wtaa = vep_variant[3]
                                 mtaa = vep_variant[3]
-                            if (vep_variant[2]=="2"):
-                                print("******------ positiion 2, wtaa:", wtaa, " mtaa:", mtaa, "vep score:")
-                                for v in vep_variant[6:]:
-                                    print(type(v))
                             temp = {
                                     "geneID": geneid,
                                     "variant_marker": marker,
