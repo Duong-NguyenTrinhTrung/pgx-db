@@ -102,28 +102,33 @@ class DrugByGeneRestApiView(DrugByGeneBaseView,APIView,):
 
         if serializer.is_valid():
             returned_data = []
-                
+            
             if request.GET.get('gene_id'):
                 data = self.get_drug_by_gene_data(request.GET.get('gene_id'))
+                name = request.GET.get('gene_id')
             else:
                 if request.GET.get('genename'):
                     data = self.get_drug_by_gene_data(request.GET.get('genename'))
+                    name = request.GET.get('genename')
                 else:
                     return Response(serializer.errors, status=400)
                 
             table_data = data.get('list_of_targeting_drug', [])
-            if len(table_data)>0:
-                for index, row in table_data.iterrows():
-                    d={
-                        "drug_bankID":row["drug_bankID"],
-                        "actions":row["actions"],
-                        "known_action":row["known_action"],
-                        "interaction_type":row["interaction_type"],
-                    }
-                    returned_data.append(d)
-                return Response({"List of targeting drugs: ": returned_data})
+            if isinstance(table_data,list):
+                return Response(table_data)
             else:
-                return Response(serializer.errors, status=400)
+                if len(table_data)>0:
+                    for index, row in table_data.iterrows():
+                        d={
+                            "drug_bankID":row["drug_bankID"],
+                            "actions":row["actions"],
+                            "known_action":row["known_action"],
+                            "interaction_type":row["interaction_type"],
+                        }
+                        returned_data.append(d)
+                    return Response({f"List of targeting drugs of gene {name}": returned_data})
+                else:
+                    return Response(serializer.errors, status=400)
         else:
             return Response(serializer.errors, status=400)
 
@@ -176,7 +181,11 @@ class DrugsByAtcRestApiView(DrugByAtcBaseView,APIView,):
                     "DrugBank identifier": drug.get("DrugbankID"),
                 }
                 returned_data.append(d)
-            return Response({"List of drugs: ": returned_data})
+            if len(returned_data)>0:
+                return Response({"List of drugs: ": returned_data})
+            else:
+                return Response({"List of drugs: ": "No results or wrong input. Please check it again!"})
+
         else:
             return Response(serializer.errors, status=400)
 
@@ -194,8 +203,14 @@ class DrugTargetInteractionByAtcRestApiView(DrugTargetInteractionByAtcBaseView,A
         if serializer.is_valid():
             data = self.get_interaction_by_atc_code(serializer.validated_data.get('atc_code'))
             interactions_by_atc_code = data.get('interactions_by_atc_code', [])
-            
-            return Response({"List of drug-protein interations: ": interactions_by_atc_code})
+            atc_code = data.get('atc_code', "")
+            if atc_code:
+                atc_code = atc_code.upper()
+            if len(interactions_by_atc_code)>0:
+                return Response({f"List of drug-protein interations for {atc_code}": interactions_by_atc_code})
+            else:
+                return Response({f"List of drug-protein interations for {atc_code}": "No results or wrong input. Please check it again!"})
+
         else:
             return Response(serializer.errors, status=400)
         
@@ -231,10 +246,8 @@ class AtcToDescriptionRestApiView(DescriptionByAtcBaseView,APIView,):
         if serializer.is_valid():
             data = self.get_description_by_atc_code(serializer.validated_data.get('atc_code'))
             description = data.get('description', [])
-            returned_data = [{
-                    "Description":description,
-                }]
-            return Response({"ATC description: ": returned_data})
+            atc_code = data.get('atc_code', "")
+            return Response({f"ATC description for {atc_code}": description})
         else:
             return Response(serializer.errors, status=400)
 
@@ -286,17 +299,21 @@ class TargetsByDrugRestApiView(TargetsByDrugBaseView,APIView,):
         serializer = TargetDrugSerializer(data=self.kwargs)
 
         if serializer.is_valid():
-            data = self.get_targets_by_drug(serializer.validated_data.get('drug_id'))
-            returned_data = []
-            for pair in data.get("list_of_targets"):
-                temp = {
-                    "UniProt_ID": pair[0],
-                    "Protein name": pair[1],
-                    "Gene ID": pair[2],
-                    "Gene name": pair[3],
-                }
-                returned_data.append(temp)
-            return Response({"All targeted protein of "+self.kwargs.get("drug_id"): returned_data})
+            data = self.get_targets_by_drug(serializer.validated_data.get('drug_id')).get("list_of_targets")
+            
+            if len(data)==1 and type(data[0])=="list":
+                return Response(data)
+            else:
+                returned_data = []
+                for pair in data:
+                    temp = {
+                        "UniProt_ID": pair[0],
+                        "Protein name": pair[1],
+                        "Gene ID": pair[2],
+                        "Gene name": pair[3],
+                    }
+                    returned_data.append(temp)
+                return Response({"All targeted protein of "+self.kwargs.get("drug_id"): returned_data})
         else:
             return Response(serializer.errors, status=400)
 
@@ -313,10 +330,11 @@ class AtcToPgxRestApiView(PGxByAtcCodeView,APIView,):
         if serializer.is_valid():
             data = self.get_pharmgkb_pgx_by_atc_code(serializer.validated_data.get('atc_code'))
             Pharmacogenomics = data.get('pgx', [])
-            returned_data = [{
-                    "Pharmacogenomics":Pharmacogenomics,
-                }]
-            return Response({"ATC Pharmacogenomics: ": returned_data})
+            atc_code = data.get('atc_code', "")
+            if len(Pharmacogenomics)>0:
+                return Response({f"ATC Pharmacogenomics for {atc_code}": Pharmacogenomics})
+            else:
+                return Response({f"ATC Pharmacogenomics for {atc_code}": "No results or wrong input. Please check it again!"})
         else:
             return Response(serializer.errors, status=400)
         
@@ -333,14 +351,14 @@ class AtcCodesByDrugRestApiView(AtcCodesByDrugView,APIView,):
 
         if serializer.is_valid():
             data = self.get_atc_codes_by_drug(serializer.validated_data.get('drug_id'))
-            returned_data = []
-            for pair in data.get("list_of_atc_codes"):
-                temp = {
-                    "ATC code": pair.get("Atc code")[0],
-                    "Description": pair.get("Description"),
-                }
-                returned_data.append(temp)
-            return Response({"ATC code of drug "+self.kwargs.get("drug_id"): returned_data})
+            returned_data = data.get("list_of_atc_codes")
+            print("returned_data ", returned_data)
+            
+            if len(returned_data)==1 and returned_data[0].get("Results")!=None:
+                return Response(returned_data)
+            else:
+                temp=[{"Atc code": t.get("atc_code"), "Description": t.get("description")} for t in returned_data]
+                return Response({"ATC code of drug "+self.kwargs.get("drug_id"): temp})
         else:
             return Response(serializer.errors, status=400)
         
