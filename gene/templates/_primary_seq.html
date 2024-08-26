@@ -124,7 +124,7 @@
                     tooltip_text = `<span style="color: red;"> No variant occurs at position ${p}</span>`;
                     // viewer.render();
                 } else {
-                    tooltip_text += `<span style="color:#c1121f";><i >Click on the amino acid again to deselect it</i></span><br>`;
+                    tooltip_text += `<span style="color:#c1121f";><i >Click outside the tooltip to close it. <br>Click on the amino acid again to deselect it.</i></span><br>`;
                     viewer.addStyle({ resi: resiList }, { stick: { colorscheme: 'greenCarbon', radius: 1.4, opacity: 1.0 } });
                     viewer.render();
                 }
