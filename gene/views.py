@@ -316,14 +316,19 @@ class GenebasedAssociationStatisticsView:
                 table = cache.get("association_statistics_data_" + slug)
             else:
                 table = pd.DataFrame()
-                
                 data = GenebassVariant.objects.filter(markerID_id=slug).values_list("markerID", "phenocode", "n_cases", "n_controls", "n_cases_defined", \
                                                                                 "n_cases_both_sexes", "n_cases_females", "n_cases_males", "category", \
                                                                                 "AC", "AF", "BETA", "SE", \
                                                                                 "AF_Cases", "AF_Controls", "Pvalue")
+                
                 if len(data) == 0:
-                    return dict()
-
+                    try:
+                        v = Variant.objects.get(VariantMarker=slug)
+                    except:
+                        v = None
+                        return {"Results":"No variant found or wrong input. Please check it again!"}
+                    if v:
+                        return {"Results":"No significant association (p_value<0.05) found for this variant"}
                 for row in data:
                     temp = pd.DataFrame([row])
                     phenocode = temp.iloc[0, 1]
@@ -332,11 +337,11 @@ class GenebasedAssociationStatisticsView:
                     temp.iloc[0, 8] = GenebassCategory.objects.get(category_code=category).category_description
 
                     table = table.append(temp, ignore_index=True)
-                table.fillna('', inplace=True)
-                table.columns=["markerID", "phenocode", "n_cases", "n_controls", "n_cases_defined", "n_cases_both_sexes", "n_cases_females", \
-                                "n_cases_males", "category", "AC", "AF", "BETA", "SE", "AF_Cases", "AF_Controls", "Pvalue"]
-                context = dict()
-                cache.set("association_statistics_data_" + slug, table, 60 * 60)
+                    table.fillna('', inplace=True)
+            table.columns=["markerID", "phenocode", "n_cases", "n_controls", "n_cases_defined", "n_cases_both_sexes", "n_cases_females", \
+                    "n_cases_males", "category", "AC", "AF", "BETA", "SE", "AF_Cases", "AF_Controls", "Pvalue"]
+            context = dict()
+            cache.set("association_statistics_data_" + slug, table, 60 * 60)
             context['association_statistics_data'] = table
         return context
 
