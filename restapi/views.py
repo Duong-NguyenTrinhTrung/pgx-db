@@ -377,30 +377,33 @@ class GenebasedAssociationStatisticsRestApiView(GenebasedAssociationStatisticsVi
             variant_marker = serializer.validated_data.get('variant_marker')
             variant_marker = variant_marker[:-1] if variant_marker[-1] == "/" else variant_marker
             data = self.get_association_statistics_by_variant_marker(variant_marker)
-            if not data:
-                return Response({"error" : f"{variant_marker} not found"}, status=404)
-            returned_data = []
-            for index, row in data.get("association_statistics_data").iterrows():
-                temp = {
-                    "Variant marker": row["markerID"],
-                    "Phenotype description": row["phenocode"],
-                    "n_cases": row["n_cases"],
-                    "n_controls": row["n_controls"],
-                    "n_cases_defined": row["n_cases_defined"],
-                    "n_cases_both_sexes": row["n_cases_both_sexes"],
-                    "n_cases_females": row["n_cases_females"],
-                    "n_cases_males": row["n_cases_males"],
-                    "Category": row["category"],
-                    "AC": row["AC"],
-                    "AF": row["AF"],
-                    "BETA": row["BETA"],
-                    "SE": row["SE"],
-                    "AF_Cases": row["AF_Cases"],
-                    "AF_Controls": row["AF_Controls"],
-                    "Pvalue": row["Pvalue"],
-                }
-                returned_data.append(temp)
-            return Response({"Gene-based association statistics of "+variant_marker: returned_data})
+
+            if data.get("Results")!=None:
+                # return Response(data, status=404)
+                return Response(data)
+            else:
+                returned_data = []
+                for index, row in data.get("association_statistics_data").iterrows():
+                    temp = {
+                        "Variant marker": row["markerID"],
+                        "Phenotype description": row["phenocode"],
+                        "n_cases": row["n_cases"],
+                        "n_controls": row["n_controls"],
+                        "n_cases_defined": row["n_cases_defined"],
+                        "n_cases_both_sexes": row["n_cases_both_sexes"],
+                        "n_cases_females": row["n_cases_females"],
+                        "n_cases_males": row["n_cases_males"],
+                        "Category": row["category"],
+                        "AC": row["AC"],
+                        "AF": row["AF"],
+                        "BETA": row["BETA"],
+                        "SE": row["SE"],
+                        "AF_Cases": row["AF_Cases"],
+                        "AF_Controls": row["AF_Controls"],
+                        "Pvalue": row["Pvalue"],
+                    }
+                    returned_data.append(temp)
+                return Response({"Gene-based association statistics of "+variant_marker: returned_data})
         else:
             return Response(serializer.errors, status=400)
 
