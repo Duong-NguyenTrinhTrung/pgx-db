@@ -23,18 +23,43 @@
     top: 0;
     bottom: 0;
     left: -10px;
-    width: 10px; 
-    background-color: #bf0603; 
+    width: 15px; 
+    
     z-index: -1; /* Push the pseudo-element behind the header text */
+    }
+
+    #header_drug::before {
+        background-color: rgb(255, 203, 119); 
+    }
+    #header_target::before {
+        background-color: rgb(142, 190, 240); 
+    }
+    #header_variant::before {
+        background-color: rgb(255, 180, 204); 
+    }
+    #header_indication::before {
+        background-color: rgb(144, 210, 157); 
+    }
+    #header_atc::before {
+        background-color: #6c757d; 
+    }
+    #header_api::before {
+        background-color: #cae9ff; 
+    }
+    #header_statistic::before {
+        background-color: rgb(118, 120, 237); 
     }
 
     .tutorial_explanation {
         margin-top: 10px;
         font-size: 18px;
-        color: #00afb9;
+        color: #6c757d;
         margin-bottom: 10px;
     }
 
+    .tutorial_explanation a{
+        text-decoration: underline;
+    }
     .scale-needed {
         width: 100%;
         height: 100%; 
@@ -55,24 +80,24 @@
     <!-- atc  -->
     <section class="tutorial_container" >
         <div style="width: 1000px; margin: 0 auto; display: flex; flex-direction: column;">
-            <header>
+            <header id="header_atc">
                 <h2>
                     Search or Browse to any ATC code of interest
                 </h2>
             </header>
-            <p class="tutorial_explanation">From menu 'ATC codes/ATC classification hierachy browser', users can input a single ATC code or browse in the ATC tree to launch the search process. The ATC tree starts with 14 Anatomical groups.</p>
+            <p class="tutorial_explanation">From menu <a href="https://pgx-db.org/atc_lookup" target="_blank">'ATC codes/ATC classification hierachy browser'</a>, users can input a single ATC code or browse in the ATC tree to launch the search process. The ATC tree starts with 14 Anatomical groups.</p>
             <img  src="/static/home/images/atc_browse.png" alt="">
         </div>
     </section>
 
     <section class="tutorial_container">
         <div style="width: 1000px; margin: 0 auto; display: flex; flex-direction: column;">
-            <header>
+            <header id="header_atc">
                 <h2>
                     Explore the drug-indication and -target network associated with an ATC code of interest
                 </h2>
             </header>
-            <p class="tutorial_explanation">The ‘ATC classification hierarchy browser’ on the left is 5-tiered, beginning with the anatomical group and narrowing down through therapeutic, pharmacological, and chemical groups to a specific 7-character chemical substance code. Clicking any ATC code reveals a network illustrating drug-protein interactions and/ or drug-indication associations.</p>
+            <p class="tutorial_explanation">The <a href="https://pgx-db.org/atc_lookup" target="_blank">‘ATC classification hierarchy browser’</a> on the left is 5-tiered, beginning with the anatomical group and narrowing down through therapeutic, pharmacological, and chemical groups to a specific 7-character chemical substance code. Clicking any ATC code reveals a network illustrating drug-protein interactions and/ or drug-indication associations.</p>
             <img src="/static/home/images/atc_level_network1.png" alt="">
             <br>
             <p class="tutorial_explanation">Network visualization tab provides a tripartite network visualization with drugs, targets, and indication nodes. User will need first filter the types of Drug-protein mode of actions and the clinical trial phase of Drug-indication association studies.</p>
@@ -83,12 +108,12 @@
     <!-- drug  -->
     <section class="tutorial_container">
         <div style="width: 1000px; margin: 0 auto; height: 65%; display: flex; flex-direction: column;">
-            <header>
+            <header id="header_drug">
                 <h2>
                     Search a drug of interest
                 </h2>
             </header>
-            <p class ="tutorial_explanation">Users can input a single drug name or drug bank ID on the 'Drug search' to launch the search process. The table beneath gives quick drug examples</p>
+            <p class ="tutorial_explanation">Users can input a single drug name or drug bank ID on the <a href="https://pgx-db.org/drug_lookup/" target="_blank">'Drug search'</a> page to launch the search process. The table beneath gives quick drug examples</p>
             <img class="scale-needed" src="/static/home/images/drug_search.png" alt="">
         </div>
     </section>
@@ -96,12 +121,12 @@
     <!-- disease  -->
     <section class="tutorial_container">
         <div style="width: 1000px; margin: 0 auto; height: 65%; display: flex; flex-direction: column;">
-            <header>
+            <header id="header_indication">
                 <h2>
                     Search an indication of interest
                 </h2>
             </header>
-            <p class ="tutorial_explanation">Users can input an indication name on the 'Indication search' page to launch the search process. The table beneath gives quick indication examples</p>
+            <p class ="tutorial_explanation">Users can input an indication name on the <a href="https://pgx-db.org/disease_lookup/" target="_blank">'Indication search'</a> page to launch the search process. The table beneath gives quick indication examples</p>
             <img class="scale-needed" src="/static/home/images/disease_search.png" alt="">
         </div>
     </section>
@@ -109,12 +134,12 @@
     <!-- target  -->
     <section class="tutorial_container">
         <div style="width: 1000px; margin: 0 auto; display: flex; flex-direction: column;">
-            <header>
-                <h2>
+            <header id="header_target">
+                <h2 >
                     Search a protein/target/gene of interest
                 </h2>
             </header>
-            <p class ="tutorial_explanation">Users can input a single protein name or protein uniprot ID or gene name or gene identifier on the 'Protein search' page to launch the search process. The table beneath gives quick protein examples</p>
+            <p class ="tutorial_explanation">Users can input a single protein name or protein uniprot ID or gene name or gene identifier on the <a href="https://pgx-db.org/target_lookup/" target="_blank">'Protein search'</a> page to launch the search process. The table beneath gives quick protein examples</p>
             <img class="scale-needed" src="/static/home/images/target_search.png" alt="">
         </div>
     </section>
@@ -122,12 +147,12 @@
     <!-- variant  -->
     <section class="tutorial_container">
         <div style="width: 1000px; margin: 0 auto; display: flex; flex-direction: column;">
-            <header>
+            <header id="header_variant">
                 <h2>
                     Search a variant of interest 
                 </h2>
             </header>
-            <p class ="tutorial_explanation">Users can input a single variant identifier on the 'Variant search' page to launch the search process. The table beneath gives quick variant examples</p>
+            <p class ="tutorial_explanation">Users can input a single variant identifier on the <a href="https://pgx-db.org/variant_lookup/" target="_blank">'Variant search'</a> page to launch the search process. The table beneath gives quick variant examples</p>
             <img  class="scale-needed" src="/static/home/images/variant_search.png" alt="">
         </div>
     </section>
@@ -135,12 +160,12 @@
     <!-- overall statistics   -->
     <section class="tutorial_container">
         <div style="width: 1000px; margin: 0 auto; display: flex; flex-direction: column;">
-            <header>
+            <header id = "header_api">
                 <h2>
                     Download data programmatically
                 </h2>
             </header>
-            <p class ="tutorial_explanation">We used the REST framework (https://www.django-rest-framework.org/) to implemented API calls enabling programmatic retrieval of PGx information.</p>
+            <p class ="tutorial_explanation">We used the REST framework (https://www.django-rest-framework.org/) to implemented <a href="https://pgx-db.org/swagger/" target="_blank">'API calls'</a> enabling programmatic retrieval of PGx information.</p>
             <img class="scale-needed" src="/static/home/images/download_api.png" alt="">
         </div>
     </section>
@@ -148,12 +173,12 @@
     <!-- overall statistics   -->
     <section class="tutorial_container">
         <div style="width: 1000px; margin: 0 auto; display: flex; flex-direction: column;">
-            <header>
+            <header id="header_statistic">
                 <h2>
                     Grasp a quick overview of data of each types (drug, gene/target, disease) in PGx
                 </h2>
             </header>
-            <p class ="tutorial_explanation scale_needed">In Target menu, choose "Target statistics", statistics page will appear allowing users to grasp overview of target data. The similar functions are also available for drug and disease data. For each data type, user can select sub-categories to see the corresponding data distribution. A screenshot of statistics for targets is provided below as an example.</p>
+            <p class ="tutorial_explanation scale_needed">In Target menu, choose <a href="https://pgx-db.org/target_statistics/" target="_blank">'Target statistics'</a>, statistics page will appear allowing users to grasp overview of target data. The similar functions are also available for drug and disease data. For each data type, user can select sub-categories to see the corresponding data distribution. A screenshot of statistics for targets is provided below as an example.</p>
             <img class="scale-needed" src="/static/home/images/target_statistics.png" alt="">
         </div>
     </section>
