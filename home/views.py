@@ -325,6 +325,10 @@ def tutorial(request):
     context = {}
     return render(request, 'home/tutorial.html', context)
 
+def use_case_examples(request):
+    context = {}
+    return render(request, 'home/use_case_examples.html', context)
+
 def sort_dict(my_dict):
     sorted_items_desc = sorted(my_dict.items(), key=lambda item: item[1], reverse = True)
     sorted_dict_desc = dict(sorted_items_desc)
