@@ -2,6 +2,8 @@
 {% csrf_token %}
 
 {% block addon_css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static '/home/css/font.awesome.all.min.css' %}">
     <style>
         table.dataTable thead .sorting{
             background-image:url("/static/home/images/sort-both10.png");
@@ -18,6 +20,39 @@
         th.sorting div, th.sorting_asc div, th.sorting_desc div {
             text-align: left;
         }
+        /* .tooltip {
+            display: none;
+            position: absolute;
+            background-color: #333;
+            color: #fff;
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+            white-space: nowrap;
+        } */
+
+        .beta_p_value_tooltip {
+            background-color: #0056b3; /* Semi-transparent background */
+            color: white;  /* Text color */
+            border-radius: 5px; /* Rounded corners */
+            padding: 5px; /* Padding around text */
+            z-index: 1000; /* Ensure it appears above other elements */
+            white-space: normal; /* Prevent text wrapping */
+            display: none; /* Initially hidden */
+            max-width: 200px;
+        }
+
+        .info-icon {
+            cursor: pointer;
+            color: #c01324;
+            font-size: 20px;
+        }
+
+        .info-icon:hover {
+            color: #0056b3;
+        }
+
     </style>
 {% endblock %}
 
@@ -41,7 +76,7 @@
                                         <fieldset style="width:250px; border-radius: 5px;">
                                                 <legend
                                                 style="font-size: 14px; margin-bottom:0; text-decoration: none; color: #337ab7;">
-                                                Clinical PGx data (Variant drug response)</legend>
+                                                Variant drug response</legend>
                                                 <input id="variant-based-clinical-pgx-control" data-atc-code=""
                                                 name="clinical-pgx-control" type="radio" class="custom-radio" value="variant-based-clinical-pgx" checked>
                                                 <label for="variant-based-clinical-pgx-control">Variant-based (only)</label>
@@ -54,7 +89,7 @@
                                                 <fieldset style="width:250px; border-radius: 5px;">
                                                 <legend
                                                         style="font-size: 14px; margin-bottom:0; text-decoration: none; color: #337ab7;">
-                                                        Burden data</legend>
+                                                        Burden test</legend>
                                                 <input id="genebased-burden-control" data-atc-code="" name="burden-control" type="radio" class="custom-radio"
                                                         value="gene-based"="">
                                                 <label for="genebased-burden-control">Gene-based</label>
@@ -81,6 +116,7 @@
 </div>
 
 {% block addon_js %}
+
 <script>
     
     function getHeaderContent(element) {
@@ -280,7 +316,7 @@
 
     function render_gene_based_burden_data(gene_based_burden_data) {
         $("#pgx-data-table-div").show();
-        var tableHtml = '<table class="display compact text-nowrap" id="pgx-data-table" style="margin: unset;"><thead id="headers" style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
+        var tableHtml = '<table class="display compact text-nowrap" id="pgx-data-table" style="margin: unset;"><thead id="headers" style="text-align: left;"><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">MOA &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value <i class="fa-solid fa-info-circle info-icon " data-tooltip="The p-value represents the statistical significance of the association."></i>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA <i class="fa-solid fa-info-circle info-icon" data-tooltip="The BETA value reflects the effect size and direction of the association."></i>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
         for (var k = 0; k < gene_based_burden_data.length; k++) {
             row = gene_based_burden_data[k];
             for (var l = 0; l < row.burden_data.length; l++) {
@@ -301,6 +337,51 @@
         tableHtml += '</tbody></table>';
         var genebased_burden_distribution_div = document.getElementById("pgx-data-table-div");
         genebased_burden_distribution_div.innerHTML = tableHtml;
+
+        //showing tooltip when hovering icon for beta and p_value 
+        // Using event delegation for the info-icon elements within the specific container
+        genebased_burden_distribution_div.addEventListener('mouseover', function(event) {
+            if (event.target.classList.contains('info-icon')) {
+                console.log("mouse is over");
+                // Check if there is an existing tooltip and remove it
+                if (event.target.tooltipElement) {
+                    document.body.removeChild(event.target.tooltipElement);
+                    event.target.tooltipElement = null; // Clean up reference
+                }
+                // Create tooltip element dynamically
+                var tooltip = document.createElement('div');
+                tooltip.className = 'beta_p_value_tooltip';
+                // console.log("tooltip classname "+tooltip.className);
+                var message = event.target.getAttribute('data-tooltip');
+                // console.log("message "+message);
+                tooltip.innerHTML = message;
+                tooltip.style.position = 'absolute';
+                tooltip.style.display = 'block';
+                console.log("tooltip.style.display "+tooltip.style.display);
+
+                // Get the icon's position and set tooltip position relative to the icon
+                var rect = event.target.getBoundingClientRect();
+                // console.log("rect.right "+rect.right+", rect.top "+rect.top);
+                tooltip.style.left = rect.right + 5 + 'px'; // Place it to the right of the icon
+                tooltip.style.top = rect.top + 5 + 'px';    // Align it vertically with the icon
+                // Append the tooltip to the body
+                document.body.appendChild(tooltip);
+
+                // Store the tooltip reference on the icon for future use
+                event.target.tooltipElement = tooltip;
+            }
+        });
+
+        genebased_burden_distribution_div.addEventListener('mouseout', function(event) {
+            if (event.target.classList.contains('info-icon')) {
+                console.log("mouse is out");
+                // Remove the dynamically created tooltip
+                if (event.target.tooltipElement) {
+                    document.body.removeChild(event.target.tooltipElement);
+                    event.target.tooltipElement = null; // Clean up reference
+                }
+            }
+        });
 
         let structures_scrollable = $("#pgx-data-table");
         structures_scrollable.show();
@@ -364,7 +445,7 @@
 
     function render_variant_based_burden_data(variant_based_burden_data) {
         $("#pgx-data-table-div").show();
-        var tableHtml = '<table class="display compact text-nowrap" id="pgx-data-table"><thead id="headers" style="text-align: left; "><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">VariantID &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>AC </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>AF </br>burden&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
+        var tableHtml = '<table class="display compact text-nowrap" id="pgx-data-table"><thead id="headers" style="text-align: left; "><tr><th style="white-space: nowrap;">Drugbank ID &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap;">Gene name&nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">VariantID &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">Annotation &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_cases &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th style="white-space: nowrap; text-align: center;">n_controls &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </th><th>P-value <i class="fa-solid fa-info-circle info-icon" data-tooltip="The p-value represents the statistical significance of the association."></i>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; </th><th>BETA <i class="fa-solid fa-info-circle info-icon" data-tooltip="The BETA value reflects the effect size and direction of the association."></i>&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>AC&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th><th>AF&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp;</th></tr></thead><tbody>';
         
         for (var k = 0; k < variant_based_burden_data.length; k++) {
             row = variant_based_burden_data[k];
@@ -390,6 +471,64 @@
         tableHtml += '</tbody></table>';
         var genebased_burden_distribution_div = document.getElementById("pgx-data-table-div");
         genebased_burden_distribution_div.innerHTML = tableHtml;
+
+        //showing tooltip when hovering icon for beta and p_value 
+        // Using event delegation for the info-icon elements within the specific container
+        genebased_burden_distribution_div.addEventListener('mouseover', function(event) {
+            if (event.target.classList.contains('info-icon')) {
+                console.log("mouse is over");
+                
+                // Check if there is an existing tooltip and remove it
+                if (event.target.tooltipElement) {
+                    document.body.removeChild(event.target.tooltipElement);
+                    event.target.tooltipElement = null; // Clean up reference
+                }
+
+                // Create tooltip element dynamically
+                var tooltip = document.createElement('div');
+                tooltip.className = 'beta_p_value_tooltip';
+                // console.log("tooltip classname "+tooltip.className);
+                var message = event.target.getAttribute('data-tooltip');
+                // console.log("message "+message);
+                tooltip.innerHTML = message;
+                tooltip.style.position = 'absolute';
+                tooltip.style.display = 'block';
+                console.log("tooltip.style.display "+tooltip.style.display);
+
+                // Get the icon's position and set tooltip position relative to the icon
+                var rect = event.target.getBoundingClientRect();
+                // console.log("rect.right "+rect.right+", rect.top "+rect.top);
+                tooltip.style.left = rect.right + 5 + 'px'; // Place it to the right of the icon
+                tooltip.style.top = rect.top + 5 + 'px';    // Align it vertically with the icon
+                // Append the tooltip to the body
+                document.body.appendChild(tooltip);
+
+                // Store the tooltip reference on the icon for future use
+                event.target.tooltipElement = tooltip;
+            }
+        });
+
+        genebased_burden_distribution_div.addEventListener('mouseout', function(event) {
+            if (event.target.classList.contains('info-icon')) {
+                console.log("mouse is out");
+                // Remove the dynamically created tooltip
+                if (event.target.tooltipElement) {
+                    document.body.removeChild(event.target.tooltipElement);
+                    event.target.tooltipElement = null; // Clean up reference
+                }
+            }
+        });
+
+        // Move tooltip with the cursor
+        // document.addEventListener('mousemove', function(event) {
+        //     var tooltip = document.querySelector('.tooltip'); // Get the currently displayed tooltip
+        //     if (tooltip) {
+        //         tooltip.style.left = event.pageX + 10 + 'px'; // Offset for better visibility
+        //         tooltip.style.top = event.pageY + 10 + 'px';
+        //     }
+        // }); 
+        // end of code for showing tooltip 
+
 
         let structures_scrollable = $("#pgx-data-table");
         structures_scrollable.show();
@@ -759,4 +898,11 @@
     //     });
     // });
 </script>
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+
+
+
+
+
 {% endblock %}
