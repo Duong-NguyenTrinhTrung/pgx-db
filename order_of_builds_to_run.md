@@ -1,0 +1,10 @@
+build_druggroup
+build_drugclass
+build_drugsubclass
+build_drugsuperclass
+build_drugparent
+build_drugcategory
+build_drugcompound
+build_drugpubchemsubstance
+build_drugchembl
+build_drug
