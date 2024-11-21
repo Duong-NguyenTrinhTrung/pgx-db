@@ -1,7 +1,16 @@
 # Created by https://www.gitignore.io
 
 
+#trivial files
 .env.example
+PGxDB_notes_Jimmy.docx
+order_of_builds_to_run.md
+smile_example.docx
+Tutorial.pptx
+soth_sort_icon.docx
+run_build_data_scripts.md
+run_build_data_scripts.sh
+
 
 ### OSX ###
 .DS_Store
