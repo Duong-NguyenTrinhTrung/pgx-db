@@ -76,24 +76,24 @@
         }
 
         .tutorial_content {
-            width: 1000px; 
+            width: 80%; 
             margin: 0 auto; 
             display: flex; 
             flex-direction: column;
         }
         #toc_tut {
             margin-left: 10px;
-            margin-top: 20px;
-            width: 18%;
+            margin-top: 25px;
+            width: 22%;
             height: 300px;
         }
         #content_tut {
-            width: 82%;
+            width: 78%;
         }
         .back_to_top {
             font-size: 16px;
             color: #c1121f; /* A nice blue color */
-            background-color: yellow;
+            background-color: rgb(225, 227, 231);
             text-decoration: none;
             font-weight: bold;
             position: relative;
@@ -105,6 +105,16 @@
             color: #6c757d;
             font-size: 20px;
         }
+        #toc_tut a{
+            font-size: 18px;
+            /* margin-bottom: 15px;
+            margin-left: 10px; */
+        }
+        .tutorial_container_toc {
+            display: flex;
+            flex-direction: row;
+            gap: 5px;
+        }
     </style>
 
 {% endblock %}
@@ -113,14 +123,49 @@
 
 <main>
     <div id="toc_tut">
-        <h2 id="tutorial_list">Tutorial list</h2>
-        <h4><i class="fa-regular fa-hand-point-right tut_icon"></i> <a href="#search_atc_code_tut">Search or Browse to any ATC code of interest</a></h4>
-        <h4><i class="fa-regular fa-hand-point-right tut_icon"></i> <a href="#search_drug_tut">Search a drug of interest</a></h4>
-        <h4><i class="fa-regular fa-hand-point-right tut_icon"></i> <a href="#search_indication_tut">Search an indication of interest</a></h4>
-        <h4><i class="fa-regular fa-hand-point-right tut_icon"></i> <a href="#search_protein_tut">Search a protein/target/gene of interest</a></h4>
-        <h4><i class="fa-regular fa-hand-point-right tut_icon"></i> <a href="#search_variant_tut">Search a variant of interest</a></h4>
-        <h4><i class="fa-regular fa-hand-point-right tut_icon"></i> <a href="#api_tut">Download data programmatically</a></h4>
-        <h4><i class="fa-regular fa-hand-point-right tut_icon"></i> <a href="#overall_statistics_tut">Grasp a quick overview of data of each types (drug, gene/target, disease) in PGxDB</a></h4>
+        <h2 id="tutorial_list" style="color: #0353a4">Tutorial list</h2>
+        <div class="tutorial_container_toc">
+            <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
+            <div>
+                <a href="#search_atc_code_tut">Search or Browse to any ATC code of interest</a>
+            </div>
+        </div>
+        <div class="tutorial_container_toc">
+            <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
+            <div>
+                <a href="#search_drug_tut">Search a drug of interest</a>
+            </div>
+        </div>
+        <div class="tutorial_container_toc">
+            <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
+            <div>
+                <a href="#search_indication_tut">Search an indication of interest</a>
+            </div>
+        </div>
+        <div class="tutorial_container_toc">
+            <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
+            <div>
+                <a href="#search_protein_tut">Search a protein/target/gene of interest</a>
+            </div>
+        </div>
+        <div class="tutorial_container_toc">
+            <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
+            <div>
+                <a href="#search_variant_tut">Search a variant of interest</a>
+            </div>
+        </div>
+        <div class="tutorial_container_toc">
+            <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
+            <div>
+                <a href="#api_tut">Download data programmatically</a>
+            </div>
+        </div>
+        <div class="tutorial_container_toc">
+            <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
+            <div>
+                <a href="#overall_statistics_tut">Grasp a quick overview of data of each types (drug, gene/target, disease) in PGxDB</a>
+            </div>
+        </div>
     </div>
     
 
@@ -155,7 +200,7 @@
     
         <!-- drug  -->
         <section id="search_drug_tut" class="tutorial_container">
-            <div style="width: 1000px; margin: 0 auto; height: 65%; display: flex; flex-direction: column;">
+            <div class="tutorial_content">
                 <header id="header_drug">
                     <a class="back_to_top" href="#tutorial_list">Back to top</a>
                     <h2>
@@ -169,7 +214,7 @@
     
         <!-- disease  -->
         <section id="search_indication_tut" class="tutorial_container">
-            <div style="width: 1000px; margin: 0 auto; height: 65%; display: flex; flex-direction: column;">
+            <div class="tutorial_content">
                 <header id="header_indication">
                     <a class="back_to_top" href="#tutorial_list">Back to top</a>
                     <h2>
