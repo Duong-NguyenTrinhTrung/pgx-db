@@ -157,6 +157,12 @@
         <div class="tutorial_container_toc">
             <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
             <div>
+                <a href="#variant_comprehensive_check_tut">Evaluate the overall impact of a variant</a>
+            </div>
+        </div>
+        <div class="tutorial_container_toc">
+            <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
+            <div>
                 <a href="#api_tut">Download data programmatically</a>
             </div>
         </div>
@@ -180,6 +186,7 @@
                 </header>
                 <p class="tutorial_explanation">From menu <a href="https://pgx-db.org/atc_lookup" target="_blank">'ATC codes/ATC classification hierachy browser'</a>, users can input a single ATC code or browse in the ATC tree to launch the search process. The ATC tree starts with 14 Anatomical groups.</p>
                 <img  src="/static/home/images/atc_browse.png" alt="">
+                <p class ="tutorial_explanation"><b><i class="uc_element">Video:</i></b> Watch the video guide <a href="/static/home/videos/tut1.mp4" target="_blank">here</a></p>
             </div>
         </section>
     
@@ -195,6 +202,7 @@
                 <br>
                 <p class="tutorial_explanation">Network visualization tab provides a tripartite network visualization with drugs, targets, and indication nodes. User will need first filter the types of Drug-protein mode of actions and the clinical trial phase of Drug-indication association studies.</p>
                 <img src="/static/home/images/atc_level_network2.png" alt="">
+                <p class ="tutorial_explanation"><b><i class="uc_element">Video:</i></b> Watch the video guide <a href="/static/home/videos/tut2.mp4" target="_blank">here</a></p>
             </div>
         </section>
     
@@ -253,8 +261,31 @@
                 <img  class="scale-needed" src="/static/home/images/variant_search.png" alt="">
             </div>
         </section>
+        <!-- variant comprehending  -->
+        <section id="variant_comprehensive_check_tut" class="tutorial_container">
+            <div class="tutorial_content">
+                <header id="header_variant">
+                    <a class="back_to_top" href="#tutorial_list">Back to top</a>
+                    <h2>
+                        Evaluate the overall impact of a variant 
+                    </h2>
+                </header>
+                <p class ="tutorial_explanation">
+                <b><i class="uc_element">Objective:</i></b> Find the predicted impact of a protein-coding genetic variant. Given a healthcare professional identifies a variant of interest in a patient, which has not been listed on drug labels for PGx-testing previously.</p>   
+                <br><br>
+                <b><i class="uc_element">How:</i></b> Navigating to the <a href="https://pgx-db.org/variant_lookup/" target="_blank">'Variant search'</a> page, enter the variant identifier (e.g. 9_35057179_T/C) in the search box.
+                <br><br>
+                <b><i class="uc_element">Expected results:</i></b><span style="font-style: italic;"> (This screenshot shows only a portion of the full results).</span>
+                <br><br>
+                </b><span style="font-style: italic;"> Table showing basic annotation and predicted variant effect scores of variant 9_35057179_T/C</span>
+                <img style="width: 100%; height: 100%; border: #6c757d 1px solid;" src="/static/home/images/Expected-result-uc3.png" alt="">
+                <br><br>
+                </b><span style="font-style: italic;"> Table showing Significant burden associations of variant 9_35057179_T/C</span>
+                <img style="width: 100%; height: 100%; border: #6c757d 1px solid;" src="/static/home/images/Expected-result-uc3-2.png" alt="">
+            </div>
+        </section>
     
-        <!-- overall statistics   -->
+        <!-- API   -->
         <section id="api_tut" class="tutorial_container">
             <div class="tutorial_content">
                 <header id = "header_api">
