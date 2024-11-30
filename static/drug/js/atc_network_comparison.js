@@ -4,8 +4,10 @@ function reset(){
     // $("#atc_code_box").html("");
     // $("#atc_comparison_box").html("");
     var contentAtcCodeBox = document.getElementById("atc_code_box");
+    contentAtcCodeBox.style.display = "block";
     contentAtcCodeBox.style.width = '50%';
     var contentAtcComparisonBox = document.getElementById("atc_comparison_box");
+    contentAtcComparisonBox.style.display = "block";
     contentAtcComparisonBox.style.width = '50%';
 }
 
@@ -357,6 +359,7 @@ function toTitleCase(str) {
 }
 
 function createDistributionPlotForCategoryData(classes, class_count, elementID, text, relation) {
+    
     var types;
     if (relation==="interactions"){
         types = "Modes of action"
@@ -364,6 +367,8 @@ function createDistributionPlotForCategoryData(classes, class_count, elementID, 
         types = "Clinical trial phases";
     }
     reset();
+    contentAtcComparisonBox.style.display = "none";
+
     if (classes.length>0)
     {
         const data = [];
@@ -592,6 +597,8 @@ function createDistributionPlotForCategoryData1(classes, class_count, max_class,
 //2 plots sharing axis
 function createDistributionPlotForCategoryData2(atc_code, classes1, class_count1, atc_comparison, classes2, class_count2, elementID1, elementID2, text, relation) {
     reset();
+    $("#atc_code_box").html("");
+    $("#atc_comparison_box").html("");
     var value1 = [];
     var value2 = [];
     var plottingBox1 = document.getElementById(elementID1);
