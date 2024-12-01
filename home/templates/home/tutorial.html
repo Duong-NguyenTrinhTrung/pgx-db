@@ -34,25 +34,25 @@
         z-index: -1; /* Push the pseudo-element behind the header text */
         }
 
-        #header_drug::before {
+        .header_drug::before {
             background-color: rgb(255, 203, 119); 
         }
-        #header_target::before {
+        .header_target::before {
             background-color: rgb(142, 190, 240); 
         }
-        #header_variant::before {
+        .header_variant::before {
             background-color: rgb(255, 180, 204); 
         }
-        #header_indication::before {
+        .header_indication::before {
             background-color: rgb(144, 210, 157); 
         }
-        #header_atc::before {
+        .header_atc::before {
             background-color: #6c757d; 
         }
-        #header_api::before {
+        .header_api::before {
             background-color: #cae9ff; 
         }
-        #header_statistic::before {
+        .header_statistic::before {
             background-color: rgb(118, 120, 237); 
         }
 
@@ -166,6 +166,55 @@
         <div class="tutorial_container_toc">
             <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
             <div>
+                <a href="#residues_significant_effects_tut">Find residues with signigicant effects in a protein</a>
+                <!-- <a href="/static/home/videos/tut4.mp4" target="_blank" style="color: red;"><i>Video</i></a> -->
+            </div>
+        </div>
+        <div class="tutorial_container_toc">
+            <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
+            <div>
+                <a href="#target_of_a_drug_tut">Find targets of a drugs and details about those targets</a>
+                <!-- <a href="/static/home/videos/tut5.mp4" target="_blank" style="color: red;"><i>Video</i></a> -->
+            </div>
+        </div>
+        <div class="tutorial_container_toc">
+            <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
+            <div>
+                <a href="#side_effects_with_high_frequencies_tut">Find side effects with high frequencies of a drug</a>
+                <!-- <a href="/static/home/videos/tut6.mp4" target="_blank" style="color: red;"><i>Video</i></a> -->
+            </div>
+        </div>
+        <div class="tutorial_container_toc">
+            <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
+            <div>
+                <a href="#max_clinical_trial_tut">Find maximum clinical phase of an indication/drug</a>
+                <!-- <a href="/static/home/videos/tut7.mp4" target="_blank" style="color: red;"><i>Video</i></a> -->
+            </div>
+        </div>
+        <div class="tutorial_container_toc">
+            <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
+            <div>
+                <a href="#find_disease_trail4_tut">Find diseases in clinical trial phase 4 of a drug, details about those diseases</a>
+                <!-- <a href="/static/home/videos/tut8.mp4" target="_blank" style="color: red;"><i>Video</i></a> -->
+            </div>
+        </div>
+        <div class="tutorial_container_toc">
+            <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
+            <div>
+                <a href="#find_significant_variants_tut">Find missense variants with predicted effect scores above a value, i.e, 0.7, given a gene</a>
+                <!-- <a href="/static/home/videos/tut8.mp4" target="_blank" style="color: red;"><i>Video</i></a> -->
+            </div>
+        </div>
+        <div class="tutorial_container_toc">
+            <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
+            <div>
+                <a href="#drugs_interacting_with_protein_tut">Find drugs interacting with a protein</a>
+                <!-- <a href="/static/home/videos/tut9.mp4" target="_blank" style="color: red;"><i>Video</i></a> -->
+            </div>
+        </div>
+        <div class="tutorial_container_toc">
+            <div><span><i class="fa-regular fa-hand-point-right tut_icon"></i></span></div>
+            <div>
                 <a href="#api_tut">Download data programmatically</a>
                 <a href="/static/home/videos/tut3.mp4" target="_blank" style="color: red;"><i>Video</i></a>
             </div>
@@ -183,7 +232,7 @@
         <!-- atc  -->
         <section id="search_atc_code_tut" class="tutorial_container" >
             <div class="tutorial_content">
-                <header id="header_atc">
+                <header class="header_atc">
                     <h2>
                         Search or Browse to any ATC code of interest
                     </h2>
@@ -196,7 +245,7 @@
     
         <section class="tutorial_container">
             <div class="tutorial_content">
-                <header id="header_atc">
+                <header class="header_atc">
                     <h2>
                         Explore the drug-indication and -target network associated with an ATC code of interest
                     </h2>
@@ -213,7 +262,7 @@
         <!-- drug  -->
         <section id="search_drug_tut" class="tutorial_container">
             <div class="tutorial_content">
-                <header id="header_drug">
+                <header class="header_drug">
                     <a class="back_to_top" href="#tutorial_list">Back to top</a>
                     <h2>
                         Search a drug of interest
@@ -223,11 +272,87 @@
                 <img class="scale-needed" src="/static/home/images/drug_search.png" alt="">
             </div>
         </section>
+        <!-- find side effects of a drug  -->
+        <section id="side_effects_with_high_frequencies_tut" class="tutorial_container">
+            <div class="tutorial_content">
+                <header class="header_drug">
+                    <a class="back_to_top" href="#tutorial_list">Back to top</a>
+                    <h2>
+                        Find side effects with high frequencies of a drug
+                    </h2>
+                </header>
+                <p class ="tutorial_explanation">Input a single drug name or drug bank ID (i.e., <i>Bepridil</i>) on the <a href="https://pgx-db.org/drug_lookup/" target="_blank">'Drug search'</a> page. The side effects information can be found in the "Adverse drug reactions" column of the result table</p>
+                </b><span style="font-style: italic;">In this example for "Bepridil", there are 11 side effects. Click on "View detail" will open a pop-up windows listing all the side effects and their frequencies. The side effects are sorted descendingly based on frequencies (in brackets) in the surveyed populations. Click on the "i" icon to see the definition of side effects</span>
+                <img style="width: 100%; height: 100%; border: #6c757d 1px solid;" src="/static/home/images/Expected-result-tut6.png" alt="">
+            </div>
+        </section>
+
+        <!-- find targets of a drug  -->
+        <section id="target_of_a_drug_tut" class="tutorial_container">
+            <div class="tutorial_content">
+                <header class="header_drug">
+                    <a class="back_to_top" href="#tutorial_list">Back to top</a>
+                    <h2>
+                        Find targets of a drugs and details about those targets 
+                    </h2>
+                </header>
+                <p class ="tutorial_explanation">
+                <b><i class="uc_element">Objective:</i></b> Given a drug, find how many targets this drug has and their detailed information such as family, variant profile</p>   
+                <br><br>
+                <b><i class="uc_element">How:</i></b> First, navigating to the <a href="https://pgx-db.org/drug_lookup/" target="_blank">'Drug search'</a> page, enter the drug name or it DrugBank ID (e.g. Goserelin) in the search box. Second, click on the link in the "DrugBankID" column in the "Result(s)" table to open the new page. The interactions of the drug will be show in a network style.
+                <br><br>
+                <b><i class="uc_element">Expected results:</i></b><span style="font-style: italic;"> (This screenshot shows only a portion of the full results).</span>
+                <br><br>
+                </b><span style="font-style: italic;"> Search result table </span>
+                <img style="width: 100%; height: 100%; border: #6c757d 1px solid;" src="/static/home/images/Expected-result-tut5.png" alt="">
+                <br><br>
+                </b><span style="font-style: italic;">In the network, click on protein (display in gene names) icons (circle shapes) to see for information of the protein. Check out the legend to see protein family or filter out certain families.</span>
+                <img style="width: 100%; height: 100%; border: #6c757d 1px solid;" src="/static/home/images/Expected-result-tut5-2.png" alt="">
+            </div>
+        </section>
+        <!-- Find maximum clinical phase of an indication/drug  -->
+        <section id="max_clinical_trial_tut" class="tutorial_container">
+            <div class="tutorial_content">
+                <header class="header_drug">
+                    <a class="back_to_top" href="#tutorial_list">Back to top</a>
+                    <h2>
+                        Find maximum clinical phase of an indication/drug
+                    </h2>
+                </header>
+                <p class ="tutorial_explanation">Input a single drug name or drug bank ID (i.e., <i>Bepridil</i>) on the <a href="https://pgx-db.org/drug_lookup/" target="_blank">'Drug search'</a> page. Click on ATC code in the "ATC code" column. The diseases with their disease-indication association studies will be shown in a network style</p>
+                <br>
+                </b><span style="font-style: italic;">In this example for "Efavirenz", its has 3 ATC codes: "J05AR06", "J05AG03", and "J05AR11". Click on the link underlying code, i.e., "J05AR06" will open a new page. There is an abundance of information in this page.</span>
+                <img style="width: 100%; height: 100%; border: #6c757d 1px solid;" src="/static/home/images/Expected-result-tut7.png" alt="">
+                <br>
+                </b><span style="font-style: italic;">To see the maximum clinical trials, look into the upper table in the right panel at the "List of diseases in studies" columns. The diseases will be listed and arranged based on the phases of trials</span>
+                <img style="width: 100%; height: 100%; border: #6c757d 1px solid;" src="/static/home/images/Expected-result-tut7-2.png" alt="">
+            </div>
+        </section>
+        <!-- Find diseases with clinical trial of phase 4 of an indication/drug  -->
+        <section id="find_disease_trail4_tut" class="tutorial_container">
+            <div class="tutorial_content">
+                <header class="header_drug">
+                    <a class="back_to_top" href="#tutorial_list">Back to top</a>
+                    <h2>
+                        Find diseases in clinical trial phase 4 of a drug, details about those diseases
+                    </h2>
+                </header>
+                <p class ="tutorial_explanation">Input a single drug name or drug bank ID (i.e., <i>Bepridil</i>) on the <a href="https://pgx-db.org/drug_lookup/" target="_blank">'Drug search'</a> page. Click on ATC code in the "ATC code" column. The diseases with their disease-indication association studies will be shown in a network style</p>
+                <br>
+                </b><span style="font-style: italic;">In this example for "Efavirenz", its has 3 ATC codes: "J05AR06", "J05AG03", and "J05AR11". Click on the link underlying code, i.e., "J05AR06" will open a new page. There is an abundance of information in this page.</span>
+                <img style="width: 100%; height: 100%; border: #6c757d 1px solid;" src="/static/home/images/Expected-result-tut7.png" alt="">
+                <br>
+                </b><span style="font-style: italic;">Users can look into the upper table in the right panel at the "List of diseases in studies" columns for check for disease names listed in "Phase 4" line. For more information, in the pop-up diaglog, users can check in the box for "Phase 4". The drug-disease network will be shown where users could also see classes of diseases. When hovering around disease icons (in triangle shapes), a link for further disease information will be shown</span>
+                <img style="width: 100%; height: 100%; border: #6c757d 1px solid;" src="/static/home/images/Expected-result-tut8-1.png" alt="">
+                <img style="width: 100%; height: 100%; border: #6c757d 1px solid;" src="/static/home/images/Expected-result-tut8-2.png" alt="">
+            </div>
+        </section>
+        
     
         <!-- disease  -->
         <section id="search_indication_tut" class="tutorial_container">
             <div class="tutorial_content">
-                <header id="header_indication">
+                <header class="header_indication">
                     <a class="back_to_top" href="#tutorial_list">Back to top</a>
                     <h2>
                         Search an indication of interest
@@ -241,7 +366,7 @@
         <!-- target  -->
         <section id="search_protein_tut" class="tutorial_container">
             <div class="tutorial_content">
-                <header id="header_target">
+                <header class="header_target">
                     <a class="back_to_top" href="#tutorial_list">Back to top</a>
                     <h2 >
                         Search a protein/target/gene of interest
@@ -251,11 +376,26 @@
                 <img class="scale-needed" src="/static/home/images/target_search.png" alt="">
             </div>
         </section>
-    
+        
+        <!-- target  -->
+        <section id="drugs_interacting_with_protein_tut" class="tutorial_container">
+            <div class="tutorial_content">
+                <header class="header_target">
+                    <a class="back_to_top" href="#tutorial_list">Back to top</a>
+                    <h2 >
+                        Find drugs interacting with a protein
+                    </h2>
+                </header>
+                <p class ="tutorial_explanation">Users can input a single protein name or protein uniprot ID or gene name or gene identifier on the <a href="https://pgx-db.org/target_lookup/" target="_blank">'Protein search'</a> page to launch the search process. The table beneath gives quick protein examples</p>
+                <br>
+                </b><span style="font-style: italic;">In the result table, look at the "Interacting drugs" column to see the list of drugs interacting (targeting, or being transported, carried or catalysed) by this protein</span>
+                <img style="width: 100%; height: 100%; border: #6c757d 1px solid;" src="/static/home/images/Expected-result-tut10.png" alt="">
+            </div>
+        </section>
         <!-- variant  -->
         <section id="search_variant_tut" class="tutorial_container">
             <div class="tutorial_content">
-                <header id="header_variant">
+                <header class="header_variant">
                     <a class="back_to_top" href="#tutorial_list">Back to top</a>
                     <h2>
                         Search a variant of interest 
@@ -268,7 +408,7 @@
         <!-- variant comprehending  -->
         <section id="variant_comprehensive_check_tut" class="tutorial_container">
             <div class="tutorial_content">
-                <header id="header_variant">
+                <header class="header_variant">
                     <a class="back_to_top" href="#tutorial_list">Back to top</a>
                     <h2>
                         Evaluate the overall impact of a variant 
@@ -288,11 +428,54 @@
                 <img style="width: 100%; height: 100%; border: #6c757d 1px solid;" src="/static/home/images/Expected-result-uc3-2.png" alt="">
             </div>
         </section>
+
+        <!-- residues with significant effects  -->
+        <section id="residues_significant_effects_tut" class="tutorial_container">
+            <div class="tutorial_content">
+                <header class="header_variant">
+                    <a class="back_to_top" href="#tutorial_list">Back to top</a>
+                    <h2>
+                        Find residues with signigicant effects in a protein 
+                    </h2>
+                </header>
+                <p class ="tutorial_explanation">
+                <b><i class="uc_element">Objective:</i></b> given a protein, find residue spots that have variants with high predicted effect scores.</p>   
+                <br><br>
+                <b><i class="uc_element">How:</i></b> First, navigating to the <a href="https://pgx-db.org/target_lookup/" target="_blank">'Target search'</a> page, enter the protein UniProt accession number or protein name or gene name (e.g. Serotonin receptor 3E) in the search box. Second, click on "Link" in the "Details" column in the "Result(s)" table. 
+                <br><br>
+                <b><i class="uc_element">Expected results:</i></b><span style="font-style: italic;"> (This screenshot shows only a portion of the full results).</span>
+                <br><br>
+                </b><span style="font-style: italic;"> Search result table </span>
+                <img style="width: 100%; height: 100%; border: #6c757d 1px solid;" src="/static/home/images/Expected-result-tut4.png" alt="">
+                <br><br>
+                </b><span style="font-style: italic;">The upper left panel of the new page opened shows color-coded amino acids of the protein. Underlined residues with darker colors have variants with higher predicted significant effects. Click on interested residues to see their variant information.</span>
+                <img style="width: 100%; height: 100%; border: #6c757d 1px solid;" src="/static/home/images/Expected-result-tut4-2.png" alt="">
+            </div>
+        </section>
+
+        <!-- Find missense variants with predicted effect scores above a value, i.e, 0.7, given a gene  -->
+        <section id="find_significant_variants_tut" class="tutorial_container">
+            <div class="tutorial_content">
+                <header class="header_variant">
+                    <a class="back_to_top" href="#tutorial_list">Back to top</a>
+                    <h2>
+                        Find missense variants with predicted effect scores above a value, i.e, 0.7, given a gene
+                    </h2>
+                </header>
+                <p class ="tutorial_explanation">Input a gene name, gene ID or protein name on the <a href="https://pgx-db.org/drug_lookup/" target="_blank">'Protein search'</a> page to launch the search process. In the result table, click on the link in the "Details" column to open the specific page for that gene/protein</p>
+                <img style="width: 100%; height: 100%; border: #6c757d 1px solid;" src="/static/home/images/Expected-result-tut9-1.png" alt="">
+                <br>
+                </b><span style="font-style: italic;">In the new page, look at the lower right: the first column shows all variants of this gene while the "Mean VEP scores" columns shows the mean of variant effect prediction scores for each variant from 40 different prediction algorithms. Users can use "Min" and "Max" input box to filter variants of interest. In this example, specify min as 0.7 this make the table shows only variants with mean VEP scores of 0.7 or higher.</span>
+                <img style="width: 100%; height: 100%; border: #6c757d 1px solid;" src="/static/home/images/Expected-result-tut9-2.png" alt="">
+            </div>
+        </section>
+
+        
     
         <!-- API   -->
         <section id="api_tut" class="tutorial_container">
             <div class="tutorial_content">
-                <header id = "header_api">
+                <header class = "header_api">
                     <a class="back_to_top" href="#tutorial_list">Back to top</a>
                     <h2>
                         Download data programmatically
@@ -306,7 +489,7 @@
         <!-- overall statistics   -->
         <section id="overall_statistics_tut" class="tutorial_container">
             <div class="tutorial_content">
-                <header id="header_statistic">
+                <header class="header_statistic">
                     <a class="back_to_top" href="#tutorial_list">Back to top</a>
                     <h2>
                         Grasp a quick overview of data of each types (drug, gene/target, disease) in PGxDB
