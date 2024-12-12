@@ -1,7 +1,7 @@
-# Pharmacogenomics
-
+# Pharmacogenomics database
+In the rapidly evolving field of pharmacogenomics, the demand for efficient and user-friendly tools to access and analyze genetic data in the context of medication-use has never been greater. Researchers and healthcare professionals seek solutions that empower them to explore the intricate relationship between an individual's genetic makeup and their response to various drugs. To meet this need, we have developed an interactive web-based resource, PGxDB, offering a dynamic platform for comprehensive pharmacogenomics research and hypothesis testing covering diverse data types. 
 ## Introduction
-
+This repo serves as a code base for PGxDB
 ## How to start
 ### Prerequisites
 * Python 3.8++
