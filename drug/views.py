@@ -93,7 +93,7 @@ class DiseaseAssociationByDrugView:
                                             "Reference link": association.link,
                                             }
                                     result.append(temp)
-                        if len(results)>0:
+                        if len(result)>0:
                             response_data = {
                                 f"Indication(s) associated with the drug {drug.name} ({drug_id})": result,
                             }

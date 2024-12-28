@@ -13,11 +13,13 @@ from django.core.cache import cache
 from variant.models import GenebassCategory, VariantPhenocode
 import pandas as pd
 
+
+#Drug
 class DrugToDiseaseAssociationRestApiView(DiseaseAssociationByDrugView, APIView,):
     allowed_methods = ['get']
     @swagger_auto_schema(
             operation_description="Retrieves a comprehensive list of disease association studies for a specified drug, identified by its DrugBank ID. The data returned includes disease name, disease class, clinical trial phase, reference link",
-            operation_summary="Get a list of disease association studies of a drug given its drugbank ID",
+            operation_summary="Get a list of disease association studies of a drug given a drugbank ID",
     )
     def get(self, request, *args, **kwargs):
         serializer = TargetDrugSerializer(data=self.kwargs)
@@ -41,53 +43,6 @@ class DrugToDrugAdrRestApiView(AdrByDrugView, APIView,):
         else:
             return Response(serializer.errors, status=400)
 
-class VariantToVepRestApiView(VEPFromVariantBaseView, APIView,):
-    allowed_methods = ['get']
-    @swagger_auto_schema(
-            operation_description="Retrieves a list of variant effect prediction scores for a specified variant, identified by its identifier. The data returned includes 40 scores from different algorithms including AlphaMissense, pathogenicity, Polyphen2, SIFT",
-            operation_summary="Get all VEP scores for a variant",
-    )
-
-    def get(self, request, *args, **kwargs):
-        serializer = VariantSerializer(data=self.kwargs)
-        if serializer.is_valid():
-            data = self.get_vep_from_variant(serializer.validated_data.get('variant_marker'))
-            return Response(data)
-        else:
-            return Response(serializer.errors, status=400)
-
-class GeneVariantRestApiView(BasicVariantAnnotationFromGeneIDView,APIView,):
-    allowed_methods = ['get']
-    @swagger_auto_schema(
-            operation_description="Retrieves a list of variants occur in a specified variant, identified by its Enseml ID. The data returned includes transcript, consequence, cDNA position, CDS position, protein position, wildtype amino acid, mutant amino acid, respective codons, impact and allele frequency",
-            operation_summary="Get basic annotations of all variants on a gene given its gene Enseml ID",
-    )
-
-    def get(self, request, *args, **kwargs):
-        serializer = GeneDetailSerializer(data=self.kwargs)
-
-        if serializer.is_valid():
-            gene_data = self.get_basic_annotation_for_all_variant_by_gene(self.kwargs.get('gene_id'))
-            # array_data = gene_data.get('array', [])
-            # returned_data = []
-            # for variant in array_data:
-            #     d = {
-            #         "Variant_marker": variant[0],
-            #         "Transcript_ID": variant[1],
-            #         "Consequence": variant[2],
-            #         "cDNA_position": variant[3],
-            #         "CDS_position": variant[4],
-            #         "Protein_position": variant[5],
-            #         "Amino_acids": variant[6],
-            #         "Codons": variant[7],
-            #         "Impact": variant[8],
-            #     }
-                
-                # returned_data.append(d)
-            return Response({'Basic information about variants of gene '+self.kwargs.get("gene_id"): gene_data})
-        else:
-            return Response(serializer.errors, status=400)
-        
 class DrugByGeneRestApiView(DrugByGeneBaseView,APIView,):
     allowed_methods = ['get']
     @swagger_auto_schema(
@@ -132,35 +87,6 @@ class DrugByGeneRestApiView(DrugByGeneBaseView,APIView,):
         else:
             return Response(serializer.errors, status=400)
 
-# class DrugByGeneRestApiView(DrugByGeneBaseView,APIView,):
-#     allowed_methods = ['get']
-#     @swagger_auto_schema(
-#             operation_description="operation_description",
-#             operation_summary="Get a list of all drugs that target a gene given its gene Ensembl ID",
-#             manual_parameters=[openapi.Parameter('name', openapi.IN_QUERY, description="name", type=openapi.TYPE_STRING)]
-#     )
-
-#     def get(self, request, *args, **kwargs):
-#         serializer = GeneDetailSerializer(data=self.kwargs)
-
-#         if serializer.is_valid():
-#             data = self.get_drug_by_gene_data(serializer.validated_data.get('gene_id'))
-#             table_data = data.get('list_of_targeting_drug', [])
-#             returned_data = []
-#             for index, row in table_data.iterrows():
-#                 d={
-#                     "drug_bankID":row["drug_bankID"],
-#                     "actions":row["actions"],
-#                     "known_action":row["known_action"],
-#                     "interaction_type":row["interaction_type"],
-
-#                 }
-#                 returned_data.append(d)
-#             return Response({"List of targeting drugs: ": returned_data})
-#         else:
-#             return Response(serializer.errors, status=400)
-
-
 class DrugsByAtcRestApiView(DrugByAtcBaseView,APIView,):
     allowed_methods = ['get']
     @swagger_auto_schema(
@@ -188,7 +114,6 @@ class DrugsByAtcRestApiView(DrugByAtcBaseView,APIView,):
 
         else:
             return Response(serializer.errors, status=400)
-
 
 class DrugTargetInteractionByAtcRestApiView(DrugTargetInteractionByAtcBaseView,APIView,):
     allowed_method = ["get"]
@@ -233,7 +158,9 @@ class DrugDiseaseAssociationByAtcRestApiView(DrugDiseaseAssociationByAtcBaseView
                 return Response({"List of drug-indication associations: ": associations_by_atc_code})
         else:
             return Response(serializer.errors, status=400)
-        
+
+
+#ATC code
 class AtcToDescriptionRestApiView(DescriptionByAtcBaseView,APIView,):
     allowed_method = ["get"]
     @swagger_auto_schema(
@@ -288,35 +215,6 @@ class AtcCodesByLevelRestApiView(AtcCodesByLevelBaseView,APIView,):
         else:
             return Response(serializer.errors, status=400)
 
-class TargetsByDrugRestApiView(TargetsByDrugBaseView,APIView,):
-    allowed_method = ["get"]
-    @swagger_auto_schema(
-            operation_description="operation_description",
-            operation_summary="Get a list of all proteins targeted by a drug given its drugbank ID",
-    )
-
-    def get(self, request, *args, **kwargs):
-        serializer = TargetDrugSerializer(data=self.kwargs)
-
-        if serializer.is_valid():
-            data = self.get_targets_by_drug(serializer.validated_data.get('drug_id')).get("list_of_targets")
-            
-            if len(data)==1 and type(data[0])=="list":
-                return Response(data)
-            else:
-                returned_data = []
-                for pair in data:
-                    temp = {
-                        "UniProt_ID": pair[0],
-                        "Protein name": pair[1],
-                        "Gene ID": pair[2],
-                        "Gene name": pair[3],
-                    }
-                    returned_data.append(temp)
-                return Response({"All targeted protein of "+self.kwargs.get("drug_id"): returned_data})
-        else:
-            return Response(serializer.errors, status=400)
-
 class AtcToPgxRestApiView(PGxByAtcCodeView,APIView,):
     allowed_method = ["get"]
     @swagger_auto_schema(
@@ -337,7 +235,6 @@ class AtcToPgxRestApiView(PGxByAtcCodeView,APIView,):
                 return Response({f"ATC Pharmacogenomics for {atc_code}": "No results or wrong input. Please check it again!"})
         else:
             return Response(serializer.errors, status=400)
-        
 
 class AtcCodesByDrugRestApiView(AtcCodesByDrugView,APIView,):
     allowed_method = ["get"]
@@ -361,9 +258,9 @@ class AtcCodesByDrugRestApiView(AtcCodesByDrugView,APIView,):
                 return Response({"ATC code of drug "+self.kwargs.get("drug_id"): temp})
         else:
             return Response(serializer.errors, status=400)
-        
 
 
+#Gene/Target
 class GenebasedAssociationStatisticsRestApiView(GenebasedAssociationStatisticsView,APIView,):
     allowed_method = ["get"]
     @swagger_auto_schema(
@@ -407,7 +304,6 @@ class GenebasedAssociationStatisticsRestApiView(GenebasedAssociationStatisticsVi
         else:
             return Response(serializer.errors, status=400)
 
-
 class TargetToBundleRestApiView(BundleByTargetCodeView,APIView,):
     allowed_method = ["get"]
     @swagger_auto_schema(
@@ -424,3 +320,80 @@ class TargetToBundleRestApiView(BundleByTargetCodeView,APIView,):
         else:
             return Response(serializer.errors, status=400)
     
+class TargetsByDrugRestApiView(TargetsByDrugBaseView,APIView,):
+    allowed_method = ["get"]
+    @swagger_auto_schema(
+            operation_description="operation_description",
+            operation_summary="Get a list of all proteins targeted by a drug given its drugbank ID",
+    )
+
+    def get(self, request, *args, **kwargs):
+        serializer = TargetDrugSerializer(data=self.kwargs)
+
+        if serializer.is_valid():
+            data = self.get_targets_by_drug(serializer.validated_data.get('drug_id')).get("list_of_targets")
+            
+            if len(data)==1 and type(data[0])=="list":
+                return Response(data)
+            else:
+                returned_data = []
+                for pair in data:
+                    temp = {
+                        "UniProt_ID": pair[0],
+                        "Protein name": pair[1],
+                        "Gene ID": pair[2],
+                        "Gene name": pair[3],
+                    }
+                    returned_data.append(temp)
+                return Response({"All targeted protein of "+self.kwargs.get("drug_id"): returned_data})
+        else:
+            return Response(serializer.errors, status=400)
+
+#Variant
+class VariantToVepRestApiView(VEPFromVariantBaseView, APIView,):
+    allowed_methods = ['get']
+    @swagger_auto_schema(
+            operation_description="Retrieves a list of variant effect prediction scores for a specified variant, identified by its identifier. The data returned includes 40 scores from different algorithms including AlphaMissense, pathogenicity, Polyphen2, SIFT",
+            operation_summary="Get all VEP scores for a variant",
+    )
+
+    def get(self, request, *args, **kwargs):
+        serializer = VariantSerializer(data=self.kwargs)
+        if serializer.is_valid():
+            data = self.get_vep_from_variant(serializer.validated_data.get('variant_marker'))
+            return Response(data)
+        else:
+            return Response(serializer.errors, status=400)
+
+class GeneVariantRestApiView(BasicVariantAnnotationFromGeneIDView,APIView,):
+    allowed_methods = ['get']
+    @swagger_auto_schema(
+            operation_description="Retrieves a list of variants occur in a specified variant, identified by its Enseml ID. The data returned includes transcript, consequence, cDNA position, CDS position, protein position, wildtype amino acid, mutant amino acid, respective codons, impact and allele frequency",
+            operation_summary="Get basic annotations of all variants on a gene given its gene Enseml ID",
+    )
+
+    def get(self, request, *args, **kwargs):
+        serializer = GeneDetailSerializer(data=self.kwargs)
+
+        if serializer.is_valid():
+            gene_data = self.get_basic_annotation_for_all_variant_by_gene(self.kwargs.get('gene_id'))
+            # array_data = gene_data.get('array', [])
+            # returned_data = []
+            # for variant in array_data:
+            #     d = {
+            #         "Variant_marker": variant[0],
+            #         "Transcript_ID": variant[1],
+            #         "Consequence": variant[2],
+            #         "cDNA_position": variant[3],
+            #         "CDS_position": variant[4],
+            #         "Protein_position": variant[5],
+            #         "Amino_acids": variant[6],
+            #         "Codons": variant[7],
+            #         "Impact": variant[8],
+            #     }
+                
+                # returned_data.append(d)
+            return Response({'Basic information about variants of gene '+self.kwargs.get("gene_id"): gene_data})
+        else:
+            return Response(serializer.errors, status=400)
+        
