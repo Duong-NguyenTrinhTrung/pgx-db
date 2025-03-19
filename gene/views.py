@@ -131,22 +131,23 @@ class BasicVariantAnnotationFromGeneIDView(object):
                 try:
                     results = []
                     primary_ts = Gene.objects.get(gene_id=slug).primary_transcript
-                    data = VepVariant.objects.filter(Transcript_ID=primary_ts).values_list(*list_necessary_columns)
+                    data = VepVariant.objects.filter(Transcript_ID=primary_ts).values_list(["Variant_marker"]+*list_necessary_columns)
                     for i, item in enumerate(data):
                         consequence_list = item[1].split(",")
                         t = [name_dic.get(c) for c in consequence_list]
 
                         results.append({
-                            "Transcript_ID": item[0],
+                            "Variant_Identifier": item[0].VariantMarker,
+                            "Transcript_ID": item[1],
                             "Consequence": ",".join(t),
-                            "cDNA_position": item[2],
-                            "CDS_position": item[3],
-                            "Protein_position": item[4],
-                            "Amino_acids": item[5],
-                            "Codons": item[6],
-                            "Impact": item[7],
-                            "Strand": item[8],
-                            "HighestAF": str(item[9])
+                            "cDNA_position": item[3],
+                            "CDS_position": item[4],
+                            "Protein_position": item[5],
+                            "Amino_acids": item[6],
+                            "Codons": item[7],
+                            "Impact": item[8],
+                            "Strand": item[9],
+                            "HighestAF": str(item[10])
                         })
                     # print("------results ", results)
 
