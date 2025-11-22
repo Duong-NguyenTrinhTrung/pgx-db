@@ -109,6 +109,7 @@ name_dic = {'NMD': 'NMD_transcript', 'cse': 'coding_sequence', 'fsh': 'frameshif
 # this is for API call
 class BasicVariantAnnotationFromGeneIDView(object):
     list_necessary_columns = [
+        "Variant_marker",
         "Transcript_ID",
         "Consequence",
         "cDNA_position",
@@ -131,7 +132,8 @@ class BasicVariantAnnotationFromGeneIDView(object):
                 try:
                     results = []
                     primary_ts = Gene.objects.get(gene_id=slug).primary_transcript
-                    data = VepVariant.objects.filter(Transcript_ID=primary_ts).values_list(["Variant_marker"]+*list_necessary_columns)
+                    data = VepVariant.objects.filter(Transcript_ID=primary_ts).values_list(*list_necessary_columns)
+                    # data = VepVariant.objects.filter(Transcript_ID=primary_ts).values_list(["Variant_marker"]+*list_necessary_columns)
                     for i, item in enumerate(data):
                         consequence_list = item[1].split(",")
                         t = [name_dic.get(c) for c in consequence_list]
