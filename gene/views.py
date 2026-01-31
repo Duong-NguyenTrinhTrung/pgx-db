@@ -339,7 +339,7 @@ class GenebasedAssociationStatisticsView:
                     category = temp.iloc[0, 8]
                     temp.iloc[0, 8] = GenebassCategory.objects.get(category_code=category).category_description
 
-                    table = table.append(temp, ignore_index=True)
+                    table = pd.concat([table, temp], ignore_index=True)
                     table.fillna('', inplace=True)
             table.columns=["markerID", "phenocode", "n_cases", "n_controls", "n_cases_defined", "n_cases_both_sexes", "n_cases_females", \
                     "n_cases_males", "category", "AC", "AF", "BETA", "SE", "AF_Cases", "AF_Controls", "Pvalue"]
@@ -370,7 +370,7 @@ class DrugByGeneBaseView(object):
                         uniprot_ID=protein_ID).values_list("drug_bankID", "actions", "known_action", "interaction_type")
                     for drug in drugs:
                         drug_df = pd.DataFrame([drug])
-                        results = results.append(drug_df, ignore_index=True)
+                        results = pd.concat([results, drug_df], ignore_index=True)
                     results.fillna('', inplace=True)
                     results.columns=["drug_bankID", "actions", "known_action", "interaction_type"]
                     context = dict()
@@ -474,7 +474,7 @@ def get_variant_annotation_and_vep(request, slug): #lower for one gene
                         *list_necessary_columns)
                     for vep_variant in vep_variants:
                         data_subset = parse_marker_data(marker, vep_variant)
-                        table = table.append(data_subset, ignore_index=True)
+                        table = pd.concat([table, pd.DataFrame([data_subset])], ignore_index=True)
             table.fillna('', inplace=True)
             table_with_mean_vep_score = []
             for i, data_row in enumerate(table.to_numpy()):
